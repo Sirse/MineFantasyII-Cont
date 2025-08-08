@@ -3,6 +3,7 @@ package minefantasy.mf2.network.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -33,10 +34,15 @@ public class AnvilPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        // Client-only sync of anvil state
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
-        if (entity != null && entity instanceof TileEntityAnvilMF) {
+        if (entity instanceof TileEntityAnvilMF) {
             floats[0] = packet.readFloat();
             floats[1] = packet.readFloat();
             floats[2] = packet.readFloat();
@@ -71,11 +77,9 @@ public class AnvilPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
-        for (int a = 0; a < floats.length; a++) {
-            packet.writeFloat(floats[a]);
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
+        for (float aFloat : floats) {
+            packet.writeFloat(aFloat);
         }
         packet.writeInt(tiers[0]);
         packet.writeInt(tiers[1]);

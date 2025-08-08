@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -20,11 +21,14 @@ public class TannerPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         float newAnim = packet.readFloat();
 
-        if (entity != null && entity instanceof TileEntityTanningRack) {
+        if (entity instanceof TileEntityTanningRack) {
             TileEntityTanningRack tile = (TileEntityTanningRack) entity;
             tile.acTime = newAnim;
         }
@@ -37,9 +41,7 @@ public class TannerPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeFloat(animation);
     }
 }

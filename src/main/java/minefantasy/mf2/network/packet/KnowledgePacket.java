@@ -5,10 +5,10 @@ import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 public class KnowledgePacket extends PacketMF {
     public static final String packetName = "MF2_KnowledgeSync";
@@ -26,7 +26,7 @@ public class KnowledgePacket extends PacketMF {
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
         int size = InformationList.knowledgeList.size();
-        ArrayList<Object[]> completed = new ArrayList<Object[]>();
+        ArrayList<Object[]> completed = new ArrayList<>();
         for (int a = 0; a < size; a++) {
             boolean unlocked = packet.readBoolean();
             int artefactCount = packet.readInt();
@@ -37,10 +37,8 @@ public class KnowledgePacket extends PacketMF {
             }
         }
         username = ByteBufUtils.readUTF8String(packet);
-        if (username != null && player.getCommandSenderName().equals(username)) {
-            Iterator researches = completed.iterator();
-            while (researches.hasNext()) {
-                Object[] entry = (Object[]) researches.next();
+        if (!NetworkUtils.isServer(player)) {
+            for (Object[] entry : completed) {
                 InformationBase base = (InformationBase) entry[0];
                 ResearchLogic.setArtefactCount(base.getUnlocalisedName(), player, (Integer) entry[2]);
                 if ((Boolean) entry[1]) {
@@ -48,8 +46,6 @@ public class KnowledgePacket extends PacketMF {
                 }
             }
         }
-        packet.clear();
-        completed = null;
     }
 
     @Override

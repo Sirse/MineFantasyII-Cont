@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityForge;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -27,7 +28,11 @@ public class ForgePacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         fuels[0] = packet.readFloat();
         fuels[1] = packet.readFloat();
         temps[0] = packet.readFloat();
@@ -37,7 +42,7 @@ public class ForgePacket extends PacketMF {
 
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
-        if (entity != null && entity instanceof TileEntityForge) {
+        if (entity instanceof TileEntityForge) {
             TileEntityForge tile = (TileEntityForge) entity;
             tile.fuel = fuels[0];
             tile.maxFuel = fuels[1];
@@ -55,9 +60,7 @@ public class ForgePacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeFloat(fuels[0]);
         packet.writeFloat(fuels[1]);
         packet.writeFloat(temps[0]);

@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityCrossbowBench;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -24,13 +25,17 @@ public class CrossbowBenchPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         float newProgress = packet.readFloat();
         float newMaxProgress = packet.readFloat();
         boolean newRecipe = packet.readBoolean();
 
-        if (entity != null && entity instanceof TileEntityCrossbowBench) {
+        if (entity instanceof TileEntityCrossbowBench) {
             TileEntityCrossbowBench tile = (TileEntityCrossbowBench) entity;
             tile.progress = newProgress;
             tile.maxProgress = newMaxProgress;
@@ -45,9 +50,7 @@ public class CrossbowBenchPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeFloat(progress);
         packet.writeFloat(maxProgress);
         packet.writeBoolean(hasRecipe);

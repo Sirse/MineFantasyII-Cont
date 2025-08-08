@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityResearch;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -25,13 +26,16 @@ public class ResearchTablePacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         float prog1 = packet.readFloat();
         float prog2 = packet.readFloat();
         int ID = packet.readInt();
 
-        if (entity != null && entity instanceof TileEntityResearch) {
+        if (entity instanceof TileEntityResearch) {
             progress[0] = prog1;
             progress[1] = prog2;
             id = ID;
@@ -50,9 +54,7 @@ public class ResearchTablePacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeFloat(progress[0]);
         packet.writeFloat(progress[1]);
         packet.writeInt(id);

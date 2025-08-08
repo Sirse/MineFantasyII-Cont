@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityChimney;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -22,10 +23,13 @@ public class ChimneyPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
-        if (entity != null && entity instanceof TileEntityChimney) {
+        if (entity instanceof TileEntityChimney) {
             TileEntityChimney tile = (TileEntityChimney) entity;
 
             int blockID = packet.readInt();
@@ -41,9 +45,7 @@ public class ChimneyPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeInt(block);
         packet.writeInt(meta);
     }

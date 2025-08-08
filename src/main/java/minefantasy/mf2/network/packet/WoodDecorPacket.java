@@ -1,8 +1,8 @@
 package minefantasy.mf2.network.packet;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -21,11 +21,15 @@ public class WoodDecorPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
-        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
-        materialName = ByteBufUtils.readUTF8String(packet);
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
 
-        if (entity != null && entity instanceof TileEntityWoodDecor) {
+        coords = NetworkUtils.readCoords(packet);
+        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
+        materialName = cpw.mods.fml.common.network.ByteBufUtils.readUTF8String(packet);
+
+        if (entity instanceof TileEntityWoodDecor) {
             TileEntityWoodDecor tile = (TileEntityWoodDecor) entity;
             tile.trySetMaterial(materialName);
         }
@@ -38,9 +42,7 @@ public class WoodDecorPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
-        ByteBufUtils.writeUTF8String(packet, materialName);
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
+        cpw.mods.fml.common.network.ByteBufUtils.writeUTF8String(packet, materialName);
     }
 }

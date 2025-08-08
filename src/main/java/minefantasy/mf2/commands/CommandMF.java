@@ -44,7 +44,7 @@ public class CommandMF implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
-        return null;
+    return "/minefantasy edit <material|quality|unbreakable> <value>";
     }
 
     @Override
@@ -54,29 +54,36 @@ public class CommandMF implements ICommand {
 
     @Override
     public void processCommand(ICommandSender iCommandSender, String[] strings) {
-        if (iCommandSender instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) iCommandSender;
-            if (strings.length > 0) {
-                if (strings[0].equalsIgnoreCase("edit")) {
-                    ItemStack equippedItem = player.getCurrentEquippedItem();
-                    if (equippedItem == null) {
-                        player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.invalid.item")));
-                        return;
-                    }
+        if (!(iCommandSender instanceof EntityPlayer)) {
+            return;
+        }
+        EntityPlayer player = (EntityPlayer) iCommandSender;
+        boolean hasPerms = player.capabilities.isCreativeMode || iCommandSender.canCommandSenderUseCommand(2, getCommandName());
+        if (!hasPerms) {
+            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.mf.no_permission")));
+            return;
+        }
 
-                    switch (strings[1]) {
-                        case "material":
-                            processEditMaterialCommand(strings, player, equippedItem);
-                            break;
-                        case "quality":
-                            processQualityCommand(strings, player, equippedItem);
-                            break;
-                        case "unbreakable":
-                            processUnbreakableCommand(strings, player, equippedItem);
-                            break;
-                    }
-                }
-            }
+        if (strings.length < 3 || !"edit".equalsIgnoreCase(strings[0])) {
+            player.addChatMessage(new ChatComponentText(getCommandUsage(iCommandSender)));
+            return;
+        }
+
+        ItemStack equippedItem = player.getCurrentEquippedItem();
+        if (equippedItem == null) {
+            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.invalid.item")));
+            return;
+        }
+
+        String sub = strings[1].toLowerCase();
+        if ("material".equals(sub)) {
+            processEditMaterialCommand(strings, player, equippedItem);
+        } else if ("quality".equals(sub)) {
+            processQualityCommand(strings, player, equippedItem);
+        } else if ("unbreakable".equals(sub)) {
+            processUnbreakableCommand(strings, player, equippedItem);
+        } else {
+            player.addChatMessage(new ChatComponentText(getCommandUsage(iCommandSender)));
         }
     }
 
@@ -98,17 +105,24 @@ public class CommandMF implements ICommand {
     }
 
     private void processQualityCommand(String[] strings, EntityPlayer player, ItemStack equippedItem) {
-        int qualityLvl = Integer.parseInt(strings[2]);
-        if (0 <= qualityLvl && qualityLvl <= 200) {
-            equippedItem = ToolHelper.setQuality(equippedItem, qualityLvl);
-            //this is only approximate trait calculation
-            if (qualityLvl <= 50) {
-                equippedItem.stackTagCompound.setBoolean("MF_Inferior", true);
+        try {
+            int qualityLvl = Integer.parseInt(strings[2]);
+            if (qualityLvl < 0 || qualityLvl > 200) {
+                player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.quality")));
+                return;
             }
-            if (qualityLvl >= 150) {
-                equippedItem.stackTagCompound.setBoolean("MF_Inferior", false);
+            ItemStack updated = ToolHelper.setQuality(equippedItem, qualityLvl);
+            if (updated.stackTagCompound != null) {
+                if (qualityLvl <= 50) {
+                    updated.stackTagCompound.setBoolean("MF_Inferior", true);
+                }
+                if (qualityLvl >= 150) {
+                    updated.stackTagCompound.setBoolean("MF_Inferior", false);
+                }
             }
             onSuccess(player);
+        } catch (NumberFormatException e) {
+            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.number")));
         }
     }
 
@@ -124,7 +138,7 @@ public class CommandMF implements ICommand {
 
     @Override
     public boolean canCommandSenderUseCommand(ICommandSender iCommandSender) {
-        return true;
+        return iCommandSender.canCommandSenderUseCommand(2, getCommandName());
     }
 
     @Override

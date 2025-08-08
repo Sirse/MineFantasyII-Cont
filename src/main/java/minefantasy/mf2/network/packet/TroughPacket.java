@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -20,11 +21,15 @@ public class TroughPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
-        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         int newFill = packet.readInt();
 
-        if (entity != null && entity instanceof TileEntityTrough) {
+        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
+        if (entity instanceof TileEntityTrough) {
             TileEntityTrough tile = (TileEntityTrough) entity;
             tile.fill = newFill;
         }
@@ -37,9 +42,7 @@ public class TroughPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeInt(fill);
     }
 }

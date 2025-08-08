@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -23,17 +24,24 @@ public class CogworkControlPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        if (!NetworkUtils.isServer(player)) {
+            return;
+        }
+
         int id = packet.readInt();
         forward = packet.readFloat();
         strafe = packet.readFloat();
         isJumping = packet.readBoolean();
         Entity entity = player.worldObj.getEntityByID(id);
 
-        if (entity != null && entity instanceof EntityCogwork) {
+        if (entity instanceof EntityCogwork) {
             suit = (EntityCogwork) entity;
-            suit.setMoveForward(forward);
-            suit.setMoveStrafe(strafe);
-            suit.setJumpControl(isJumping);
+
+            if (suit.riddenByEntity == player) {
+                suit.setMoveForward(forward);
+                suit.setMoveStrafe(strafe);
+                suit.setJumpControl(isJumping);
+            }
         }
     }
 

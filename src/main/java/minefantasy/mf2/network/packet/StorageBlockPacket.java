@@ -4,6 +4,7 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.tileentity.TileEntityComponent;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -30,7 +31,11 @@ public class StorageBlockPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         type = ByteBufUtils.readUTF8String(packet);
         tex = ByteBufUtils.readUTF8String(packet);
@@ -39,7 +44,7 @@ public class StorageBlockPacket extends PacketMF {
         stackSize = packet.readInt();
         max = packet.readInt();
 
-        if (entity != null && entity instanceof TileEntityComponent) {
+        if (entity instanceof TileEntityComponent) {
             TileEntityComponent tile = (TileEntityComponent) entity;
             tile.type = this.type;
             tile.tex = this.tex;
@@ -57,9 +62,7 @@ public class StorageBlockPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         ByteBufUtils.writeUTF8String(packet, type);
         ByteBufUtils.writeUTF8String(packet, tex);
         ByteBufUtils.writeUTF8String(packet, materialName);

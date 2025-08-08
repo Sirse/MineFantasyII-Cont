@@ -3,6 +3,7 @@ package minefantasy.mf2.network.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -24,12 +25,16 @@ public class AmmoBoxPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
+        coords = NetworkUtils.readCoords(packet);
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         stock = packet.readInt();
         ammo = ByteBufUtils.readItemStack(packet);
 
-        if (entity != null && entity instanceof TileEntityAmmoBox) {
+        if (entity instanceof TileEntityAmmoBox) {
             TileEntityAmmoBox tile = (TileEntityAmmoBox) entity;
             tile.ammo = this.ammo;
             tile.stock = this.stock;
@@ -43,9 +48,7 @@ public class AmmoBoxPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeInt(stock);
         ByteBufUtils.writeItemStack(packet, ammo);
     }

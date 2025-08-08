@@ -4,6 +4,7 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
@@ -30,8 +31,7 @@ public class LevelupPacket extends PacketMF {
         String name = ByteBufUtils.readUTF8String(packet);
         int skillLvl = packet.readInt();
 
-        username = ByteBufUtils.readUTF8String(packet);
-        if (username != null && player.getCommandSenderName().equalsIgnoreCase(username)) {
+        if (!NetworkUtils.isServer(player)) {
             Skill skill = RPGElements.getSkillByName(name);
 
             if (skill != null) {

@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.util.MFLogUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -25,6 +26,10 @@ public class TileInventoryPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
         int x = packet.readInt();
         int y = packet.readInt();
         int z = packet.readInt();
@@ -32,19 +37,19 @@ public class TileInventoryPacket extends PacketMF {
 
         TileEntity entity = player.worldObj.getTileEntity(x, y, z);
 
-        if (entity != null && entity instanceof IInventory) {
+        if (entity instanceof IInventory) {
             IInventory inv = (IInventory) entity;
-            for (int s = 0; s < size; s++) {
+            int limit = Math.min(size, inv.getSizeInventory());
+            for (int s = 0; s < limit; s++) {
                 ItemStack item = ByteBufUtils.readItemStack(packet);
-                if (s < inv.getSizeInventory()) {
-                    inv.setInventorySlotContents(s, item);
-                } else {
-                    item = null;
-                    MFLogUtil.logDebug("Dropped Packet Item " + s);
-                }
+                inv.setInventorySlotContents(s, item);
+            }
+
+            for (int s = limit; s < size; s++) {
+                ByteBufUtils.readItemStack(packet);
+                MFLogUtil.logDebug("Dropped Packet Item " + s);
             }
         }
-        packet.clear();
     }
 
     @Override

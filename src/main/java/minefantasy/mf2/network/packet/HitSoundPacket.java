@@ -3,6 +3,7 @@ package minefantasy.mf2.network.packet;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.config.ConfigClient;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -23,10 +24,13 @@ public class HitSoundPacket extends PacketMF {
     public void process(ByteBuf packet, EntityPlayer player) {
         entId = packet.readInt();
         sound = ByteBufUtils.readUTF8String(packet);
-        Entity entity = player.worldObj.getEntityByID(entId);
-        if (entity != null) {
-            if (ConfigClient.playHitsound) {
-                entity.worldObj.playSound(entity.posX, entity.posY, entity.posZ, sound, 1.0F, 1.0F, false);
+
+        if (!NetworkUtils.isServer(player)) {
+            Entity entity = player.worldObj.getEntityByID(entId);
+            if (entity != null) {
+                if (ConfigClient.playHitsound) {
+                    entity.worldObj.playSound(entity.posX, entity.posY, entity.posZ, sound, 1.0F, 1.0F, false);
+                }
             }
         }
     }

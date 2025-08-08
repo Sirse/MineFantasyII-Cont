@@ -2,6 +2,7 @@ package minefantasy.mf2.network.packet;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityRoad;
+import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -28,27 +29,29 @@ public class RoadPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        this.coords = new int[]{packet.readInt(), packet.readInt(), packet.readInt()};
+        this.coords = NetworkUtils.readCoords(packet);
         isRequest = packet.readBoolean();
 
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
+        if (!(entity instanceof TileEntityRoad)) {
+            return;
+        }
+        TileEntityRoad tile = (TileEntityRoad) entity;
 
-        if (entity != null && entity instanceof TileEntityRoad) {
-            TileEntityRoad tile = (TileEntityRoad) entity;
-            if (isRequest) {
+        if (isRequest) {
+            if (NetworkUtils.isServer(player)) {
                 tile.sendPacketToClients();
-            } else {
+            }
+        } else {
+            if (!NetworkUtils.isServer(player)) {
                 int s0 = packet.readInt();
                 int s1 = packet.readInt();
                 this.isLocked = packet.readBoolean();
-
                 tile.surface = new int[]{s0, s1};
                 tile.isLocked = this.isLocked;
-
                 tile.refreshSurface();
             }
         }
-        packet.clear();
     }
 
     @Override
@@ -58,9 +61,7 @@ public class RoadPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        for (int a = 0; a < coords.length; a++) {
-            packet.writeInt(coords[a]);
-        }
+        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
         packet.writeBoolean(isRequest);
 
         if (!isRequest) {

@@ -48,13 +48,28 @@ public class PacketHandlerMF {
 
     @SubscribeEvent
     public void onServerPacket(FMLNetworkEvent.ServerCustomPacketEvent event) {
-        packetList.get(event.packet.channel()).process(event.packet.payload(),
-                ((NetHandlerPlayServer) event.handler).playerEntity);
+        PacketMF handler = packetList.get(event.packet.channel());
+        if (handler == null) {
+            return;
+        }
+        try {
+            handler.process(event.packet.payload(), ((NetHandlerPlayServer) event.handler).playerEntity);
+        } catch (Throwable t) {
+            // Supressed
+        }
     }
 
     @SubscribeEvent
     public void onClientPacket(FMLNetworkEvent.ClientCustomPacketEvent event) {
-        packetList.get(event.packet.channel()).process(event.packet.payload(), MineFantasyII.proxy.getClientPlayer());
+        PacketMF handler = packetList.get(event.packet.channel());
+        if (handler == null) {
+            return;
+        }
+        try {
+            handler.process(event.packet.payload(), MineFantasyII.proxy.getClientPlayer());
+        } catch (Throwable t) {
+            // Supressed
+        }
     }
 
     public void sendPacketToPlayer(FMLProxyPacket packet, EntityPlayerMP player) {
