@@ -1,134 +1,86 @@
 package minefantasy.mf2.container;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerBlastHeater extends Container {
-    private TileEntityBlastFH tile;
-    private boolean isGuiContainer = false;
-    private int lastFuel;
-    private int lastFuelMax;
+public class ContainerBlastHeater extends ContainerMF {
+    private static final int FUEL_SLOT = 0;
+    private static final int HEATER_SLOT_COUNT = 1;
+
+    private final TileEntityBlastFH tile;
+
+    private final int playerInventoryStartIndex;
 
     public ContainerBlastHeater(InventoryPlayer user, TileEntityBlastFH tile) {
-        isGuiContainer = true;
         this.tile = tile;
+        this.addSlotToContainer(new SlotFiltered(tile, FUEL_SLOT, 80, 76));
 
-        this.addSlotToContainer(new Slot(tile, 0, 80, 76));
+        this.playerInventoryStartIndex = HEATER_SLOT_COUNT;
+        this.addPlayerInventory(user, 0, 126);
 
-        int i;
-
-        for (i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlotToContainer(new Slot(user, j + i * 9 + 9, 8 + j * 18, 126 + i * 18));
-            }
-        }
-
-        for (i = 0; i < 9; ++i) {
-            this.addSlotToContainer(new Slot(user, i, 8 + i * 18, 184));
-        }
+        trackInt(() -> tile.fuel, value -> tile.fuel = value);
+        trackInt(() -> tile.maxFuel, value -> tile.maxFuel = value);
     }
 
     @Override
-    public void detectAndSendChanges() {
-        for (int i = 0; i < this.crafters.size(); ++i) {
-            ICrafting icrafting = (ICrafting) this.crafters.get(i);
-
-            if (this.lastFuel != tile.fuel) {
-                icrafting.sendProgressBarUpdate(this, 0, tile.fuel);
-            }
-
-            if (this.lastFuelMax != tile.maxFuel) {
-                icrafting.sendProgressBarUpdate(this, 1, tile.maxFuel);
-            }
-        }
-        this.lastFuel = tile.fuel;
-        this.lastFuelMax = tile.maxFuel;
-
-        for (int i = 0; i < this.inventorySlots.size(); ++i) {
-            ItemStack itemstack = ((Slot) this.inventorySlots.get(i)).getStack();
-            ItemStack itemstack1 = (ItemStack) this.inventoryItemStacks.get(i);
-
-            if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-                if (isGuiContainer) {
-                    tile.onInventoryChanged();
-                }
-
-                itemstack1 = itemstack == null ? null : itemstack.copy();
-                this.inventoryItemStacks.set(i, itemstack1);
-
-                for (int j = 0; j < this.crafters.size(); ++j) {
-                    ((ICrafting) this.crafters.get(j)).sendSlotContents(this, i, itemstack1);
-                }
-            }
-        }
+    public boolean canInteractWith(EntityPlayer player) {
+        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void updateProgressBar(int id, int value) {
-        if (id == 0) {
-            tile.fuel = value;
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
+            return null;
+        }
+        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
+        if (slot == null || !slot.getHasStack()) {
+            return null;
         }
 
-        if (id == 1) {
-            tile.maxFuel = value;
-        }
-    }
+        ItemStack stackInSlot = slot.getStack();
+        ItemStack originalStack = stackInSlot.copy();
+        boolean merged = false;
 
-    @Override
-    public boolean canInteractWith(EntityPlayer p_75145_1_) {
-        return this.tile.isUseableByPlayer(p_75145_1_);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer user, int clicked) {
-        ItemStack itemstack = null;
-        Slot slot = (Slot) this.inventorySlots.get(clicked);
-
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-
-            if (clicked > 0)// INVENTORY
-            {
-                if (TileEntityBlastFH.isFuel(itemstack1)) {
-                    if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
-                        return null;
-                    }
-                } else if (clicked >= 1 && clicked < 28)// INVENTORY
-                {
-                    if (!this.mergeItemStack(itemstack1, 28, 37, false)) {
-                        return null;
-                    }
+        if (slotIndex < HEATER_SLOT_COUNT) {
+            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
+                merged = true;
+            }
+        } else {
+            if (tile.isItemValidForSlot(FUEL_SLOT, stackInSlot)) {
+                if (this.mergeItemStack(stackInSlot, FUEL_SLOT, HEATER_SLOT_COUNT, false)) {
+                    merged = true;
                 }
-                // BAR
-                else if (clicked >= 28 && clicked < 37 && !this.mergeItemStack(itemstack1, 1, 28, false)) {
-                    return null;
+            }
+            if (!merged) {
+                int mainStart = playerInventoryStartIndex;
+                int mainEnd = mainStart + 27;
+                int hotbarEnd = this.inventorySlots.size();
+
+                if (slotIndex >= mainStart && slotIndex < mainEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainEnd, hotbarEnd, false);
+                } else if (slotIndex >= mainEnd && slotIndex < hotbarEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainStart, mainEnd, false);
                 }
-            } else if (!this.mergeItemStack(itemstack1, 1, 37, false)) {
-                return null;
             }
-
-            if (itemstack1.stackSize == 0) {
-                slot.putStack((ItemStack) null);
-            } else {
-                slot.onSlotChanged();
-            }
-
-            if (itemstack1.stackSize == itemstack.stackSize) {
-                return null;
-            }
-
-            slot.onPickupFromSlot(user, itemstack1);
         }
 
-        return itemstack;
+        if (!merged) {
+            return null;
+        }
+
+        if (stackInSlot.stackSize == 0) {
+            slot.putStack(null);
+        } else {
+            slot.onSlotChanged();
+        }
+
+        if (stackInSlot.stackSize == originalStack.stackSize) {
+            return null;
+        }
+        slot.onPickupFromSlot(player, stackInSlot);
+        return originalStack;
     }
 }

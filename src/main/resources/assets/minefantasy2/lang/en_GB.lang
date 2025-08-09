@@ -15,6 +15,7 @@ knowledge.armourpro=Armour Proficiency
 knowledge.armourpro.1=After all this time, your core has become stronger.^Armour penalty to stamina cost is halved.
 
 knowledge.cogArmour.desc=Power Armour
+gui.noproject=No Project Set
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /ITEM STATS/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

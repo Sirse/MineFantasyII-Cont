@@ -23,46 +23,60 @@ import net.minecraft.tileentity.TileEntity;
 import java.util.Random;
 
 public class TileEntityCrucible extends TileEntity implements IInventory, ISidedInventory, IHeatUser {
-    private final int[] grid = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
-    private final int[] output = new int[]{9};
-    private final int[] whole = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    public float progress = 0, progressMax = 400;
+    // Constants
+    private static final int GRID_SLOT_COUNT = 9;
+    private static final int OUTPUT_SLOT = 9;
+    private static final int INVENTORY_SIZE = 10;
+    private static final float BASE_PROGRESS_MAX = 400F;
+    private static final float ADVANCED_PROGRESS_MAX = 2000F;
+    private static final float SMELT_TEMPERATURE_THRESHOLD = 600F;
+
+    private final int[] gridSlots = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
+    private final int[] outputSlots = new int[]{OUTPUT_SLOT};
+    private final int[] allSlots = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    public float progress = 0;
+    public float progressMax = BASE_PROGRESS_MAX;
     public float temperature;
-    private ItemStack[] inv = new ItemStack[10];
-    private Random rand = new Random();
+    private ItemStack[] inventory = new ItemStack[INVENTORY_SIZE];
+    private final Random rand = new Random();
+    private ItemStack cachedRecipeOutput;
 
     @Override
     public void updateEntity() {
         super.updateEntity();
-        boolean isHot = getIsHot();
-        temperature = getTemperature();
-        if (getTier() >= 2) {
-            progressMax = 2000;
+
+        if (worldObj.isRemote) {
+            return;
         }
 
-        /*
-         * int time = 400; for(int a = 1; a < getSizeInventory()-1; a ++) { if(inv[a] !=
-         * null) { time += 50; } } if(!worldObj.isRemote) { progressMax = time; }
-         */
+        boolean wasHot = getIsHot();
+        this.temperature = getTemperature();
+        this.progressMax = (getTier() >= 2) ? ADVANCED_PROGRESS_MAX : BASE_PROGRESS_MAX;
 
-        if (isHot && canSmelt()) {
-            progress += (temperature / 600F);
-            if (progress >= progressMax) {
-                progress = 0;
-                smeltItem();
-                if (isAuto()) {
-                    onAutoSmelt();
-                }
-            }
+        if (wasHot && canSmelt()) {
+            updateSmelting();
         } else {
             progress = 0;
         }
+
         if (progress > 0 && rand.nextInt(4) == 0 && !isOutside() && this.getTier() < 2) {
             SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, 1);
         }
 
-        if (isHot != getIsHot()) {
-            BlockCrucible.updateFurnaceBlockState(getTemperature() > 0, worldObj, xCoord, yCoord, zCoord);
+        if (wasHot != getIsHot()) {
+            BlockCrucible.updateFurnaceBlockState(this.temperature > 0, worldObj, xCoord, yCoord, zCoord);
+        }
+    }
+
+    private void updateSmelting() {
+        progress += (temperature / SMELT_TEMPERATURE_THRESHOLD);
+        if (progress >= progressMax) {
+            progress = 0;
+            smeltItem();
+            if (isAuto()) {
+                onAutoSmelt();
+            }
         }
     }
 
@@ -70,7 +84,7 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         if (this.getTier() >= 2) {
             return this.isCoated();
         }
-        return getTemperature() > 0;
+        return this.temperature > 0;
     }
 
     private void onAutoSmelt() {
@@ -94,28 +108,35 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             return;
         }
 
-        ItemStack itemstack = getRecipe();
+        ItemStack result = this.cachedRecipeOutput.copy();
+        ItemStack outputSlot = inventory[OUTPUT_SLOT];
 
-        if (inv[getOutSlot()] == null) {
-            inv[getOutSlot()] = itemstack.copy();
-        } else if (CustomToolHelper.areEqual(inv[getOutSlot()], itemstack)) {
-            inv[getOutSlot()].stackSize += itemstack.stackSize;
+        if (outputSlot == null) {
+            inventory[OUTPUT_SLOT] = result;
+        } else if (CustomToolHelper.areEqual(outputSlot, result)) {
+            outputSlot.stackSize += result.stackSize;
         }
 
-        for (int a = 0; a < (getSizeInventory() - 1); a++) {
-            if (inv[a] != null) {
-                inv[a].stackSize--;
-                if (inv[a].stackSize <= 0) {
-                    inv[a] = null;
+        for (int i = 0; i < GRID_SLOT_COUNT; i++) {
+            if (inventory[i] != null) {
+                inventory[i].stackSize--;
+                if (inventory[i].stackSize <= 0) {
+                    inventory[i] = null;
                 }
             }
         }
+        onInventoryChanged(); // Update recipe after consuming ingredients
+
         if (worldObj.isRemote && getTier() >= 2) {
-            spawnParticle(-3, 0, 0);
-            spawnParticle(3, 0, 0);
-            spawnParticle(0, 0, -3);
-            spawnParticle(0, 0, 3);
+            spawnStructureParticles();
         }
+    }
+
+    private void spawnStructureParticles() {
+        spawnParticle(-3, 0, 0);
+        spawnParticle(3, 0, 0);
+        spawnParticle(0, 0, -3);
+        spawnParticle(0, 0, 3);
     }
 
     private void spawnParticle(int x, int y, int z) {
@@ -123,60 +144,56 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     private boolean canSmelt() {
-        if (temperature <= 0) {
+        if (this.temperature <= 0 || this.cachedRecipeOutput == null) {
             return false;
         }
 
-        ItemStack result = getRecipe();
+        ItemStack result = this.cachedRecipeOutput;
+        ItemStack outputSlot = inventory[OUTPUT_SLOT];
 
-        if (result == null) {
-            return false;
+        if (outputSlot == null) {
+            return true;
         }
-
-        if (inv[getOutSlot()] == null)
-            return true;
-        if (inv[getOutSlot()] != null && CustomToolHelper.areEqual(inv[getOutSlot()], result)
-                && inv[getOutSlot()].stackSize < (inv[getOutSlot()].getMaxStackSize() - (result.stackSize - 1)))
-            return true;
+        if (CustomToolHelper.areEqual(outputSlot, result)) {
+            return (outputSlot.stackSize + result.stackSize) <= outputSlot.getMaxStackSize();
+        }
         return false;
     }
 
-    private int getOutSlot() {
-        return 9;
-    }
+    private void updateCachedRecipe() {
+        ItemStack[] inputs = new ItemStack[GRID_SLOT_COUNT];
+        for (int i = 0; i < GRID_SLOT_COUNT; i++) {
+            inputs[i] = inventory[i];
+        }
 
-    private ItemStack getRecipe() {
-        ItemStack[] input = new ItemStack[getSizeInventory() - 1];
-        for (int a = 0; a < 9; a++) {
-            input[a] = inv[a];
+        Alloy alloy = AlloyRecipes.getResult(inputs);
+        if (alloy != null && alloy.getLevel() <= getTier()) {
+            this.cachedRecipeOutput = alloy.getRecipeOutput();
+        } else {
+            this.cachedRecipeOutput = null;
         }
-        Alloy alloy = AlloyRecipes.getResult(input);
-        if (alloy != null) {
-            if (alloy.getLevel() <= getTier()) {
-                return AlloyRecipes.getResult(input).getRecipeOutput();
-            }
-        }
-        return null;
     }
 
     @Override
     public Block getBlockType() {
-        if (worldObj == null)
+        if (worldObj == null) {
             return Blocks.air;
-
+        }
         return super.getBlockType();
     }
 
     public int getTier() {
-        if (this.getBlockType() != null && this.getBlockType() instanceof BlockCrucible) {
-            return ((BlockCrucible) this.getBlockType()).tier;
+        Block block = this.getBlockType();
+        if (block instanceof BlockCrucible) {
+            return ((BlockCrucible) block).tier;
         }
         return 0;
     }
 
     public boolean isAuto() {
-        if (this.getBlockType() != null && this.getBlockType() instanceof BlockCrucible) {
-            return ((BlockCrucible) this.getBlockType()).isAuto;
+        Block block = this.getBlockType();
+        if (block instanceof BlockCrucible) {
+            return ((BlockCrucible) block).isAuto;
         }
         return false;
     }
@@ -186,18 +203,21 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             return 0F;
         }
         if (getTier() >= 2) {
-            return 500;
+            return 500F;
         }
-        Block under = worldObj.getBlock(xCoord, yCoord - 1, zCoord);
 
-        if (under.getMaterial() == Material.fire) {
+        Block under = worldObj.getBlock(xCoord, yCoord - 1, zCoord);
+        Material underMaterial = under.getMaterial();
+
+        if (underMaterial == Material.fire) {
             return 10F;
         }
-        if (under.getMaterial() == Material.lava) {
+        if (underMaterial == Material.lava) {
             return 50F;
         }
+
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (tile != null && tile instanceof TileEntityForge) {
+        if (tile instanceof TileEntityForge) {
             return ((TileEntityForge) tile).getBlockTemperature();
         }
         return 0F;
@@ -215,108 +235,96 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private boolean isFirebrick(int x, int y, int z) {
         return worldObj.getBlock(xCoord + x, yCoord + y, zCoord + z) == BlockListMF.firebricks;
     }
-    // INVENTORY
 
     private boolean isEnderAlter(int x, int y, int z) {
         Block block = worldObj.getBlock(xCoord + x, yCoord + y, zCoord + z);
         int meta = worldObj.getBlockMetadata(xCoord + x, yCoord + y, zCoord + z);
-
-        if (block == Blocks.end_portal_frame && BlockEndPortalFrame.isEnderEyeInserted(meta)) {
-            return true;
-        } else {
-            // worldObj.setBlock(xCoord+x, yCoord+y, zCoord+z, Blocks.end_portal_frame, 0,
-            // 2);
-            return false;
-        }
+        return block == Blocks.end_portal_frame && BlockEndPortalFrame.isEnderEyeInserted(meta);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-
         nbt.setFloat("progress", progress);
         nbt.setFloat("progressMax", progressMax);
 
         NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
+        for (int i = 0; i < this.inventory.length; ++i) {
+            if (this.inventory[i] != null) {
                 NBTTagCompound savedSlot = new NBTTagCompound();
                 savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
+                this.inventory[i].writeToNBT(savedSlot);
                 savedItems.appendTag(savedSlot);
             }
         }
-
         nbt.setTag("Items", savedItems);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
         progress = nbt.getFloat("progress");
         progressMax = nbt.getFloat("progressMax");
 
         NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
+        this.inventory = new ItemStack[this.getSizeInventory()];
         for (int i = 0; i < savedItems.tagCount(); ++i) {
             NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
             byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
+            if (slotNum >= 0 && slotNum < this.inventory.length) {
+                this.inventory[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
             }
         }
+        onInventoryChanged(); // Update cache on load
     }
 
     @Override
     public int getSizeInventory() {
-        return inv.length;
+        return inventory.length;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return inv[slot];
+        return inventory[slot];
     }
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        if (this.inv[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inv[slot].stackSize <= num) {
-                itemstack = this.inv[slot];
-                this.inv[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inv[slot].splitStack(num);
-
-                if (this.inv[slot].stackSize == 0) {
-                    this.inv[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
+        if (this.inventory[slot] == null) {
             return null;
         }
+        ItemStack itemstack;
+        if (this.inventory[slot].stackSize <= num) {
+            itemstack = this.inventory[slot];
+            this.inventory[slot] = null;
+        } else {
+            itemstack = this.inventory[slot].splitStack(num);
+            if (this.inventory[slot].stackSize == 0) {
+                this.inventory[slot] = null;
+            }
+        }
+        onInventoryChanged();
+        return itemstack;
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return inv[slot];
+        return inventory[slot];
     }
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack item) {
+        inventory[slot] = item;
+        if (item != null && item.stackSize > this.getInventoryStackLimit()) {
+            item.stackSize = this.getInventoryStackLimit();
+        }
         onInventoryChanged();
-        inv[slot] = item;
     }
 
     public void onInventoryChanged() {
+        if (!worldObj.isRemote) {
+            updateCachedRecipe();
+        }
     }
 
     @Override
@@ -349,32 +357,33 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
-        return true;
+        return slot != OUTPUT_SLOT;
     }
 
     private boolean isBlastOutput() {
-        if (worldObj == null)
+        if (worldObj == null) {
             return false;
+        }
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        return tile != null && tile instanceof TileEntityBlastFH;
+        return tile instanceof TileEntityBlastFH;
     }
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
         if (isBlastOutput()) {
-            return whole;
+            return allSlots;
         }
-        return side == 0 ? output : grid;
+        return side == 0 ? outputSlots : gridSlots;
     }
 
     @Override
     public boolean canInsertItem(int slot, ItemStack item, int side) {
-        return !isBlastOutput() && slot < getOutSlot();
+        return !isBlastOutput() && isItemValidForSlot(slot, item);
     }
 
     @Override
     public boolean canExtractItem(int slot, ItemStack item, int side) {
-        return isAuto() && slot == getOutSlot();
+        return isAuto() && slot == OUTPUT_SLOT;
     }
 
     @Override

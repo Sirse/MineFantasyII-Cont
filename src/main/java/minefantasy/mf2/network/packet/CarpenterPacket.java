@@ -10,7 +10,6 @@ import net.minecraft.tileentity.TileEntity;
 public class CarpenterPacket extends PacketMF {
     public static final String packetName = "MF2_CarpenterPacket";
     private int[] coords = new int[3];
-    private String resultName;
     private String toolNeeded;
     private float[] progress = new float[2];
     private int[] tiers = new int[2];
@@ -18,7 +17,6 @@ public class CarpenterPacket extends PacketMF {
 
     public CarpenterPacket(TileEntityCarpenterMF tile) {
         coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
-        resultName = tile.getResultName();
         toolNeeded = tile.getToolNeeded();
         progress = new float[]{tile.progress, tile.progressMax};
         tiers = new int[]{tile.getToolTierNeeded(), tile.getCarpenterTierNeeded()};
@@ -45,16 +43,16 @@ public class CarpenterPacket extends PacketMF {
             progress[1] = packet.readFloat();
             tiers[0] = packet.readInt();
             tiers[1] = packet.readInt();
-            resultName = ByteBufUtils.readUTF8String(packet);
             toolNeeded = ByteBufUtils.readUTF8String(packet);
             research = ByteBufUtils.readUTF8String(packet);
+            if (toolNeeded == null) toolNeeded = "";
+            if (research == null) research = "";
 
             TileEntityCarpenterMF carpenter = (TileEntityCarpenterMF) entity;
-            carpenter.resName = resultName;
             carpenter.setToolType(toolNeeded);
             carpenter.setResearch(research);
             carpenter.progress = progress[0];
-            carpenter.progressMax = progress[1];
+            carpenter.progressMax = Math.max(0F, progress[1]);
             carpenter.setToolTier(tiers[0]);
             carpenter.setRequiredCarpenter(tiers[1]);
         }
@@ -72,7 +70,6 @@ public class CarpenterPacket extends PacketMF {
         packet.writeFloat(progress[1]);
         packet.writeInt(tiers[0]);
         packet.writeInt(tiers[1]);
-        ByteBufUtils.writeUTF8String(packet, resultName);
         ByteBufUtils.writeUTF8String(packet, toolNeeded);
         ByteBufUtils.writeUTF8String(packet, research);
     }

@@ -1,184 +1,86 @@
 package minefantasy.mf2.container;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.tileentity.TileEntityForge;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerForge extends Container {
-    private TileEntityForge tile;
-    private int lastTemp;
+public class ContainerForge extends ContainerMF {
+    private static final int FORGE_SLOT = 0;
+    private static final int FORGE_SLOT_COUNT = 1;
+    private final TileEntityForge tile;
+    private final int playerInventoryStartIndex;
 
     public ContainerForge(InventoryPlayer user, TileEntityForge tile) {
         this.tile = tile;
-        int width = 3;
-        int height = 3;
 
-        this.addSlotToContainer(new Slot(tile, 0, 70 + 18, 14 + 18));
-        int i;
+        this.addSlotToContainer(new SlotFiltered(tile, FORGE_SLOT, 88, 32));
 
-        for (i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlotToContainer(new Slot(user, j + i * 9 + 9, 8 + j * 18, 93 + i * 18));
-            }
-        }
+        this.playerInventoryStartIndex = FORGE_SLOT_COUNT;
+        this.addPlayerInventory(user, 0, 93);
 
-        for (i = 0; i < 9; ++i) {
-            this.addSlotToContainer(new Slot(user, i, 8 + i * 18, 151));
-        }
+        trackFloat(() -> tile.temperature, value -> tile.temperature = value);
+        trackFloat(() -> tile.fuel, value -> tile.fuel = value);
     }
 
     @Override
-    public void detectAndSendChanges() {
-        for (int i = 0; i < this.crafters.size(); ++i) {
-            ICrafting icrafting = (ICrafting) this.crafters.get(i);
-
-            if (this.lastTemp != (int) tile.temperature) {
-                icrafting.sendProgressBarUpdate(this, 0, (int) tile.temperature);
-            }
-        }
-        this.lastTemp = (int) tile.temperature;
-
-        for (int i = 0; i < this.inventorySlots.size(); ++i) {
-            ItemStack itemstack = ((Slot) this.inventorySlots.get(i)).getStack();
-            ItemStack itemstack1 = (ItemStack) this.inventoryItemStacks.get(i);
-
-            if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-                tile.onInventoryChanged();
-
-                itemstack1 = itemstack == null ? null : itemstack.copy();
-                this.inventoryItemStacks.set(i, itemstack1);
-
-                for (int j = 0; j < this.crafters.size(); ++j) {
-                    ((ICrafting) this.crafters.get(j)).sendSlotContents(this, i, itemstack1);
-                }
-            }
-        }
+    public boolean canInteractWith(EntityPlayer player) {
+        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void updateProgressBar(int id, int value) {
-        if (id == 0) {
-            tile.temperature = value;
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
+            return null;
         }
-    }
+        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
+        if (slot == null || !slot.getHasStack()) {
+            return null;
+        }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer p_75145_1_) {
-        return this.tile.isUseableByPlayer(p_75145_1_);
-    }
+        ItemStack stackInSlot = slot.getStack();
+        ItemStack originalStack = stackInSlot.copy();
+        boolean merged = false;
 
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer user, int currentSlot) {
-        int slotCount = tile.getSizeInventory();
-        ItemStack itemstack = null;
-        Slot slot = (Slot) this.inventorySlots.get(currentSlot);
-
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-
-            if (currentSlot < slotCount) {
-                if (!this.mergeItemStack(itemstack1, slotCount, this.inventorySlots.size(), false)) {
-                    return null;
-                }
-            } else if (!this.mergeItemStack(true, itemstack1, 0, slotCount, false)) {
-                return null;
+        if (slotIndex < FORGE_SLOT_COUNT) {
+            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
+                merged = true;
             }
-
-            if (itemstack1.stackSize <= 0) {
-                slot.putStack((ItemStack) null);
-            } else {
-                slot.onSlotChanged();
-            }
-        }
-
-        return itemstack;
-    }
-
-    @Override
-    protected boolean mergeItemStack(ItemStack item, int minSlot, int maxSlot, boolean goBackwards) {
-        return mergeItemStack(true, item, minSlot, maxSlot, goBackwards);
-    }
-
-    protected boolean mergeItemStack(boolean allowStack, ItemStack item, int minSlot, int maxSlot,
-                                     boolean goBackwards) {
-        boolean flag1 = false;
-        int k = minSlot;
-
-        if (goBackwards) {
-            k = maxSlot - 1;
-        }
-
-        Slot slot;
-        ItemStack itemstack1;
-
-        if (allowStack && item.isStackable()) {
-            while (item.stackSize > 0 && (!goBackwards && k < maxSlot || goBackwards && k >= minSlot)) {
-                slot = (Slot) this.inventorySlots.get(k);
-                itemstack1 = slot.getStack();
-
-                if (itemstack1 != null && itemstack1.getItem() == item.getItem()
-                        && (!item.getHasSubtypes() || item.getItemDamage() == itemstack1.getItemDamage())
-                        && ItemStack.areItemStackTagsEqual(item, itemstack1)) {
-                    int l = itemstack1.stackSize + item.stackSize;
-
-                    if (l <= item.getMaxStackSize()) {
-                        item.stackSize = 0;
-                        itemstack1.stackSize = l;
-                        slot.onSlotChanged();
-                        flag1 = true;
-                    } else if (itemstack1.stackSize < item.getMaxStackSize()) {
-                        item.stackSize -= item.getMaxStackSize() - itemstack1.stackSize;
-                        itemstack1.stackSize = item.getMaxStackSize();
-                        slot.onSlotChanged();
-                        flag1 = true;
-                    }
+        } else {
+            if (tile.isItemValidForSlot(FORGE_SLOT, stackInSlot)) {
+                if (this.mergeItemStack(stackInSlot, FORGE_SLOT, FORGE_SLOT + 1, false)) {
+                    merged = true;
                 }
+            }
+            if (!merged) {
+                int mainStart = playerInventoryStartIndex;
+                int mainEnd = mainStart + 27;
+                int hotbarEnd = this.inventorySlots.size();
 
-                if (goBackwards) {
-                    --k;
-                } else {
-                    ++k;
+                if (slotIndex >= mainStart && slotIndex < mainEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainEnd, hotbarEnd, false);
+                } else if (slotIndex >= mainEnd && slotIndex < hotbarEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainStart, mainEnd, false);
                 }
             }
         }
 
-        if (item.stackSize > 0) {
-            if (goBackwards) {
-                k = maxSlot - 1;
-            } else {
-                k = minSlot;
-            }
-
-            while (!goBackwards && k < maxSlot || goBackwards && k >= minSlot) {
-                slot = (Slot) this.inventorySlots.get(k);
-                itemstack1 = slot.getStack();
-
-                if (itemstack1 == null) {
-                    ItemStack i2 = item.copy();
-                    i2.stackSize = 1;
-                    slot.putStack(i2);
-                    slot.onSlotChanged();
-                    item.stackSize--;
-                    flag1 = true;
-                    break;
-                }
-
-                if (goBackwards) {
-                    --k;
-                } else {
-                    ++k;
-                }
-            }
+        if (!merged) {
+            return null;
         }
 
-        return flag1;
+        if (stackInSlot.stackSize == 0) {
+            slot.putStack(null);
+        } else {
+            slot.onSlotChanged();
+        }
+
+        if (stackInSlot.stackSize == originalStack.stackSize) {
+            return null;
+        }
+
+        slot.onPickupFromSlot(player, stackInSlot);
+        return originalStack;
     }
 }

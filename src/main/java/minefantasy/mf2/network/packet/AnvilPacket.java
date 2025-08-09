@@ -10,7 +10,6 @@ import net.minecraft.tileentity.TileEntity;
 public class AnvilPacket extends PacketMF {
     public static final String packetName = "MF2_AnvilPacket";
     private int[] coords = new int[3];
-    private String resultName;
     private String toolNeeded;
     private String research;
     private float[] floats = new float[6];
@@ -18,7 +17,6 @@ public class AnvilPacket extends PacketMF {
 
     public AnvilPacket(TileEntityAnvilMF tile) {
         coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
-        resultName = tile.getResultName();
         toolNeeded = tile.getToolNeeded();
         research = tile.getResearchNeeded();
         floats = new float[]{tile.progress, tile.progressMax, tile.qualityBalance, tile.thresholdPosition,
@@ -51,15 +49,15 @@ public class AnvilPacket extends PacketMF {
             floats[5] = packet.readFloat();
             tiers[0] = packet.readInt();
             tiers[1] = packet.readInt();
-            resultName = ByteBufUtils.readUTF8String(packet);
             toolNeeded = ByteBufUtils.readUTF8String(packet);
             research = ByteBufUtils.readUTF8String(packet);
+            if (toolNeeded == null) toolNeeded = "";
+            if (research == null) research = "";
 
             TileEntityAnvilMF anvil = (TileEntityAnvilMF) entity;
-            anvil.resName = resultName;
             anvil.setToolType(toolNeeded);
             anvil.progress = floats[0];
-            anvil.progressMax = floats[1];
+            anvil.progressMax = Math.max(0F, floats[1]);
             anvil.qualityBalance = floats[2];
             anvil.thresholdPosition = floats[3];
             anvil.leftHit = floats[4];
@@ -83,7 +81,6 @@ public class AnvilPacket extends PacketMF {
         }
         packet.writeInt(tiers[0]);
         packet.writeInt(tiers[1]);
-        ByteBufUtils.writeUTF8String(packet, resultName);
         ByteBufUtils.writeUTF8String(packet, toolNeeded);
         ByteBufUtils.writeUTF8String(packet, research);
     }

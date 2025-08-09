@@ -28,6 +28,7 @@ item.talisman_greater.name=大型知识护符
 prospect.canmine=你可以采集它！(工具：%1$s | 方块：%2$s)
 prospect.cannotmine=你无法采集它！(工具：%1$s | 方块：%2$s)
 gui.information=研究
+gui.noproject=未设置项目
 information.discovered=已研究
 information.buy=点击研究
 knowledge.unknownUse=你不知道如何使用它！

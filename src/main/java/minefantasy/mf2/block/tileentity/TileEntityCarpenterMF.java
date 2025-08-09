@@ -21,13 +21,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
+import net.minecraft.util.StatCollector;
 
 import java.util.Random;
 
 public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICarpenter {
     public final int width = 4;
     public final int height = 4;
-    public String resName = "<No Project Set>";
     public float progressMax;
     public float progress;
     private int tier;
@@ -74,7 +74,6 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         }
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
-        resName = nbt.getString("ResultName");
         toolTypeRequired = nbt.getString("toolTypeRequired");
         craftSound = nbt.getString("craftSound");
         researchRequired = nbt.getString("researchRequired");
@@ -98,9 +97,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
         nbt.setTag("Items", savedItems);
 
-        nbt.setFloat("Progress", progress);
-        nbt.setFloat("ProgressMax", progressMax);
-        nbt.setString("ResName", resName);
+    nbt.setFloat("Progress", progress);
+    nbt.setFloat("ProgressMax", progressMax);
         nbt.setString("toolTypeRequired", toolTypeRequired);
         nbt.setString("craftSound", craftSound);
         nbt.setString("researchRequired", researchRequired);
@@ -194,7 +192,6 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
             }
             if (!canCraft() && ticksExisted > 1) {
                 progress = progressMax = 0;
-                this.resName = "";
                 this.recipe = null;
             }
         }
@@ -369,10 +366,10 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     public String getResultName() {
-        if (!worldObj.isRemote && recipe != null && recipe.getItem() != null && recipe.getDisplayName() != null) {
-            resName = recipe.getDisplayName();
+        if (recipe != null && recipe.getItem() != null && recipe.getDisplayName() != null) {
+            return recipe.getDisplayName();
         }
-        return resName;
+        return StatCollector.translateToLocal("gui.noproject");
     }
 
     public String getToolNeeded() {
@@ -530,7 +527,10 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     public int getProgressBar(int i) {
-        return (int) Math.ceil(i / progressMax * progress);
+        if (progressMax <= 0.0F) {
+            return 0;
+        }
+        return (int) Math.ceil((i * progress) / progressMax);
     }
 
     @Override

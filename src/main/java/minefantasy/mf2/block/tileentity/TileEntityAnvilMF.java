@@ -34,8 +34,8 @@ import net.minecraft.world.WorldServer;
 import java.util.Random;
 
 public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil, IQualityBalance {
+    private final Random rand = new Random();
     public int tier;
-    public String resName = "<No Project Set>";
     public float progressMax;
     public float progress;
     public String texName = "";
@@ -44,7 +44,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     public float leftHit = 0F;
     public float rightHit = 0F;
     private ItemStack[] inventory;
-    private Random rand = new Random();
     private int ticksExisted;
     private ContainerAnvilMF syncAnvil;
     private AnvilCraftMatrix craftMatrix;
@@ -92,7 +91,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         }
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
-        resName = nbt.getString("ResultName");
         toolTypeRequired = nbt.getString("toolTypeRequired");
         researchRequired = nbt.getString("researchRequired");
         texName = nbt.getString("TextureName");
@@ -122,7 +120,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
-        nbt.setString("ResName", resName);
         nbt.setString("toolTypeRequired", toolTypeRequired);
         nbt.setString("researchRequired", researchRequired);
         nbt.setString("TextureName", texName);
@@ -223,7 +220,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             }
             if (!canCraft() && ticksExisted > 1) {
                 progress = progressMax = 0;
-                this.resName = "";
                 this.recipe = null;
             }
         }
@@ -572,10 +568,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     public String getResultName() {
-        if (!worldObj.isRemote && recipe != null && recipe.getDisplayName() != null) {
-            resName = recipe.getDisplayName();
+        if (recipe != null && recipe.getDisplayName() != null) {
+            return recipe.getDisplayName();
         }
-        return resName;
+        return "gui.noproject";
     }
 
     public String getResearchNeeded() {
@@ -626,10 +622,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     resSlot = heated;
                 }
             }
-            if (!resSlot.isItemEqual(result)
-                    && (SpecialForging.getItemDesign(resSlot) == null || resSlot.stackSize > 1)) {
-                return false;
-            }
+            return resSlot.isItemEqual(result)
+                    || (SpecialForging.getItemDesign(resSlot) != null && resSlot.stackSize <= 1);
         }
         return true;
     }
@@ -716,6 +710,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         outputHot = i;
     }
 
+    public boolean isOutputHot() {
+        return this.outputHot;
+    }
+
     public void setContainer(ContainerAnvilMF container) {
         syncAnvil = container;
         craftMatrix = new AnvilCraftMatrix(this, syncAnvil, ShapelessAnvilRecipes.globalWidth,
@@ -727,7 +725,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     public int getProgressBar(int i) {
-        return (int) Math.ceil(i / progressMax * progress);
+        if (progressMax <= 0.0F) {
+            return 0;
+        }
+        return (int) Math.ceil((i * progress) / progressMax);
     }
 
     @Override

@@ -34,14 +34,15 @@ public class GuiAnvilMF extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {
         boolean knowsCraft = tile.doesPlayerKnowCraft(mc.thePlayer);
+        String resultName = tile.getResultName();
         String s = MineFantasyII.isDebug() ? "Anvil Crafting"
-                : knowsCraft ? StatCollector.translateToLocal(tile.getResultName()) : "????";
+                : knowsCraft ? (resultName.startsWith("gui.") ? StatCollector.translateToLocal(resultName) : resultName) : "????";
         this.fontRendererObj.drawString(s, 10 + xInvOffset, 8, 0);
 
         int xPoint = (this.width - this.xSize) / 2 + 30;
         int yPoint = (this.height - this.ySize) / 2;
 
-        if (knowsCraft && !tile.resName.equalsIgnoreCase("")) {
+        if (knowsCraft && tile.getResultName() != null && !tile.getResultName().equalsIgnoreCase("")) {
             if (tile.getToolNeeded() != null) {
                 if (x < xPoint && x > xPoint - 20 && y < yPoint + 20 && y > yPoint) {
                     String s2 = StatCollector.translateToLocal("tooltype." + tile.getToolNeeded()) + ", "
@@ -79,7 +80,7 @@ public class GuiAnvilMF extends GuiContainer {
             int progressWidth = (int) (160F / tile.progressMax * tile.progress);
             this.drawTexturedModalRect(xPoint + 8 + xInvOffset, yPoint + 21, 0, 210, progressWidth, 3);
         }
-        if (tile.doesPlayerKnowCraft(mc.thePlayer) && !tile.resName.equalsIgnoreCase("")) {
+        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null && !tile.getResultName().equalsIgnoreCase("")) {
             GuiHelper.renderToolIcon(this, "anvil", tile.getAnvilTierNeeded(), xPoint + regularXSize + xInvOffset,
                     yPoint, isBlockSufficient());
 

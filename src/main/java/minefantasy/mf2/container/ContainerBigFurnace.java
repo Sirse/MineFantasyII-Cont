@@ -1,64 +1,55 @@
 package minefantasy.mf2.container;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 
-/**
- * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
- */
-public class ContainerBigFurnace extends Container {
-    public TileEntityBigFurnace smelter;
-    public int lastProgress;
-    public int lastFuel;
-    public int lastMaxFuel;
-    public int lastHeat;
-    public int lastMaxHeat;
+public class ContainerBigFurnace extends ContainerMF {
+    private static final int HEATER_FUEL_SLOT = 0;
+    private static final int HEATER_SLOT_COUNT = 1;
 
-    public ContainerBigFurnace(EntityPlayer play, TileEntityBigFurnace tileentityfurnace) {
-        lastProgress = 0;
-        lastFuel = 0;
-        lastMaxFuel = 0;
-        lastHeat = 0;
-        lastMaxHeat = 0;
-        smelter = tileentityfurnace;
-        tileentityfurnace.openChest();
+    private static final int SMELTER_INPUT_START_INDEX = 0;
+    private static final int SMELTER_OUTPUT_START_INDEX = 4;
+    private static final int SMELTER_TOTAL_SLOTS = 8;
+
+    private final TileEntityBigFurnace smelter;
+
+    private final int furnaceSlotCount;
+    private final int playerInventoryStartIndex;
+
+    public ContainerBigFurnace(EntityPlayer player, TileEntityBigFurnace tile) {
+        this.smelter = tile;
+        tile.openChest();
 
         if (smelter.isHeater()) {
-            addSlotToContainer(new Slot(smelter, 0, 59, 44));
+            addSlotToContainer(new SlotFiltered(smelter, HEATER_FUEL_SLOT, 59, 44));
+            furnaceSlotCount = HEATER_SLOT_COUNT;
         } else {
-            // IN
-            addSlotToContainer(new Slot(smelter, 0, 36, 26));
-            addSlotToContainer(new Slot(smelter, 1, 54, 26));
-            addSlotToContainer(new Slot(smelter, 2, 36, 44));
-            addSlotToContainer(new Slot(smelter, 3, 54, 44));
-
-            // OUT
-            addSlotToContainer(new SlotFurnace(play, smelter, 4, 106, 26));
-            addSlotToContainer(new SlotFurnace(play, smelter, 5, 124, 26));
-            addSlotToContainer(new SlotFurnace(play, smelter, 6, 106, 44));
-            addSlotToContainer(new SlotFurnace(play, smelter, 7, 124, 44));
+            // Input
+            addSlotToContainer(new SlotFiltered(smelter, 0, 36, 26));
+            addSlotToContainer(new SlotFiltered(smelter, 1, 54, 26));
+            addSlotToContainer(new SlotFiltered(smelter, 2, 36, 44));
+            addSlotToContainer(new SlotFiltered(smelter, 3, 54, 44));
+            // Output
+            addSlotToContainer(new SlotFurnace(player, smelter, 4, 106, 26));
+            addSlotToContainer(new SlotFurnace(player, smelter, 5, 124, 26));
+            addSlotToContainer(new SlotFurnace(player, smelter, 6, 106, 44));
+            addSlotToContainer(new SlotFurnace(player, smelter, 7, 124, 44));
+            furnaceSlotCount = SMELTER_TOTAL_SLOTS;
         }
 
-        // PLAYER INV
-        for (int i = 0; i < 3; i++) {
-            for (int k = 0; k < 9; k++) {
-                addSlotToContainer(new Slot(play.inventory, k + i * 9 + 9, 8 + k * 18, 84 + i * 18));
-            }
-        }
+        this.playerInventoryStartIndex = furnaceSlotCount;
+        this.addPlayerInventory(player.inventory, 0, 84);
 
-        for (int j = 0; j < 9; j++) {
-            addSlotToContainer(new Slot(play.inventory, j, 8 + j * 18, 142));
-        }
+        trackInt(() -> smelter.fuel, value -> smelter.fuel = value);
+        trackInt(() -> smelter.maxFuel, value -> smelter.maxFuel = value);
+        trackInt(() -> smelter.progress, value -> smelter.progress = value);
+        trackInt(() -> smelter.doorAngle, value -> smelter.doorAngle = value);
+        trackFloat(() -> smelter.heat, value -> smelter.heat = value);
+        trackFloat(() -> smelter.maxHeat, value -> smelter.maxHeat = value);
+        trackInt(() -> smelter.built ? 1 : 0, value -> smelter.built = value == 1);
     }
 
     @Override
@@ -68,131 +59,76 @@ public class ContainerBigFurnace extends Container {
     }
 
     @Override
-    public void addCraftingToCrafters(ICrafting icrafting) {
-        super.addCraftingToCrafters(icrafting);
-        icrafting.sendProgressBarUpdate(this, 0, smelter.progress);
-        icrafting.sendProgressBarUpdate(this, 1, smelter.fuel);
-        icrafting.sendProgressBarUpdate(this, 2, smelter.maxFuel);
-        icrafting.sendProgressBarUpdate(this, 3, (int) smelter.heat);
-        icrafting.sendProgressBarUpdate(this, 4, (int) smelter.maxHeat);
+    public boolean canInteractWith(EntityPlayer player) {
+        return this.smelter != null && !this.smelter.isInvalid() && this.smelter.isUseableByPlayer(player);
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
+            return null;
+        }
+        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
+        if (slot == null || !slot.getHasStack()) {
+            return null;
+        }
 
-        for (int i = 0; i < this.crafters.size(); ++i) {
-            ICrafting icrafting = (ICrafting) this.crafters.get(i);
+        ItemStack stackInSlot = slot.getStack();
+        ItemStack originalStack = stackInSlot.copy();
+        boolean merged = false;
 
-            if (this.lastProgress != this.smelter.progress) {
-                icrafting.sendProgressBarUpdate(this, 0, this.smelter.progress);
+        // From furnace to player
+        if (slotIndex < furnaceSlotCount) {
+            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
+                merged = true;
             }
-
-            if (this.lastFuel != this.smelter.fuel) {
-                icrafting.sendProgressBarUpdate(this, 1, this.smelter.fuel);
-            }
-
-            if (this.lastMaxFuel != this.smelter.maxFuel) {
-                icrafting.sendProgressBarUpdate(this, 2, this.smelter.maxFuel);
-            }
-
-            if (this.lastHeat != this.smelter.heat) {
-                icrafting.sendProgressBarUpdate(this, 3, (int) this.smelter.heat);
-            }
-
-            if (this.lastMaxHeat != this.smelter.maxHeat) {
-                icrafting.sendProgressBarUpdate(this, 4, (int) this.smelter.maxHeat);
-            }
-
         }
-
-        this.lastProgress = this.smelter.progress;
-        this.lastFuel = this.smelter.fuel;
-        this.lastMaxFuel = this.smelter.maxFuel;
-        this.lastHeat = (int) this.smelter.heat;
-        this.lastMaxHeat = (int) this.smelter.maxHeat;
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void updateProgressBar(int id, int value) {
-        if (id == 0) {
-            this.smelter.progress = value;
-        }
-
-        if (id == 1) {
-            this.smelter.fuel = value;
-        }
-
-        if (id == 2) {
-            this.smelter.maxFuel = value;
-        }
-
-        if (id == 3) {
-            this.smelter.heat = value;
-        }
-
-        if (id == 4) {
-            this.smelter.maxHeat = value;
-        }
-    }
-
-    public boolean canInteractWith(EntityPlayer entityplayer) {
-        return smelter.isUseableByPlayer(entityplayer);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int num) {
-        int invSize = 8;
-        if (smelter.isHeater()) {
-            invSize = 1;
-        }
-        ItemStack placedItem = null;
-        Slot slot = (Slot) this.inventorySlots.get(num);
-
-        if (slot != null && slot.getHasStack()) {
-            ItemStack itemSlot = slot.getStack();
-            placedItem = itemSlot.copy();
-
-            // Take
-            if (num < invSize) {
-                if (!this.mergeItemStack(itemSlot, invSize, 36 + invSize, true)) {
-                    return null;
-                }
-
-                slot.onSlotChange(itemSlot, placedItem);
-            }
-            // Put
-            else {
-                if (smelter.isHeater()) {
-                    if (smelter.isItemFuel(itemSlot)) {
-                        if (!this.mergeItemStack(itemSlot, 0, 1, false)) {
-                            return null;
-                        }
-                    }
-                } else {
-                    if (smelter.getResult(itemSlot) != null) {
-                        if (!this.mergeItemStack(itemSlot, 0, 4, false)) {
-                            return null;
-                        }
+        // From player to furnace
+        else {
+            if (smelter.isHeater()) {
+                // Try to move to fuel slot
+                if (smelter.isItemValidForSlot(HEATER_FUEL_SLOT, stackInSlot)) {
+                    if (this.mergeItemStack(stackInSlot, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)) {
+                        merged = true;
                     }
                 }
-
-                slot.onSlotChange(itemSlot, placedItem);
-            }
-
-            if (itemSlot.stackSize == 0) {
-                slot.putStack((ItemStack) null);
             } else {
-                slot.onSlotChanged();
+                // Try to move to input slots
+                if (smelter.isItemValidForSlot(SMELTER_INPUT_START_INDEX, stackInSlot)) {
+                    if (this.mergeItemStack(stackInSlot, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false)) {
+                        merged = true;
+                    }
+                }
             }
+            // If not moved into furnace, bounce between main and hotbar
+            if (!merged) {
+                int mainStart = playerInventoryStartIndex;
+                int mainEnd = mainStart + 27;
+                int hotbarEnd = this.inventorySlots.size();
 
-            if (itemSlot.stackSize == placedItem.stackSize) {
-                return null;
+                if (slotIndex >= mainStart && slotIndex < mainEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainEnd, hotbarEnd, false);
+                } else if (slotIndex >= mainEnd && slotIndex < hotbarEnd) {
+                    merged = this.mergeItemStack(stackInSlot, mainStart, mainEnd, false);
+                }
             }
-
-            slot.onPickupFromSlot(player, itemSlot);
         }
 
-        return placedItem;
+        if (!merged) {
+            return null;
+        }
+
+        if (stackInSlot.stackSize == 0) {
+            slot.putStack(null);
+        } else {
+            slot.onSlotChanged();
+        }
+
+        if (stackInSlot.stackSize == originalStack.stackSize) {
+            return null;
+        }
+
+        slot.onPickupFromSlot(player, stackInSlot);
+        return originalStack;
     }
 }

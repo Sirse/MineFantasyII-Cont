@@ -34,6 +34,7 @@ item.talisman_greater.name=Большой талисман знания
 prospect.canmine=Вы можете добыть это! (Инструмент: %1$s | Блок: %2$s)
 prospect.cannotmine=Вы не можете добыть это! (Инструмент: %1$s | Блок: %2$s)
 gui.information=Исследование
+gui.noproject=Проект не выбран
 information.discovered=Исследовано
 information.buy=Нажмите для исследования
 knowledge.unknownUse=Вы не знаете, как использовать это!

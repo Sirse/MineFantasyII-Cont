@@ -5,125 +5,99 @@ import minefantasy.mf2.api.archery.IAmmo;
 import minefantasy.mf2.api.archery.IFirearm;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.ICrafting;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerReload extends Container {
-    private InventoryBasic weaponInv;
-    private ItemStack weapon;
-    private ItemStack previousAmmo;
+public class ContainerReload extends ContainerMF {
+    private final InventoryBasic weaponInv;
+    private final ItemStack weapon;
 
-    public ContainerReload(InventoryPlayer user, ItemStack weapon) {
+    public ContainerReload(InventoryPlayer playerInventory, ItemStack weapon) {
         this.weapon = weapon;
-        weaponInv = new InventoryBasic("reload", false, 1);
+        this.weaponInv = new InventoryBasic("reload", false, 1);
         weaponInv.setInventorySlotContents(0, AmmoMechanicsMF.getAmmo(weapon));
-        this.addSlotToContainer(new SlotReload(this, weaponInv, 0, 79, 11));
 
-        int i;
+        addSlotToContainer(new SlotReload(this, weaponInv, 0, 79, 11));
 
-        for (i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlotToContainer(new Slot(user, j + i * 9 + 9, 8 + j * 18, 66 + i * 18));
-            }
-        }
-
-        for (i = 0; i < 9; ++i) {
-            if (i != user.currentItem) {
-                this.addSlotToContainer(new Slot(user, i, 8 + i * 18, 124));
-            }
-        }
+        addPlayerMainInventory(playerInventory, 0, 66);
+        addPlayerHotbarExcept(playerInventory, 0, 124, playerInventory.currentItem);
     }
 
     @Override
-    public ItemStack slotClick(int p_75144_1_, int p_75144_2_, int p_75144_3_, EntityPlayer p_75144_4_) {
-        ItemStack result = super.slotClick(p_75144_1_, p_75144_2_, p_75144_3_, p_75144_4_);
+    public boolean canInteractWith(EntityPlayer player) {
+        ItemStack held = player.getCurrentEquippedItem();
+        return held == weapon || (held != null && weapon != null && held.getItem() == weapon.getItem() && ItemStack.areItemStackTagsEqual(held, weapon));
+    }
 
-        ItemStack ammo = weaponInv.getStackInSlot(0);
-        AmmoMechanicsMF.setAmmo(weapon, ammo);
-
+    @Override
+    public ItemStack slotClick(int slotId, int mouseButton, int modifier, EntityPlayer player) {
+        ItemStack result = super.slotClick(slotId, mouseButton, modifier, player);
+        if (weapon != null) {
+            ItemStack ammo = weaponInv.getStackInSlot(0);
+            AmmoMechanicsMF.setAmmo(weapon, ammo);
+        }
         return result;
     }
 
     @Override
-    public void detectAndSendChanges() {
-        for (int i = 0; i < this.inventorySlots.size(); ++i) {
-            ItemStack itemstack = ((Slot) this.inventorySlots.get(i)).getStack();
-            ItemStack itemstack1 = (ItemStack) this.inventoryItemStacks.get(i);
-
-            if (!ItemStack.areItemStacksEqual(itemstack1, itemstack)) {
-                itemstack1 = itemstack == null ? null : itemstack.copy();
-                this.inventoryItemStacks.set(i, itemstack1);
-                for (int j = 0; j < this.crafters.size(); ++j) {
-                    ((ICrafting) this.crafters.get(j)).sendSlotContents(this, i, itemstack1);
-                }
-            }
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        if (index < 0 || index >= inventorySlots.size()) {
+            return null; // Invalid index
         }
-        previousAmmo = weaponInv.getStackInSlot(0);
-    }
 
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer user, int clicked) {
         ItemStack itemstack = null;
-        Slot slot = (Slot) this.inventorySlots.get(clicked);
+        Slot slot = (Slot) inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
+            ItemStack stackInSlot = slot.getStack();
+            itemstack = stackInSlot.copy();
 
-            if (clicked > 0)// INVENTORY
-            {
-                if (canAccept(itemstack1)) {
-                    if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
-                        return null;
-                    }
-                } else if (clicked >= 1 && clicked < 27)// INVENTORY
-                {
-                    if (!this.mergeItemStack(itemstack1, 27, 36, false)) {
-                        return null;
-                    }
-                }
-                // BAR
-                else if (clicked >= 27 && clicked < 36 && !this.mergeItemStack(itemstack1, 1, 27, false)) {
-                    return null;
-                }
-            } else if (!this.mergeItemStack(itemstack1, 1, 36, false)) {
-                return null;
-            }
-
-            if (itemstack1.stackSize == 0) {
-                slot.putStack((ItemStack) null);
+            if (index == 0) {
+                if (!mergeItemStack(stackInSlot, 1, inventorySlots.size(), true)) return null;
             } else {
-                slot.onSlotChanged();
+                if (canAccept(stackInSlot)) {
+                    if (!mergeItemStack(stackInSlot, 0, 1, false)) return null;
+                } else if (index < 28) {
+                    if (!mergeItemStack(stackInSlot, 28, inventorySlots.size(), false)) return null;
+                } else {
+                    if (!mergeItemStack(stackInSlot, 1, 28, false)) return null;
+                }
             }
 
-            if (itemstack1.stackSize == itemstack.stackSize) {
-                return null;
-            }
+            if (stackInSlot.stackSize == 0) slot.putStack(null);
+            else slot.onSlotChanged();
 
-            slot.onPickupFromSlot(user, itemstack1);
+            if (stackInSlot.stackSize == itemstack.stackSize) return null;
+
+            slot.onPickupFromSlot(player, stackInSlot);
         }
-
         return itemstack;
     }
 
     public boolean canAccept(ItemStack ammo) {
-        String ammoType = "null";
         if (ammo != null && ammo.getItem() instanceof IAmmo) {
-            ammoType = ((IAmmo) ammo.getItem()).getAmmoType(ammo);
+            String ammoType = ((IAmmo) ammo.getItem()).getAmmoType(ammo);
+            if (weapon != null && weapon.getItem() instanceof IFirearm) {
+                return ((IFirearm) weapon.getItem()).canAcceptAmmo(weapon, ammoType);
+            }
+            return ammoType.equalsIgnoreCase("arrow");
         }
-
-        if (weapon != null && weapon.getItem() instanceof IFirearm) {
-            return ((IFirearm) weapon.getItem()).canAcceptAmmo(weapon, ammoType);
-        }
-
-        return ammoType.equalsIgnoreCase("arrow");
+        return false;
     }
 
-    @Override
-    public boolean canInteractWith(EntityPlayer user) {
-        return true;
+    private static class SlotReload extends Slot {
+        private final ContainerReload container;
+
+        SlotReload(ContainerReload container, IInventory inventory, int id, int x, int y) {
+            super(inventory, id, x, y);
+            this.container = container;
+        }
+
+        @Override
+        public boolean isItemValid(ItemStack item) {
+            return container.canAccept(item);
+        }
     }
 }
