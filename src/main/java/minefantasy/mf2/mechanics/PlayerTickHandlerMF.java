@@ -50,113 +50,6 @@ public class PlayerTickHandlerMF {
         return n > 0 && random.nextInt(n) == 0;
     }
 
-    // Table-driven tier selection support
-    private static class DragonTierRule {
-        final int maxKills; // inclusive
-        final int young;
-        final int mature;
-        final int adult;
-        final int elder;
-        final int ancient;
-
-        DragonTierRule(int maxKills, int young, int mature, int adult, int elder, int ancient) {
-            this.maxKills = maxKills;
-            this.young = young;
-            this.mature = mature;
-            this.adult = adult;
-            this.elder = elder;
-            this.ancient = ancient;
-        }
-    }
-
-    // Defaults matching legacy behavior
-    private static final DragonTierRule[] DEFAULT_TIER_RULES = new DragonTierRule[]{
-            new DragonTierRule(4, 100, 0, 0, 0, 0),
-            new DragonTierRule(9, 20, 0, 80, 0, 0),
-            new DragonTierRule(14, 10, 0, 90, 0, 0),
-            new DragonTierRule(24, 5, 10, 85, 0, 0),
-            new DragonTierRule(34, 0, 25, 75, 0, 0),
-            new DragonTierRule(49, 0, 0, 100, 0, 0),
-            new DragonTierRule(75, 0, 70, 10, 20, 0),
-            new DragonTierRule(Integer.MAX_VALUE, 0, 49, 0, 50, 1)
-    };
-
-    private static volatile DragonTierRule[] parsedTierRules;
-    private static volatile String lastTierRulesSpec;
-
-    private static DragonTierRule[] getConfiguredTierRules() {
-        String spec = ConfigMobs.dragonTierRules;
-        if (parsedTierRules != null && spec != null && spec.equals(lastTierRulesSpec)) {
-            return parsedTierRules;
-        }
-
-        DragonTierRule[] parsed = parseTierRules(spec);
-        if (parsed == null || parsed.length == 0) {
-            MFLogUtil.logDebug("Using default dragon tier rules (parse failed or empty)");
-            parsed = DEFAULT_TIER_RULES;
-        }
-        parsedTierRules = parsed;
-        lastTierRulesSpec = spec;
-        return parsedTierRules;
-    }
-
-    private static DragonTierRule[] parseTierRules(String spec) {
-        try {
-            if (spec == null || spec.trim().isEmpty()) return DEFAULT_TIER_RULES;
-            String[] rows = spec.split("[;\r\n]+");
-            java.util.ArrayList<DragonTierRule> list = new java.util.ArrayList<DragonTierRule>(rows.length);
-            for (String row : rows) {
-                row = row.trim();
-                // strip inline comments (# ... or // ...)
-                int hash = row.indexOf('#');
-                if (hash >= 0) row = row.substring(0, hash).trim();
-                int slashes = row.indexOf("//");
-                if (slashes >= 0) row = row.substring(0, slashes).trim();
-                if (row.isEmpty()) continue;
-                String[] parts = row.split(":");
-                if (parts.length != 2) {
-                    MFLogUtil.logDebug("Invalid dragon tier row (missing ':'): " + row);
-                    continue;
-                }
-                int maxKills = Integer.parseInt(parts[0].trim());
-                String[] probs = parts[1].split(",");
-                if (probs.length != 5) {
-                    MFLogUtil.logDebug("Invalid dragon tier row (need 5 probabilities): " + row);
-                    continue;
-                }
-                int young = clampPercent(probs[0]);
-                int mature = clampPercent(probs[1]);
-                int adult = clampPercent(probs[2]);
-                int elder = clampPercent(probs[3]);
-                int ancient = clampPercent(probs[4]);
-                list.add(new DragonTierRule(maxKills, young, mature, adult, elder, ancient));
-            }
-            if (list.isEmpty()) return DEFAULT_TIER_RULES;
-            // Ensure sorted by maxKills
-            list.sort(new java.util.Comparator<DragonTierRule>() {
-                @Override
-                public int compare(DragonTierRule a, DragonTierRule b) {
-                    return Integer.compare(a.maxKills, b.maxKills);
-                }
-            });
-            return list.toArray(new DragonTierRule[0]);
-        } catch (Exception ex) {
-            MFLogUtil.logDebug("Failed to parse dragon tier rules: " + ex.getMessage());
-            return DEFAULT_TIER_RULES;
-        }
-    }
-
-    private static int clampPercent(String s) {
-        try {
-            int v = Integer.parseInt(s.trim());
-            if (v < 0) return 0;
-            if (v > 100) return 100;
-            return v;
-        } catch (Exception ignore) {
-            return 0;
-        }
-    }
-
     public static void spawnDragon(EntityPlayer player) {
         spawnDragon(player, 64);
     }
@@ -209,19 +102,53 @@ public class PlayerTickHandlerMF {
 
     public static int getDragonTier(EntityPlayer player) {
         int kills = getDragonEnemyPoints(player);
-        DragonTierRule[] rules = getConfiguredTierRules();
-        for (DragonTierRule rule : rules) {
-            if (kills <= rule.maxKills) {
-                int roll = random.nextInt(100) + 1; // 1..100
-                int r = roll;
-                if ((r -= rule.young) <= 0) return TIER_YOUNG;
-                if ((r -= rule.mature) <= 0) return TIER_MATURE;
-                if ((r -= rule.adult) <= 0) return TIER_ADULT;
-                if ((r -= rule.elder) <= 0) return TIER_ELDER;
-                return TIER_ANCIENT;
-            }
+
+        // < 5: always Young
+        if (kills < 5) {
+            return TIER_YOUNG;
         }
-        return TIER_YOUNG; // fallback
+
+        // 5-9: 20% Young else Adult
+        if (kills < 10) {
+            if (oneIn(5)) return TIER_YOUNG;
+            return TIER_ADULT;
+        }
+
+        // 10-14: 10% Young else Adult
+        if (kills < 15) {
+            if (oneIn(10)) return TIER_YOUNG;
+            return TIER_ADULT;
+        }
+
+        // 15-24: 5% Young, 10% Mature, else Adult
+        if (kills < 25) {
+            if (oneIn(20)) return TIER_YOUNG;
+            if (oneIn(10)) return TIER_MATURE;
+            return TIER_ADULT;
+        }
+
+        // 25-34: 25% Mature else Adult
+        if (kills < 35) {
+            if (oneIn(4)) return TIER_MATURE;
+            return TIER_ADULT;
+        }
+
+        // 35-49: Adult
+        if (kills < 50) {
+            return TIER_ADULT;
+        }
+
+        // > 75: 1% Ancient, 50% Elder, else Mature
+        if (kills > 75) {
+            if (oneIn(100)) return TIER_ANCIENT;
+            if (oneIn(2)) return TIER_ELDER;
+            return TIER_MATURE;
+        }
+
+        // 50-75: 10% Adult, 20% Elder, else Mature
+        if (oneIn(10)) return TIER_ADULT;
+        if (oneIn(5)) return TIER_ELDER;
+        return TIER_MATURE;
     }
 
     public static void addDragonKill(EntityPlayer player) {
