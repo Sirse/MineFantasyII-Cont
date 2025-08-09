@@ -84,19 +84,15 @@ public class ContainerAnvilMF extends ContainerMF {
         ItemStack originalStack = stackInSlot.copy();
         boolean merged = false;
 
-        // From anvil to player
         if (slotIndex < anvilSlotCount) {
             if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
                 merged = true;
             }
-        }
-        // From player inventory to anvil
-        else {
-            // Try move into anvil grid first
+        } else {
             if (this.mergeItemStack(stackInSlot, 0, anvilOutputSlotIndex, false)) {
                 merged = true;
             }
-            // If not moved - bounce between main inventory and hotbar for convenience
+
             if (!merged) {
                 merged = this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex);
             }

@@ -7,7 +7,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
 public class ContainerBombBench extends ContainerMF {
-    // Slot indices
     private static final int CASE_SLOT = 0;
     private static final int POWDER_SLOT = 1;
     private static final int FILLING_SLOT = 2;

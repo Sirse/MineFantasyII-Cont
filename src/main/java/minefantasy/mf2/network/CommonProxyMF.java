@@ -23,12 +23,12 @@ import minefantasy.mf2.integration.minetweaker.MTCompat;
 import minefantasy.mf2.item.archery.ArrowFireFlint;
 import minefantasy.mf2.item.archery.ArrowFirerMF;
 import minefantasy.mf2.mechanics.*;
-import minefantasy.mf2.util.XSTRandom;
-import minetweaker.MineTweakerAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+
+import java.util.Random;
 
 /**
  * @author Anonymous Productions
@@ -149,12 +149,19 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
 
     @Override
     public void spawnSmoke(World world, double x, double y, double z, int value) {
-        XSTRandom random = new XSTRandom();
-        for (int a = 0; a < value; a++) {
-            float sprayRange = 0.005F;
-            float sprayX = (random.nextFloat() * sprayRange) - (sprayRange / 2);
-            float sprayZ = (random.nextFloat() * sprayRange) - (sprayRange / 2);
-            float height = 0.001F;
+        if (world == null || world.isRemote) {
+            return;
+        }
+
+        final Random random = world.rand;
+        final int count = Math.min(Math.max(value, 0), 64);
+        final float sprayRange = 0.005F;
+        final float halfRange = sprayRange / 2F;
+        final float height = 0.001F;
+
+        for (int a = 0; a < count; a++) {
+            float sprayX = (random.nextFloat() * sprayRange) - halfRange;
+            float sprayZ = (random.nextFloat() * sprayRange) - halfRange;
             if (random.nextInt(2) == 0) {
                 EntitySmoke smoke = new EntitySmoke(world, x, y - 0.5D, z, sprayX, height, sprayZ);
                 world.spawnEntityInWorld(smoke);

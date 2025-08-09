@@ -131,21 +131,19 @@ public abstract class ContainerMF extends Container {
      * Try moving between main (27 slots) and hotbar (9 slots) depending on where the item currently is.
      * fromIndex is the slot index in this container.
      */
-    protected boolean bounceBetweenMainAndHotbar(ItemStack stack, int playerInventoryStartIndex, int fromIndex) {
-        int mainStart = playerInventoryStartIndex;
+    protected boolean bounceBetweenMainAndHotbar(ItemStack stack, int mainStart, int fromIndex) {
         int mainEnd = mainStart + 27; // exclusive
-        int hotbarStart = mainEnd;
         int hotbarEnd = this.inventorySlots.size(); // exclusive
 
         if (fromIndex >= mainStart && fromIndex < mainEnd) {
-            return this.mergeItemStack(stack, hotbarStart, hotbarEnd, false);
+            return this.mergeItemStack(stack, mainEnd, hotbarEnd, false);
         }
-        if (fromIndex >= hotbarStart && fromIndex < hotbarEnd) {
+        if (fromIndex >= mainEnd && fromIndex < hotbarEnd) {
             return this.mergeItemStack(stack, mainStart, mainEnd, false);
         }
         // If origin unknown/not in player inventory, try main then hotbar
         if (this.mergeItemStack(stack, mainStart, mainEnd, false)) return true;
-        return this.mergeItemStack(stack, hotbarStart, hotbarEnd, false);
+        return this.mergeItemStack(stack, mainEnd, hotbarEnd, false);
     }
 
     /**

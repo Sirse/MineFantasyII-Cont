@@ -27,12 +27,11 @@ public class ContainerBigFurnace extends ContainerMF {
             addSlotToContainer(new SlotFiltered(smelter, HEATER_FUEL_SLOT, 59, 44));
             furnaceSlotCount = HEATER_SLOT_COUNT;
         } else {
-            // Input
             addSlotToContainer(new SlotFiltered(smelter, 0, 36, 26));
             addSlotToContainer(new SlotFiltered(smelter, 1, 54, 26));
             addSlotToContainer(new SlotFiltered(smelter, 2, 36, 44));
             addSlotToContainer(new SlotFiltered(smelter, 3, 54, 44));
-            // Output
+
             addSlotToContainer(new SlotFurnace(player, smelter, 4, 106, 26));
             addSlotToContainer(new SlotFurnace(player, smelter, 5, 124, 26));
             addSlotToContainer(new SlotFurnace(player, smelter, 6, 106, 44));
@@ -77,30 +76,24 @@ public class ContainerBigFurnace extends ContainerMF {
         ItemStack originalStack = stackInSlot.copy();
         boolean merged = false;
 
-        // From furnace to player
         if (slotIndex < furnaceSlotCount) {
             if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
                 merged = true;
             }
-        }
-        // From player to furnace
-        else {
+        } else {
             if (smelter.isHeater()) {
-                // Try to move to fuel slot
                 if (smelter.isItemValidForSlot(HEATER_FUEL_SLOT, stackInSlot)) {
                     if (this.mergeItemStack(stackInSlot, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)) {
                         merged = true;
                     }
                 }
             } else {
-                // Try to move to input slots
                 if (smelter.isItemValidForSlot(SMELTER_INPUT_START_INDEX, stackInSlot)) {
                     if (this.mergeItemStack(stackInSlot, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false)) {
                         merged = true;
                     }
                 }
             }
-            // If not moved into furnace, bounce between main and hotbar
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;

@@ -39,15 +39,134 @@ public class PlayerTickHandlerMF {
     private static String resetBed = "MF_Resetbed";
 
     private static XSTRandom random = new XSTRandom();
+    // Dragon tiers
+    private static final int TIER_YOUNG = 0;
+    private static final int TIER_ADULT = 1;
+    private static final int TIER_MATURE = 2;
+    private static final int TIER_ELDER = 3;
+    private static final int TIER_ANCIENT = 4;
+
+    private static boolean oneIn(int n) {
+        return n > 0 && random.nextInt(n) == 0;
+    }
+
+    // Table-driven tier selection support
+    private static class DragonTierRule {
+        final int maxKills; // inclusive
+        final int young;
+        final int mature;
+        final int adult;
+        final int elder;
+        final int ancient;
+
+        DragonTierRule(int maxKills, int young, int mature, int adult, int elder, int ancient) {
+            this.maxKills = maxKills;
+            this.young = young;
+            this.mature = mature;
+            this.adult = adult;
+            this.elder = elder;
+            this.ancient = ancient;
+        }
+    }
+
+    // Defaults matching legacy behavior
+    private static final DragonTierRule[] DEFAULT_TIER_RULES = new DragonTierRule[]{
+            new DragonTierRule(4, 100, 0, 0, 0, 0),
+            new DragonTierRule(9, 20, 0, 80, 0, 0),
+            new DragonTierRule(14, 10, 0, 90, 0, 0),
+            new DragonTierRule(24, 5, 10, 85, 0, 0),
+            new DragonTierRule(34, 0, 25, 75, 0, 0),
+            new DragonTierRule(49, 0, 0, 100, 0, 0),
+            new DragonTierRule(75, 0, 70, 10, 20, 0),
+            new DragonTierRule(Integer.MAX_VALUE, 0, 49, 0, 50, 1)
+    };
+
+    private static volatile DragonTierRule[] parsedTierRules;
+    private static volatile String lastTierRulesSpec;
+
+    private static DragonTierRule[] getConfiguredTierRules() {
+        String spec = ConfigMobs.dragonTierRules;
+        if (parsedTierRules != null && spec != null && spec.equals(lastTierRulesSpec)) {
+            return parsedTierRules;
+        }
+
+        DragonTierRule[] parsed = parseTierRules(spec);
+        if (parsed == null || parsed.length == 0) {
+            MFLogUtil.logDebug("Using default dragon tier rules (parse failed or empty)");
+            parsed = DEFAULT_TIER_RULES;
+        }
+        parsedTierRules = parsed;
+        lastTierRulesSpec = spec;
+        return parsedTierRules;
+    }
+
+    private static DragonTierRule[] parseTierRules(String spec) {
+        try {
+            if (spec == null || spec.trim().isEmpty()) return DEFAULT_TIER_RULES;
+            String[] rows = spec.split("[;\r\n]+");
+            java.util.ArrayList<DragonTierRule> list = new java.util.ArrayList<DragonTierRule>(rows.length);
+            for (String row : rows) {
+                row = row.trim();
+                // strip inline comments (# ... or // ...)
+                int hash = row.indexOf('#');
+                if (hash >= 0) row = row.substring(0, hash).trim();
+                int slashes = row.indexOf("//");
+                if (slashes >= 0) row = row.substring(0, slashes).trim();
+                if (row.isEmpty()) continue;
+                String[] parts = row.split(":");
+                if (parts.length != 2) {
+                    MFLogUtil.logDebug("Invalid dragon tier row (missing ':'): " + row);
+                    continue;
+                }
+                int maxKills = Integer.parseInt(parts[0].trim());
+                String[] probs = parts[1].split(",");
+                if (probs.length != 5) {
+                    MFLogUtil.logDebug("Invalid dragon tier row (need 5 probabilities): " + row);
+                    continue;
+                }
+                int young = clampPercent(probs[0]);
+                int mature = clampPercent(probs[1]);
+                int adult = clampPercent(probs[2]);
+                int elder = clampPercent(probs[3]);
+                int ancient = clampPercent(probs[4]);
+                list.add(new DragonTierRule(maxKills, young, mature, adult, elder, ancient));
+            }
+            if (list.isEmpty()) return DEFAULT_TIER_RULES;
+            // Ensure sorted by maxKills
+            list.sort(new java.util.Comparator<DragonTierRule>() {
+                @Override
+                public int compare(DragonTierRule a, DragonTierRule b) {
+                    return Integer.compare(a.maxKills, b.maxKills);
+                }
+            });
+            return list.toArray(new DragonTierRule[0]);
+        } catch (Exception ex) {
+            MFLogUtil.logDebug("Failed to parse dragon tier rules: " + ex.getMessage());
+            return DEFAULT_TIER_RULES;
+        }
+    }
+
+    private static int clampPercent(String s) {
+        try {
+            int v = Integer.parseInt(s.trim());
+            if (v < 0) return 0;
+            if (v > 100) return 100;
+            return v;
+        } catch (Exception ignore) {
+            return 0;
+        }
+    }
 
     public static void spawnDragon(EntityPlayer player) {
         spawnDragon(player, 64);
     }
 
     public static void spawnDragon(EntityPlayer player, int offset) {
-        int y = (int) (player.posY + offset);
-        boolean canMobSpawn = !player.worldObj.isRemote && canDragonSpawnOnPlayer(player, y);
-        if (canMobSpawn && !player.worldObj.isRemote) {
+        int y = MathHelper.floor_double(player.posY + offset);
+        int maxY = Math.max(1, player.worldObj.getActualHeight() - 1);
+        if (y < 1) y = 1;
+        if (y > maxY) y = maxY;
+        if (!player.worldObj.isRemote && canDragonSpawnOnPlayer(player, y)) {
             int tier = getDragonTier(player);// Gets tier on kills
             EntityDragon dragon = new EntityDragon(player.worldObj);
             dragon.setPosition(player.posX, y, player.posZ);
@@ -58,7 +177,7 @@ public class PlayerTickHandlerMF {
                     1.5F);
             dragon.fireBreathCooldown = 200;
 
-            if (ConfigMobs.dragonMSG && !player.worldObj.isRemote) {
+            if (ConfigMobs.dragonMSG) {
                 player.addChatMessage(new ChatComponentText(
                         EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));
 
@@ -76,9 +195,11 @@ public class PlayerTickHandlerMF {
     }
 
     private static boolean canDragonSpawnOnPlayer(EntityPlayer player, int y) {
+        int baseX = MathHelper.floor_double(player.posX);
+        int baseZ = MathHelper.floor_double(player.posZ);
         for (int x = -3; x <= 3; x++) {
             for (int z = -3; z <= 3; z++) {
-                if (!player.worldObj.canBlockSeeTheSky((int) player.posX + x, y, (int) player.posZ + z)) {
+                if (!player.worldObj.canBlockSeeTheSky(baseX + x, y, baseZ + z)) {
                     return false;
                 }
             }
@@ -88,47 +209,19 @@ public class PlayerTickHandlerMF {
 
     public static int getDragonTier(EntityPlayer player) {
         int kills = getDragonEnemyPoints(player);
-        if (kills < 5) {
-            return 0;// Young 100%
+        DragonTierRule[] rules = getConfiguredTierRules();
+        for (DragonTierRule rule : rules) {
+            if (kills <= rule.maxKills) {
+                int roll = random.nextInt(100) + 1; // 1..100
+                int r = roll;
+                if ((r -= rule.young) <= 0) return TIER_YOUNG;
+                if ((r -= rule.mature) <= 0) return TIER_MATURE;
+                if ((r -= rule.adult) <= 0) return TIER_ADULT;
+                if ((r -= rule.elder) <= 0) return TIER_ELDER;
+                return TIER_ANCIENT;
+            }
         }
-        if (kills < 10) {
-            if (random.nextInt(5) == 0)
-                return 0;// 20% chance for Young
-            return 1;// Adult
-        }
-        if (kills < 15) {
-            if (random.nextInt(10) == 0)
-                return 0;// 10% chance for Young
-            return 1;// Adult
-        }
-        if (kills < 25) {
-            if (random.nextInt(20) == 0)
-                return 0;// 5% chance for Young
-            if (random.nextInt(10) == 0)
-                return 2;// 10% chance for Mature
-            return 1;// Adult
-        }
-        if (kills < 35) {
-            if (random.nextInt(4) == 0)
-                return 2;// 25% chance for Mature
-            return 1;// Adult
-        }
-        if (kills >= 50) {
-            if (random.nextInt(10) == 0)
-                return 1;// 10% chance for Adult
-            if (random.nextInt(5) == 0)
-                return 3;// 20% chance Elder
-            return 2;// Mature
-        }
-        if (kills > 75) {
-            if (random.nextInt(100) == 0)
-                return 4;// 1% chance Ancient
-            if (random.nextInt(2) == 0)
-                return 3;// 50% chance Elder
-            return 2;// Mature
-        }
-
-        return 0;// Young 100%
+        return TIER_YOUNG; // fallback
     }
 
     public static void addDragonKill(EntityPlayer player) {
@@ -226,6 +319,7 @@ public class PlayerTickHandlerMF {
                     if (item != null && item.getItem() instanceof IHotItem) {
                         event.player.setFire(5);
                         event.player.attackEntityFrom(DamageSource.onFire, 1.0F);
+                        break;
                     }
                 }
             }
@@ -297,6 +391,7 @@ public class PlayerTickHandlerMF {
             if (PlayerTickHandlerMF.getDragonEnemyPoints(player) >= 50) {
                 chance *= 2;// twice the chance
             }
+            i = Math.max(1, i); // guard against division by zero
             if (!player.worldObj.isRemote && player.worldObj.getTotalWorldTime() % i == 0
                     && random.nextFloat() * 100F < chance) {
                 spawnDragon(player);
@@ -331,7 +426,6 @@ public class PlayerTickHandlerMF {
             yawBalance -= weight;
 
             if (ConfigWeapon.useBalance) {
-                MFLogUtil.logDebug("Weapon Balance Move");
                 entityPlayer.rotationYaw += yawBalance > 0 ? weight : -weight;
             }
 

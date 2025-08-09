@@ -47,27 +47,23 @@ public class ContainerBlastChamber extends ContainerMF {
         ItemStack originalStack = stackInSlot.copy();
         boolean merged = false;
 
-        // From chamber to player
         if (slotIndex < CHAMBER_SLOT_COUNT) {
             if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
                 merged = true;
             }
-        }
-        // From player to chamber
-        else {
-            // Try to move to fuel slot first
+        } else {
             if (tile.isItemValidForSlot(CARBON_SLOT, stackInSlot)) {
                 if (this.mergeItemStack(stackInSlot, CARBON_SLOT, CARBON_SLOT + 1, false)) {
                     merged = true;
                 }
             }
-            // If not moved, try to move to input slot
+
             if (!merged && tile.isItemValidForSlot(INPUT_SLOT, stackInSlot)) {
                 if (this.mergeItemStack(stackInSlot, INPUT_SLOT, INPUT_SLOT + 1, false)) {
                     merged = true;
                 }
             }
-            // If not moved - bounce between main and hotbar
+
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;

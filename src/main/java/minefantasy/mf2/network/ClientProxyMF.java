@@ -77,7 +77,6 @@ public class ClientProxyMF extends CommonProxyMF {
     public void registerTickHandlers() {
         super.registerTickHandlers();
         FMLCommonHandler.instance().bus().register(new PlayerTickHandlerMF());
-        FMLCommonHandler.instance().bus().register(new AnimationHandlerMF());
         FMLCommonHandler.instance().bus().register(new ExtendedReachMF());
         MinecraftForge.EVENT_BUS.register(new HudHandlerMF());
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
