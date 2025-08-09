@@ -5,13 +5,14 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.item.archery.ItemBowMF;
 import minefantasy.mf2.item.gadget.IScope;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
 @SideOnly(Side.CLIENT)
 public class HudHandlerMF {
-    private MineFantasyHUD inGameGUI = new MineFantasyHUD();
+    private final MineFantasyHUD inGameGUI = new MineFantasyHUD();
 
     @SubscribeEvent
     public void postRenderOverlay(RenderGameOverlayEvent.Post event) {
@@ -26,19 +27,28 @@ public class HudHandlerMF {
     @SubscribeEvent
     public void onBowFOV(FOVUpdateEvent event) {
         ItemStack stack = event.entity.getItemInUse();
-        if (stack != null && stack.getItem() instanceof ItemBowMF) {
-            int i = event.entity.getItemInUseDuration();
-            float f1 = i / 20.0F;
-            if (f1 > 1.0F) {
-                f1 = 1.0F;
-            } else {
-                f1 *= f1;
-            }
-            event.newfov *= 1.0F - f1 * 0.15F;
+        if (stack == null) {
+            return;
         }
-        if (stack != null && stack.getItem() instanceof IScope) {
-            IScope spyglass = (IScope) stack.getItem();
-            event.newfov *= 1.0F - spyglass.getZoom(stack);
+
+        float zoomModifier = 0.0F;
+        Item item = stack.getItem();
+
+        if (item instanceof IScope) {
+            zoomModifier = ((IScope) item).getZoom(stack);
+        } else if (item instanceof ItemBowMF) {
+            float chargeProgress = event.entity.getItemInUseDuration() / 20.0F;
+
+            if (chargeProgress > 1.0F) {
+                chargeProgress = 1.0F;
+            } else {
+                chargeProgress *= chargeProgress;
+            }
+            zoomModifier = chargeProgress * 0.15F;
+        }
+
+        if (zoomModifier > 0.0F) {
+            event.newfov *= (1.0F - zoomModifier);
         }
     }
 }
