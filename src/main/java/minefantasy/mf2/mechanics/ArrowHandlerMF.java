@@ -106,6 +106,10 @@ public class ArrowHandlerMF {
 
         ItemStack bow = event.bow;
         World world = event.entity.worldObj;
+
+        if (world.isRemote) {
+            return;
+        }
         boolean creative = user.capabilities.isCreativeMode;
 
         float charge = power / 20.0F;
@@ -119,12 +123,15 @@ public class ArrowHandlerMF {
             charge = 1.0F;
         }
 
-        // Default is flint arrow
-        ItemStack arrow = new ItemStack(Items.arrow);
-        if (AmmoMechanicsMF.getArrowOnBow(bow) != null) {
-            // if an arrow is on the bow, it uses that
-            arrow = AmmoMechanicsMF.getArrowOnBow(bow);
+        // Determine arrow to fire: must be loaded on the bow unless infinite
+        ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(bow);
+        boolean infinite = getIsInfinite(user, bow);
+        if (loaded == null && !infinite) {
+            // No loaded arrow and not infinite: do not allow firing (prevents ammo bypass)
+            return;
         }
+        // Use loaded arrow if present; otherwise fall back to a default when infinite
+        ItemStack arrow = (loaded != null) ? loaded : new ItemStack(Items.arrow);
         if (AmmoMechanicsMF.handlers != null && AmmoMechanicsMF.handlers.size() > 0) {
             for (int a = 0; a < AmmoMechanicsMF.handlers.size(); a++) {
                 // If the Arrow handler succeeds at firing an arrow
@@ -136,7 +143,10 @@ public class ArrowHandlerMF {
                             1.0F / (world.rand.nextFloat() * 0.4F + 1.2F) + charge * 0.5F);
                     loadArrow(user, bow, null);
                     event.setCanceled(true);
-                    AmmoMechanicsMF.consumeAmmo(user, bow);
+                    // Only consume ammo when not infinite; handlers may also account for this
+                    if (!infinite) {
+                        AmmoMechanicsMF.consumeAmmo(user, bow);
+                    }
                     break;
                 }
             }
@@ -147,17 +157,4 @@ public class ArrowHandlerMF {
         return user.capabilities.isCreativeMode
                 || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, bow) > 0;
     }
-
-    // Used to take an item/subId from the inventory
-    private boolean consumePlayerItem(EntityPlayer player, ItemStack item) {
-        for (int a = 0; a < player.inventory.getSizeInventory(); a++) {
-            ItemStack i = player.inventory.getStackInSlot(a);
-            if (i != null && i.isItemEqual(item)) {
-                player.inventory.decrStackSize(a, 1);
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

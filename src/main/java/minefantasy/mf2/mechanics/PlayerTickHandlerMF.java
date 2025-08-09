@@ -63,10 +63,8 @@ public class PlayerTickHandlerMF {
                         EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));
 
                 List<?> list = player.worldObj.playerEntities;
-                Iterator<?> players = list.iterator();
-                while (players.hasNext()) {
-                    Object instance = players.next();
-                    if (instance != null && instance instanceof EntityPlayer) {
+                for (Object instance : list) {
+                    if (instance instanceof EntityPlayer) {
                         if (((EntityPlayer) instance).getDistanceToEntity(player) < 256D && instance != player) {
                             ((EntityPlayer) instance).addChatMessage(new ChatComponentText(
                                     EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));

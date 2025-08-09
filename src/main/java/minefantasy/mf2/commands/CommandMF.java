@@ -29,8 +29,8 @@ public class CommandMF implements ICommand {
 
     private List setupMaterialsList() {
         List materials = new ArrayList<String>();
-        for(CustomMaterial material : CustomMaterial.materialList.values()) {
-            if(material.type.equalsIgnoreCase("wood") || material.type.equalsIgnoreCase("metal")) {
+        for (CustomMaterial material : CustomMaterial.materialList.values()) {
+            if (material.type.equalsIgnoreCase("wood") || material.type.equalsIgnoreCase("metal")) {
                 materials.add(material);
             }
         }
@@ -44,7 +44,7 @@ public class CommandMF implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
-    return "/minefantasy edit <material|quality|unbreakable> <value>";
+        return "/minefantasy edit <material|quality|unbreakable> <value>";
     }
 
     @Override

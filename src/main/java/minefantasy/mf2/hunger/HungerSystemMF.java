@@ -12,7 +12,9 @@ public class HungerSystemMF {
     public static int slowdownRate = 3;
 
     public static void setSaturation(EntityPlayer user, float value) {
-        user.getEntityData().setFloat(saturationNBT, value);
+        if (!user.worldObj.isRemote) {
+            user.getEntityData().setFloat(saturationNBT, value);
+        }
     }
 
     public static float getSaturation(EntityPlayer user) {
@@ -23,7 +25,9 @@ public class HungerSystemMF {
     }
 
     public static void setTempFood(EntityPlayer user, float value) {
-        user.getEntityData().setFloat(tempFoodNBT, value);
+        if (!user.worldObj.isRemote) {
+            user.getEntityData().setFloat(tempFoodNBT, value);
+        }
     }
 
     public static float getTempFood(EntityPlayer user) {
@@ -35,10 +39,7 @@ public class HungerSystemMF {
 
     public static void decrSaturation(EntityPlayer user) {
         float sat = getSaturation(user);
-        sat--;
-        if (sat < 0) {
-            sat = -1;
-        }
+        sat = Math.max(0F, sat - 1F);
         if (!user.worldObj.isRemote) {
             setSaturation(user, sat);
         }
@@ -65,6 +66,9 @@ public class HungerSystemMF {
     }
 
     public void slowHunger(EntityPlayer player) {
+        if (player.capabilities.isCreativeMode) {
+            return;
+        }
         // init vars
         int food = player.getFoodStats().getFoodLevel();
 

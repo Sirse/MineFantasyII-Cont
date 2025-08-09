@@ -17,8 +17,9 @@ public class BombDispenser implements IBehaviorDispenseItem {
     public ItemStack dispense(IBlockSource dispenser, ItemStack item) {
         EnumFacing direction = BlockDispenser.func_149937_b(dispenser.getBlockMetadata());
         // BlockDispenser
-        if (item == null)
-            return null;
+        if (item == null || item.getItem() == null) {
+            return item;
+        }
 
         if (item.getItem() instanceof ItemBomb) {
             ItemBomb itembomb = (ItemBomb) item.getItem();
@@ -42,11 +43,10 @@ public class BombDispenser implements IBehaviorDispenseItem {
                 if (item.hasTagCompound() && item.getTagCompound().hasKey("stickyBomb")) {
                     bomb.getEntityData().setBoolean("stickyBomb", true);
                 }
+                // Consume one item only on the server
+                item.splitStack(1);
             }
-            item.splitStack(1);
-        }
-
-        if (item.getItem() instanceof ItemMine) {
+        } else if (item.getItem() instanceof ItemMine) {
             ItemMine itembomb = (ItemMine) item.getItem();
             World world = dispenser.getWorld();
 
@@ -68,8 +68,9 @@ public class BombDispenser implements IBehaviorDispenseItem {
                 if (item.hasTagCompound() && item.getTagCompound().hasKey("stickyBomb")) {
                     bomb.getEntityData().setBoolean("stickyBomb", true);
                 }
+                // Consume one item only on the server
+                item.splitStack(1);
             }
-            item.splitStack(1);
         }
 
         return item;

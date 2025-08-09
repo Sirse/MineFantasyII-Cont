@@ -82,9 +82,19 @@ public class EventManagerMF {
 
     public static final String hitspeedNBT = "MF_HitCooldown";
     public static final String injuredNBT = "MF_Injured";
+    // Cache optional class presence to avoid repeated reflection in hot paths
+    private static final boolean ARROW_EFFECTS_PRESENT = isClassPresent("minefantasy.mf2.api.helpers.ArrowEffectsMF");
     public static boolean displayOreDict;
-
     private static XSTRandom random = new XSTRandom();
+
+    private static boolean isClassPresent(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 
     public static void addArmourDT(ItemStack armour, EntityPlayer user, List<String> list, boolean extra) {
         list.add("");
@@ -208,6 +218,9 @@ public class EventManagerMF {
 
     @SubscribeEvent
     public void tryDropItems(LivingDropsEvent event) {
+        if (event.entityLiving.worldObj.isRemote) {
+            return;
+        }
         EntityLivingBase dropper = event.entityLiving;
 
         if (dropper instanceof EntityChicken) {
@@ -236,7 +249,7 @@ public class EventManagerMF {
                 alterDrops(dropper, event);
             }
         }
-        if (getRegisterName(dropper).contains("Horse")) {
+        if (dropper instanceof EntityHorse) {
             int dropCount = random.nextInt(3 + event.lootingLevel);
             if (ConfigHardcore.lessHunt) {
                 dropCount = 1 + random.nextInt(event.lootingLevel + 1);
@@ -247,7 +260,7 @@ public class EventManagerMF {
                 dropper.entityDropItem(new ItemStack(meat), 0.0F);
             }
         }
-        if (getRegisterName(dropper).contains("Wolf")) {
+        if (dropper instanceof EntityWolf) {
             int dropCount = random.nextInt(3 + event.lootingLevel);
             if (ConfigHardcore.lessHunt) {
                 dropCount = 1 + random.nextInt(event.lootingLevel + 1);
@@ -272,7 +285,7 @@ public class EventManagerMF {
                     ItemStack drop = entItem.getEntityItem();
 
                     if (drop.getItem() == Items.arrow) {
-                        entItem.setDead();
+                        list.remove();
                     }
                 }
             }
@@ -291,7 +304,8 @@ public class EventManagerMF {
                 ItemStack drop = entItem.getEntityItem();
 
                 if (drop.getItem() == Items.leather) {
-                    entItem.setDead();
+                    // Remove vanilla leather drop; we'll replace with hide below
+                    list.remove();
                     dropHide = true;
                 }
             }
@@ -320,14 +334,13 @@ public class EventManagerMF {
     }
 
     private int getHideSizeFor(EntityLivingBase mob) {
-        String mobName = mob.getClass().getName();
-        if (mobName.endsWith("EntityCow") || mobName.endsWith("EntityHorse")) {
+        if (mob instanceof EntityCow || mob instanceof EntityHorse) {
             return 3;
         }
-        if (mobName.endsWith("EntitySheep")) {
+        if (mob instanceof EntitySheep) {
             return 2;
         }
-        if (mobName.endsWith("EntityPig")) {
+        if (mob instanceof EntityPig) {
             return 1;
         }
 
@@ -344,11 +357,6 @@ public class EventManagerMF {
     }
 
     private boolean shouldAnimalDropHide(EntityLivingBase mob) {
-        String mobName = mob.getClass().getName();
-        if (mobName.endsWith("EntityWolf") || mobName.endsWith("EntityPig") || mobName.endsWith("EntitySheep")
-                || mobName.endsWith("EntityCow") || mobName.endsWith("EntityHorse")) {
-            return true;
-        }
         if (mob instanceof EntityWolf || mob instanceof EntityCow || mob instanceof EntityPig
                 || mob instanceof EntitySheep || mob instanceof EntityHorse) {
             return true;
@@ -368,19 +376,11 @@ public class EventManagerMF {
         }
         Entity dropper = event.entity;
 
-        boolean useArrows = true;
-        try {
-            Class.forName("minefantasy.mf2.api.helpers.ArrowEffectsMF");
-        } catch (Exception e) {
-            useArrows = false;
-        }
-        if (dropper != null && useArrows && ConfigExperiment.stickArrows && !dropper.worldObj.isRemote) {
+        if (dropper != null && ARROW_EFFECTS_PRESENT && ConfigExperiment.stickArrows && !dropper.worldObj.isRemote) {
             ArrayList<ItemStack> stuckArrows = (ArrayList<ItemStack>) ArrowEffectsMF.getStuckArrows(dropper);
-            if (stuckArrows != null && !stuckArrows.isEmpty()) {
-                Iterator<ItemStack> list = stuckArrows.iterator();
+            if (!stuckArrows.isEmpty()) {
 
-                while (list.hasNext()) {
-                    ItemStack arrow = list.next();
+                for (ItemStack arrow : stuckArrows) {
                     if (arrow != null) {
                         dropper.entityDropItem(arrow, 0.0F);
                     }
@@ -393,6 +393,9 @@ public class EventManagerMF {
     @SubscribeEvent
     public void spawnEntity(EntityJoinWorldEvent event) {
         if (event.entity.isDead) {
+            return;
+        }
+        if (event.world.isRemote) {
             return;
         }
         if (event.entity instanceof EntityItem && !(event.entity instanceof EntityItemUnbreakable)) {
@@ -430,13 +433,14 @@ public class EventManagerMF {
                 boolean dropItem = true;
 
                 if (drop.getItem() instanceof ItemFood) {
-                    entItem.setDead();
+                    // Remove original food drop from the drop list; we'll re-add deduped items
+                    list.remove();
 
                     if (!meats.isEmpty()) {
-                        for (int a = 0; a < meats.size(); a++) {
-                            ItemStack compare = meats.get(a);
+                        for (ItemStack compare : meats) {
                             if (drop.isItemEqual(compare)) {
                                 dropItem = false;
+                                break;
                             }
                         }
                     }
@@ -461,7 +465,7 @@ public class EventManagerMF {
     public void killEntity(LivingDeathEvent event) {
         // killsCount
         EntityLivingBase dead = event.entityLiving;
-        EntityLivingBase hunter = null;
+        EntityLivingBase hunter;
         ItemStack weapon = null;
         DamageSource source = event.source;
 
@@ -572,10 +576,6 @@ public class EventManagerMF {
             playerMineBlock(event);
         }
     }
-
-	/*@SubscribeEvent
-    public void loadChunk(ChunkEvent.Load event) {
-	}*/
 
     public void playerMineBlock(BlockEvent.BreakEvent event) {
         EntityPlayer player = event.getPlayer();
@@ -773,10 +773,6 @@ public class EventManagerMF {
             StaminaMechanics.tickEntity(event.entityLiving);
         }
         tickHitSpeeds(event.entityLiving);
-
-		/*if (event.entity.ticksExisted == 1 && event.entity instanceof EntityPlayer && !event.entity.worldObj.isRemote) {
-		}*/
-
     }
 
     @SubscribeEvent
