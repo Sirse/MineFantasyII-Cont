@@ -33,7 +33,9 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         this.storageSize = size;
     }
 
-    public boolean interact(EntityPlayer user, ItemStack held) {
+    public boolean interact(EntityPlayer user) {
+        ItemStack held = user.getHeldItem();
+
         if (held != null) {
             if (this.getStorageType() == 1 && ammo != null && held.getItem() instanceof IFirearm && loadGun(held)) {
                 open();
@@ -44,10 +46,10 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
                 int max = this.getMaxAmmo(ammo != null ? ammo : held);
                 if (ammo == null) {
                     open();
-                    placeInEmpty(user, held, max);
+                    placeInEmpty(user, max);
                 } else if (areItemStacksEqual(held, ammo) && stock < max) {
                     open();
-                    addToBox(user, held, max);
+                    addToBox(user, max);
                 }
 
                 syncData();
@@ -56,7 +58,7 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
             return false;
         } else if (ammo != null) {
             open();
-            takeStack(user, held);
+            takeStack(user);
             syncData();
             return true;
         }
@@ -64,12 +66,11 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         return false;
     }
 
-    private boolean canAcceptItem(ItemStack held) {
-        if (held.getItem() instanceof IStorageBlock) {
+    public boolean canAcceptItem(ItemStack held) {
+        if (held == null || held.getItem() instanceof IStorageBlock) {
             return false;
         }
         byte type = this.getStorageType();
-
         return type == 0 ? isFood(held) : type == 1 ? held.getItem() instanceof IAmmo : type == 2;
     }
 
@@ -111,27 +112,39 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         return false;
     }
 
-    private void addToBox(EntityPlayer user, ItemStack held, int max) {
+    private void addToBox(EntityPlayer user, int max) {
+        ItemStack held = user.getHeldItem();
+        if (held == null) return;
+
         int room_left = max - stock;
-        if (held.stackSize <= room_left) {
-            stock += held.stackSize;
-            user.setCurrentItemOrArmor(0, null);
-        } else {
-            held.stackSize -= room_left;
-            stock += room_left;
+        if (room_left <= 0) return;
+
+        int toAdd = Math.min(held.stackSize, room_left);
+        if (toAdd <= 0) return;
+
+        stock += toAdd;
+        if (!user.capabilities.isCreativeMode) {
+            if (held.stackSize <= room_left) {
+                user.setCurrentItemOrArmor(0, null);
+            } else {
+                held.stackSize -= toAdd;
+            }
         }
     }
 
-    private void takeStack(EntityPlayer user, ItemStack held) {
-        int ss = stock;
+    private void takeStack(EntityPlayer user) {
+        if (ammo == null || stock <= 0) return;
+
+        int ss = Math.min(stock, ammo.getMaxStackSize());
+        if (ss <= 0) return;
+
         ItemStack taken = ammo.copy();
-        if (ss > taken.getMaxStackSize()) {
-            ss = taken.getMaxStackSize();
-        }
         taken.stackSize = ss;
         stock -= ss;
         user.setCurrentItemOrArmor(0, taken);
+
         if (stock <= 0) {
+            stock = 0;
             ammo = null;
         }
     }
@@ -139,18 +152,22 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
     /**
      * Place ammo in empty box
      */
-    private void placeInEmpty(EntityPlayer user, ItemStack held, int max) {
-        ammo = held.copy();
-        int ss = held.stackSize;
-        if (held.stackSize <= max)// Place all
-        {
-            user.setCurrentItemOrArmor(0, null);
-        } else // Fill as much
-        {
-            stock = max;
-            held.stackSize -= max;
+    private void placeInEmpty(EntityPlayer user, int max) {
+        ItemStack held = user.getHeldItem();
+        if (held == null) {
+            return;
         }
-        stock = ss;
+
+        ammo = held.copy();
+        int amount_to_place = Math.min(held.stackSize, max);
+        stock = amount_to_place;
+
+        if (!user.capabilities.isCreativeMode) {
+            held.stackSize -= amount_to_place;
+            if (held.stackSize <= 0) {
+                user.setCurrentItemOrArmor(0, null);
+            }
+        }
     }
 
     private void open() {
@@ -187,23 +204,43 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         if (nbt.hasKey("storage")) {
             NBTTagCompound itemsave = nbt.getCompoundTag("storage");
             ammo = ItemStack.loadItemStackFromNBT(itemsave);
+        } else {
+            ammo = null;
         }
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
+        // Validate current contents before sync
+        setContentsValidated(ammo, stock);
 
         NetworkUtils.sendToWatchers(new AmmoBoxPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+    }
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player, new AmmoBoxPacket(this).generatePacket());
-			super.sendPacketToClient(player);
-		}
-		*/
+    /**
+     * Validates and applies ammo/stock ensuring type acceptance and capacity bounds.
+     * Returns true if state changed.
+     */
+    public boolean setContentsValidated(ItemStack newAmmo, int newStock) {
+        ItemStack validatedAmmo = newAmmo;
+        int validatedStock = newStock;
+
+        if (validatedAmmo != null && !canAcceptItem(validatedAmmo)) {
+            validatedAmmo = null;
+            validatedStock = 0;
+        }
+        int max = (validatedAmmo != null) ? getMaxAmmo(validatedAmmo) : 0;
+        if (validatedStock < 0) validatedStock = 0;
+        if (validatedStock > max) validatedStock = max;
+        if (validatedAmmo != null && validatedAmmo.stackSize > validatedAmmo.getMaxStackSize()) {
+            validatedAmmo = validatedAmmo.copy();
+            validatedAmmo.stackSize = validatedAmmo.getMaxStackSize();
+        }
+
+        boolean changed = this.ammo != validatedAmmo || this.stock != validatedStock || this.ammo != null && !areItemStacksEqual(this.ammo, validatedAmmo);
+        this.ammo = validatedAmmo;
+        this.stock = validatedStock;
+        return changed;
     }
 
     public int getMaxAmmo(ItemStack ammo) {

@@ -30,14 +30,18 @@ public class AmmoBoxPacket extends PacketMF {
         }
 
         coords = NetworkUtils.readCoords(packet);
-        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
-        stock = packet.readInt();
-        ammo = ByteBufUtils.readItemStack(packet);
+        int newStock = packet.readInt();
+        ItemStack newAmmo = ByteBufUtils.readItemStack(packet);
 
-        if (entity instanceof TileEntityAmmoBox) {
-            TileEntityAmmoBox tile = (TileEntityAmmoBox) entity;
-            tile.ammo = this.ammo;
-            tile.stock = this.stock;
+        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
+        if (!(entity instanceof TileEntityAmmoBox)) {
+            return;
+        }
+
+        TileEntityAmmoBox tile = (TileEntityAmmoBox) entity;
+        boolean changed = tile.setContentsValidated(newAmmo, newStock);
+        if (changed && player.worldObj != null) {
+            player.worldObj.markBlockForUpdate(coords[0], coords[1], coords[2]);
         }
     }
 

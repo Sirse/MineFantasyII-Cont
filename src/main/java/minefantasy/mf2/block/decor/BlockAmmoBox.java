@@ -107,14 +107,9 @@ public class BlockAmmoBox extends BlockWoodDecor {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
         int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         world.setBlockMetadataWithNotify(x, y, z, direction, 2);
-
         TileEntityAmmoBox tile = getTile(world, x, y, z);
         if (tile != null) {
-            if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_Ammo)
-                    && item.getTagCompound().hasKey(NBT_Stock)) {
-                tile.ammo = ItemStack.loadItemStackFromNBT(item.getTagCompound().getCompoundTag(NBT_Ammo));
-                tile.stock = item.getTagCompound().getInteger(NBT_Stock);
-            }
+            applyItemNbtToTile(item, tile);
         }
         super.onBlockPlacedBy(world, x, y, z, user, item);
     }
@@ -127,47 +122,63 @@ public class BlockAmmoBox extends BlockWoodDecor {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
                                     float yOffset, float zOffset) {
-        ItemStack held = user.getHeldItem();
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityAmmoBox) {
-            return ((TileEntityAmmoBox) tile).interact(user, held);
+        if (!world.isRemote) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof TileEntityAmmoBox) {
+                return ((TileEntityAmmoBox) tile).interact(user);
+            }
         }
         return false;
     }
 
     @Override
     public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-        ArrayList<ItemStack> ret = new ArrayList<ItemStack>();
-        return ret;
+        return new ArrayList<>();
     }
 
     @Override
     protected ItemStack modifyDrop(TileEntityWoodDecor tile, ItemStack item) {
-        return modifyAmmo((TileEntityAmmoBox) tile, super.modifyDrop(tile, item));
+        ItemStack base = super.modifyDrop(tile, item);
+        if (tile instanceof TileEntityAmmoBox) {
+            return writeAmmoToItem((TileEntityAmmoBox) tile, base);
+        }
+        return base;
     }
 
-    private ItemStack modifyAmmo(TileEntityAmmoBox tile, ItemStack item) {
-        if (tile != null && item != null) {
-            if (tile.ammo != null) {
-                NBTTagCompound nbt = new NBTTagCompound();
-                if (!item.hasTagCompound()) {
-                    item.setTagCompound(new NBTTagCompound());
-                }
-                tile.ammo.writeToNBT(nbt);
-
-                MFLogUtil.logDebug("Added Drop: " + tile.ammo.getDisplayName() + " x" + tile.stock);
-                item.getTagCompound().setTag(NBT_Ammo, nbt);
-                item.getTagCompound().setInteger(NBT_Stock, tile.stock);
+    private ItemStack writeAmmoToItem(TileEntityAmmoBox tile, ItemStack item) {
+        if (tile != null && item != null && tile.ammo != null) {
+            NBTTagCompound nbt = new NBTTagCompound();
+            if (!item.hasTagCompound()) {
+                item.setTagCompound(new NBTTagCompound());
             }
+            tile.ammo.writeToNBT(nbt);
+
+            MFLogUtil.logDebug("Added Drop: " + tile.ammo.getDisplayName() + " x" + tile.stock);
+            item.getTagCompound().setTag(NBT_Ammo, nbt);
+            item.getTagCompound().setInteger(NBT_Stock, tile.stock);
         }
         return item;
     }
 
     private TileEntityAmmoBox getTile(World world, int x, int y, int z) {
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityAmmoBox) {
-            return (TileEntityAmmoBox) tile;
+        return (tile instanceof TileEntityAmmoBox) ? (TileEntityAmmoBox) tile : null;
+    }
+
+    private void applyItemNbtToTile(ItemStack item, TileEntityAmmoBox tile) {
+        if (tile == null || item == null || !item.hasTagCompound()) return;
+        NBTTagCompound tag = item.getTagCompound();
+        if (!tag.hasKey(NBT_Ammo) || !tag.hasKey(NBT_Stock)) return;
+
+        tile.ammo = ItemStack.loadItemStackFromNBT(tag.getCompoundTag(NBT_Ammo));
+        tile.stock = tag.getInteger(NBT_Stock);
+
+        if (tile.ammo != null && !tile.canAcceptItem(tile.ammo)) {
+            tile.ammo = null;
+            tile.stock = 0;
         }
-        return null;
+        int max = (tile.ammo != null) ? tile.getMaxAmmo(tile.ammo) : 0;
+        if (tile.stock < 0) tile.stock = 0;
+        if (tile.stock > max) tile.stock = max;
     }
 }
