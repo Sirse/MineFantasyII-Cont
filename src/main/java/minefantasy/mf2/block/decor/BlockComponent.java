@@ -190,6 +190,7 @@ public class BlockComponent extends BlockContainer {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         TileEntity tile = world.getTileEntity(x, y, z);
         if (tile != null && tile instanceof TileEntityComponent) {
@@ -273,6 +274,7 @@ public class BlockComponent extends BlockContainer {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
         return getBoundingBox(world, x, y, z);
     }
@@ -282,6 +284,7 @@ public class BlockComponent extends BlockContainer {
      */
     @SideOnly(Side.CLIENT)
     @Override
+    @SuppressWarnings("deprecation")
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
         return getBoundingBox(world, x, y, z);
     }

@@ -12,8 +12,6 @@ pluginManagement {
       }
     }
     gradlePluginPortal()
-    mavenCentral()
-    mavenLocal()
   }
 }
 
