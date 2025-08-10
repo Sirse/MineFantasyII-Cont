@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 public class AI_HoundBeg extends EntityAIBase {
-    private static final String __OBFID = "CL_00001576";
     private EntityHound theWolf;
     private EntityPlayer thePlayer;
     private World worldObject;
