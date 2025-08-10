@@ -200,22 +200,19 @@ tasks.named("check").configure {
 }
 
 tasks.matching { it.name == "extractNatives" || it.name == "extractNatives2" }.configureEach {
-  val extractTaskName = this.name
-  tasks.matching { it.name == "spotlessGradle" || it.name == "spotlessGradleCheck" }.configureEach {
-    mustRunAfter(extractTaskName)
-  }
-}
+  tasks.named("spotlessGradle").configure { mustRunAfter("extractNatives", "extractNatives2") }
+  tasks.named("spotlessGradleCheck").configure { mustRunAfter("extractNatives", "extractNatives2") }
 
-tasks.register("installGitHook") {
-  group = "formatting"
-  description = "Installs a pre-commit git hook that runs spotlessApply"
-  doLast {
-    val hooksDir = file(".git/hooks")
-    if (!hooksDir.exists()) hooksDir.mkdirs()
-    val hookFile = file(".git/hooks/pre-commit")
-    val isWindows = System.getProperty("os.name").lowercase().contains("win")
-    val script = if (isWindows) {
-      """
+  tasks.register("installGitHook") {
+    group = "formatting"
+    description = "Installs a pre-commit git hook that runs spotlessApply"
+    doLast {
+      val hooksDir = file(".git/hooks")
+      if (!hooksDir.exists()) hooksDir.mkdirs()
+      val hookFile = file(".git/hooks/pre-commit")
+      val isWindows = System.getProperty("os.name").lowercase().contains("win")
+      val script = if (isWindows) {
+        """
       |@echo off
       |REM Run Gradle Spotless before commit
       |call gradlew.bat spotlessApply
@@ -225,8 +222,8 @@ tasks.register("installGitHook") {
       |)
       |exit /b 0
       |""".trimMargin().replace("\n", "\r\n")
-    } else {
-      """
+      } else {
+        """
       |#!/bin/sh
       |# Run Gradle Spotless before commit
       |./gradlew spotlessApply
@@ -236,9 +233,10 @@ tasks.register("installGitHook") {
       |fi
       |exit 0
       |""".trimMargin()
+      }
+      hookFile.writeText(script)
+      if (!isWindows) hookFile.setExecutable(true)
+      println("Pre-commit hook installed: ${hookFile}")
     }
-    hookFile.writeText(script)
-    if (!isWindows) hookFile.setExecutable(true)
-    println("Pre-commit hook installed: ${hookFile}")
   }
 }
