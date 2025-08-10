@@ -199,7 +199,13 @@ tasks.named("check").configure {
   dependsOn("spotlessCheck")
 }
 
-// Optional helper: install pre-commit hook to auto-run Spotless
+tasks.matching { it.name == "extractNatives" || it.name == "extractNatives2" }.configureEach {
+  val extractTaskName = this.name
+  tasks.matching { it.name == "spotlessGradle" || it.name == "spotlessGradleCheck" }.configureEach {
+    mustRunAfter(extractTaskName)
+  }
+}
+
 tasks.register("installGitHook") {
   group = "formatting"
   description = "Installs a pre-commit git hook that runs spotlessApply"
