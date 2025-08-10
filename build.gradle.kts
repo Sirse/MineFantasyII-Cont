@@ -15,14 +15,13 @@ version = "2.8.14.7"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
-    vendor.set(org.gradle.jvm.toolchain.JvmVendorSpec.AZUL)
+    vendor.set(JvmVendorSpec.AZUL)
   }
   withSourcesJar()
   withJavadocJar()
 }
 
 minecraft {
-  mcVersion.set("1.7.10")
   username.set(System.getProperty("user.name"))
   injectedTags.put("VERSION", project.version)
   extraRunJvmArguments.add("-ea:${project.group}")
@@ -138,4 +137,12 @@ idea {
 
 tasks.processIdeaSettings.configure {
   dependsOn(tasks.injectTags)
+}
+
+tasks.withType<Javadoc>().configureEach {
+  isFailOnError = false
+  val opts = options as StandardJavadocDocletOptions
+  opts.addStringOption("Xdoclint:none", "-quiet")
+  opts.encoding = "UTF-8"
+  opts.charSet = "UTF-8"
 }
