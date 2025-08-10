@@ -1,17 +1,19 @@
 package minefantasy.mf2.api.mining;
 
-import minefantasy.mf2.api.knowledge.ResearchLogic;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Random;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
 
 public class RandomOre {
+
     public static ArrayList<RandomOre> drops = new ArrayList<RandomOre>();
 
     private final ItemStack loot;
@@ -25,12 +27,12 @@ public class RandomOre {
     private final String research;
 
     public RandomOre(ItemStack drop, float chance, Block base, int meta, int harvestLevel, int min, int max,
-                     boolean silkDisable) {
+            boolean silkDisable) {
         this(drop, chance, base, meta, harvestLevel, min, max, silkDisable, null);
     }
 
     public RandomOre(ItemStack drop, float chance, Block base, int meta, int harvestLevel, int min, int max,
-                     boolean silkDisable, String research) {
+            boolean silkDisable, String research) {
         doesSilktouchDisable = silkDisable;
         minHeight = min;
         maxHeight = max;
@@ -51,24 +53,41 @@ public class RandomOre {
      * @param block  the block it drops from (ID, Block, or stack)
      */
     public static void addOre(ItemStack drop, float chance, Block block, int meta, int harvestLevel, int min, int max,
-                              boolean silkDisable) {
+            boolean silkDisable) {
         drops.add(new RandomOre(drop, chance / 100F, block, meta, harvestLevel, min, max, silkDisable));
     }
 
     public static void addOre(ItemStack drop, float chance, Block block, int harvestLevel, int min, int max,
-                              boolean silkDisable) {
-        drops.add(new RandomOre(drop, chance / 100F, block, OreDictionary.WILDCARD_VALUE, harvestLevel, min, max,
-                silkDisable));
+            boolean silkDisable) {
+        drops.add(
+                new RandomOre(
+                        drop,
+                        chance / 100F,
+                        block,
+                        OreDictionary.WILDCARD_VALUE,
+                        harvestLevel,
+                        min,
+                        max,
+                        silkDisable));
     }
 
     public static void addOre(ItemStack drop, float chance, Block block, int harvestLevel, int min, int max,
-                              boolean silkDisable, String research) {
-        drops.add(new RandomOre(drop, chance / 100F, block, OreDictionary.WILDCARD_VALUE, harvestLevel, min, max,
-                silkDisable, research));
+            boolean silkDisable, String research) {
+        drops.add(
+                new RandomOre(
+                        drop,
+                        chance / 100F,
+                        block,
+                        OreDictionary.WILDCARD_VALUE,
+                        harvestLevel,
+                        min,
+                        max,
+                        silkDisable,
+                        research));
     }
 
     public static ArrayList<ItemStack> getDroppedItems(EntityLivingBase user, Block base, int meta, int harvest,
-                                                       int fortune, boolean silktouch, int y) {
+            int fortune, boolean silktouch, int y) {
         ArrayList<ItemStack> loot = new ArrayList<ItemStack>();
 
         if (!drops.isEmpty()) {
@@ -86,7 +105,7 @@ public class RandomOre {
     }
 
     private static boolean matchesOre(EntityLivingBase user, RandomOre ore, Block base, int meta, int harvest,
-                                      float multiplier, boolean silktouch, int y) {
+            float multiplier, boolean silktouch, int y) {
         Random random = new Random();
 
         if (ore.doesSilktouchDisable && silktouch) {

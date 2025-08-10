@@ -1,12 +1,13 @@
 package minefantasy.mf2.mechanics.worldGen.structure;
 
-import minefantasy.mf2.item.list.ComponentListMF;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
+
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class StructureGenAFRoom extends StructureModuleMF {
 
@@ -79,7 +80,10 @@ public class StructureGenAFRoom extends StructureModuleMF {
         TileEntityChest tileentitychest = (TileEntityChest) worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
         if (tileentitychest != null) {
-            WeightedRandomChestContent.generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tileentitychest,
+            WeightedRandomChestContent.generateChestContents(
+                    rand,
+                    ChestGenHooks.getItems(loot, rand),
+                    tileentitychest,
                     ChestGenHooks.getCount(loot, rand));
             if (hasTrinket) {
                 // North = -z, South = +z

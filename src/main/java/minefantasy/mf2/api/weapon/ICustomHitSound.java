@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 
 public interface ICustomHitSound {
+
     /**
      * Plays the hit sound
      *

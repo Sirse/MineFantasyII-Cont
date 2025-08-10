@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityBombBench;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityBombBench;
+
 public class ContainerBombBench extends ContainerMF {
+
     private static final int CASE_SLOT = 0;
     private static final int POWDER_SLOT = 1;
     private static final int FILLING_SLOT = 2;

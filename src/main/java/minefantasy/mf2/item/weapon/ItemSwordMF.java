@@ -1,18 +1,20 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.weapon.WeaponClass;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
+import minefantasy.mf2.api.weapon.WeaponClass;
+
 /**
  * @author Anonymous Productions
  */
 public class ItemSwordMF extends ItemWeaponMF {
+
     /**
-     * Swords are the average weapon. They do regular damage and are extremely
-     * effective at parrying balancing both attack and defense
+     * Swords are the average weapon. They do regular damage and are extremely effective at parrying balancing both
+     * attack and defense
      * <p>
      * These are for the average player
      */

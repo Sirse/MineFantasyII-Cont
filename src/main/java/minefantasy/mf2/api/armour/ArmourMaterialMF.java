@@ -1,10 +1,10 @@
 package minefantasy.mf2.api.armour;
 
 public class ArmourMaterialMF {
+
     /**
-     * EnumArmorMaterial VANILLA GUIDE: Leather_____28% Ratio: 1.3 Chain_______48%
-     * Ratio: 1.9 Iron________60% Ratio: 2.5 Gold________44% Ratio: 1.7
-     * Diamond_____80% Ratio: 5.0
+     * EnumArmorMaterial VANILLA GUIDE: Leather_____28% Ratio: 1.3 Chain_______48% Ratio: 1.9 Iron________60% Ratio: 2.5
+     * Gold________44% Ratio: 1.7 Diamond_____80% Ratio: 5.0
      */
     public final String name;
     public final int durability;

@@ -3,9 +3,9 @@ package minefantasy.mf2.api.archery;
 import net.minecraft.item.ItemStack;
 
 public interface IArrowRetrieve {
+
     /**
-     * Gets if the arrow will be dropped by a killed mob (this pretty much connects
-     * to the canBePickedUp variable)
+     * Gets if the arrow will be dropped by a killed mob (this pretty much connects to the canBePickedUp variable)
      */
     public boolean canBePickedUp();
 

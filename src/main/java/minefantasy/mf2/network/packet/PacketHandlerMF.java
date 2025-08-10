@@ -1,19 +1,21 @@
 package minefantasy.mf2.network.packet;
 
+import java.util.Hashtable;
+import java.util.Map;
+
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.NetHandlerPlayServer;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import minefantasy.mf2.MineFantasyII;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetHandlerPlayServer;
-
-import java.util.Hashtable;
-import java.util.Map;
 
 public class PacketHandlerMF {
+
     public Map<String, PacketMF> packetList = new Hashtable<String, PacketMF>();
     public Map<String, FMLEventChannel> channels = new Hashtable<String, FMLEventChannel>();
 
@@ -81,7 +83,8 @@ public class PacketHandlerMF {
     }
 
     public void sendPacketAround(Entity entity, double range, FMLProxyPacket packet) {
-        channels.get(packet.channel()).sendToAllAround(packet,
+        channels.get(packet.channel()).sendToAllAround(
+                packet,
                 new NetworkRegistry.TargetPoint(entity.dimension, entity.posX, entity.posY, entity.posZ, range));
     }
 

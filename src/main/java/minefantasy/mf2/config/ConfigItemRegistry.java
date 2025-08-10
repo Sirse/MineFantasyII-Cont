@@ -1,16 +1,18 @@
 package minefantasy.mf2.config;
 
+import java.util.Arrays;
+
+import net.minecraft.item.Item;
+
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.CustomArmourEntry;
 import minefantasy.mf2.api.armour.CustomDamageRatioEntry;
 import minefantasy.mf2.api.crafting.CustomCrafterEntry;
 import minefantasy.mf2.api.farming.CustomHoeEntry;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.item.Item;
-
-import java.util.Arrays;
 
 public class ConfigItemRegistry extends ConfigurationBaseMF {
+
     public static final String CATEGORY_ARMOUR = "Armour List";
     public static final String CATEGORY_FARM = "Farming";
     public static final String CATEGORY_TOOL = "Tools";
@@ -96,8 +98,14 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
                     Item piece = getItemFromString(id);
                     if (AD != null && piece != null) {
                         CustomArmourEntry.registerItem(piece, AD, weight, weightGroup);
-                        MFLogUtil.logDebug("Added Armour: " + piece.getUnlocalizedName() + "(" + AD.getName() + ") To "
-                                + weightGroup + " armour category... Modified weight is " + weight);
+                        MFLogUtil.logDebug(
+                                "Added Armour: " + piece.getUnlocalizedName()
+                                        + "("
+                                        + AD.getName()
+                                        + ") To "
+                                        + weightGroup
+                                        + " armour category... Modified weight is "
+                                        + weight);
                     }
                     phase = 0;
                 }
@@ -218,7 +226,7 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
 
                     Item weapon = getItemFromString(id);
                     if (weapon != null) {
-                        CustomDamageRatioEntry.registerItem(weapon, new float[]{cut, blunt, pierce});
+                        CustomDamageRatioEntry.registerItem(weapon, new float[] { cut, blunt, pierce });
                         MFLogUtil.logDebug(
                                 "Added Custom weapon: " + id + " With Ratio " + cut + ":" + pierce + ":" + blunt);
                     }
@@ -261,7 +269,7 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
                     blunt = Float.valueOf(temp);
                     temp = "";
 
-                    CustomDamageRatioEntry.registerEntity(id, new float[]{cut, blunt, pierce});
+                    CustomDamageRatioEntry.registerEntity(id, new float[] { cut, blunt, pierce });
                     MFLogUtil
                             .logDebug("Added Custom entity: " + id + " With Ratio " + cut + ":" + pierce + ":" + blunt);
                     phase = 0;
@@ -289,8 +297,10 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
                 + "Designs can be any that are registered: MineFantasy designs are 'clothing', 'leather', 'mail', 'default'(that's just basic metal armour), and 'plate'\n"
                 + "WeightGroup refers to whether it is light medium or heavy armour \n"
                 + "EXAMPLE (This is what vanilla gold is registered under) \n"
-                + "minecraft:golden_helmet|default|medium|2.0 \n" + "minecraft:golden_chestplate|default|medium|2.0 \n"
-                + "minecraft:golden_leggings|default|medium|2.0 \n" + "minecraft:golden_boots|default|medium|2.0 \n"
+                + "minecraft:golden_helmet|default|medium|2.0 \n"
+                + "minecraft:golden_chestplate|default|medium|2.0 \n"
+                + "minecraft:golden_leggings|default|medium|2.0 \n"
+                + "minecraft:golden_boots|default|medium|2.0 \n"
                 + "The 2.0 means it is 2x heavier than other vanilla armours \n"
                 + "This does not override existing MF armours \n";
 
@@ -324,7 +334,8 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
                 + "be added to the list: Put each entry on it's own line set out like this: \n"
                 + "id|cutting|pierce|blunt \n"
                 + "id is the item id as a string (you need to find it out yourself), cutting and blunt are the ratio. \n"
-                + "EXAMPLE (for example... making a stick to piercing damage) \n" + "minecraft:stick|0|1.0|0 \n"
+                + "EXAMPLE (for example... making a stick to piercing damage) \n"
+                + "minecraft:stick|0|1.0|0 \n"
                 + "The difference between the ratio is what determines damage 1|0 means 100% cutting damage, 3|1 means it's 3 cutting to 1 blunt (or 75%, 25%). use whatever numbers you need to make the ratio.";
 
         customDamagerList = config.get(CATEGORY_WEPS, "Custom Damage Ratios", new String[0], damageDesc)

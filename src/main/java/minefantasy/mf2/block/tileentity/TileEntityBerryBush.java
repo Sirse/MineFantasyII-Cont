@@ -1,12 +1,13 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MathHelper;
 
-import java.util.Random;
-
 public class TileEntityBerryBush extends TileEntity {
+
     private long nextGrowbackTime;
     private Random rand = new Random();
 
@@ -20,7 +21,7 @@ public class TileEntityBerryBush extends TileEntity {
     }
 
     public void harvestBerries() {
-        double[] days = new double[]{2D, 7D};
+        double[] days = new double[] { 2D, 7D };
         double modifier = MathHelper.getRandomDoubleInRange(rand, days[0], days[1]);
         nextGrowbackTime = worldObj.getTotalWorldTime() + (int) (24000 * modifier);
         worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, 1, 2);

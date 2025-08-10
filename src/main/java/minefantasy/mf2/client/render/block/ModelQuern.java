@@ -1,17 +1,19 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.block.tileentity.TileEntityQuern;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
+import minefantasy.mf2.block.tileentity.TileEntityQuern;
+
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelQuern extends ModelBase {
+
     ModelRenderer base;
     ModelRenderer top;
     ModelRenderer handle;

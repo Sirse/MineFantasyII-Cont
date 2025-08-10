@@ -1,12 +1,14 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.entity.EntityCogwork;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class CogworkControlPacket extends PacketMF {
+
     public static final String packetName = "MF2_CogworkCtrl";
     private EntityCogwork suit;
     private float forward, strafe;
@@ -19,8 +21,7 @@ public class CogworkControlPacket extends PacketMF {
         this.isJumping = suit.getJumpControl();
     }
 
-    public CogworkControlPacket() {
-    }
+    public CogworkControlPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

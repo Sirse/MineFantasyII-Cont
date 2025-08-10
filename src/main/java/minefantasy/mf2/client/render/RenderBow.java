@@ -1,10 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.Loader;
-import minefantasy.mf2.api.archery.AmmoMechanicsMF;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.item.archery.ItemBowMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -14,9 +9,17 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.Loader;
+import minefantasy.mf2.api.archery.AmmoMechanicsMF;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.item.archery.ItemBowMF;
+
 public class RenderBow implements IItemRenderer {
+
     private boolean isLongbow;
 
     public RenderBow(boolean big) {
@@ -107,19 +110,18 @@ public class RenderBow implements IItemRenderer {
                 drawAmount = bow.getDrawAmount(timer);
                 // arrowStack = bow.getArrow(item);
             } else {
-                if (timer >= 18)
-                    drawAmount = 2;
-                else if (timer > 13)
-                    drawAmount = 1;
-                else if (timer > 0)
-                    drawAmount = 0;
+                if (timer >= 18) drawAmount = 2;
+                else if (timer > 13) drawAmount = 1;
+                else if (timer > 0) drawAmount = 0;
 
             }
 
-            if(Loader.isModLoaded("battlegear2")) {
-                ItemStack quiver = mods.battlegear2.api.quiver.QuiverArrowRegistry.getArrowContainer(item, (EntityPlayer) entityLivingBase);
+            if (Loader.isModLoaded("battlegear2")) {
+                ItemStack quiver = mods.battlegear2.api.quiver.QuiverArrowRegistry
+                        .getArrowContainer(item, (EntityPlayer) entityLivingBase);
                 if (quiver != null) {
-                    arrowStack = ((mods.battlegear2.api.quiver.IArrowContainer2) quiver.getItem()).getStackInSlot(quiver,
+                    arrowStack = ((mods.battlegear2.api.quiver.IArrowContainer2) quiver.getItem()).getStackInSlot(
+                            quiver,
                             ((mods.battlegear2.api.quiver.IArrowContainer2) quiver.getItem()).getSelectedSlot(quiver));
                 }
             }
@@ -156,8 +158,15 @@ public class RenderBow implements IItemRenderer {
 
             GL11.glColor4f(red, green, blue, 1.0F);
 
-            ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(),
-                    icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+            ItemRenderer.renderItemIn2D(
+                    tessellator,
+                    icon.getMaxU(),
+                    icon.getMinV(),
+                    icon.getMinU(),
+                    icon.getMaxV(),
+                    icon.getIconWidth(),
+                    icon.getIconHeight(),
+                    0.0625F);
             GL11.glColor3f(1F, 1F, 1F);
             GL11.glPopMatrix();
         }
@@ -185,11 +194,20 @@ public class RenderBow implements IItemRenderer {
 
                 GL11.glColor4f(red, green, blue, 1.0F);
 
-                GL11.glTranslatef(-(x + drawAmount) / 16F, -(y + drawAmount) / 16F,
+                GL11.glTranslatef(
+                        -(x + drawAmount) / 16F,
+                        -(y + drawAmount) / 16F,
                         firstPerson ? -0.5F / 16F : 0.5F / 16F);
                 GL11.glRotatef(-90, 0, 0, 1);
-                ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(),
-                        icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
+                ItemRenderer.renderItemIn2D(
+                        tessellator,
+                        icon.getMaxU(),
+                        icon.getMinV(),
+                        icon.getMinU(),
+                        icon.getMaxV(),
+                        icon.getIconWidth(),
+                        icon.getIconHeight(),
+                        0.0625F);
                 GL11.glColor3f(1F, 1F, 1F);
                 GL11.glPopMatrix();
             }

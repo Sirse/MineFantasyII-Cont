@@ -1,10 +1,7 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.ToolListMF;
+import java.util.List;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,9 +14,14 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 public class EntityParachute extends Entity {
+
     /**
      * true if no player in parachute
      */
@@ -58,8 +60,8 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * returns if this entity triggers Block.onEntityWalking on the blocks they walk
-     * on. used for spiders and wolves to prevent them from trampling crops
+     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
+     * prevent them from trampling crops
      */
     @Override
     protected boolean canTriggerWalking() {
@@ -78,9 +80,8 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * Returns a boundingBox used to collide the entity with other entities and
-     * blocks. This enables the entity to be pushable on contact, like parachutes or
-     * minecarts.
+     * Returns a boundingBox used to collide the entity with other entities and blocks. This enables the entity to be
+     * pushable on contact, like parachutes or minecarts.
      */
     public AxisAlignedBB getCollisionBox(Entity entity) {
         return entity.boundingBox;
@@ -94,16 +95,14 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * Returns true if this entity should push and be pushed by other entities when
-     * colliding.
+     * Returns true if this entity should push and be pushed by other entities when colliding.
      */
     public boolean canBePushed() {
         return true;
     }
 
     /**
-     * Returns the Y offset from the entity's position for any entity riding this
-     * one.
+     * Returns the Y offset from the entity's position for any entity riding this one.
      */
     public double getMountedYOffset() {
         return 1D;
@@ -142,8 +141,7 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * Setups the entity to do the hurt animation. Only used by packets in
-     * multiplayer.
+     * Setups the entity to do the hurt animation. Only used by packets in multiplayer.
      */
     @SideOnly(Side.CLIENT)
     public void performHurtAnimation() {
@@ -153,16 +151,15 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     public boolean canBeCollidedWith() {
         return !this.isDead;
     }
 
     /**
-     * Sets the position and rotation. Only difference from the other one is no
-     * bounding on the rotation. Args: posX, posY, posZ, yaw, pitch
+     * Sets the position and rotation. Only difference from the other one is no bounding on the rotation. Args: posX,
+     * posY, posZ, yaw, pitch
      */
     @SideOnly(Side.CLIENT)
     public void setPositionAndRotation2(double x, double y, double z, float xr, float yr, int zr) {
@@ -204,8 +201,7 @@ public class EntityParachute extends Entity {
     /**
      * Called to update the entity's position/logic.
      */
-    protected void fall(float distance) {
-    }
+    protected void fall(float distance) {}
 
     public void onUpdate() {
         if (this.riddenByEntity != null) {
@@ -231,8 +227,13 @@ public class EntityParachute extends Entity {
         for (int i = 0; i < b0; ++i) {
             double d1 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (i + 0) / b0 - 0.125D;
             double d3 = this.boundingBox.minY + (this.boundingBox.maxY - this.boundingBox.minY) * (i + 1) / b0 - 0.125D;
-            AxisAlignedBB axisalignedbb = AxisAlignedBB.getBoundingBox(this.boundingBox.minX, d1, this.boundingBox.minZ,
-                    this.boundingBox.maxX, d3, this.boundingBox.maxZ);
+            AxisAlignedBB axisalignedbb = AxisAlignedBB.getBoundingBox(
+                    this.boundingBox.minX,
+                    d1,
+                    this.boundingBox.minZ,
+                    this.boundingBox.maxX,
+                    d3,
+                    this.boundingBox.maxZ);
 
             if (this.worldObj.isAABBInMaterial(axisalignedbb, Material.water)) {
                 d0 += 1.0D / b0;
@@ -289,9 +290,11 @@ public class EntityParachute extends Entity {
                 EntityLivingBase entitylivingbase = (EntityLivingBase) this.riddenByEntity;
                 float f = this.riddenByEntity.rotationYaw + -entitylivingbase.moveStrafing * 90.0F;
                 this.motionX += -Math.sin(f * (float) Math.PI / 180.0F) * this.speedMultiplier
-                        * entitylivingbase.moveForward * 0.05000000074505806D;
+                        * entitylivingbase.moveForward
+                        * 0.05000000074505806D;
                 this.motionZ += Math.cos(f * (float) Math.PI / 180.0F) * this.speedMultiplier
-                        * entitylivingbase.moveForward * 0.05000000074505806D;
+                        * entitylivingbase.moveForward
+                        * 0.05000000074505806D;
             }
 
             d2 = Math.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
@@ -368,7 +371,8 @@ public class EntityParachute extends Entity {
             this.setRotation(this.rotationYaw, this.rotationPitch);
 
             if (!this.worldObj.isRemote) {
-                List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this,
+                List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(
+                        this,
                         this.boundingBox.expand(0.20000000298023224D, 0.0D, 0.20000000298023224D));
 
                 if (list != null && !list.isEmpty()) {
@@ -400,22 +404,22 @@ public class EntityParachute extends Entity {
         if (this.riddenByEntity != null) {
             double d0 = Math.cos(this.rotationYaw * Math.PI / 180.0D) * 0.4D;
             double d1 = Math.sin(this.rotationYaw * Math.PI / 180.0D) * 0.4D;
-            this.riddenByEntity.setPosition(this.posX + d0,
-                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(), this.posZ + d1);
+            this.riddenByEntity.setPosition(
+                    this.posX + d0,
+                    this.posY + this.getMountedYOffset() + this.riddenByEntity.getYOffset(),
+                    this.posZ + d1);
         }
     }
 
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    protected void writeEntityToNBT(NBTTagCompound nbt) {
-    }
+    protected void writeEntityToNBT(NBTTagCompound nbt) {}
 
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    protected void readEntityFromNBT(NBTTagCompound nbt) {
-    }
+    protected void readEntityFromNBT(NBTTagCompound nbt) {}
 
     @SideOnly(Side.CLIENT)
     public float getShadowSize() {
@@ -423,9 +427,8 @@ public class EntityParachute extends Entity {
     }
 
     /**
-     * Takes in the distance the entity has fallen this tick and whether its on the
-     * ground to update the fall distance and deal fall damage if landing on the
-     * ground. Args: distanceFallenThisTick, onGround
+     * Takes in the distance the entity has fallen this tick and whether its on the ground to update the fall distance
+     * and deal fall damage if landing on the ground. Args: distanceFallenThisTick, onGround
      */
     protected void updateFallState(double dist, boolean hitGound) {
         int i = MathHelper.floor_double(this.posX);

@@ -1,19 +1,22 @@
 package minefantasy.mf2.client.render.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.mob.EntityHound;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.mob.EntityHound;
 
 @SideOnly(Side.CLIENT)
 public class RenderHound extends RenderLiving {
+
     public RenderHound(ModelBase modelbase) {
         super(modelbase, 1.0F);
         this.setRenderPassModel(modelbase);
@@ -38,7 +41,9 @@ public class RenderHound extends RenderLiving {
         } else if (layer == 1 && hound.isTamed()) {
             this.bindTexture("collar");
             int j = hound.getCollarColor();
-            GL11.glColor3f(EntitySheep.fleeceColorTable[j][0], EntitySheep.fleeceColorTable[j][1],
+            GL11.glColor3f(
+                    EntitySheep.fleeceColorTable[j][0],
+                    EntitySheep.fleeceColorTable[j][1],
                     EntitySheep.fleeceColorTable[j][2]);
             return 1;
         } else {
@@ -51,8 +56,7 @@ public class RenderHound extends RenderLiving {
     }
 
     /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless
-     * you call Render.bindEntityTexture.
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(EntityHound p_110775_1_) {
         return TextureHelperMF.getResource("textures/models/animal/hound/hound.png");
@@ -73,8 +77,7 @@ public class RenderHound extends RenderLiving {
     }
 
     /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless
-     * you call Render.bindEntityTexture.
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
         return this.getEntityTexture((EntityHound) p_110775_1_);

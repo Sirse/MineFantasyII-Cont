@@ -1,15 +1,17 @@
 package minefantasy.mf2.api.knowledge;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.PlayerTagData;
-import minefantasy.mf2.network.packet.KnowledgePacket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.PlayerTagData;
+import minefantasy.mf2.network.packet.KnowledgePacket;
+
 public class ResearchLogic {
+
     public static final String KnowledgeNBT = "Knowledge";
     public static int knowledgelyr = 0;
 
@@ -42,8 +44,7 @@ public class ResearchLogic {
     }
 
     public static boolean hasInfoUnlocked(EntityPlayer player, InformationBase base) {
-        if (base.isPreUnlocked())
-            return base.parentInfo == null || hasInfoUnlocked(player, base.parentInfo);
+        if (base.isPreUnlocked()) return base.parentInfo == null || hasInfoUnlocked(player, base.parentInfo);
 
         NBTTagCompound nbt = getNBT(player);
         String basename = base.getUnlocalisedName();
@@ -115,8 +116,8 @@ public class ResearchLogic {
 
     public static void syncData(EntityPlayer player) {
         if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker().func_151248_b(player,
-                    new KnowledgePacket(player).generatePacket());
+            ((WorldServer) player.worldObj).getEntityTracker()
+                    .func_151248_b(player, new KnowledgePacket(player).generatePacket());
         }
     }
 

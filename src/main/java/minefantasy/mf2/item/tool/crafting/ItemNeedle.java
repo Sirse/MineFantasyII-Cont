@@ -1,17 +1,9 @@
 package minefantasy.mf2.item.tool.crafting;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.api.tool.IToolMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -24,14 +16,25 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.util.IIcon;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.tool.IToolMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemNeedle extends ItemTool implements IToolMaterial, IToolMF {
+
     protected int itemRarity;
     private ToolMaterial material;
     private int tier;
@@ -44,7 +47,7 @@ public class ItemNeedle extends ItemTool implements IToolMaterial, IToolMF {
     private IIcon detailTex = null;
 
     public ItemNeedle(String name, ToolMaterial material, int rarity, int tier) {
-        super(0F, material, Sets.newHashSet(new Block[]{}));
+        super(0F, material, Sets.newHashSet(new Block[] {}));
         this.material = material;
         this.name = name;
         itemRarity = rarity;
@@ -58,7 +61,8 @@ public class ItemNeedle extends ItemTool implements IToolMaterial, IToolMF {
     @Override
     public Multimap getItemAttributeModifiers() {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", 0.5D, 0));
 
         return map;

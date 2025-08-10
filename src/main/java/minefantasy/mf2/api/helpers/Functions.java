@@ -1,9 +1,9 @@
 package minefantasy.mf2.api.helpers;
 
 public class Functions {
+
     /**
-     * f(x) = cos(xPi/(f/2))*(m/2) + (m/2) + c Create a wave output from c to m and
-     * back between x=f
+     * f(x) = cos(xPi/(f/2))*(m/2) + (m/2) + c Create a wave output from c to m and back between x=f
      *
      * @param x the running variable
      * @param p period: time between waves (in 20ths of seconds)
@@ -16,8 +16,7 @@ public class Functions {
     }
 
     /**
-     * f(x) = cos(xPi/(f/2))*(m/2) + (m/2) + c Create a wave output from c to m and
-     * back between x=f
+     * f(x) = cos(xPi/(f/2))*(m/2) + (m/2) + c Create a wave output from c to m and back between x=f
      *
      * @param x the running variable
      * @param p period: time between waves (in 20ths of seconds)

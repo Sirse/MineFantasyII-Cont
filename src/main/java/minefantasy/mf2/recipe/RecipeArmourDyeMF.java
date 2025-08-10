@@ -1,6 +1,7 @@
 package minefantasy.mf2.recipe;
 
-import minefantasy.mf2.item.armour.ItemArmourMF;
+import java.util.ArrayList;
+
 import net.minecraft.block.BlockColored;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.init.Items;
@@ -9,9 +10,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
+import minefantasy.mf2.item.armour.ItemArmourMF;
 
 public class RecipeArmourDyeMF implements IRecipe {
+
     /**
      * Used to check if a recipe matches current crafting inventory
      */

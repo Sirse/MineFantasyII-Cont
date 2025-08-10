@@ -1,13 +1,15 @@
 package minefantasy.mf2.entity.mob.ai.hound;
 
-import minefantasy.mf2.entity.mob.EntityHound;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.entity.mob.EntityHound;
+
 public class AI_HoundFollow extends EntityAIBase {
+
     World theWorld;
     float maxDist;
     float minDist;
@@ -97,8 +99,12 @@ public class AI_HoundFollow extends EntityAIBase {
                                             && World.doesBlockHaveSolidTopSurface(this.theWorld, i + l, k - 1, j + i1)
                                             && !this.theWorld.getBlock(i + l, k, j + i1).isNormalCube()
                                             && !this.theWorld.getBlock(i + l, k + 1, j + i1).isNormalCube()) {
-                                        this.thePet.setLocationAndAngles(i + l + 0.5F, k, j + i1 + 0.5F,
-                                                this.thePet.rotationYaw, this.thePet.rotationPitch);
+                                        this.thePet.setLocationAndAngles(
+                                                i + l + 0.5F,
+                                                k,
+                                                j + i1 + 0.5F,
+                                                this.thePet.rotationYaw,
+                                                this.thePet.rotationPitch);
                                         this.petPathfinder.clearPathEntity();
                                         return;
                                     }

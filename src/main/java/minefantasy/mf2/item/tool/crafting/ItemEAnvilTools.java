@@ -1,16 +1,18 @@
 package minefantasy.mf2.item.tool.crafting;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemEAnvilTools extends Item {
+
     public ItemEAnvilTools(String name, int uses) {
         setCreativeTab(CreativeTabMF.tabCraftTool);
 

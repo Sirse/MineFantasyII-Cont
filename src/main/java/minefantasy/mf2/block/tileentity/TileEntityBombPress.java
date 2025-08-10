@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityBombPress extends TileEntity {
+
     public float animation = 0F;
 
     @Override

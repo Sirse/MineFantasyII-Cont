@@ -1,13 +1,7 @@
 package minefantasy.mf2.api.helpers;
 
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.armour.IElementalResistance;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.weapon.IParryable;
-import minefantasy.mf2.api.weapon.ISpecialCombatMob;
-import minefantasy.mf2.entity.EntityArrowMF;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityWitch;
@@ -21,13 +15,20 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MathHelper;
 
-import java.util.Random;
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.armour.IElementalResistance;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.weapon.IParryable;
+import minefantasy.mf2.api.weapon.ISpecialCombatMob;
+import minefantasy.mf2.entity.EntityArrowMF;
+import minefantasy.mf2.mechanics.CombatMechanics;
 
 /**
- * This calculates different tactical contexts for combat like flanking and
- * blocking
+ * This calculates different tactical contexts for combat like flanking and blocking
  */
 public class TacticalManager {
+
     public static boolean shouldSlow = true;
     public static float minWeightSpeed = 10F;
     public static float arrowDeflectChance = 1.0F;
@@ -58,8 +59,7 @@ public class TacticalManager {
      * @return true if the hit is on the front
      */
     public static boolean canBlock(Entity attacker, EntityLivingBase defender, float blockAngle) {
-        if (attacker == null || defender == null)
-            return false;
+        if (attacker == null || defender == null) return false;
 
         float yaw = calculateHitAngle(attacker, defender);
 
@@ -73,8 +73,7 @@ public class TacticalManager {
      * @param attacker the attacking entity
      * @param defender the entity on view is questioned
      * @param angle    the angle the defender is flanked by
-     * @return true if the attacker hit within the back of defender between the
-     * angle
+     * @return true if the attacker hit within the back of defender between the angle
      */
     public static boolean isFlankedBy(Entity attacker, EntityLivingBase defender, float angle) {
         float yaw = calculateHitAngle(attacker, defender);
@@ -85,7 +84,8 @@ public class TacticalManager {
 
     public static boolean canParry(DamageSource source, EntityLivingBase user, Entity entityHitting, ItemStack weapon) {
         boolean autoParry = false;
-        if (shouldStaminaBlock && StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(user)
+        if (shouldStaminaBlock && StaminaBar.isSystemActive
+                && StaminaBar.doesAffectEntity(user)
                 && !StaminaBar.isAnyStamina(user, false)) {
             return false;
         }
@@ -187,7 +187,9 @@ public class TacticalManager {
      * @param height the height they jump
      */
     public static void knockbackEntity(Entity target, Entity source, float power, float height) {
-        target.addVelocity(-MathHelper.sin(source.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F, height,
+        target.addVelocity(
+                -MathHelper.sin(source.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F,
+                height,
                 MathHelper.cos(source.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F);
     }
 
@@ -200,7 +202,9 @@ public class TacticalManager {
      * @param height   the height of the jump
      */
     public static void lungeEntity(Entity attacker, Entity target, float power, float height) {
-        attacker.addVelocity(-MathHelper.sin(attacker.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F, height,
+        attacker.addVelocity(
+                -MathHelper.sin(attacker.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F,
+                height,
                 MathHelper.cos(attacker.rotationYaw * (float) Math.PI / 180.0F) * power * 0.5F);
     }
 
@@ -231,8 +235,8 @@ public class TacticalManager {
         double xGap = attacker.posX - defender.posX;
         double zGap;
 
-        for (zGap = attacker.posZ - defender.posZ; xGap * xGap
-                + zGap * zGap < 1.0E-4D; zGap = (Math.random() - Math.random()) * 0.01D) {
+        for (zGap = attacker.posZ - defender.posZ; xGap * xGap + zGap * zGap
+                < 1.0E-4D; zGap = (Math.random() - Math.random()) * 0.01D) {
             xGap = (Math.random() - Math.random()) * 0.01D; // makes the zgap
         }
 
@@ -339,8 +343,7 @@ public class TacticalManager {
     }
 
     /**
-     * This tries to see if the projectile is an arrow, just so certain projectiles
-     * dont do the armour bouncy thing
+     * This tries to see if the projectile is an arrow, just so certain projectiles dont do the armour bouncy thing
      */
     public static boolean isArrow(Entity hitter) {
         return hitter instanceof EntityArrow || hitter instanceof EntityArrowMF;
@@ -485,7 +488,9 @@ public class TacticalManager {
     }
 
     public static void leap(Entity target, float angle, float power, float height) {
-        target.addVelocity(-MathHelper.sin(angle * (float) Math.PI / 180.0F) * power, height,
+        target.addVelocity(
+                -MathHelper.sin(angle * (float) Math.PI / 180.0F) * power,
+                height,
                 MathHelper.cos(angle * (float) Math.PI / 180.0F) * power);
     }
 

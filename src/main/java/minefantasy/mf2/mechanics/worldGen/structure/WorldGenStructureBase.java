@@ -1,15 +1,15 @@
 package minefantasy.mf2.mechanics.worldGen.structure;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-import java.util.Random;
-
 public abstract class WorldGenStructureBase extends WorldGenerator {
-    public WorldGenStructureBase() {
-    }
+
+    public WorldGenStructureBase() {}
 
     @Override
     public boolean generate(World world, Random random, int i, int j, int k) {
@@ -61,8 +61,7 @@ public abstract class WorldGenStructureBase extends WorldGenerator {
     protected abstract boolean isBlockAcceptableOrigin(World world, int x, int y, int z);
 
     /**
-     * Called after IsBlockAcceptableOrigin: If a specific structure can generate
-     * here
+     * Called after IsBlockAcceptableOrigin: If a specific structure can generate here
      */
     protected abstract boolean canStructureBuild(StructureModuleMF ruin);
 

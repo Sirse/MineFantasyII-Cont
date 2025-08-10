@@ -1,7 +1,7 @@
 package minefantasy.mf2.block.basic;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.material.BaseMaterialMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.material.Material;
@@ -10,15 +10,20 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.material.BaseMaterialMF;
 
 public class BlockMetalBarsMF extends BlockPane {
+
     private BaseMaterialMF baseMat;
     private Random rand = new Random();
 
     public BlockMetalBarsMF(BaseMaterialMF material) {
-        super("minefantasy2:metal/" + material.name.toLowerCase() + "_bars",
-                "minefantasy2:metal/" + material.name.toLowerCase() + "_bars", Material.iron, true);
+        super(
+                "minefantasy2:metal/" + material.name.toLowerCase() + "_bars",
+                "minefantasy2:metal/" + material.name.toLowerCase() + "_bars",
+                Material.iron,
+                true);
         String name = material.name.toLowerCase() + "_bars";
         GameRegistry.registerBlock(this, name);
         setBlockName(name);
@@ -36,9 +41,21 @@ public class BlockMetalBarsMF extends BlockPane {
                 && hitter instanceof EntityLivingBase) {
             hitter.setFire(10);
             hitter.attackEntityFrom(DamageSource.inFire, 1);
-            world.spawnParticle("flame", x + rand.nextDouble(), y + rand.nextDouble(), z + rand.nextDouble(), 0D, 0D,
+            world.spawnParticle(
+                    "flame",
+                    x + rand.nextDouble(),
+                    y + rand.nextDouble(),
+                    z + rand.nextDouble(),
+                    0D,
+                    0D,
                     0D);
-            world.spawnParticle("smoke", x + rand.nextDouble(), y + rand.nextDouble(), z + rand.nextDouble(), 0D, 0D,
+            world.spawnParticle(
+                    "smoke",
+                    x + rand.nextDouble(),
+                    y + rand.nextDouble(),
+                    z + rand.nextDouble(),
+                    0D,
+                    0D,
                     0D);
         }
     }

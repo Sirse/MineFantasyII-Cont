@@ -1,12 +1,13 @@
 package minefantasy.mf2.api.knowledge;
 
-import minefantasy.mf2.api.rpg.SkillList;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import minefantasy.mf2.api.rpg.SkillList;
+
 public class InformationList {
+
     public static InformationPage artisanry = new InformationPage("infoPage.artisanry", SkillList.artisanry)
             .registerInfoPage();
     public static InformationPage construction = new InformationPage("infoPage.construction", SkillList.construction)
@@ -42,6 +43,5 @@ public class InformationList {
     /**
      * A stub functions called to make the static initializer for this class run.
      */
-    public static void init() {
-    }
+    public static void init() {}
 }

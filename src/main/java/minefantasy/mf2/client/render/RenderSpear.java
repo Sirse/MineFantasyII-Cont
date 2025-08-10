@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -12,18 +10,23 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons.
- * though small bits of code, or methods can be used in your own creations.
- * <p>
- * Code based off Battlegear Spears by Nerd Boy.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
+ *         <p>
+ *         Code based off Battlegear Spears by Nerd Boy.
  */
 
 public class RenderSpear implements IItemRenderer {
+
     private Minecraft mc;
     private RenderItem itemRenderer;
     private boolean isHalbeard;
@@ -80,8 +83,15 @@ public class RenderSpear implements IItemRenderer {
                 x = icon.getMinU();
             }
 
-            ItemRenderer.renderItemIn2D(tessellator, x, icon.getMinV(), x2, icon.getMaxV(), icon.getIconWidth(),
-                    icon.getIconHeight(), 1F / 16F);
+            ItemRenderer.renderItemIn2D(
+                    tessellator,
+                    x,
+                    icon.getMinV(),
+                    x2,
+                    icon.getMaxV(),
+                    icon.getIconWidth(),
+                    icon.getIconHeight(),
+                    1F / 16F);
         }
         if (item != null && item.hasEffect(0)) {
             TextureHelperMF.renderEnchantmentEffects(tessellator);

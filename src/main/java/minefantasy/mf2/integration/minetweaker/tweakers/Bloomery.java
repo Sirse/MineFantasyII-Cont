@@ -1,5 +1,12 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -7,16 +14,10 @@ import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import minetweaker.mc1710.item.MCItemStack;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @ZenClass("mods.minefantasy.Bloomery")
 public class Bloomery {
@@ -48,6 +49,7 @@ public class Bloomery {
     }
 
     private static class AddRecipeAction implements IUndoableAction {
+
         IItemStack result;
         IIngredient input;
 
@@ -92,6 +94,7 @@ public class Bloomery {
     }
 
     private static class RemoveAction implements IUndoableAction {
+
         private final List<ItemStack> items;
         private final List<ItemStack> values;
 

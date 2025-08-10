@@ -1,15 +1,17 @@
 package minefantasy.mf2.api.refine;
 
-import minefantasy.mf2.api.crafting.MineFantasyFuels;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
+import java.util.*;
+
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.*;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
 
 public class Alloy {
+
     public final List recipeItems;
     public final ItemStack recipeOutput;
     public final int level;
@@ -50,7 +52,7 @@ public class Alloy {
 
                     if (itemstack.isItemEqual(checkItem) && areMaterialsEqual(itemstack, checkItem)
                             && (checkItem.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                            || itemstack.getItemDamage() == checkItem.getItemDamage())) {
+                                    || itemstack.getItemDamage() == checkItem.getItemDamage())) {
                         matches = true;
                         checkRecipe.remove(checkItem);
                         break;
@@ -104,8 +106,7 @@ public class Alloy {
     /**
      * Gets the level of the Alloy, requiring a more powerful smelter
      *
-     * @return the minimal level required to make (crucible is 0, alloy forge = 1,
-     * etc)
+     * @return the minimal level required to make (crucible is 0, alloy forge = 1, etc)
      */
     public int getLevel() {
         return level;

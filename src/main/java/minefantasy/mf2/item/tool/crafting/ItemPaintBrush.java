@@ -1,5 +1,12 @@
 package minefantasy.mf2.item.tool.crafting;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.crafting.refine.PaintOilRecipe;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -9,17 +16,12 @@ import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
+
     public ItemPaintBrush(String name, int uses) {
         super(name, "brush", 0, uses);
         setCreativeTab(CreativeTabMF.tabCraftTool);
@@ -44,7 +46,7 @@ public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
 
     @Override
     public boolean onItemUse(ItemStack item, EntityPlayer user, World world, int x, int y, int z, int side, float f,
-                             float f1, float f2) {
+            float f1, float f2) {
         if (user.canPlayerEdit(x, y, z, side, item) && ResearchLogic.hasInfoUnlocked(user, "paint_brush")) {
             if (!user.isSwingInProgress && user.inventory.hasItem(ComponentListMF.plant_oil)) {
                 Block block = world.getBlock(x, y, z);
@@ -73,8 +75,7 @@ public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
             if (!user.inventory.addItemStackToInventory(jug) && !world.isRemote) {
                 user.entityDropItem(jug, 0F);
             }
-            if (world.isRemote)
-                return true;
+            if (world.isRemote) return true;
 
             SkillList.construction.addXP(user, 1);
             item.damageItem(1, user);

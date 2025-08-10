@@ -1,25 +1,26 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityChimney;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityChimney;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class ChimneyPacket extends PacketMF {
+
     public static final String packetName = "MF2_ChimneyPacket";
     private int[] coords = new int[3];
     private int block, meta;
 
     public ChimneyPacket(TileEntityChimney tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         block = Block.getIdFromBlock(tile.maskBlock);
         meta = tile.blockMetadata;
     }
 
-    public ChimneyPacket() {
-    }
+    public ChimneyPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

@@ -1,16 +1,18 @@
 package minefantasy.mf2.recipe;
 
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 
 public class CookingRecipes {
+
     public static void init() {
         cookMeat(FoodListMF.horse_raw, FoodListMF.horse_cooked);
         cookMeat(FoodListMF.wolf_raw, FoodListMF.wolf_cooked);
@@ -38,12 +40,23 @@ public class CookingRecipes {
         bake(FoodListMF.eclair_raw, FoodListMF.eclair_uniced, 150, 250, 60, 5, true);
 
         addCeramics();
-        MineFantasyAPI.addCookingRecipe(new ItemStack(FoodListMF.generic_meat_mince_uncooked),
-                new ItemStack(FoodListMF.generic_meat_mince_cooked), new ItemStack(FoodListMF.burnt_pot), 100, 200, 10,
+        MineFantasyAPI.addCookingRecipe(
+                new ItemStack(FoodListMF.generic_meat_mince_uncooked),
+                new ItemStack(FoodListMF.generic_meat_mince_cooked),
+                new ItemStack(FoodListMF.burnt_pot),
+                100,
+                200,
+                10,
                 false);
 
-        MineFantasyAPI.addCookingRecipe(new ItemStack(FoodListMF.bowl_water_salt), new ItemStack(FoodListMF.salt), 100,
-                200, 2, false, false);
+        MineFantasyAPI.addCookingRecipe(
+                new ItemStack(FoodListMF.bowl_water_salt),
+                new ItemStack(FoodListMF.salt),
+                100,
+                200,
+                2,
+                false,
+                false);
 
         if (!ConfigHardcore.preventCook) {
             smeltFood();
@@ -65,8 +78,16 @@ public class CookingRecipes {
      * @param time   how much time roughly
      */
     private static CookRecipe bake(Item in, Item out, int mint, int maxt, int time, int burn_time, boolean burn) {
-        return MineFantasyAPI.addCookingRecipe(new ItemStack(in), new ItemStack(out),
-                new ItemStack(FoodListMF.burnt_food), mint, maxt, time, burn_time, true, burn);
+        return MineFantasyAPI.addCookingRecipe(
+                new ItemStack(in),
+                new ItemStack(out),
+                new ItemStack(FoodListMF.burnt_food),
+                mint,
+                maxt,
+                time,
+                burn_time,
+                true,
+                burn);
     }
 
     /**
@@ -77,20 +98,33 @@ public class CookingRecipes {
      * @param time   how much time roughly
      */
     private static CookRecipe bake(Item in, Item out, int mint, int maxt, int time, int burn_time, Item burn) {
-        return MineFantasyAPI.addCookingRecipe(new ItemStack(in), new ItemStack(out), new ItemStack(burn), mint, maxt,
-                time, burn_time, true);
+        return MineFantasyAPI.addCookingRecipe(
+                new ItemStack(in),
+                new ItemStack(out),
+                new ItemStack(burn),
+                mint,
+                maxt,
+                time,
+                burn_time,
+                true);
     }
 
     private static void smeltFood() {
         GameRegistry.addSmelting(FoodListMF.horse_raw, new ItemStack(FoodListMF.horse_cooked), 0.2F);
         GameRegistry.addSmelting(FoodListMF.wolf_raw, new ItemStack(FoodListMF.wolf_cooked), 0.2F);
         GameRegistry.addSmelting(FoodListMF.generic_meat_uncooked, new ItemStack(FoodListMF.generic_meat_cooked), 0);
-        GameRegistry.addSmelting(FoodListMF.generic_meat_strip_uncooked,
-                new ItemStack(FoodListMF.generic_meat_strip_cooked), 0);
-        GameRegistry.addSmelting(FoodListMF.generic_meat_chunk_uncooked,
-                new ItemStack(FoodListMF.generic_meat_chunk_cooked), 0);
-        GameRegistry.addSmelting(FoodListMF.generic_meat_mince_uncooked,
-                new ItemStack(FoodListMF.generic_meat_mince_cooked), 0);
+        GameRegistry.addSmelting(
+                FoodListMF.generic_meat_strip_uncooked,
+                new ItemStack(FoodListMF.generic_meat_strip_cooked),
+                0);
+        GameRegistry.addSmelting(
+                FoodListMF.generic_meat_chunk_uncooked,
+                new ItemStack(FoodListMF.generic_meat_chunk_cooked),
+                0);
+        GameRegistry.addSmelting(
+                FoodListMF.generic_meat_mince_uncooked,
+                new ItemStack(FoodListMF.generic_meat_mince_cooked),
+                0);
         GameRegistry.addSmelting(FoodListMF.bowl_water_salt, new ItemStack(FoodListMF.salt), 0);
         GameRegistry.addSmelting(FoodListMF.saussage_raw, new ItemStack(FoodListMF.saussage_cooked), 0);
     }
@@ -110,8 +144,8 @@ public class CookingRecipes {
         if (!ConfigHardcore.preventCook) {
             GameRegistry.addSmelting(clay, new ItemStack(ceramic), 0F);
         }
-        return MineFantasyAPI.addCookingRecipe(new ItemStack(clay), new ItemStack(ceramic), null, temp, 1000, time, 0,
-                true, false);
+        return MineFantasyAPI
+                .addCookingRecipe(new ItemStack(clay), new ItemStack(ceramic), null, temp, 1000, time, 0, true, false);
 
     }
 }

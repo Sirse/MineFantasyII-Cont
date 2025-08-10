@@ -1,28 +1,29 @@
 package minefantasy.mf2.network.packet;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.util.MFLogUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.util.MFLogUtil;
+
 public class TileInventoryPacket extends PacketMF {
+
     public static final String packetName = "MF2_TileInvPacket";
     private int[] coords = new int[3];
     private int invSize;
     private IInventory inventory;
 
     public TileInventoryPacket(IInventory inv, TileEntity tile) {
-        this.coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        this.coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         this.inventory = inv;
         this.invSize = inv.getSizeInventory();
     }
 
-    public TileInventoryPacket() {
-    }
+    public TileInventoryPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

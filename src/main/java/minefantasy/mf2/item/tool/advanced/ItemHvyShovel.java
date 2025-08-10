@@ -1,17 +1,10 @@
 package minefantasy.mf2.item.tool.advanced;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.config.ConfigTools;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.util.BukkitUtils;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -31,15 +24,25 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.config.ConfigTools;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.util.BukkitUtils;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
+
     protected int itemRarity;
     private String name;
     private float baseDamage = 2F;
@@ -64,7 +67,7 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
 
     @Override
     public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-                                    EntityLivingBase user) {
+            EntityLivingBase user) {
         if (!world.isRemote && ForgeHooks.isToolEffective(item, block, world.getBlockMetadata(x, y, z))
                 && ItemLumberAxe.canAcceptCost(user)) {
             int range = 2;
@@ -93,7 +96,12 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
                                     }
 
                                     if (rand.nextFloat() * 100F < (100F - ConfigTools.hvyDropChance)) {
-                                        newblock.dropBlockAsItem(world, blockX, blockY, blockZ, m,
+                                        newblock.dropBlockAsItem(
+                                                world,
+                                                blockX,
+                                                blockY,
+                                                blockZ,
+                                                m,
                                                 EnchantmentHelper.getFortuneModifier(user));
                                     }
                                     world.setBlockToAir(blockX, blockY, blockZ);
@@ -145,7 +153,8 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;
@@ -227,7 +236,7 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
     public float func_150893_a(ItemStack stack, Block block) {
         return block.getMaterial() != Material.iron && block.getMaterial() != Material.anvil
                 && block.getMaterial() != Material.rock ? super.func_150893_a(stack, block)
-                : CustomToolHelper.getEfficiency(stack, this.efficiencyOnProperMaterial, efficiencyMod / 2);
+                        : CustomToolHelper.getEfficiency(stack, this.efficiencyOnProperMaterial, efficiencyMod / 2);
     }
 
     @Override

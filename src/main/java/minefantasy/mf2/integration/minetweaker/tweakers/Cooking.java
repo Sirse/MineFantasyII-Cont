@@ -1,36 +1,41 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.cooking.CookRecipe;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @ZenClass("mods.minefantasy.Cooking")
 public class Cooking {
 
     @ZenMethod
-    public static void addRecipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime, boolean requireBaking, @Optional boolean canBurn) {
-        MineTweakerAPI.apply(new AddRecipeAction(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn));
+    public static void addRecipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime,
+            boolean requireBaking, @Optional boolean canBurn) {
+        MineTweakerAPI
+                .apply(new AddRecipeAction(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn));
     }
 
     private static class AddRecipeAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
         private final int minTemp, maxTemp, time, burnTime;
         private final boolean requireBaking, canBurn;
         private final List<CookRecipe> addedRecipes = new ArrayList<CookRecipe>();
 
-        public AddRecipeAction(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime, boolean requireBaking, boolean canBurn) {
+        public AddRecipeAction(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime,
+                boolean requireBaking, boolean canBurn) {
             this.output = output;
             this.input = input;
             this.minTemp = minTemp;
@@ -45,7 +50,17 @@ public class Cooking {
         public void apply() {
             for (IIngredient ingredient : input.getItems()) {
                 ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
-                addedRecipes.add(CookRecipe.addRecipe(MineTweakerMC.getItemStack(output), mcInput, new ItemStack(CookRecipe.burnt_food), minTemp, maxTemp, time, burnTime, requireBaking, canBurn));
+                addedRecipes.add(
+                        CookRecipe.addRecipe(
+                                MineTweakerMC.getItemStack(output),
+                                mcInput,
+                                new ItemStack(CookRecipe.burnt_food),
+                                minTemp,
+                                maxTemp,
+                                time,
+                                burnTime,
+                                requireBaking,
+                                canBurn));
             }
         }
 

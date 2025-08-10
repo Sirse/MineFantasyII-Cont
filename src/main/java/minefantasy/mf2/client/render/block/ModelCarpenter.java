@@ -6,11 +6,12 @@ import net.minecraft.entity.Entity;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelCarpenter extends ModelBase {
+
     // fields
     ModelRenderer leg4;
     ModelRenderer top;

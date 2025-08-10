@@ -1,12 +1,14 @@
 package minefantasy.mf2.api.rpg;
 
-import minefantasy.mf2.api.MineFantasyAPI;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.MinecraftForge;
 
+import minefantasy.mf2.api.MineFantasyAPI;
+
 public class Skill {
+
     public final String skillName;
 
     public Skill(String name) {
@@ -40,15 +42,14 @@ public class Skill {
         if (skill != null) {
             int value = skill.getInteger("xp");
             int max = skill.getInteger("xpMax");
-            return new int[]{value, max};
+            return new int[] { value, max };
         }
-        return new int[]{0, 0};
+        return new int[] { 0, 0 };
     }
 
     public void manualLvlUp(EntityPlayer player, int newLevel) {
         NBTTagCompound skill = RPGElements.getSkill(player, skillName);
-        if (skill == null)
-            return;
+        if (skill == null) return;
 
         skill.setInteger("xp", 0);
 
@@ -64,8 +65,7 @@ public class Skill {
     public void addXP(EntityPlayer player, int xp) {
         xp = (int) (RPGElements.levelSpeedModifier * xp);
         NBTTagCompound skill = RPGElements.getSkill(player, skillName);
-        if (skill == null)
-            return;
+        if (skill == null) return;
 
         int value = skill.getInteger("xp");
         int max = skill.getInteger("xpMax");
@@ -87,8 +87,7 @@ public class Skill {
         } else {
             if (value < 0) {
                 int level = skill.getInteger("level") - 1;
-                if (level < 1)
-                    return;
+                if (level < 1) return;
 
                 skill.setInteger("level", level);
 
@@ -111,8 +110,7 @@ public class Skill {
      *
      * @param functionID a string representing what to do, depends on the skill
      */
-    public void callFunction(EntityPlayer user, String functionID) {
-    }
+    public void callFunction(EntityPlayer user, String functionID) {}
 
     public void init(NBTTagCompound tag, EntityPlayer player) {
         int start = getStartLevel();

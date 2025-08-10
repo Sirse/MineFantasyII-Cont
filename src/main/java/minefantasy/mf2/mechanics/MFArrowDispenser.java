@@ -1,7 +1,5 @@
 package minefantasy.mf2.mechanics;
 
-import minefantasy.mf2.entity.EntityArrowMF;
-import minefantasy.mf2.item.archery.ItemArrowMF;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBlockSource;
@@ -10,7 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.entity.EntityArrowMF;
+import minefantasy.mf2.item.archery.ItemArrowMF;
+
 public class MFArrowDispenser extends BehaviorDefaultDispenseItem {
+
     /**
      * Dispense the specified stack, play the dispense sound and spawn particles.
      */
@@ -25,8 +27,12 @@ public class MFArrowDispenser extends BehaviorDefaultDispenseItem {
         if (item.getItem() instanceof ItemArrowMF) {
             ItemArrowMF arrowitem = (ItemArrowMF) item.getItem();
             EntityArrowMF arrow = arrowitem.getFiredArrow(new EntityArrowMF(world, posX, posY, posZ), item);
-            arrow.setThrowableHeading(direction.getFrontOffsetX(), direction.getFrontOffsetY() + 0.1F,
-                    direction.getFrontOffsetZ(), this.func_82500_b(), this.func_82498_a());
+            arrow.setThrowableHeading(
+                    direction.getFrontOffsetX(),
+                    direction.getFrontOffsetY() + 0.1F,
+                    direction.getFrontOffsetZ(),
+                    this.func_82500_b(),
+                    this.func_82498_a());
             world.spawnEntityInWorld(arrow);
             arrow.canBePickedUp = 1;
             item.splitStack(1);

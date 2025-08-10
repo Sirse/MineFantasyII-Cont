@@ -1,7 +1,7 @@
 package minefantasy.mf2.api.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
+import java.util.HashMap;
+
 import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
@@ -9,7 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.world.World;
 
-import java.util.HashMap;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
 
 public class BasicTierRecipe extends ShapedRecipes {
 
@@ -127,10 +128,8 @@ public class BasicTierRecipe extends ShapedRecipes {
                     String component_metal = CustomToolHelper.getComponentMaterial(itemstack1, "metal");
 
                     if (recipe_metal != null) {
-                        if (component_metal == null)
-                            return false;
-                        if (!component_metal.equalsIgnoreCase(recipe_metal))
-                            return false;
+                        if (component_metal == null) return false;
+                        if (!component_metal.equalsIgnoreCase(recipe_metal)) return false;
                     }
 
                     if (itemstack1 == null && itemstack != null || itemstack1 != null && itemstack == null) {

@@ -1,15 +1,10 @@
 package minefantasy.mf2.item.archery;
 
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.archery.*;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import mods.battlegear2.api.weapons.IBattlegearWeapon;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
@@ -29,13 +24,20 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.archery.*;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import mods.battlegear2.api.weapons.IBattlegearWeapon;
 
 @Optional.Interface(iface = "mods.battlegear2.api.weapons.IBattlegearWeapon", modid = "battlegear2")
 public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, IBattlegearWeapon, IFirearm {
+
     public static final DecimalFormat decimal_format = new DecimalFormat("#.##");
     private final EnumBowType model;
     public IIcon[] mainIcons = new IIcon[3];
@@ -49,8 +51,7 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     private float baseDamage = 1.0F;
     private String name;
     /**
-     * Return the enchantability factor of the item, most of the time is based on
-     * material.
+     * Return the enchantability factor of the item, most of the time is based on material.
      */
     private int enchantmentLvl = 1;
     // ===================================================== CUSTOM START
@@ -90,8 +91,7 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     }
 
     /**
-     * called when the player releases the use item button. Args: itemstack, world,
-     * entityplayer, itemInUseCount
+     * called when the player releases the use item button. Args: itemstack, world, entityplayer, itemInUseCount
      */
     @Override
     public void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int time) {
@@ -140,7 +140,10 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
             }
 
             AmmoMechanicsMF.damageContainer(item, player, 1);
-            world.playSoundAtEntity(player, "minefantasy2:weapon.bowFire", 1.0F,
+            world.playSoundAtEntity(
+                    player,
+                    "minefantasy2:weapon.bowFire",
+                    1.0F,
                     1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + firepower * 0.5F);
 
             if (var5) {
@@ -169,8 +172,7 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     }
 
     /**
-     * returns the action that specifies what animation to play when the items is
-     * being used
+     * returns the action that specifies what animation to play when the items is being used
      */
     @Override
     public EnumAction getItemUseAction(ItemStack item) {
@@ -187,13 +189,14 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
             desc.add(EnumChatFormatting.DARK_GRAY + ammo.getDisplayName() + " x" + ammo.stackSize);
         }
 
-        desc.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.bowPower.name",
-                decimal_format.format(getBowDamage(item))));
+        desc.add(
+                EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted(
+                        "attribute.bowPower.name",
+                        decimal_format.format(getBowDamage(item))));
     }
 
     /**
-     * Called whenever this item is equipped and the right mouse button is pressed.
-     * Args: itemStack, world, entityPlayer
+     * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
     @Override
     /// Item is the bow.
@@ -239,19 +242,15 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     @Override
     public void onUpdate(ItemStack item, World world, Entity entity, int i, boolean b) {
         super.onUpdate(item, world, entity, i, b);
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         item.stackTagCompound.setInteger("Use", i);
     }
 
     public int getDrawAmount(int timer) {
         float maxCharge = this.getMaxCharge();
-        if (timer > (maxCharge * 0.9F))
-            return 2;
-        else if (timer > (maxCharge * 0.65F))
-            return 1;
-        else if (timer > 0)
-            return 0;
+        if (timer > (maxCharge * 0.9F)) return 2;
+        else if (timer > (maxCharge * 0.65F)) return 1;
+        else if (timer > 0) return 0;
 
         return -2;
     }
@@ -260,8 +259,8 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     public EnumRarity getRarity(ItemStack item) {
         int lvl = itemRarity;
 
-        EnumRarity[] rarity = new EnumRarity[]{EnumRarity.common, EnumRarity.uncommon, EnumRarity.rare,
-                EnumRarity.epic};
+        EnumRarity[] rarity = new EnumRarity[] { EnumRarity.common, EnumRarity.uncommon, EnumRarity.rare,
+                EnumRarity.epic };
         if (item.isItemEnchanted()) {
             if (lvl == 0) {
                 lvl++;
@@ -275,8 +274,8 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     }
 
     private EnumRarity rarity(ItemStack item, int lvl) {
-        EnumRarity[] rarity = new EnumRarity[]{EnumRarity.common, EnumRarity.uncommon, EnumRarity.rare,
-                EnumRarity.epic};
+        EnumRarity[] rarity = new EnumRarity[] { EnumRarity.common, EnumRarity.uncommon, EnumRarity.rare,
+                EnumRarity.epic };
         if (item.isItemEnchanted()) {
             if (lvl == 0) {
                 lvl++;
@@ -330,7 +329,8 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
 
     @Override
     @Optional.Method(modid = "battlegear2")
-    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
+    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event,
+            ItemStack mainhandItem, ItemStack offhandItem) {
         return false;
     }
 
@@ -345,8 +345,7 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     }
 
     @Override
-    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {
-    }
+    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {}
 
     @Override
     public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {

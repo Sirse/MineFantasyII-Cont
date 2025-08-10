@@ -6,6 +6,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 public class EntryPageText extends EntryPage {
+
     private Minecraft mc = Minecraft.getMinecraft();
     private String paragraph;
     private Object[] additional;
@@ -64,6 +65,5 @@ public class EntryPageText extends EntryPage {
     }
 
     @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-    }
+    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
 }

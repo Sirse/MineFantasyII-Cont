@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelFullplate extends ModelBiped {
+
     ModelRenderer rightPauldron;
     ModelRenderer leftPauldron;
 
@@ -46,9 +47,8 @@ public class ModelFullplate extends ModelBiped {
         setRotation(armetface, 0F, 0.7853982F, 0F);
 
         /*
-         * armetface = new ModelRenderer(this, 20, 32); armetface.addBox(-2.5F, -2.5F,
-         * -2.6F, 5, 4, 5); armetface.setRotationPoint(0F, -0.5F, -4F);
-         * setRotation(armetface, 0.2617994F, 0.7853982F, 0.2617994F);
+         * armetface = new ModelRenderer(this, 20, 32); armetface.addBox(-2.5F, -2.5F, -2.6F, 5, 4, 5);
+         * armetface.setRotationPoint(0F, -0.5F, -4F); setRotation(armetface, 0.2617994F, 0.7853982F, 0.2617994F);
          */
 
         bascinetface = new ModelRenderer(this, 0, 54);

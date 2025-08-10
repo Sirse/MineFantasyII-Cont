@@ -1,5 +1,13 @@
 package minefantasy.mf2.mechanics;
 
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.*;
+import net.minecraft.world.EnumDifficulty;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -23,16 +31,9 @@ import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
 import minefantasy.mf2.util.MFLogUtil;
 import minefantasy.mf2.util.XSTRandom;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.*;
-import net.minecraft.world.EnumDifficulty;
-
-import java.util.Iterator;
-import java.util.List;
 
 public class PlayerTickHandlerMF {
+
     private static ItemStack lastStack;
     private static String stepNBT = "MF_LastStep";
     private static String chunkCoords = "MF_BedPos";
@@ -66,20 +67,23 @@ public class PlayerTickHandlerMF {
             player.worldObj.spawnEntityInWorld(dragon);
             dragon.setDragon(tier);
             dragon.disengage(100);
-            player.worldObj.playSoundEffect(dragon.posX, dragon.posY - 16D, dragon.posZ, "mob.enderdragon.growl", 3.0F,
-                    1.5F);
+            player.worldObj
+                    .playSoundEffect(dragon.posX, dragon.posY - 16D, dragon.posZ, "mob.enderdragon.growl", 3.0F, 1.5F);
             dragon.fireBreathCooldown = 200;
 
             if (ConfigMobs.dragonMSG) {
-                player.addChatMessage(new ChatComponentText(
-                        EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));
+                player.addChatMessage(
+                        new ChatComponentText(
+                                EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));
 
                 List<?> list = player.worldObj.playerEntities;
                 for (Object instance : list) {
                     if (instance instanceof EntityPlayer) {
                         if (((EntityPlayer) instance).getDistanceToEntity(player) < 256D && instance != player) {
-                            ((EntityPlayer) instance).addChatMessage(new ChatComponentText(
-                                    EnumChatFormatting.GOLD + StatCollector.translateToLocal("event.dragonnear.name")));
+                            ((EntityPlayer) instance).addChatMessage(
+                                    new ChatComponentText(
+                                            EnumChatFormatting.GOLD
+                                                    + StatCollector.translateToLocal("event.dragonnear.name")));
                         }
                     }
                 }
@@ -216,12 +220,10 @@ public class PlayerTickHandlerMF {
                 }
             }
             /*
-             * if(RPGElements.isSystemActive) { if(event.player.isSprinting() &&
-             * event.player.ticksExisted % 10 == 0) {
-             * SkillList.athletics.addXP(event.player, 1); } else
-             * if(event.player.isSneaking() && TacticalManager.isEntityMoving(event.player)
-             * && event.player.ticksExisted % 10 == 0) { SkillList.sneak.addXP(event.player,
-             * 1); } }
+             * if(RPGElements.isSystemActive) { if(event.player.isSprinting() && event.player.ticksExisted % 10 == 0) {
+             * SkillList.athletics.addXP(event.player, 1); } else if(event.player.isSneaking() &&
+             * TacticalManager.isEntityMoving(event.player) && event.player.ticksExisted % 10 == 0) {
+             * SkillList.sneak.addXP(event.player, 1); } }
              */
             // DRAGON EVENT
             if (!event.player.worldObj.isRemote) {
@@ -297,15 +299,11 @@ public class PlayerTickHandlerMF {
     }
 
     /*
-     * private static String lastPitchNBT = "MF_last_AimPitch"; public static void
-     * setLastPitch(EntityPlayer user, float value) {
-     * user.getEntityData().setFloat(lastPitchNBT, value); } public static void
-     * updatePitch(EntityPlayer user) { user.getEntityData().setFloat(lastPitchNBT,
-     * user.rotationPitch); } public static float getPitchMovement(EntityPlayer
-     * user) { float lastPitch = user.getEntityData().getFloat(lastPitchNBT) +
-     * 1000F; float nowPitch = user.rotationPitch + 1000F;
-     *
-     * return nowPitch - lastPitch; }
+     * private static String lastPitchNBT = "MF_last_AimPitch"; public static void setLastPitch(EntityPlayer user, float
+     * value) { user.getEntityData().setFloat(lastPitchNBT, value); } public static void updatePitch(EntityPlayer user)
+     * { user.getEntityData().setFloat(lastPitchNBT, user.rotationPitch); } public static float
+     * getPitchMovement(EntityPlayer user) { float lastPitch = user.getEntityData().getFloat(lastPitchNBT) + 1000F;
+     * float nowPitch = user.rotationPitch + 1000F; return nowPitch - lastPitch; }
      */
     private void tickDragonSpawner(EntityPlayer player) {
         if (player.worldObj.difficultySetting != EnumDifficulty.PEACEFUL && player.dimension == 0) {
@@ -336,28 +334,24 @@ public class PlayerTickHandlerMF {
                 : 0F;
 
         if (pitchBalance > 0) {
-            if (pitchBalance < 1.0F && pitchBalance > -1.0F)
-                weight = pitchBalance;
+            if (pitchBalance < 1.0F && pitchBalance > -1.0F) weight = pitchBalance;
             pitchBalance -= weight;
 
             if (ConfigWeapon.useBalance) {
                 entityPlayer.rotationPitch += pitchBalance > 0 ? weight : -weight;
             }
 
-            if (pitchBalance < 0)
-                pitchBalance = 0;
+            if (pitchBalance < 0) pitchBalance = 0;
         }
         if (yawBalance > 0) {
-            if (yawBalance < 1.0F && yawBalance > -1.0F)
-                weight = yawBalance;
+            if (yawBalance < 1.0F && yawBalance > -1.0F) weight = yawBalance;
             yawBalance -= weight;
 
             if (ConfigWeapon.useBalance) {
                 entityPlayer.rotationYaw += yawBalance > 0 ? weight : -weight;
             }
 
-            if (yawBalance < 0)
-                yawBalance = 0;
+            if (yawBalance < 0) yawBalance = 0;
         }
         entityPlayer.getEntityData().setFloat("MF_Balance_Pitch", pitchBalance);
         entityPlayer.getEntityData().setFloat("MF_Balance_Yaw", yawBalance);
@@ -379,8 +373,7 @@ public class PlayerTickHandlerMF {
     }
 
     public void onPlayerEnterWorld(EntityPlayer player) {
-        if (player.worldObj.isRemote)
-            return;
+        if (player.worldObj.isRemote) return;
 
         NBTTagCompound persist = PlayerTagData.getPersistedData(player);
         MFLogUtil.logDebug("Sync data");
@@ -388,8 +381,7 @@ public class PlayerTickHandlerMF {
 
         if (!persist.hasKey("MF_HasBook")) {
             persist.setBoolean("MF_HasBook", true);
-            if (player.capabilities.isCreativeMode)
-                return;
+            if (player.capabilities.isCreativeMode) return;
 
             player.inventory.addItemStackToInventory(new ItemStack(ToolListMF.researchBook));
         }

@@ -5,6 +5,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 public abstract class EntityFlyingMF extends EntityLiving {
+
     public EntityFlyingMF(World world) {
         super(world);
     }
@@ -12,13 +13,11 @@ public abstract class EntityFlyingMF extends EntityLiving {
     /**
      * Called when the mob is falling. Calculates and applies fall damage.
      */
-    protected void fall(float distance) {
-    }
+    protected void fall(float distance) {}
 
     /**
-     * Takes in the distance the entity has fallen this tick and whether its on the
-     * ground to update the fall distance and deal fall damage if landing on the
-     * ground. Args: distanceFallenThisTick, onGround
+     * Takes in the distance the entity has fallen this tick and whether its on the ground to update the fall distance
+     * and deal fall damage if landing on the ground. Args: distanceFallenThisTick, onGround
      */
     protected void updateFallState(double distance, boolean hitground) {
         if (isTerrestrial()) {
@@ -51,7 +50,8 @@ public abstract class EntityFlyingMF extends EntityLiving {
             float f2 = 0.91F;
 
             if (this.onGround) {
-                f2 = this.worldObj.getBlock(MathHelper.floor_double(this.posX),
+                f2 = this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
                         MathHelper.floor_double(this.boundingBox.minY) - 1,
                         MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
             }
@@ -61,7 +61,8 @@ public abstract class EntityFlyingMF extends EntityLiving {
             f2 = 0.91F;
 
             if (this.onGround) {
-                f2 = this.worldObj.getBlock(MathHelper.floor_double(this.posX),
+                f2 = this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
                         MathHelper.floor_double(this.boundingBox.minY) - 1,
                         MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
             }

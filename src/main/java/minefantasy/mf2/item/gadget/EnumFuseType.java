@@ -1,7 +1,9 @@
 package minefantasy.mf2.item.gadget;
 
 public enum EnumFuseType {
-    BASIC("basic", 30), LONGFUSE("long", 60);
+
+    BASIC("basic", 30),
+    LONGFUSE("long", 60);
 
     public String name;
     public int time;

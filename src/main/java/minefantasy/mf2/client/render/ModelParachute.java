@@ -5,6 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelParachute extends ModelBase {
+
     // fields
     ModelRenderer chuteSegment5;
     ModelRenderer harness;

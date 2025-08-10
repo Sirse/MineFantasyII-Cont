@@ -1,12 +1,14 @@
 package minefantasy.mf2.recipe;
 
-import minefantasy.mf2.api.crafting.Salvage;
-import minefantasy.mf2.item.list.ComponentListMF;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.Salvage;
+import minefantasy.mf2.item.list.ComponentListMF;
+
 public class SalvageRecipes {
+
     public static void init() {
         ItemStack ironHunk = ComponentListMF.metalHunk.createComm("iron");
         Salvage.addSalvage(Items.wooden_pickaxe, new ItemStack(Items.stick, 2), new ItemStack(Blocks.planks, 3));
@@ -76,7 +78,11 @@ public class SalvageRecipes {
         Salvage.addSalvage(Blocks.dispenser, Items.bow, Items.redstone, new ItemStack(Blocks.cobblestone, 7));
         Salvage.addSalvage(Blocks.dropper, Items.redstone, new ItemStack(Blocks.cobblestone, 7));
         Salvage.addSalvage(Blocks.chest, new ItemStack(Blocks.planks, 8));
-        Salvage.addSalvage(Blocks.piston, Items.redstone, Items.iron_ingot, new ItemStack(Blocks.cobblestone, 4),
+        Salvage.addSalvage(
+                Blocks.piston,
+                Items.redstone,
+                Items.iron_ingot,
+                new ItemStack(Blocks.cobblestone, 4),
                 new ItemStack(Blocks.planks, 3));
         Salvage.addSalvage(Blocks.sticky_piston, Items.slime_ball, Blocks.piston);
         Salvage.addSalvage(Items.wooden_door, new ItemStack(Blocks.planks, 6));
@@ -88,27 +94,42 @@ public class SalvageRecipes {
         Salvage.addSalvage(Items.book, new ItemStack(Items.paper, 3), Items.leather);
         Salvage.addSalvage(Items.brewing_stand, new ItemStack(Blocks.cobblestone, 3), Items.blaze_rod);
         Salvage.addSalvage(Items.carrot_on_a_stick, Items.carrot, Items.fishing_rod);
-        Salvage.addSalvage(Items.comparator, new ItemStack(Blocks.redstone_torch, 3), new ItemStack(Blocks.stone, 3),
+        Salvage.addSalvage(
+                Items.comparator,
+                new ItemStack(Blocks.redstone_torch, 3),
+                new ItemStack(Blocks.stone, 3),
                 Items.quartz);
         Salvage.addSalvage(Items.ender_eye, Items.ender_pearl, Items.blaze_powder);
         Salvage.addSalvage(Items.magma_cream, Items.blaze_powder, Items.slime_ball);
         Salvage.addSalvage(Items.painting, new ItemStack(Items.stick, 8), Blocks.wool);
-        Salvage.addSalvage(Items.repeater, new ItemStack(Blocks.stone, 3), new ItemStack(Blocks.redstone_torch, 2),
+        Salvage.addSalvage(
+                Items.repeater,
+                new ItemStack(Blocks.stone, 3),
+                new ItemStack(Blocks.redstone_torch, 2),
                 Items.redstone);
         Salvage.addSalvage(Items.saddle, Items.leather, 5);
         Salvage.addSalvage(Items.sign, new ItemStack(Blocks.planks, 2));
         Salvage.addSalvage(Items.speckled_melon, new ItemStack(Items.gold_nugget, 8), Items.melon);
         Salvage.addSalvage(Blocks.activator_rail, Items.iron_ingot, Items.redstone);
         Salvage.addSalvage(Blocks.anvil, new ItemStack(Items.iron_ingot, 31));
-        Salvage.addSalvage(Blocks.beacon, Items.nether_star, new ItemStack(Blocks.glass, 5),
+        Salvage.addSalvage(
+                Blocks.beacon,
+                Items.nether_star,
+                new ItemStack(Blocks.glass, 5),
                 new ItemStack(Blocks.obsidian, 3));
         Salvage.addSalvage(Blocks.bookshelf, new ItemStack(Blocks.planks, 6), new ItemStack(Items.book, 3));
         Salvage.addSalvage(Blocks.crafting_table, new ItemStack(Blocks.planks, 4));
-        Salvage.addSalvage(Blocks.daylight_detector, new ItemStack(Blocks.glass, 3),
-                new ItemStack(Blocks.wooden_slab, 3), new ItemStack(Items.quartz, 3));
+        Salvage.addSalvage(
+                Blocks.daylight_detector,
+                new ItemStack(Blocks.glass, 3),
+                new ItemStack(Blocks.wooden_slab, 3),
+                new ItemStack(Items.quartz, 3));
         Salvage.addSalvage(Blocks.deadbush, new ItemStack(Items.stick, 4));
         Salvage.addSalvage(Blocks.detector_rail, Blocks.rail, Blocks.stone_pressure_plate);
-        Salvage.addSalvage(Blocks.enchanting_table, new ItemStack(Blocks.obsidian, 4), new ItemStack(Items.diamond, 2),
+        Salvage.addSalvage(
+                Blocks.enchanting_table,
+                new ItemStack(Blocks.obsidian, 4),
+                new ItemStack(Items.diamond, 2),
                 Items.book);
         Salvage.addSalvage(Blocks.ender_chest, new ItemStack(Blocks.obsidian, 8), Items.ender_eye);
         Salvage.addSalvage(Blocks.fence, new ItemStack(Items.stick, 3));

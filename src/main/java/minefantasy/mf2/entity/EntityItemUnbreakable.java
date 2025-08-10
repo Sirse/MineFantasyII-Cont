@@ -1,5 +1,7 @@
 package minefantasy.mf2.entity;
 
+import java.util.Iterator;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
@@ -9,9 +11,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 
-import java.util.Iterator;
-
 public class EntityItemUnbreakable extends EntityItem {
+
     public EntityItemUnbreakable(World world) {
         super(world);
     }
@@ -63,14 +64,16 @@ public class EntityItemUnbreakable extends EntityItem {
             } else {
                 this.motionY -= 0.03999999910593033D;
             }
-            this.noClip = this.func_145771_j(this.posX, (this.boundingBox.minY + this.boundingBox.maxY) / 2.0D,
-                    this.posZ);
+            this.noClip = this
+                    .func_145771_j(this.posX, (this.boundingBox.minY + this.boundingBox.maxY) / 2.0D, this.posZ);
             this.moveEntity(this.motionX, this.motionY, this.motionZ);
             boolean flag = (int) this.prevPosX != (int) this.posX || (int) this.prevPosY != (int) this.posY
                     || (int) this.prevPosZ != (int) this.posZ;
 
             if (flag || this.ticksExisted % 25 == 0) {
-                if (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY),
+                if (this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
+                        MathHelper.floor_double(this.posY),
                         MathHelper.floor_double(this.posZ)).getMaterial() == Material.lava) {
                     this.motionY = 0.20000000298023224D;
                     this.motionX = (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F;
@@ -85,7 +88,8 @@ public class EntityItemUnbreakable extends EntityItem {
             float f = 0.98F;
 
             if (this.onGround) {
-                f = this.worldObj.getBlock(MathHelper.floor_double(this.posX),
+                f = this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
                         MathHelper.floor_double(this.boundingBox.minY) - 1,
                         MathHelper.floor_double(this.posZ)).slipperiness * 0.98F;
             }
@@ -105,7 +109,8 @@ public class EntityItemUnbreakable extends EntityItem {
             if (isBreakable()) {
                 if (!this.worldObj.isRemote && this.age >= lifespan) {
                     if (item != null) {
-                        ItemExpireEvent event = new ItemExpireEvent(this,
+                        ItemExpireEvent event = new ItemExpireEvent(
+                                this,
                                 (item.getItem() == null ? 6000 : item.getItem().getEntityLifespan(item, worldObj)));
                         if (MinecraftForge.EVENT_BUS.post(event)) {
                             lifespan += event.extraLife;

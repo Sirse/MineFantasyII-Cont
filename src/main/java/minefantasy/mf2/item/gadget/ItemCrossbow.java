@@ -1,5 +1,22 @@
 package minefantasy.mf2.item.gadget;
 
+import java.util.List;
+
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -21,28 +38,13 @@ import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.mechanics.CombatMechanics;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-
-import java.util.List;
 
 public class ItemCrossbow extends Item
         implements IFirearm, IDisplayMFAmmo, IDamageModifier, IRackItem, IDamageType, IScope, ISpecialSalvage {
+
     private static final String partNBT = "MineFantasy_GunPiece_";
     public static String useTypeNBT = "MF_ActionInUse";
-    private String[] fullParts = new String[]{"mod", "muzzle", "mechanism", "stock"};
+    private String[] fullParts = new String[] { "mod", "muzzle", "mechanism", "stock" };
     private IIcon[] strings;
 
     public ItemCrossbow() {
@@ -80,8 +82,7 @@ public class ItemCrossbow extends Item
     }
 
     public static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -107,8 +108,7 @@ public class ItemCrossbow extends Item
             startUse(user, item, "reload");
             return item;
         } else // FIRE
-        {
-        }
+        {}
         startUse(user, item, "fire");
         return item;
     }
@@ -133,13 +133,11 @@ public class ItemCrossbow extends Item
                 if (loaded == null) {
                     ItemStack ammo = storage.copy();
                     ammo.stackSize = 1;
-                    if (shouldConsume)
-                        AmmoMechanicsMF.consumeAmmo(user, item);
+                    if (shouldConsume) AmmoMechanicsMF.consumeAmmo(user, item);
                     AmmoMechanicsMF.putAmmoOnFirearm(item, ammo);
                     success = true;
                 } else if (loaded.isItemEqual(storage) && loaded.stackSize < getAmmoCapacity(item)) {
-                    if (shouldConsume)
-                        AmmoMechanicsMF.consumeAmmo(user, item);
+                    if (shouldConsume) AmmoMechanicsMF.consumeAmmo(user, item);
                     ++loaded.stackSize;
                     AmmoMechanicsMF.putAmmoOnFirearm(item, loaded);
                     success = true;
@@ -168,8 +166,13 @@ public class ItemCrossbow extends Item
         ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(item);
         String action = getUseAction(item);
 
-        if (action.equalsIgnoreCase("fire") && this.onFireArrow(user.worldObj, AmmoMechanicsMF.getArrowOnBow(item),
-                item, user, this.getFullValue(item, "power"), false)) {
+        if (action.equalsIgnoreCase("fire") && this.onFireArrow(
+                user.worldObj,
+                AmmoMechanicsMF.getArrowOnBow(item),
+                item,
+                user,
+                this.getFullValue(item, "power"),
+                false)) {
             if (loaded != null) {
                 --loaded.stackSize;
                 AmmoMechanicsMF.putAmmoOnFirearm(item, (loaded.stackSize > 0 ? loaded : null));
@@ -182,8 +185,7 @@ public class ItemCrossbow extends Item
 
     public void startUse(EntityPlayer user, ItemStack item, String action) {
         setUseAction(item, action);
-        if (user != null)
-            user.setItemInUse(item, getMaxItemUseDuration(item));
+        if (user != null) user.setItemInUse(item, getMaxItemUseDuration(item));
     }
 
     public void stopUse(ItemStack item) {
@@ -217,10 +219,12 @@ public class ItemCrossbow extends Item
 
         list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.power.name", getFullValue(item, "power")));
         list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.speed.name", getFullValue(item, "speed")));
-        list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.recoil.name",
-                getFullValue(item, "recoil")));
-        list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.spread.name",
-                getFullValue(item, "spread")));
+        list.add(
+                StatCollector
+                        .translateToLocalFormatted("attribute.crossbow.recoil.name", getFullValue(item, "recoil")));
+        list.add(
+                StatCollector
+                        .translateToLocalFormatted("attribute.crossbow.spread.name", getFullValue(item, "spread")));
         list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.capacity.name", getAmmoCapacity(item)));
         list.add(StatCollector.translateToLocalFormatted("attribute.crossbow.bash.name", getMeleeDmg(item)));
     }
@@ -232,12 +236,9 @@ public class ItemCrossbow extends Item
 
         String fullName = "Crossbow";
 
-        if (base != null)
-            fullName = base;
-        if (arms != null)
-            fullName = arms + " " + fullName;
-        if (mod != null)
-            fullName = mod + " " + fullName;
+        if (base != null) fullName = base;
+        if (arms != null) fullName = arms + " " + fullName;
+        if (mod != null) fullName = mod + " " + fullName;
 
         return fullName;
     }
@@ -297,17 +298,30 @@ public class ItemCrossbow extends Item
 
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
-        list.add(constructCrossbow((ICrossbowPart) ComponentListMF.crossbow_handle_wood,
-                (ICrossbowPart) ComponentListMF.cross_arms_basic));
-        list.add(constructCrossbow((ICrossbowPart) ComponentListMF.crossbow_stock_wood,
-                (ICrossbowPart) ComponentListMF.cross_arms_light));
+        list.add(
+                constructCrossbow(
+                        (ICrossbowPart) ComponentListMF.crossbow_handle_wood,
+                        (ICrossbowPart) ComponentListMF.cross_arms_basic));
+        list.add(
+                constructCrossbow(
+                        (ICrossbowPart) ComponentListMF.crossbow_stock_wood,
+                        (ICrossbowPart) ComponentListMF.cross_arms_light));
 
-        list.add(constructCrossbow((ICrossbowPart) ComponentListMF.crossbow_stock_wood,
-                (ICrossbowPart) ComponentListMF.cross_arms_basic, (ICrossbowPart) ComponentListMF.cross_ammo));
-        list.add(constructCrossbow((ICrossbowPart) ComponentListMF.crossbow_stock_wood,
-                (ICrossbowPart) ComponentListMF.cross_arms_heavy, (ICrossbowPart) ComponentListMF.cross_bayonet));
-        list.add(constructCrossbow((ICrossbowPart) ComponentListMF.crossbow_stock_iron,
-                (ICrossbowPart) ComponentListMF.cross_arms_advanced, (ICrossbowPart) ComponentListMF.cross_scope));
+        list.add(
+                constructCrossbow(
+                        (ICrossbowPart) ComponentListMF.crossbow_stock_wood,
+                        (ICrossbowPart) ComponentListMF.cross_arms_basic,
+                        (ICrossbowPart) ComponentListMF.cross_ammo));
+        list.add(
+                constructCrossbow(
+                        (ICrossbowPart) ComponentListMF.crossbow_stock_wood,
+                        (ICrossbowPart) ComponentListMF.cross_arms_heavy,
+                        (ICrossbowPart) ComponentListMF.cross_bayonet));
+        list.add(
+                constructCrossbow(
+                        (ICrossbowPart) ComponentListMF.crossbow_stock_iron,
+                        (ICrossbowPart) ComponentListMF.cross_arms_advanced,
+                        (ICrossbowPart) ComponentListMF.cross_scope));
     }
 
     @SideOnly(Side.CLIENT)
@@ -334,8 +348,7 @@ public class ItemCrossbow extends Item
     }
 
     /**
-     * Get the modifier for a part (such as power, speed, recoil, capacity and
-     * spread)
+     * Get the modifier for a part (such as power, speed, recoil, capacity and spread)
      */
     public float getModifierForPart(ItemStack item, String partName, String variable) {
         ICrossbowPart part = ItemCrossbowPart.getPart(partName, getPart(partName, item));
@@ -378,11 +391,11 @@ public class ItemCrossbow extends Item
         if (implement.length > 0 && implement[0] instanceof ItemStack) {
             if (this.getMeleeDmg((ItemStack) implement[0]) > 1.0F)// Bayonet is used
             {
-                return new float[]{0F, 0F, 1F};
+                return new float[] { 0F, 0F, 1F };
             }
         }
 
-        return new float[]{0F, 1F, 0F};
+        return new float[] { 0F, 1F, 0F };
     }
 
     @Override
@@ -401,12 +414,12 @@ public class ItemCrossbow extends Item
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         return initialDam + this.getMeleeDmg(item) - 1;
     }
 
     public boolean onFireArrow(World world, ItemStack arrow, ItemStack bow, EntityPlayer user, float charge,
-                               boolean infinite) {
+            boolean infinite) {
         if (arrow == null || !(arrow.getItem() instanceof ItemArrowMF)) {
             return false;
         }
@@ -455,8 +468,8 @@ public class ItemCrossbow extends Item
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{getItem(item, "stock"), getItem(item, "mechanism"), getItem(item, "muzzle"),
-                getItem(item, "mod")};
+        return new Object[] { getItem(item, "stock"), getItem(item, "mechanism"), getItem(item, "muzzle"),
+                getItem(item, "mod") };
     }
 
     private Object getItem(ItemStack item, String type) {
@@ -495,8 +508,7 @@ public class ItemCrossbow extends Item
 
     @Override
     public boolean canHang(TileEntityRack rack, ItemStack item, int slot) {
-        if (slot == 0 || slot == 3)
-            return false;
+        if (slot == 0 || slot == 3) return false;
 
         return isHandCrossbow(item) || rack.hasRackBelow(slot);
     }

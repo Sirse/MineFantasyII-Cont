@@ -1,17 +1,9 @@
 package minefantasy.mf2.item.tool.crafting;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tool.IHuntingItem;
-import minefantasy.mf2.api.tool.IToolMF;
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.item.weapon.ItemWeaponMF;
-import minefantasy.mf2.util.XSTRandom;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -30,14 +22,25 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IShearable;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tool.IHuntingItem;
+import minefantasy.mf2.api.tool.IToolMF;
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.item.weapon.ItemWeaponMF;
+import minefantasy.mf2.util.XSTRandom;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemKnifeMF extends ItemWeaponMF implements IToolMF, IHuntingItem {
+
     protected int itemRarity;
     private int tier;
     private float baseDamage;
@@ -65,15 +68,25 @@ public class ItemKnifeMF extends ItemWeaponMF implements IToolMF, IHuntingItem {
                 IShearable target = (IShearable) block;
                 if (target.isShearable(itemstack, player.worldObj, x, y, z)) {
                     XSTRandom rand = new XSTRandom();
-                    if(rand.nextInt(10) < 3) { //knife has reduced drop and can't be used to shear entity's
-                        ArrayList<ItemStack> drops = target.onSheared(itemstack, player.worldObj, x, y, z,
+                    if (rand.nextInt(10) < 3) { // knife has reduced drop and can't be used to shear entity's
+                        ArrayList<ItemStack> drops = target.onSheared(
+                                itemstack,
+                                player.worldObj,
+                                x,
+                                y,
+                                z,
                                 EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
                         for (ItemStack stack : drops) {
                             float f = 0.7F;
                             double d = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
                             double d1 = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
                             double d2 = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-                            EntityItem entityitem = new EntityItem(player.worldObj, (double) x + d, (double) y + d1, (double) z + d2, stack);
+                            EntityItem entityitem = new EntityItem(
+                                    player.worldObj,
+                                    (double) x + d,
+                                    (double) y + d1,
+                                    (double) z + d2,
+                                    stack);
                             entityitem.delayBeforeCanPickup = 10;
                             player.worldObj.spawnEntityInWorld(entityitem);
                         }
@@ -155,7 +168,8 @@ public class ItemKnifeMF extends ItemWeaponMF implements IToolMF, IHuntingItem {
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;

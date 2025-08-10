@@ -1,5 +1,13 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.Map.Entry;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
@@ -7,12 +15,6 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
-
-import java.util.Map.Entry;
 
 public class RecipeHandlerBlastFurnace extends TemplateRecipeHandler {
 

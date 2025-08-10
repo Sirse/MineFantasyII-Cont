@@ -1,9 +1,5 @@
 package minefantasy.mf2.block.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.crafting.refine.QuernRecipes;
-import minefantasy.mf2.item.list.ComponentListMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -12,9 +8,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.refine.QuernRecipes;
+import minefantasy.mf2.item.list.ComponentListMF;
+
 public class TileEntityQuern extends TileEntity implements IInventory, ISidedInventory {
+
     public int turnAngle;
-    private ItemStack[] inv = new ItemStack[3]; //0 input, 1 pot, 2 output
+    private ItemStack[] inv = new ItemStack[3]; // 0 input, 1 pot, 2 output
     private int postUseTicks;
 
     public static final int getMaxRevs() {
@@ -44,7 +46,8 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
         if (postUseTicks > 0
                 || !((turnAngle == levels || turnAngle == levels * 2 || turnAngle == levels * 3 || turnAngle == 0))) {
             this.turnAngle++;
-            if (!worldObj.isRemote && (turnAngle == levels || turnAngle == levels * 2 || turnAngle == levels * 3
+            if (!worldObj.isRemote && (turnAngle == levels || turnAngle == levels * 2
+                    || turnAngle == levels * 3
                     || turnAngle == max)) {
                 worldObj.playSoundEffect(xCoord, yCoord, zCoord, "minefantasy2:block.quern", 1.0F, 1.0F);
                 onRevolutionComplete();
@@ -86,13 +89,10 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     private boolean canFitResult(ItemStack result) {
         ItemStack out = inv[2];
-        if (out == null)
-            return true;
+        if (out == null) return true;
 
-        if (!out.isItemEqual(result))
-            return false;
-        if (out.stackSize + result.stackSize > result.getMaxStackSize())
-            return false;
+        if (!out.isItemEqual(result)) return false;
+        if (out.stackSize + result.stackSize > result.getMaxStackSize()) return false;
 
         return true;
     }
@@ -100,9 +100,8 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     private boolean tryCraft(ItemStack result, boolean consumePot) {
         worldObj.playSoundEffect(xCoord, yCoord, zCoord, "minefantasy2:block.craftprimitive", 0.5F, 1.2F);
         /*
-         * if(rand.nextFloat() > 0.20F)//20% success rate {
-         * worldObj.playSoundEffect(xCoord, yCoord, zCoord, "dig.gravel", 1.0F, 0.5F);
-         * return false; } else
+         * if(rand.nextFloat() > 0.20F)//20% success rate { worldObj.playSoundEffect(xCoord, yCoord, zCoord,
+         * "dig.gravel", 1.0F, 0.5F); return false; } else
          */
 
         this.decrStackSize(0, 1);
@@ -183,12 +182,10 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -242,7 +239,7 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[]{0, 1, 2};
+        return new int[] { 0, 1, 2 };
     }
 
     @Override

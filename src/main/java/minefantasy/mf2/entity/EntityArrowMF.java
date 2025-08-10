@@ -1,19 +1,8 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.archery.IArrowMF;
-import minefantasy.mf2.api.archery.IArrowRetrieve;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.weapon.IDamageType;
-import minefantasy.mf2.config.ConfigExperiment;
-import minefantasy.mf2.config.ConfigWeapon;
-import minefantasy.mf2.item.archery.ArrowType;
-import minefantasy.mf2.item.gadget.EnumExplosiveType;
-import minefantasy.mf2.item.gadget.EnumPowderType;
-import minefantasy.mf2.mechanics.CombatMechanics;
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -32,10 +21,23 @@ import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.archery.IArrowMF;
+import minefantasy.mf2.api.archery.IArrowRetrieve;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.weapon.IDamageType;
+import minefantasy.mf2.config.ConfigExperiment;
+import minefantasy.mf2.config.ConfigWeapon;
+import minefantasy.mf2.item.archery.ArrowType;
+import minefantasy.mf2.item.gadget.EnumExplosiveType;
+import minefantasy.mf2.item.gadget.EnumPowderType;
+import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageType, IArrowRetrieve {
+
     private final int texture_dw = 18;
     /**
      * 1 if the player can pick up the arrow
@@ -83,8 +85,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * This is for shooting an arrow from a shooting entity to a target(Like
-     * skeletons and such)
+     * This is for shooting an arrow from a shooting entity to a target(Like skeletons and such)
      */
     public EntityArrowMF(World world, EntityLivingBase shooter, EntityLivingBase target, float accuracy, float power) {
         super(world);
@@ -132,8 +133,12 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         }
 
         this.setSize(0.5F, 0.5F);
-        this.setLocationAndAngles(shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ,
-                shooter.rotationYaw, shooter.rotationPitch);
+        this.setLocationAndAngles(
+                shooter.posX,
+                shooter.posY + shooter.getEyeHeight(),
+                shooter.posZ,
+                shooter.rotationYaw,
+                shooter.rotationPitch);
         this.posX -= MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
         this.posY -= 0.10000000149011612D;
         this.posZ -= MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
@@ -178,8 +183,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * Similar to setArrowHeading, it's point the throwable entity to a x, y, z
-     * direction.
+     * Similar to setArrowHeading, it's point the throwable entity to a x, y, z direction.
      */
     @Override
     public void setThrowableHeading(double x, double y, double z, float power, float spread) {
@@ -203,8 +207,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * Sets the position and rotation. Only difference from the other one is no
-     * bounding on the rotation. Args: posX, posY, posZ, yaw, pitch
+     * Sets the position and rotation. Only difference from the other one is no bounding on the rotation. Args: posX,
+     * posY, posZ, yaw, pitch
      */
     @Override
     @SideOnly(Side.CLIENT)
@@ -214,8 +218,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * Sets the position and rotation. Only difference from the other one is no
-     * bounding on the rotation. Args: posX, posY, posZ, yaw, pitch
+     * Sets the position and rotation. Only difference from the other one is no bounding on the rotation. Args: posX,
+     * posY, posZ, yaw, pitch
      */
     public void setPositionAndRotation(double x, double y, double z, float yaw, float pitch, int i) {
         this.setPosition(x, y, z);
@@ -264,8 +268,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
         if (block.getMaterial() != Material.air) {
             block.setBlockBoundsBasedOnState(this.worldObj, this.xTile, this.yTile, this.zTile);
-            AxisAlignedBB axisalignedbb = block.getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile,
-                    this.zTile);
+            AxisAlignedBB axisalignedbb = block
+                    .getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
 
             if (axisalignedbb != null
                     && axisalignedbb.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ))) {
@@ -297,20 +301,23 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         } else {
             ++this.ticksInAir;
             Vec3 vec31 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            Vec3 vec3 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            Vec3 vec3 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
             MovingObjectPosition movingobjectposition = this.worldObj.func_147447_a(vec31, vec3, false, true, false);
             vec31 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            vec3 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            vec3 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
             if (movingobjectposition != null) {
-                vec3 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord,
+                vec3 = Vec3.createVectorHelper(
+                        movingobjectposition.hitVec.xCoord,
+                        movingobjectposition.hitVec.yCoord,
                         movingobjectposition.hitVec.zCoord);
             }
 
             Entity entity = null;
-            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this,
+            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(
+                    this,
                     this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
             int i;
@@ -402,15 +409,16 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
                                 if (f4 > 0.0F) {
                                     movingobjectposition.entityHit.addVelocity(
-                                            this.motionX * this.knockbackStrength * 0.6000000238418579D / f4, 0.1D,
+                                            this.motionX * this.knockbackStrength * 0.6000000238418579D / f4,
+                                            0.1D,
                                             this.motionZ * this.knockbackStrength * 0.6000000238418579D / f4);
                                 }
                             }
 
                             if (this.shootingEntity != null && this.shootingEntity instanceof EntityLivingBase) {
                                 EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
-                                EnchantmentHelper.func_151385_b((EntityLivingBase) this.shootingEntity,
-                                        entitylivingbase);
+                                EnchantmentHelper
+                                        .func_151385_b((EntityLivingBase) this.shootingEntity, entitylivingbase);
                             }
 
                             if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity
@@ -474,17 +482,27 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
             if (isMagicArrow()) {
                 for (i = 0; i < 4; ++i) {
-                    this.worldObj.spawnParticle("reddust", this.posX + this.motionX * i / 4.0D,
-                            this.posY + this.motionY * i / 4.0D, this.posZ + this.motionZ * i / 4.0D, -this.motionX,
-                            -this.motionY + 0.2D, -this.motionZ);
+                    this.worldObj.spawnParticle(
+                            "reddust",
+                            this.posX + this.motionX * i / 4.0D,
+                            this.posY + this.motionY * i / 4.0D,
+                            this.posZ + this.motionZ * i / 4.0D,
+                            -this.motionX,
+                            -this.motionY + 0.2D,
+                            -this.motionZ);
                 }
             }
 
             if (this.getIsCritical()) {
                 for (i = 0; i < 4; ++i) {
-                    this.worldObj.spawnParticle("crit", this.posX + this.motionX * i / 4.0D,
-                            this.posY + this.motionY * i / 4.0D, this.posZ + this.motionZ * i / 4.0D, -this.motionX,
-                            -this.motionY + 0.2D, -this.motionZ);
+                    this.worldObj.spawnParticle(
+                            "crit",
+                            this.posX + this.motionX * i / 4.0D,
+                            this.posY + this.motionY * i / 4.0D,
+                            this.posZ + this.motionZ * i / 4.0D,
+                            -this.motionX,
+                            -this.motionY + 0.2D,
+                            -this.motionZ);
                 }
             }
 
@@ -519,8 +537,14 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
             if (this.isInWater()) {
                 for (int l = 0; l < 4; ++l) {
                     f4 = 0.25F;
-                    this.worldObj.spawnParticle("bubble", this.posX - this.motionX * f4, this.posY - this.motionY * f4,
-                            this.posZ - this.motionZ * f4, this.motionX, this.motionY, this.motionZ);
+                    this.worldObj.spawnParticle(
+                            "bubble",
+                            this.posX - this.motionX * f4,
+                            this.posY - this.motionY * f4,
+                            this.posZ - this.motionZ * f4,
+                            this.motionX,
+                            this.motionY,
+                            this.motionZ);
                 }
 
                 f3 = 0.8F;
@@ -557,8 +581,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     private void playHitSound() {
-        if (worldObj.isRemote || playedSound)
-            return;
+        if (worldObj.isRemote || playedSound) return;
         float pitch = 1.0F / (this.rand.nextFloat() * 0.2F + 0.9F);
         if (this.arrowtype != null && this.arrowtype == ArrowType.BROADHEAD) {
             pitch *= 0.75F;
@@ -651,7 +674,9 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
             }
 
             if (canPickUp) {
-                this.playSound("random.pop", 0.2F,
+                this.playSound(
+                        "random.pop",
+                        0.2F,
                         ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 player.onItemPickup(this, 1);
                 this.setDead();
@@ -660,8 +685,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * returns if this entity triggers Block.onEntityWalking on the blocks they walk
-     * on. used for spiders and wolves to prevent them from trampling crops
+     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
+     * prevent them from trampling crops
      */
     @Override
     protected boolean canTriggerWalking() {
@@ -701,8 +726,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     /**
-     * [New Method] Whether the arrow has a stream of critical hit particles flying
-     * behind it. Called by chance
+     * [New Method] Whether the arrow has a stream of critical hit particles flying behind it. Called by chance
      */
     public void setCritical(boolean flag) {
         byte b0 = this.dataWatcher.getWatchableObjectByte(16);
@@ -839,12 +863,12 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     @Override
     public float[] getDamageRatio(Object... implement) {
         if (isExplosive()) {
-            return new float[]{0, 1, 0};
+            return new float[] { 0, 1, 0 };
         }
         if (arrowtype != null) {
             return arrowtype.ratio;
         }
-        return new float[]{0, 0, 1};
+        return new float[] { 0, 0, 1 };
     }
 
     public void modifyVelocity(float velocity) {
@@ -891,10 +915,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
                         if (distanceToEntity > radius / 2) {
                             double sc = distanceToEntity - (radius / 2);
-                            if (sc < 0)
-                                sc = 0;
-                            if (sc > (radius / 2))
-                                sc = (radius / 2);
+                            if (sc < 0) sc = 0;
+                            if (sc > (radius / 2)) sc = (radius / 2);
                             dam *= (sc / (radius / 2));
                         }
                         if (!(entityHit instanceof EntityItem)) {
@@ -915,8 +937,13 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         if (filling > 0) {
             for (int a = 0; a < 16; a++) {
                 float range = 0.6F;
-                EntityShrapnel shrapnel = new EntityShrapnel(worldObj, posX, posY + 0.5D, posZ,
-                        (rand.nextDouble() - 0.5) * range, (rand.nextDouble() - 0.5) * range,
+                EntityShrapnel shrapnel = new EntityShrapnel(
+                        worldObj,
+                        posX,
+                        posY + 0.5D,
+                        posZ,
+                        (rand.nextDouble() - 0.5) * range,
+                        (rand.nextDouble() - 0.5) * range,
                         (rand.nextDouble() - 0.5) * range);
 
                 if (filling == 2) {

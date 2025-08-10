@@ -1,12 +1,13 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
 
 public class TweakedShapedCBRecipes implements ICarpenterRecipe {
 
@@ -19,7 +20,7 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
     private String research, tool, sound;
 
     public TweakedShapedCBRecipes(IIngredient[][] input, IItemStack output, String tool, int time, int hammer,
-                                  int anvil, float exp, String sound, String research, Skill s) {
+            int anvil, float exp, String sound, String research, Skill s) {
         this.height = 4;
         this.width = 6;
         this.ingreds = input;
@@ -89,8 +90,7 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
         boolean matches = true;
         for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 4; y++) {
-                if (!matches)
-                    return false;
+                if (!matches) return false;
                 ItemStack stack = inv.getStackInRowAndColumn(x, y);
 
                 // int a = y + x * 4;
@@ -108,8 +108,7 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
                 } else {
                     matches = false;
                 }
-                if (!hasMatch)
-                    matches = false;
+                if (!hasMatch) matches = false;
             }
         }
         return matches;

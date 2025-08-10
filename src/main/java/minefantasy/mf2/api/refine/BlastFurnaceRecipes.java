@@ -1,24 +1,25 @@
 package minefantasy.mf2.api.refine;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
 public class BlastFurnaceRecipes {
+
     private static final BlastFurnaceRecipes smeltingBase = new BlastFurnaceRecipes();
     /**
      * The list of smelting results.
      */
     private Map<ItemStack, ItemStack> smeltingList = new HashMap<ItemStack, ItemStack>();
 
-    private BlastFurnaceRecipes() {
-    }
+    private BlastFurnaceRecipes() {}
 
     /**
      * Used to call methods addRecipe, removeRecipe and getSmeltingResult
@@ -45,7 +46,8 @@ public class BlastFurnaceRecipes {
 
     public void removeRecipe(@Nullable ItemStack input, ItemStack output) {
         if (output != null) {
-            for (Iterator<Map.Entry<ItemStack, ItemStack>> it = this.smeltingList.entrySet().iterator(); it.hasNext(); ) {
+            for (Iterator<Map.Entry<ItemStack, ItemStack>> it = this.smeltingList.entrySet().iterator(); it
+                    .hasNext();) {
                 Map.Entry<ItemStack, ItemStack> entry = it.next();
                 if (input != null && !this.compareItemStacks(entry.getKey(), input)) {
                     continue;

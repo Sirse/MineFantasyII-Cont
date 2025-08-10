@@ -1,12 +1,7 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.block.tileentity.TileEntityBombPress;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.knowledge.KnowledgeListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -22,9 +17,16 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.tileentity.TileEntityBombPress;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 public class BlockBombPress extends BlockContainer {
+
     public static int bpress_RI = 108;
     private Random rand = new Random();
 
@@ -64,7 +66,7 @@ public class BlockBombPress extends BlockContainer {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (!ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.bombs)) {
             if (world.isRemote)
                 user.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("knowledge.unknownUse")));

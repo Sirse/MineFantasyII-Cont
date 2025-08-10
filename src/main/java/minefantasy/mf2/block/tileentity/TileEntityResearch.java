@@ -1,13 +1,8 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.crafting.IBasicMetre;
-import minefantasy.mf2.api.knowledge.IArtefact;
-import minefantasy.mf2.api.knowledge.InformationBase;
-import minefantasy.mf2.api.knowledge.ResearchArtefacts;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.ResearchTablePacket;
+import java.util.ArrayList;
+import java.util.Random;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
@@ -18,10 +13,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.WorldServer;
 
-import java.util.ArrayList;
-import java.util.Random;
+import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.knowledge.IArtefact;
+import minefantasy.mf2.api.knowledge.InformationBase;
+import minefantasy.mf2.api.knowledge.ResearchArtefacts;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.ResearchTablePacket;
 
 public class TileEntityResearch extends TileEntity implements IInventory, IBasicMetre {
+
     public float progress;
     public float maxProgress;
     public int researchID = -1;
@@ -81,17 +83,27 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         for (int id = 0; id < research.size(); id++) {
             InformationBase base = ResearchLogic.getResearch(research.get(id));
             if (base != null && !ResearchLogic.alreadyUsedArtefact(user, base, items[0])
-                    && ResearchLogic.canPurchase(user, base) && base.hasSkillsUnlocked(user)) {
+                    && ResearchLogic.canPurchase(user, base)
+                    && base.hasSkillsUnlocked(user)) {
                 int artefacts = ResearchArtefacts.useArtefact(items[0], base, user);
-                worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "minefantasy2:updateResearch", 1.0F,
+                worldObj.playSoundEffect(
+                        xCoord + 0.5,
+                        yCoord + 0.5,
+                        zCoord + 0.5,
+                        "minefantasy2:updateResearch",
+                        1.0F,
                         1.0F);
                 if (!user.worldObj.isRemote) {
                     Object name = new ChatComponentTranslation("knowledge." + base.getUnlocalisedName());
                     if (artefacts == -1) {
                         user.addChatComponentMessage(new ChatComponentTranslation("research.finishResearch", name));
                     } else {
-                        user.addChatComponentMessage(new ChatComponentTranslation("research.addArtefact", name,
-                                artefacts, base.getArtefactCount()));
+                        user.addChatComponentMessage(
+                                new ChatComponentTranslation(
+                                        "research.addArtefact",
+                                        name,
+                                        artefacts,
+                                        base.getArtefactCount()));
                     }
                 }
                 return;
@@ -145,7 +157,12 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         if (user.swingProgress > 0) {
             efficiency *= Math.max(0F, 1.0F - user.swingProgress);
         }
-        worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "minefantasy2:block.flipPage", 1.0F,
+        worldObj.playSoundEffect(
+                xCoord + 0.5,
+                yCoord + 0.5,
+                zCoord + 0.5,
+                "minefantasy2:block.flipPage",
+                1.0F,
                 rand.nextFloat() * 0.4F + 0.8F);
         efficiency *= getEnvironmentBoost();
         progress += efficiency;
@@ -173,19 +190,19 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new ResearchTablePacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new ResearchTablePacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-					new ResearchTablePacket(this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new ResearchTablePacket(this).generatePacket()); }
+         */
     }
 
     @Override
@@ -295,12 +312,10 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {

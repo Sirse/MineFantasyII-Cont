@@ -1,5 +1,7 @@
 package mods.battlegear2.api.quiver;
 
+import java.util.*;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -7,8 +9,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-
-import java.util.*;
 
 public class QuiverArrowRegistry {
 
@@ -35,9 +35,8 @@ public class QuiverArrowRegistry {
     }
 
     /**
-     * NBT sensitive version, can be called through
-     * FMLInterModComms.sendMessage("battlegear2", "Arrow:"+classPath, itemStack);
-     * where classPath is the full class path for the arrow class
+     * NBT sensitive version, can be called through FMLInterModComms.sendMessage("battlegear2", "Arrow:"+classPath,
+     * itemStack); where classPath is the full class path for the arrow class
      *
      * @param stack
      * @param entityArrow the class from which the arrow entity will be constructed
@@ -50,10 +49,9 @@ public class QuiverArrowRegistry {
     }
 
     /**
-     * Adds a new quiver selection algorithm to the known list, can be called
-     * through FMLInterModComms.sendMessage("battlegear2", "QuiverSelection",
-     * classpath); where classPath is the full class path for the class implementing
-     * IQuiverSelection, and said class has a default constructor to built from
+     * Adds a new quiver selection algorithm to the known list, can be called through
+     * FMLInterModComms.sendMessage("battlegear2", "QuiverSelection", classpath); where classPath is the full class path
+     * for the class implementing IQuiverSelection, and said class has a default constructor to built from
      *
      * @param handler the selection algorithm to add
      * @return true if it could be added
@@ -64,9 +62,8 @@ public class QuiverArrowRegistry {
 
     /**
      * Adds a new arrow firing handler to the known list, can be called through
-     * FMLInterModComms.sendMessage("battlegear2", "FireHandler", classpath); where
-     * classPath is the full class path for the class implementing
-     * IArrowFireHandler, and said class has a default constructor to built from
+     * FMLInterModComms.sendMessage("battlegear2", "FireHandler", classpath); where classPath is the full class path for
+     * the class implementing IArrowFireHandler, and said class has a default constructor to built from
      *
      * @param handler the firing handler to add
      * @return true if it could be added
@@ -80,8 +77,7 @@ public class QuiverArrowRegistry {
      *
      * @param bow          the bow in use
      * @param entityPlayer the player using it
-     * @return the first non-null itemstack found through the quiver selection
-     * algorithms
+     * @return the first non-null itemstack found through the quiver selection algorithms
      */
     public static ItemStack getArrowContainer(ItemStack bow, EntityPlayer entityPlayer) {
         ItemStack temp;
@@ -146,10 +142,10 @@ public class QuiverArrowRegistry {
     }
 
     /**
-     * Tool class to compare ItemStack, since this class is final but doesn't
-     * implement the necessary method
+     * Tool class to compare ItemStack, since this class is final but doesn't implement the necessary method
      */
     static class StackComparator implements Comparator<ItemStack> {
+
         @Override
         public int compare(ItemStack stack, ItemStack stack2) {
             if (stack == stack2) {
@@ -180,9 +176,8 @@ public class QuiverArrowRegistry {
     }
 
     /**
-     * Default implementation of a arrow firing handler, which uses this registry of
-     * arrows to build an EntityArrow with a constructor If the arrow is unknown, or
-     * the constructor isn't valid, defers to other firing handlers silently
+     * Default implementation of a arrow firing handler, which uses this registry of arrows to build an EntityArrow with
+     * a constructor If the arrow is unknown, or the constructor isn't valid, defers to other firing handlers silently
      */
     static class DefaultArrowFire implements IArrowFireHandler {
 
@@ -198,8 +193,7 @@ public class QuiverArrowRegistry {
                 try {
                     return (EntityArrow) clazz.getConstructor(World.class, EntityLivingBase.class, Float.TYPE)
                             .newInstance(player.worldObj, player, charge);
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
             }
             return null;
         }

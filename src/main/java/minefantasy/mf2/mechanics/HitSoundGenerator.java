@@ -1,7 +1,5 @@
 package minefantasy.mf2.mechanics;
 
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.network.packet.HitSoundPacket;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,7 +7,11 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.network.packet.HitSoundPacket;
+
 public class HitSoundGenerator {
+
     public static void makeHitSound(ItemStack weapon, Entity target) {
         WeaponClass WC = WeaponClass.findClassForAny(weapon);
         String material = "metal";
@@ -21,8 +23,8 @@ public class HitSoundGenerator {
             String sndString = "minefantasy2:weapon.hit." + type + "." + material;
 
             if (!target.worldObj.isRemote) {
-                ((WorldServer) target.worldObj).getEntityTracker().func_151248_b(target,
-                        new HitSoundPacket(sndString, target).generatePacket());
+                ((WorldServer) target.worldObj).getEntityTracker()
+                        .func_151248_b(target, new HitSoundPacket(sndString, target).generatePacket());
             }
         }
     }

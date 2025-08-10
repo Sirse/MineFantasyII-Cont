@@ -1,17 +1,9 @@
 package minefantasy.mf2.item.tool.advanced;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityRoad;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -28,14 +20,25 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityRoad;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemMattock extends ItemPickaxe implements IToolMaterial {
+
     protected int itemRarity;
     private String name;
     // ===================================================== CUSTOM START
@@ -70,7 +73,7 @@ public class ItemMattock extends ItemPickaxe implements IToolMaterial {
 
     @Override
     public boolean onItemUse(ItemStack mattock, EntityPlayer player, World world, int x, int y, int z, int facing,
-                             float pitch, float yaw, float pan) {
+            float pitch, float yaw, float pan) {
         if (!player.canPlayerEdit(x, y, z, facing, mattock)) {
             return false;
         } else {
@@ -86,8 +89,13 @@ public class ItemMattock extends ItemPickaxe implements IToolMaterial {
                 if (ground == Blocks.grass) {
                     ground = Blocks.dirt;
                 }
-                world.playSoundEffect(x + 0.5F, y + 0.5F, z + 0.5F, "dig." + ground.stepSound.soundName,
-                        (var13.stepSound.getVolume() + 1.0F) / 2.0F, var13.stepSound.getPitch() * 0.8F);
+                world.playSoundEffect(
+                        x + 0.5F,
+                        y + 0.5F,
+                        z + 0.5F,
+                        "dig." + ground.stepSound.soundName,
+                        (var13.stepSound.getVolume() + 1.0F) / 2.0F,
+                        var13.stepSound.getPitch() * 0.8F);
 
                 if (world.isRemote) {
                     return true;
@@ -127,7 +135,8 @@ public class ItemMattock extends ItemPickaxe implements IToolMaterial {
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;

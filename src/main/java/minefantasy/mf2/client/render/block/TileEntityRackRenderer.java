@@ -1,9 +1,5 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.weapon.IRackItem;
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -20,10 +16,17 @@ import net.minecraftforge.client.IItemRenderer;
 import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 import net.minecraftforge.client.MinecraftForgeClient;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+
 public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
+
     private static Minecraft mc = Minecraft.getMinecraft();
     private ModelRack model;
 
@@ -32,7 +35,7 @@ public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
     }
 
     public static void renderEquippedItem(ItemRenderType type, IItemRenderer customRenderer, RenderBlocks renderBlocks,
-                                          ItemStack item) {
+            ItemStack item) {
         if (customRenderer.shouldUseRenderHelper(type, item, ItemRendererHelper.EQUIPPED_BLOCK)) {
             GL11.glPushMatrix();
             GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
@@ -56,10 +59,8 @@ public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
             i = tile.getBlockMetadata() - 2;
         }
         int j = i * 90;
-        if (i == 1)
-            j = 180;
-        if (i == 2)
-            j = 90;
+        if (i == 1) j = 180;
+        if (i == 2) j = 90;
 
         GL11.glPushMatrix();// Start all
         GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1F, (float) d2 + 0.5F);
@@ -114,8 +115,8 @@ public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
                             this.mc.getTextureManager().getResourceLocation(itemstack.getItemSpriteNumber()));
                     renderEquippedItem(ItemRenderType.EQUIPPED, customRenderer, new RenderBlocks(), itemstack);
                 } else {
-                    for (int layer = 0; layer < itemstack.getItem()
-                            .getRenderPasses(itemstack.getItemDamage()); layer++) {
+                    for (int layer = 0; layer
+                            < itemstack.getItem().getRenderPasses(itemstack.getItemDamage()); layer++) {
                         IIcon icon = itemstack.getItem().getIcon(itemstack, layer);
                         if (icon != null) {
                             GL11.glPushMatrix();
@@ -167,7 +168,8 @@ public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
     private float getRotationForItem(Item item) {
         String classname = item.getClass().getName();
         if (classname.endsWith("ItemCrossbow") || classname.endsWith("ItemBlunderbuss")
-                || classname.endsWith("ItemBlowgun") || classname.endsWith("ItemMusket")) {
+                || classname.endsWith("ItemBlowgun")
+                || classname.endsWith("ItemMusket")) {
             return 45F;
         }
         return -45F;

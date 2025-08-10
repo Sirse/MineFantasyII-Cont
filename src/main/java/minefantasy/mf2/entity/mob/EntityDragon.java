@@ -1,17 +1,8 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.armour.IArmourPenetrationMob;
-import minefantasy.mf2.api.armour.IArmouredEntity;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.helpers.PowerArmour;
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.config.ConfigMobs;
-import minefantasy.mf2.entity.EntityDragonBreath;
-import minefantasy.mf2.entity.Shockwave;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.ToolListMF;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.*;
 import net.minecraft.entity.boss.IBossDisplayData;
@@ -26,11 +17,22 @@ import net.minecraft.util.*;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.armour.IArmourPenetrationMob;
+import minefantasy.mf2.api.armour.IArmouredEntity;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.PowerArmour;
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.config.ConfigMobs;
+import minefantasy.mf2.entity.EntityDragonBreath;
+import minefantasy.mf2.entity.Shockwave;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 public class EntityDragon extends EntityFlyingMF
         implements IMob, IBossDisplayData, IArmouredEntity, IArmourPenetrationMob {
+
     private static final int dataID = 12;
     public static int interestTimeSeconds = 90;
     public static float heartChance = 1.0F;
@@ -118,10 +120,8 @@ public class EntityDragon extends EntityFlyingMF
     public void onUpdate() {
         super.onUpdate();
 
-        if (fireBreathTick > 0)
-            --fireBreathTick;
-        if (fireBreathCooldown > 0)
-            --fireBreathCooldown;
+        if (fireBreathTick > 0) --fireBreathTick;
+        if (fireBreathCooldown > 0) --fireBreathCooldown;
 
         if (!isTerrestrial()) {
             this.fallDistance = 0;
@@ -135,8 +135,7 @@ public class EntityDragon extends EntityFlyingMF
 
             int disengageTime = getDisengageTime();
             if (disengageTime > 0) {
-                if (targetedEntity != null)
-                    targetedEntity = null;
+                if (targetedEntity != null) targetedEntity = null;
                 --disengageTime;
             }
             if (disengageTime == 1 && lastEnemy != null && this.canAttackEntity(lastEnemy)) {
@@ -202,8 +201,9 @@ public class EntityDragon extends EntityFlyingMF
                             Object instance = players.next();
                             if (instance != null && instance instanceof EntityPlayer) {
                                 if (((EntityPlayer) instance).getDistanceToEntity(this) < 128D) {
-                                    ((EntityPlayer) instance).addChatMessage(new ChatComponentText(
-                                            StatCollector.translateToLocal("event.dragonaway.name")));
+                                    ((EntityPlayer) instance).addChatMessage(
+                                            new ChatComponentText(
+                                                    StatCollector.translateToLocal("event.dragonaway.name")));
                                 }
                             }
                         }
@@ -229,8 +229,7 @@ public class EntityDragon extends EntityFlyingMF
             wingTick++;
             if (wingTick == 20) {
                 wingTick = 0;
-                if (!isTerrestrial())
-                    worldObj.playSoundAtEntity(this, "mob.enderdragon.flap", 0.5F, 1.5F);
+                if (!isTerrestrial()) worldObj.playSoundAtEntity(this, "mob.enderdragon.flap", 0.5F, 1.5F);
             }
             int i = (120 / 20) * wingTick;
             wingFlap = -40 + i;
@@ -327,7 +326,8 @@ public class EntityDragon extends EntityFlyingMF
 
         if (this.targetedEntity != null && getDisengageTime() <= 0
                 && this.targetedEntity.getDistanceSqToEntity(this) < var9 * var9) {
-            if (!worldObj.isRemote && !this.canEntityBeSeen(this.targetedEntity) && getDisengageTime() <= 0
+            if (!worldObj.isRemote && !this.canEntityBeSeen(this.targetedEntity)
+                    && getDisengageTime() <= 0
                     && (targetedEntity instanceof EntityPlayer ? rand.nextInt(40) == 0 : true)) {
                 disengage(200);
                 return;
@@ -345,7 +345,8 @@ public class EntityDragon extends EntityFlyingMF
             boolean inRangeOfLeap = onGround && this.targetedEntity.getDistanceToEntity(this) > range * 2
                     && this.targetedEntity.getDistanceToEntity(this) < range * 8;
             boolean inRangeOfFire = this.targetedEntity.getDistanceToEntity(this) > range
-                    && this.targetedEntity.getDistanceToEntity(this) < range * 6 && fireBreathCooldown <= 0;
+                    && this.targetedEntity.getDistanceToEntity(this) < range * 6
+                    && fireBreathCooldown <= 0;
 
             if (this.canEntityBeSeen(this.targetedEntity) && inRangeOfFire) {
                 this.fireBreathTick = getType().fireTimer;
@@ -470,9 +471,10 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     public void setEntityToAttack(Class enClass) {
-        List list = worldObj.getEntitiesWithinAABB(enClass,
-                AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX + 1.0D, posY + 1.0D, posZ + 1.0D).expand(getAggro(),
-                        getAggro(), getAggro()));
+        List list = worldObj.getEntitiesWithinAABB(
+                enClass,
+                AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX + 1.0D, posY + 1.0D, posZ + 1.0D)
+                        .expand(getAggro(), getAggro(), getAggro()));
         while (!list.isEmpty()) {
             Entity target = (Entity) list.get(0);
             if (canAttackEntity(target)) {
@@ -501,8 +503,7 @@ public class EntityDragon extends EntityFlyingMF
         if (getDisengageTime() > 0) {
             return false;
         }
-        if (!this.canEntityBeSeen(target))
-            return false;
+        if (!this.canEntityBeSeen(target)) return false;
         if (target instanceof EntityDragon || target == this.riddenByEntity) {
             return false;
         }
@@ -525,11 +526,9 @@ public class EntityDragon extends EntityFlyingMF
         if (getDisengageTime() <= 0 && this.getHealth() < getLowHPThreshold()) {
             disengage(100);
         }
-        if (source.isFireDamage())
-            return false;
+        if (source.isFireDamage()) return false;
 
-        if (source == DamageSource.inWall)
-            return false;
+        if (source == DamageSource.inWall) return false;
 
         if (source.getEntity() != null && source.getEntity() instanceof EntityPlayer) {
             if (getDisengageTime() <= 0 && getAttackTarget() == null || damage > 16
@@ -538,8 +537,7 @@ public class EntityDragon extends EntityFlyingMF
         }
 
         if (source.getEntity() != null) {
-            if (getDisengageTime() <= 0 && getAttackTarget() == null)
-                setTarget(source.getEntity());
+            if (getDisengageTime() <= 0 && getAttackTarget() == null) setTarget(source.getEntity());
         }
         return super.attackEntityFrom(source, damage);
     }
@@ -591,9 +589,8 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     /**
-     * Drop 0-2 items of this living's type. @param par1 - Whether this entity has
-     * recently been hit by a player. @param par2 - Level of Looting used to kill
-     * this mob.
+     * Drop 0-2 items of this living's type. @param par1 - Whether this entity has recently been hit by a player. @param
+     * par2 - Level of Looting used to kill this mob.
      */
     @Override
     protected void dropFewItems(boolean playerKill, int looting) {
@@ -660,8 +657,7 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     /**
-     * Checks if the entity's current position is a valid location to spawn this
-     * entity.
+     * Checks if the entity's current position is a valid location to spawn this entity.
      */
     @Override
     public boolean getCanSpawnHere() {
@@ -809,8 +805,7 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     /**
-     * returns a new explosion. Does initiation (at time of writing Explosion is not
-     * finished)
+     * returns a new explosion. Does initiation (at time of writing Explosion is not finished)
      */
     public Shockwave newShockwave(double x, double y, double z, float power, boolean fire, boolean smoke) {
         Shockwave explosion = new Shockwave("dragonstomp", worldObj, this, x, y, z, power);
@@ -839,7 +834,7 @@ public class EntityDragon extends EntityFlyingMF
 
     @Override
     public float[] getHitTraits() {
-        return new float[]{0, 1, 9};// 90% Piercing, 10% BLunt
+        return new float[] { 0, 1, 9 };// 90% Piercing, 10% BLunt
     }
 
     @SideOnly(Side.CLIENT)
@@ -849,10 +844,8 @@ public class EntityDragon extends EntityFlyingMF
             if (!(this.motionX == 0 && this.motionZ == 0))// moving
             {
                 float angle = (float) (45F * this.motionY) * 5;
-                if (angle < -45)
-                    angle = -45;
-                if (angle > 45)
-                    angle = 45;
+                if (angle < -45) angle = -45;
+                if (angle > 45) angle = 45;
 
                 return angle;
             }
@@ -861,8 +854,7 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     private boolean canHearEntity(Entity target) {
-        if (target instanceof EntityLivingBase && PowerArmour.isWearingCogwork((EntityLivingBase) target))
-            return true;
+        if (target instanceof EntityLivingBase && PowerArmour.isWearingCogwork((EntityLivingBase) target)) return true;
 
         double distance = getDistanceToEntity(target);
 

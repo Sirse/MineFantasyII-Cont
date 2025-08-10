@@ -1,10 +1,10 @@
 package mods.battlegear2.api.heraldry;
 
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.IIcon;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.util.IIcon;
 
 @Deprecated
 public class HeraldryPattern {

@@ -1,14 +1,16 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class SkillPacket extends PacketMF {
+
     public static final String packetName = "MF2_SkillSync";
     private EntityPlayer user;
     private int level, xp, xpMax;
@@ -23,8 +25,7 @@ public class SkillPacket extends PacketMF {
         xpMax = skilltag.getInteger("xpMax");
     }
 
-    public SkillPacket() {
-    }
+    public SkillPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

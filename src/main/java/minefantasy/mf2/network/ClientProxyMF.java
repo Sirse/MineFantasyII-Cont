@@ -1,5 +1,15 @@
 package minefantasy.mf2.network;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.common.MinecraftForge;
+
+import org.lwjgl.input.Keyboard;
+
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
@@ -29,14 +39,6 @@ import minefantasy.mf2.item.list.styles.DragonforgedStyle;
 import minefantasy.mf2.item.list.styles.OrnateStyle;
 import minefantasy.mf2.mechanics.ExtendedReachMF;
 import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.MinecraftForge;
-import org.lwjgl.input.Keyboard;
 
 /**
  * @author Anonymous Productions
@@ -57,8 +59,7 @@ public class ClientProxyMF extends CommonProxyMF {
     }
 
     @Override
-    public void preInit() {
-    }
+    public void preInit() {}
 
     @Override
     public void registerMain() {
@@ -102,8 +103,8 @@ public class ClientProxyMF extends CommonProxyMF {
         RenderingRegistry.registerBlockHandler(new RenderBloomery());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityBloomery.class, new TileEntityBloomeryRenderer());
         RenderingRegistry.registerBlockHandler(new RenderCrossbowBench());
-        ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCrossbowBench.class,
-                new TileEntityCrossbowBenchRenderer());
+        ClientRegistry
+                .bindTileEntitySpecialRenderer(TileEntityCrossbowBench.class, new TileEntityCrossbowBenchRenderer());
         RenderingRegistry.registerBlockHandler(new RenderQuern());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityQuern.class, new TileEntityQuernRenderer());
         RenderingRegistry.registerBlockHandler(new RenderFirepit());
@@ -136,8 +137,8 @@ public class ClientProxyMF extends CommonProxyMF {
         RenderingRegistry.registerEntityRenderingHandler(EntityCogwork.class, new RenderPowerArmour());
 
         RenderingRegistry.registerEntityRenderingHandler(EntityDragon.class, new RenderDragon(2F));
-        RenderingRegistry.registerEntityRenderingHandler(EntityMinotaur.class,
-                new RenderMinotaur(new ModelMinotaur(), 1.5F));
+        RenderingRegistry
+                .registerEntityRenderingHandler(EntityMinotaur.class, new RenderMinotaur(new ModelMinotaur(), 1.5F));
         RenderingRegistry.registerEntityRenderingHandler(EntityHound.class, new RenderHound(new ModelHound()));
     }
 
@@ -225,13 +226,16 @@ public class ClientProxyMF extends CommonProxyMF {
         MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_waraxe, new RenderSword().setAxe());
         MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_mace, new RenderSword());
         MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_scythe, new RenderHeavyWeapon().setBlunt());
-        MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_warhammer,
-                new RenderHeavyWeapon().setBlunt());
-        MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_battleaxe,
+        MinecraftForgeClient
+                .registerItemRenderer(CustomToolListMF.standard_warhammer, new RenderHeavyWeapon().setBlunt());
+        MinecraftForgeClient.registerItemRenderer(
+                CustomToolListMF.standard_battleaxe,
                 new RenderHeavyWeapon().setBlunt().setParryable());
-        MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_greatsword,
+        MinecraftForgeClient.registerItemRenderer(
+                CustomToolListMF.standard_greatsword,
                 new RenderHeavyWeapon().setGreatsword().setParryable());
-        MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_katana,
+        MinecraftForgeClient.registerItemRenderer(
+                CustomToolListMF.standard_katana,
                 new RenderHeavyWeapon().setKatana().setParryable());
         MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_spear, new RenderSpear());
         MinecraftForgeClient.registerItemRenderer(CustomToolListMF.standard_halbeard, new RenderSpear(true));
@@ -244,21 +248,24 @@ public class ClientProxyMF extends CommonProxyMF {
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_sword, new RenderSword());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_waraxe, new RenderSword().setAxe());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_mace, new RenderSword());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_warhammer,
-                new RenderHeavyWeapon().setBlunt());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_battleaxe,
+        MinecraftForgeClient
+                .registerItemRenderer(DragonforgedStyle.dragonforged_warhammer, new RenderHeavyWeapon().setBlunt());
+        MinecraftForgeClient.registerItemRenderer(
+                DragonforgedStyle.dragonforged_battleaxe,
                 new RenderHeavyWeapon().setBlunt().setParryable());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_greatsword,
+        MinecraftForgeClient.registerItemRenderer(
+                DragonforgedStyle.dragonforged_greatsword,
                 new RenderHeavyWeapon().setGreatsword().setParryable());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_katana,
+        MinecraftForgeClient.registerItemRenderer(
+                DragonforgedStyle.dragonforged_katana,
                 new RenderHeavyWeapon().setKatana().setParryable());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_spear, new RenderSpear());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_halbeard, new RenderSpear(true));
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_lance, new RenderLance());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_scythe,
-                new RenderHeavyWeapon().setBlunt());
-        MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_lumber,
-                new RenderHeavyWeapon().setBlunt());
+        MinecraftForgeClient
+                .registerItemRenderer(DragonforgedStyle.dragonforged_scythe, new RenderHeavyWeapon().setBlunt());
+        MinecraftForgeClient
+                .registerItemRenderer(DragonforgedStyle.dragonforged_lumber, new RenderHeavyWeapon().setBlunt());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_saw, new RenderSaw());
         MinecraftForgeClient.registerItemRenderer(DragonforgedStyle.dragonforged_bow, new RenderBow(false));
 
@@ -268,12 +275,13 @@ public class ClientProxyMF extends CommonProxyMF {
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_waraxe, new RenderSword().setAxe());
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_mace, new RenderSword());
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_warhammer, new RenderHeavyWeapon().setBlunt());
-        MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_battleaxe,
-                new RenderHeavyWeapon().setBlunt().setParryable());
-        MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_greatsword,
+        MinecraftForgeClient
+                .registerItemRenderer(OrnateStyle.ornate_battleaxe, new RenderHeavyWeapon().setBlunt().setParryable());
+        MinecraftForgeClient.registerItemRenderer(
+                OrnateStyle.ornate_greatsword,
                 new RenderHeavyWeapon().setGreatsword().setParryable());
-        MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_katana,
-                new RenderHeavyWeapon().setKatana().setParryable());
+        MinecraftForgeClient
+                .registerItemRenderer(OrnateStyle.ornate_katana, new RenderHeavyWeapon().setKatana().setParryable());
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_spear, new RenderSpear());
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_halbeard, new RenderSpear(true));
         MinecraftForgeClient.registerItemRenderer(OrnateStyle.ornate_lance, new RenderLance());

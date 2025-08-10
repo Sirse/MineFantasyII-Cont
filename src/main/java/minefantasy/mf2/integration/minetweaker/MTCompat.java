@@ -7,13 +7,8 @@ import minetweaker.api.item.IIngredient;
 
 public class MTCompat {
 
-    private static final String[] COMMAND_DESC = {
-            "MineFantasy commands:",
-            "   /minetweaker mf materials",
-            "   Lists all MF materials",
-            "   /minetweaker mf skills",
-            "   Lists all MF skills"
-    };
+    private static final String[] COMMAND_DESC = { "MineFantasy commands:", "   /minetweaker mf materials",
+            "   Lists all MF materials", "   /minetweaker mf skills", "   Lists all MF skills" };
 
     public static void loadTweakers() {
         MineTweakerAPI.registerClass(Anvil.class);
@@ -36,6 +31,7 @@ public class MTCompat {
 
     @Optional.Interface(iface = "minetweaker.IRecipeRemover", modid = "MineTweaker3")
     public static class MFRecipeRemover implements minetweaker.IRecipeRemover {
+
         @Optional.Method(modid = "MineTweaker3")
         @Override
         public void remove(IIngredient iIngredient) {

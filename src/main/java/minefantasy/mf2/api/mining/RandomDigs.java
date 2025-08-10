@@ -1,14 +1,15 @@
 package minefantasy.mf2.api.mining;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 public class RandomDigs {
+
     public static ArrayList<RandomDigs> drops = new ArrayList<RandomDigs>();
 
     private final ItemStack loot;
@@ -21,7 +22,7 @@ public class RandomDigs {
     private final boolean doesSilktouchDisable;
 
     public RandomDigs(ItemStack drop, float chance, Block base, int meta, int harvestLevel, int min, int max,
-                      boolean silkDisable) {
+            boolean silkDisable) {
         doesSilktouchDisable = silkDisable;
         minHeight = min;
         maxHeight = max;
@@ -41,18 +42,26 @@ public class RandomDigs {
      * @param block  the block it drops from (ID, Block, or stack)
      */
     public static void addOre(ItemStack drop, float chance, Block block, int meta, int harvestLevel, int min, int max,
-                              boolean silkDisable) {
+            boolean silkDisable) {
         drops.add(new RandomDigs(drop, chance / 100F, block, meta, harvestLevel, min, max, silkDisable));
     }
 
     public static void addOre(ItemStack drop, float chance, Block block, int harvestLevel, int min, int max,
-                              boolean silkDisable) {
-        drops.add(new RandomDigs(drop, chance / 100F, block, OreDictionary.WILDCARD_VALUE, harvestLevel, min, max,
-                silkDisable));
+            boolean silkDisable) {
+        drops.add(
+                new RandomDigs(
+                        drop,
+                        chance / 100F,
+                        block,
+                        OreDictionary.WILDCARD_VALUE,
+                        harvestLevel,
+                        min,
+                        max,
+                        silkDisable));
     }
 
     public static ArrayList<ItemStack> getDroppedItems(Block base, int meta, int harvest, int fortune,
-                                                       boolean silktouch, int y) {
+            boolean silktouch, int y) {
         ArrayList<ItemStack> loot = new ArrayList<ItemStack>();
 
         if (!drops.isEmpty()) {
@@ -70,7 +79,7 @@ public class RandomDigs {
     }
 
     private static boolean matchesOre(RandomDigs ore, Block base, int meta, int harvest, float multiplier,
-                                      boolean silktouch, int y) {
+            boolean silktouch, int y) {
         Random random = new Random();
 
         if (ore.doesSilktouchDisable && silktouch) {

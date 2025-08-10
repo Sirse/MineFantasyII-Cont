@@ -1,12 +1,14 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityCrossbowBench;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityCrossbowBench;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class CrossbowBenchPacket extends PacketMF {
+
     public static final String packetName = "MF2_CrossbowBenchPkt";
     private int[] coords = new int[3];
     private float progress;
@@ -14,14 +16,13 @@ public class CrossbowBenchPacket extends PacketMF {
     private boolean hasRecipe;
 
     public CrossbowBenchPacket(TileEntityCrossbowBench tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         progress = tile.progress;
         maxProgress = tile.maxProgress;
         hasRecipe = tile.hasRecipe;
     }
 
-    public CrossbowBenchPacket() {
-    }
+    public CrossbowBenchPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

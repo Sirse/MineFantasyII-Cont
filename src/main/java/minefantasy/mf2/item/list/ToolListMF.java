@@ -1,5 +1,15 @@
 package minefantasy.mf2.item.list;
 
+import net.minecraft.init.Items;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.Item.ToolMaterial;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraftforge.common.ChestGenHooks;
+import net.minecraftforge.common.util.EnumHelper;
+
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.decor.ItemBedMF;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -15,57 +25,82 @@ import minefantasy.mf2.item.weapon.ItemSwordMF;
 import minefantasy.mf2.item.weapon.ItemWaraxeMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.util.EnumHelper;
 
 /**
  * @author Anonymous Productions
  */
 public class ToolListMF {
+
     public static EnumRarity poor = EnumHelper.addRarity("Poor", EnumChatFormatting.DARK_GRAY, "poor");
     public static EnumRarity unique = EnumHelper.addRarity("Unique", EnumChatFormatting.DARK_GREEN, "unique");
     public static EnumRarity rare = EnumHelper.addRarity("Rare", EnumChatFormatting.DARK_BLUE, "rare");
 
-    public static EnumRarity[] rarity = new EnumRarity[]{ToolListMF.poor, EnumRarity.common, EnumRarity.uncommon,
-            EnumRarity.rare, EnumRarity.epic};
+    public static EnumRarity[] rarity = new EnumRarity[] { ToolListMF.poor, EnumRarity.common, EnumRarity.uncommon,
+            EnumRarity.rare, EnumRarity.epic };
 
     public static Item swordTraining = new ItemSwordMF("training_sword", ToolMaterial.WOOD, -1, 0.8F);
     public static Item waraxeTraining = new ItemWaraxeMF("training_waraxe", ToolMaterial.WOOD, -1, 0.8F);
     public static Item maceTraining = new ItemMaceMF("training_mace", ToolMaterial.WOOD, -1, 0.8F);
     public static Item spearTraining = new ItemSpearMF("training_spear", ToolMaterial.WOOD, -1, 0.8F);
-    public static Item knifeStone = new ItemKnifeMF("stone_knife",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1, 3.5F, 0);
-    public static Item hammerStone = new ItemHammer("stone_hammer",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), false, -1, 0);
-    public static Item tongsStone = new ItemTongs("stone_tongs",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1);
-    public static Item needleBone = new ItemNeedle("bone_needle",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1, 0);
+    public static Item knifeStone = new ItemKnifeMF(
+            "stone_knife",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            3.5F,
+            0);
+    public static Item hammerStone = new ItemHammer(
+            "stone_hammer",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            false,
+            -1,
+            0);
+    public static Item tongsStone = new ItemTongs(
+            "stone_tongs",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1);
+    public static Item needleBone = new ItemNeedle(
+            "bone_needle",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            0);
 
-    public static Item pickStone = new ItemPickMF("stone_pick", BaseMaterialMF.getMaterial("stone").getToolConversion(),
+    public static Item pickStone = new ItemPickMF(
+            "stone_pick",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
             -1);
-    public static Item axeStone = new ItemAxeMF("stone_axe", BaseMaterialMF.getMaterial("stone").getToolConversion(),
+    public static Item axeStone = new ItemAxeMF(
+            "stone_axe",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
             -1);
-    public static Item spadeStone = new ItemSpadeMF("stone_spade",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1);
-    public static Item hoeStone = new ItemHoeMF("stone_hoe", BaseMaterialMF.getMaterial("stone").getToolConversion(),
+    public static Item spadeStone = new ItemSpadeMF(
+            "stone_spade",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1);
+    public static Item hoeStone = new ItemHoeMF(
+            "stone_hoe",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
             -1);
 
-    public static Item swordStone = new ItemSwordMF("stone_sword",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1, 2.0F);
-    public static Item maceStone = new ItemMaceMF("stone_mace", BaseMaterialMF.getMaterial("stone").getToolConversion(),
-            -1, 2.0F);
-    public static Item waraxeStone = new ItemWaraxeMF("stone_waraxe",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1, 2.0F);
-    public static Item spearStone = new ItemSpearMF("stone_spear",
-            BaseMaterialMF.getMaterial("stone").getToolConversion(), -1, 2.0F);
+    public static Item swordStone = new ItemSwordMF(
+            "stone_sword",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            2.0F);
+    public static Item maceStone = new ItemMaceMF(
+            "stone_mace",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            2.0F);
+    public static Item waraxeStone = new ItemWaraxeMF(
+            "stone_waraxe",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            2.0F);
+    public static Item spearStone = new ItemSpearMF(
+            "stone_spear",
+            BaseMaterialMF.getMaterial("stone").getToolConversion(),
+            -1,
+            2.0F);
 
     public static Item bandage_crude = new ItemBandage("bandage_crude", 5F);
     public static Item bandage_wool = new ItemBandage("bandage_wool", 8F);
@@ -129,163 +164,233 @@ public class ToolListMF {
         CustomToolListMF.load();
         CustomArmourListMF.load();
 
-        ChestGenHooks.addItem(ChestGenHooks.VILLAGE_BLACKSMITH,
+        ChestGenHooks.addItem(
+                ChestGenHooks.VILLAGE_BLACKSMITH,
                 new WeightedRandomChestContent(new ItemStack(skillbook_artisanry), 1, 5, 50));
-        ChestGenHooks.addItem(ChestGenHooks.VILLAGE_BLACKSMITH,
+        ChestGenHooks.addItem(
+                ChestGenHooks.VILLAGE_BLACKSMITH,
                 new WeightedRandomChestContent(new ItemStack(skillbook_construction), 1, 1, 10));
-        ChestGenHooks.addItem(ChestGenHooks.VILLAGE_BLACKSMITH,
+        ChestGenHooks.addItem(
+                ChestGenHooks.VILLAGE_BLACKSMITH,
                 new WeightedRandomChestContent(new ItemStack(ArmourListMF.leatherapron), 1, 1, 10));
 
-        ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.DUNGEON_CHEST,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.talisman_lesser), 1, 1, 2));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_LIBRARY,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.talisman_lesser), 1, 1, 3));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_DESERT_CHEST,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.talisman_lesser), 1, 1, 3));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_JUNGLE_CHEST,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.talisman_lesser), 1, 1, 3));
 
-        ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.DUNGEON_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 4, 10));
-        ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.DUNGEON_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 2, 5));
-        ChestGenHooks.addItem(ChestGenHooks.DUNGEON_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.DUNGEON_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_rare), 1, 1, 1));
 
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_DESERT_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 4, 10));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_DESERT_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 2, 5));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_DESERT_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_DESERT_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_rare), 1, 1, 1));
 
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_JUNGLE_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 4, 10));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_JUNGLE_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 2, 5));
-        ChestGenHooks.addItem(ChestGenHooks.PYRAMID_JUNGLE_CHEST,
+        ChestGenHooks.addItem(
+                ChestGenHooks.PYRAMID_JUNGLE_CHEST,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_rare), 1, 1, 1));
 
-        ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR,
+        ChestGenHooks.addItem(
+                ChestGenHooks.MINESHAFT_CORRIDOR,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 6, 20));
-        ChestGenHooks.addItem(ChestGenHooks.MINESHAFT_CORRIDOR,
+        ChestGenHooks.addItem(
+                ChestGenHooks.MINESHAFT_CORRIDOR,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 1, 2));
 
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_CORRIDOR,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 4, 5));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CORRIDOR,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_CORRIDOR,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 2, 3));
 
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_CROSSING,
                 new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 3, 20));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_CROSSING,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 2, 10));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_CROSSING,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_CROSSING,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_rare), 1, 1, 2));
 
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_LIBRARY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_artisanry), 2, 6, 10));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_LIBRARY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_construction), 2, 6, 10));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_LIBRARY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_provisioning), 2, 6, 10));
-        ChestGenHooks.addItem(ChestGenHooks.STRONGHOLD_LIBRARY,
+        ChestGenHooks.addItem(
+                ChestGenHooks.STRONGHOLD_LIBRARY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_engineering), 1, 4, 8));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_STUDY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_STUDY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_engineering), 1, 1, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_STUDY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_STUDY,
                 new WeightedRandomChestContent(new ItemStack(Items.paper), 5, 36, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_STUDY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_STUDY,
                 new WeightedRandomChestContent(new ItemStack(Items.feather), 1, 4, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_STUDY,
-                new WeightedRandomChestContent(new ItemStack(Items.book), 5, 26, 80));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_STUDY, new WeightedRandomChestContent(new ItemStack(Items.book), 5, 26, 80));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_FORGE,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_FORGE,
                 new WeightedRandomChestContent(new ItemStack(skillbook_artisanry), 1, 1, 40));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_FORGE,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_FORGE,
                 new WeightedRandomChestContent(new ItemStack(Items.coal), 5, 17, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_FORGE,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_FORGE,
                 new WeightedRandomChestContent(ComponentListMF.bar("Iron"), 1, 4, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_FORGE,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_FORGE,
                 new WeightedRandomChestContent(new ItemStack(Items.leather), 1, 4, 80));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_FORGE,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_FORGE,
                 new WeightedRandomChestContent(ComponentListMF.bar("Steel"), 1, 6, 40));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(BlockListMF.repair_basic), 1, 1, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(BlockListMF.repair_advanced), 1, 1, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.coke), 1, 10, 60));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(skillbook_engineering), 1, 1, 40));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.bronze_gears), 1, 9, 30));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_ARMOURY,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_ARMOURY,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.tungsten_gears), 1, 1, 20));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_AMMO,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_AMMO,
                 new WeightedRandomChestContent(CustomToolListMF.standard_bolt.construct("Iron"), 1, 1, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_AMMO,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_AMMO,
                 new WeightedRandomChestContent(CustomToolListMF.standard_bolt.construct("Encrusted"), 1, 1, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_AMMO, new WeightedRandomChestContent(
-                bomb_custom.createBomb((byte) 1, (byte) 1, (byte) 0, (byte) 0, 1), 1, 1, 25));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_AMMO, new WeightedRandomChestContent(
-                mine_custom.createMine((byte) 1, (byte) 1, (byte) 0, (byte) 0, 1), 1, 1, 25));
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_AMMO,
+                new WeightedRandomChestContent(
+                        bomb_custom.createBomb((byte) 1, (byte) 1, (byte) 0, (byte) 0, 1),
+                        1,
+                        1,
+                        25));
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_AMMO,
+                new WeightedRandomChestContent(
+                        mine_custom.createMine((byte) 1, (byte) 1, (byte) 0, (byte) 0, 1),
+                        1,
+                        1,
+                        25));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 1, 40));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 1, 10));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(Items.book), 1, 4, 60));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(Items.bowl), 1, 6, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(loot_sack), 1, 1, 40));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 1, 10));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(Items.book), 1, 4, 60));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(Items.bowl), 1, 6, 100));
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.clay_pot), 1, 7, 100));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(Items.bone), 1, 9, 80));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(Items.bone), 1, 9, 80));
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME,
                 new WeightedRandomChestContent(new ItemStack(Items.emerald), 1, 1, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME,
                 new WeightedRandomChestContent(new ItemStack(Items.diamond), 1, 1, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(ComponentListMF.bar("Iron"), 1, 4, 30));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(ComponentListMF.bar("Gold"), 1, 4, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(ComponentListMF.bar("Iron"), 1, 4, 30));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(ComponentListMF.bar("Gold"), 1, 4, 20));
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME,
                 new WeightedRandomChestContent(ComponentListMF.bar("Silver"), 1, 4, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(Items.bucket), 1, 1, 80));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME,
-                new WeightedRandomChestContent(new ItemStack(Items.clock), 1, 1, 20));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(Items.bucket), 1, 1, 80));
+        ChestGenHooks
+                .addItem(LootTypes.DWARVEN_HOME, new WeightedRandomChestContent(new ItemStack(Items.clock), 1, 1, 20));
 
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_uc), 1, 1, 40));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(loot_sack_rare), 1, 1, 10));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.book), 1, 4, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.bowl), 1, 6, 30));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(ComponentListMF.clay_pot), 1, 7, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.bone), 1, 9, 10));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.emerald), 1, 1, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.diamond), 1, 1, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(ComponentListMF.bar("Iron"), 1, 4, 30));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(ComponentListMF.bar("Gold"), 1, 4, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(ComponentListMF.bar("Silver"), 1, 4, 50));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.bucket), 1, 1, 20));
-        ChestGenHooks.addItem(LootTypes.DWARVEN_HOME_RICH,
+        ChestGenHooks.addItem(
+                LootTypes.DWARVEN_HOME_RICH,
                 new WeightedRandomChestContent(new ItemStack(Items.clock), 1, 1, 40));
     }
 

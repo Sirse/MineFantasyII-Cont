@@ -1,6 +1,20 @@
 package minefantasy.mf2.api;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.oredict.OreDictionary;
+
 import com.google.common.collect.Lists;
+
 import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -18,33 +32,20 @@ import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 
 public class MineFantasyAPI {
+
     /**
      * This variable saves if MineFantasy is in debug mode
      */
     public static boolean isInDebugMode;
     /**
-     * This fuel handler is for MineFantasy equipment, it uses real fuel(like coal)
-     * not wood
+     * This fuel handler is for MineFantasy equipment, it uses real fuel(like coal) not wood
      */
     private static List<IFuelHandler> fuelHandlers = Lists.newArrayList();
 
     @SideOnly(Side.CLIENT)
-    public static void init() {
-    }
+    public static void init() {}
 
     public static void debugMsg(String msg) {
         MFLogUtil.logDebug(msg);
@@ -61,23 +62,23 @@ public class MineFantasyAPI {
     }
 
     public static void addAnvilRecipe(Skill skill, ItemStack result, boolean hot, int hammerType, int anvil,
-                                      int forgeTime, Object... input) {
+            int forgeTime, Object... input) {
         addAnvilRecipe(skill, result, hot, "hammer", hammerType, anvil, forgeTime, input);
     }
 
     public static void addAnvilRecipe(Skill skill, ItemStack result, boolean hot, String toolType, int hammerType,
-                                      int anvil, int forgeTime, Object... input) {
-        addAnvilRecipe(skill, result, "", hot, toolType, hammerType, anvil, forgeTime,
-                input);
+            int anvil, int forgeTime, Object... input) {
+        addAnvilRecipe(skill, result, "", hot, toolType, hammerType, anvil, forgeTime, input);
     }
 
     public static IAnvilRecipe addAnvilRecipe(Skill skill, ItemStack result, String research, boolean hot,
-                                              int hammerType, int anvil, int forgeTime, Object... input) {
+            int hammerType, int anvil, int forgeTime, Object... input) {
         return addAnvilRecipe(skill, result, research, hot, "hammer", hammerType, anvil, forgeTime, input);
     }
 
     /**
      * Adds a shaped recipe for anvils with all variables
+     *
      * @param skill      The skill required for crafting
      * @param result     The output item
      * @param research   The research required
@@ -89,9 +90,9 @@ public class MineFantasyAPI {
      * @param input      The input for the item (Exactly the same as regular recipes)
      */
     public static IAnvilRecipe addAnvilRecipe(Skill skill, ItemStack result, String research, boolean hot,
-                                              String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
-        return CraftingManagerAnvil.getInstance().addRecipe(result, skill, research, hot, toolType, hammerType,
-                anvil, forgeTime, input);
+            String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
+        return CraftingManagerAnvil.getInstance()
+                .addRecipe(result, skill, research, hot, toolType, hammerType, anvil, forgeTime, input);
     }
 
     /**
@@ -109,14 +110,22 @@ public class MineFantasyAPI {
      * @return
      */
     public static IAnvilRecipe addAnvilToolRecipe(Skill skill, ItemStack result, String research, boolean hot,
-                                                  String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
-        return CraftingManagerAnvil.getInstance().addToolRecipe(result, skill, research, hot, toolType, hammerType,
-                anvil, forgeTime, input);
+            String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
+        return CraftingManagerAnvil.getInstance()
+                .addToolRecipe(result, skill, research, hot, toolType, hammerType, anvil, forgeTime, input);
     }
 
     public static IAnvilRecipe addAnvilToolRecipe(Skill skill, Item result, String research, boolean hot,
-                                                  String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
-        return addAnvilToolRecipe(skill, new ItemStack(result), research, hot, toolType, hammerType, anvil, forgeTime,
+            String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
+        return addAnvilToolRecipe(
+                skill,
+                new ItemStack(result),
+                research,
+                hot,
+                toolType,
+                hammerType,
+                anvil,
+                forgeTime,
                 input);
     }
 
@@ -124,37 +133,44 @@ public class MineFantasyAPI {
      * Adds a shaped recipe for carpenter benches sensetive to tiers
      *
      * @param result    The output item (basic itemstack)
-     * @param sound     The sound it makes ("minefantasy2:blocks.carpentermallet"),
-     *                  "step.wood", etc
+     * @param sound     The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
      * @param toolType  the tool type required to hit
      * @param toolTier  the tools tier required for creation:
      * @param craftTime The time taken to craft(default is 200. each hit is about 100)
      * @param input     The input for the item (Exactly the same as regular recipes)
      */
     public static ICarpenterRecipe addCarpenterToolRecipe(Skill skill, ItemStack result, String research, String sound,
-                                                          String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addToolRecipe(result, skill, research, sound, 0F, toolType,
-                toolTier, -1, craftTime, input);
+            String toolType, int toolTier, int craftTime, Object... input) {
+        return CraftingManagerCarpenter.getInstance()
+                .addToolRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
     }
 
     public static ICarpenterRecipe addCarpenterToolRecipe(Skill skill, Item result, String research, String sound,
-                                                          String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addToolRecipe(new ItemStack(result), skill, research, sound, 0F,
-                toolType, toolTier, -1, craftTime, input);
+            String toolType, int toolTier, int craftTime, Object... input) {
+        return CraftingManagerCarpenter.getInstance().addToolRecipe(
+                new ItemStack(result),
+                skill,
+                research,
+                sound,
+                0F,
+                toolType,
+                toolTier,
+                -1,
+                craftTime,
+                input);
     }
 
     public static ICarpenterRecipe addCarpenterToolRecipe(Skill skill, Item result, String research, String sound,
-                                                          int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addToolRecipe(new ItemStack(result), skill, research, sound, 0F,
-                "hands", -1, -1, craftTime, input);
+            int craftTime, Object... input) {
+        return CraftingManagerCarpenter.getInstance()
+                .addToolRecipe(new ItemStack(result), skill, research, sound, 0F, "hands", -1, -1, craftTime, input);
     }
 
     /**
      * Adds a shaped recipe for carpenter benches with all variables
      *
      * @param result     The output item
-     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"),
-     *                   "step.wood", etc
+     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
      * @param experience the experience gained from crafting
      * @param toolType   the tool type required to hit
      * @param toolTier   the tools tier required for creation:
@@ -162,9 +178,9 @@ public class MineFantasyAPI {
      * @param input      The input for the item (Exactly the same as regular recipes)
      */
     public static void addCarpenterRecipe(Skill skill, ItemStack result, String sound, String toolType, int toolTier,
-                                          int craftTime, Object... input) {
-        CraftingManagerCarpenter.getInstance().addRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1,
-                craftTime, input);
+            int craftTime, Object... input) {
+        CraftingManagerCarpenter.getInstance()
+                .addRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1, craftTime, input);
     }
 
     /**
@@ -178,26 +194,25 @@ public class MineFantasyAPI {
      * {@link MineFantasyAPI#addCarpenterRecipe}
      */
     public static void addShapelessCarpenterRecipe(Skill skill, ItemStack result, String sound, String toolType,
-                                                   int toolTier, int craftTime, Object... input) {
-        CraftingManagerCarpenter.getInstance().addShapelessRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1,
-                craftTime, input);
+            int toolTier, int craftTime, Object... input) {
+        CraftingManagerCarpenter.getInstance()
+                .addShapelessRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1, craftTime, input);
     }
 
     /**
      * {@link MineFantasyAPI#addCarpenterRecipe}
      */
     public static void addShapelessCarpenterRecipe(Skill skill, ItemStack result, String sound, int craftTime,
-                                                   Object... input) {
+            Object... input) {
         addShapelessCarpenterRecipe(skill, result, sound, "hands", -1, craftTime, input);
     }
 
     /**
-     * Adds a basic carpenter recipe similar to regular crafting This uses a single
-     * hit with bare hands
+     * Adds a basic carpenter recipe similar to regular crafting This uses a single hit with bare hands
      */
     public static ICarpenterRecipe addBasicCarpenterRecipe(ItemStack result, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addRecipe(result, null, "", "dig.wood", 0F, "hands", -1, -1, 1,
-                input);
+        return CraftingManagerCarpenter.getInstance()
+                .addRecipe(result, null, "", "dig.wood", 0F, "hands", -1, -1, 1, input);
     }
 
     /**
@@ -205,8 +220,7 @@ public class MineFantasyAPI {
      *
      * @param result     The output item
      * @param research   The research required
-     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"),
-     *                   "step.wood", etc
+     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
      * @param experience the experience gained from crafting
      * @param toolType   the tool type required to hit
      * @param toolTier   the tools tier required for creation:
@@ -214,16 +228,16 @@ public class MineFantasyAPI {
      * @param input      The input for the item (Exactly the same as regular recipes)
      */
     public static ICarpenterRecipe addCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-                                                      String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addRecipe(result, skill, research, sound, 0F, toolType, toolTier,
-                -1, craftTime, input);
+            String toolType, int toolTier, int craftTime, Object... input) {
+        return CraftingManagerCarpenter.getInstance()
+                .addRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
     }
 
     /**
      * {@link MineFantasyAPI#addCarpenterRecipe}
      */
     public static ICarpenterRecipe addCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-                                                      int craftTime, Object... input) {
+            int craftTime, Object... input) {
         return addCarpenterRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
     }
 
@@ -231,16 +245,16 @@ public class MineFantasyAPI {
      * {@link MineFantasyAPI#addCarpenterRecipe}
      */
     public static ICarpenterRecipe addShapelessCarpenterRecipe(Skill skill, ItemStack result, String research,
-                                                               String sound, String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addShapelessRecipe(result, skill, research, sound, 0F, toolType,
-                toolTier, -1, craftTime, input);
+            String sound, String toolType, int toolTier, int craftTime, Object... input) {
+        return CraftingManagerCarpenter.getInstance()
+                .addShapelessRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
     }
 
     /**
      * {@link MineFantasyAPI#addCarpenterRecipe}
      */
     public static ICarpenterRecipe addShapelessCarpenterRecipe(Skill skill, ItemStack result, String research,
-                                                               String sound, int craftTime, Object... input) {
+            String sound, int craftTime, Object... input) {
         return addShapelessCarpenterRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
     }
 
@@ -316,8 +330,7 @@ public class MineFantasyAPI {
     /**
      * Adds a custom alloy
      *
-     * @param alloy the Alloy to add Use this if you want your alloy to have special
-     *              properties
+     * @param alloy the Alloy to add Use this if you want your alloy to have special properties
      * @see Alloy
      */
     public static void addAlloy(Alloy alloy) {
@@ -450,7 +463,7 @@ public class MineFantasyAPI {
      * @param requireBaking   whether it needs to be in an oven
      */
     public static CookRecipe addCookingRecipe(ItemStack input, ItemStack output, int min_temperature,
-                                              int max_temperature, int time, boolean requireBaking) {
+            int max_temperature, int time, boolean requireBaking) {
         return CookRecipe.addRecipe(input, output, min_temperature, max_temperature, time, requireBaking, true);
     }
 
@@ -463,11 +476,10 @@ public class MineFantasyAPI {
      * @param max_temperature maximum temperature until burn
      * @param time            how many ticks until it finishes
      * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a
-     *                        container)
+     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
      */
     public static CookRecipe addCookingRecipe(ItemStack input, ItemStack output, int min_temperature,
-                                              int max_temperature, int time, boolean requireBaking, boolean canBurn) {
+            int max_temperature, int time, boolean requireBaking, boolean canBurn) {
         return CookRecipe.addRecipe(input, output, min_temperature, max_temperature, time, requireBaking, canBurn);
     }
 
@@ -480,13 +492,12 @@ public class MineFantasyAPI {
      * @param max_temperature maximum temperature until burn
      * @param time            how many ticks until it finishes
      * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a
-     *                        container)
+     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
      */
     public static CookRecipe addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-                                              int min_temperature, int max_temperature, int time, boolean requireBaking) {
-        return CookRecipe.addRecipe(input, output, burnItem, min_temperature, max_temperature, time, requireBaking,
-                true);
+            int min_temperature, int max_temperature, int time, boolean requireBaking) {
+        return CookRecipe
+                .addRecipe(input, output, burnItem, min_temperature, max_temperature, time, requireBaking, true);
     }
 
     /**
@@ -499,19 +510,34 @@ public class MineFantasyAPI {
      * @param time            how many ticks until it finishes
      * @param burn_time       how long until a finished product burns
      * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a
-     *                        container)
+     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
      */
     public static CookRecipe addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-                                              int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking) {
-        return CookRecipe.addRecipe(input, output, burnItem, min_temperature, max_temperature, time, burn_time,
-                requireBaking, true);
+            int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking) {
+        return CookRecipe.addRecipe(
+                input,
+                output,
+                burnItem,
+                min_temperature,
+                max_temperature,
+                time,
+                burn_time,
+                requireBaking,
+                true);
     }
 
     public static CookRecipe addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-                                              int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking, boolean canBurn) {
-        return CookRecipe.addRecipe(input, output, burnItem, min_temperature, max_temperature, time, burn_time,
-                requireBaking, canBurn);
+            int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking, boolean canBurn) {
+        return CookRecipe.addRecipe(
+                input,
+                output,
+                burnItem,
+                min_temperature,
+                max_temperature,
+                time,
+                burn_time,
+                requireBaking,
+                canBurn);
     }
 
     public static QuernRecipes addQuernRecipe(ItemStack input, ItemStack output) {

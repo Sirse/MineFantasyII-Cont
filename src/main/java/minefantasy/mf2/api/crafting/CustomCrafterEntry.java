@@ -1,11 +1,12 @@
 package minefantasy.mf2.api.crafting;
 
+import java.util.HashMap;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.HashMap;
-
 public class CustomCrafterEntry {
+
     public static HashMap<Item, CustomCrafterEntry> entries = new HashMap<Item, CustomCrafterEntry>();
     public Item itemID;
     /**

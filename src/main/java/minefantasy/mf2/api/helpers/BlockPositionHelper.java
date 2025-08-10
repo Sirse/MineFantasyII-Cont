@@ -21,7 +21,7 @@ public class BlockPositionHelper {
      * @param direction the direction the block is facing
      */
     public static int[] getCoordsFor(float clickX, float clickY, float xBound, float xBound2, float yBound,
-                                     float yBound2, int xSlots, int ySlots, int direction) {
+            float yBound2, int xSlots, int ySlots, int direction) {
         if (clickX < xBound || clickX > xBound2 || clickY < yBound || clickY > yBound2) {
             return null;
         }
@@ -70,20 +70,20 @@ public class BlockPositionHelper {
         if (dir == ForgeDirection.NORTH) {
             int newX = (maxX - x - 1);
             int newY = (maxY - y - 1);
-            return new int[]{newX, newY};
+            return new int[] { newX, newY };
         }
 
         if (dir == ForgeDirection.WEST) {
             int newX = (y);
             int newY = (maxX - x - 1);
-            return new int[]{newX, newY};
+            return new int[] { newX, newY };
         }
         if (dir == ForgeDirection.EAST) {
             int newY = (x);
             int newX = (maxY - y - 1);
-            return new int[]{newX, newY};
+            return new int[] { newX, newY };
         }
 
-        return new int[]{x, y};
+        return new int[] { x, y };
     }
 }

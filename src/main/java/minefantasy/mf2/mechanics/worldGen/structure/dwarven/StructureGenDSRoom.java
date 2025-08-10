@@ -1,5 +1,14 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
+
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -15,17 +24,10 @@ import minefantasy.mf2.material.WoodMaterial;
 import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
 
 public class StructureGenDSRoom extends StructureModuleMF {
-    private static final String[] possible_types = new String[]{"Living", "Forge", "Study", "Armoury"};
+
+    private static final String[] possible_types = new String[] { "Living", "Forge", "Study", "Armoury" };
     protected String lootType = ChestGenHooks.DUNGEON_CHEST;
     protected Block floor_block = BlockListMF.cobble_pavement;
     private String type = "Basic";
@@ -49,12 +51,9 @@ public class StructureGenDSRoom extends StructureModuleMF {
      */
     private String geRandomType() {
         int c = rand.nextInt(10);
-        if (c == 0)
-            return "Armoury";// 0 (10%)
-        else if (c < 3)
-            return "Forge";// 1,2 (20%)
-        else if (c < 6)
-            return "Study";// 3,4,5 (30%)
+        if (c == 0) return "Armoury";// 0 (10%)
+        else if (c < 3) return "Forge";// 1,2 (20%)
+        else if (c < 6) return "Study";// 3,4,5 (30%)
 
         return "Living";// 6,7,8,9 (40%)
     }
@@ -132,7 +131,11 @@ public class StructureGenDSRoom extends StructureModuleMF {
                     placeBlock((Block) blockarray[0], meta, x, height, z);
                     if ((Block) blockarray[0] == BlockListMF.reinforced_stone_framed) {
                         for (int h = height - 1; h > 1; h--) {
-                            placeBlock(h == 4 ? Blocks.glowstone : BlockListMF.reinforced_stone, h == 2 ? 1 : 0, x, h,
+                            placeBlock(
+                                    h == 4 ? Blocks.glowstone : BlockListMF.reinforced_stone,
+                                    h == 2 ? 1 : 0,
+                                    x,
+                                    h,
                                     z);
                         }
                         placeBlock(BlockListMF.reinforced_stone_framed, 0, x, 1, z);
@@ -210,15 +213,15 @@ public class StructureGenDSRoom extends StructureModuleMF {
         }
         if (x == -(radius - 1) || x == (radius - 1)) {
             if (z == (int) Math.ceil((float) depth / 2) || z == (int) Math.floor((float) depth / 2)) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
             if ((x == -(radius - 1) && (z == (depth - 1) || z == 1))
                     || (x == (radius - 1) && (z == (depth - 1) || z == 1))) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         return null;
     }
@@ -228,9 +231,9 @@ public class StructureGenDSRoom extends StructureModuleMF {
             return null;
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getFloor(int radius, int depth, int x, int z) {
@@ -241,26 +244,26 @@ public class StructureGenDSRoom extends StructureModuleMF {
             }
         }
         if (z < 2 && x >= -1 && x <= 1) {
-            return new Object[]{floor_block, false};
+            return new Object[] { floor_block, false };
         }
         if (x == -radius || x == radius || z == depth || z == 0) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{floor_block, false};
+        return new Object[] { floor_block, false };
     }
 
     private Object[] getWalls(int radius, int depth, int x, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if ((x == -radius && (z == depth || z == 0)) || (x == radius && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     public StructureModuleMF setLoot(String loot) {
@@ -344,7 +347,11 @@ public class StructureGenDSRoom extends StructureModuleMF {
 
         int z = (int) Math.ceil((float) depth / 2);
         for (int x = -width; x <= width; x++) {
-            placeBlock(x == 0 ? BlockListMF.reinforced_stone_framediron : BlockListMF.reinforced_stone, 0, x, height,
+            placeBlock(
+                    x == 0 ? BlockListMF.reinforced_stone_framediron : BlockListMF.reinforced_stone,
+                    0,
+                    x,
+                    height,
                     z);
             if (x < -1 || x > 1) {
                 if (getBlock(x, 1, z).getMaterial().isReplaceable()) {
@@ -408,8 +415,8 @@ public class StructureGenDSRoom extends StructureModuleMF {
 
     private void setupRack(TileEntityRack rack) {
         rack.setMaterial(CustomMaterial.getMaterial("ScrapWood"));
-        ItemWeaponMF[] items = new ItemWeaponMF[]{CustomToolListMF.standard_sword, CustomToolListMF.standard_waraxe,
-                CustomToolListMF.standard_mace, CustomToolListMF.standard_dagger};
+        ItemWeaponMF[] items = new ItemWeaponMF[] { CustomToolListMF.standard_sword, CustomToolListMF.standard_waraxe,
+                CustomToolListMF.standard_mace, CustomToolListMF.standard_dagger };
         for (int i = 0; i < rack.getSizeInventory(); i++) {
             if (rand.nextInt(3) != 0) {
                 ItemWeaponMF loot = items[rand.nextInt(items.length)];
@@ -496,8 +503,8 @@ public class StructureGenDSRoom extends StructureModuleMF {
         TileEntityChest tile = (TileEntityChest) getTileEntity(x, y, z, direction);
 
         if (tile != null) {
-            WeightedRandomChestContent.generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile,
-                    5 + rand.nextInt(5));
+            WeightedRandomChestContent
+                    .generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile, 5 + rand.nextInt(5));
         }
     }
 

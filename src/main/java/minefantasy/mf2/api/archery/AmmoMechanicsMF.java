@@ -1,6 +1,8 @@
 package minefantasy.mf2.api.archery;
 
-import minefantasy.mf2.block.decor.BlockAmmoBox;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,10 +14,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.List;
+import minefantasy.mf2.block.decor.BlockAmmoBox;
 
 public class AmmoMechanicsMF {
+
     public static final String arrowOnBowNBT = "loadedArrow";
     public static final String savedAmmoNBT = "MF_PresetArrow";
     private static final String ammoNBT = "MFammo";

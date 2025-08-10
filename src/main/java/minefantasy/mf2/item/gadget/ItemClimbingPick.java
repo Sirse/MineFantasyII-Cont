@@ -1,13 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.item.weapon.ItemWeaponMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,12 +13,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.item.weapon.ItemWeaponMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
+
     private Random rand = new Random();
     private int itemRarity;
 
@@ -79,8 +81,7 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
     }
 
     public boolean isInWall(EntityPlayer player, boolean init) {
-        if (player.getHeldItem() == null)
-            return false;
+        if (player.getHeldItem() == null) return false;
 
         World world = player.worldObj;
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
@@ -112,8 +113,10 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
                 Block block = world.getBlock(x, y, z);
 
                 if (player.posY < (y + 2.8F) && player.posY > (y - 3)
-                        && player.getDistance(x + 0.5, player.posY, z + 0.5) < 1D && player.fallDistance < 5
-                        && block.getMaterial().isSolid() && block.isOpaqueCube()) {
+                        && player.getDistance(x + 0.5, player.posY, z + 0.5) < 1D
+                        && player.fallDistance < 5
+                        && block.getMaterial().isSolid()
+                        && block.isOpaqueCube()) {
                     return true;
                 }
             }
@@ -181,8 +184,7 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
 
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
-        if (user.isUsingItem())
-            return item;
+        if (user.isUsingItem()) return item;
         if (StaminaBar.isSystemActive && !StaminaBar.isAnyStamina(user, true)) {
             return item;
         }

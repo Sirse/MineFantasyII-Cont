@@ -1,19 +1,21 @@
 package minefantasy.mf2.api.crafting;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.util.MFLogUtil;
-import minefantasy.mf2.util.XSTRandom;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.util.MFLogUtil;
+import minefantasy.mf2.util.XSTRandom;
 
 public class Salvage {
+
     public static HashMap<String, Object[]> salvageList = new HashMap<String, Object[]>();
     public static HashMap<String, Item> sharedSalvage = new HashMap<String, Item>();
     private static XSTRandom random = new XSTRandom();
@@ -64,7 +66,7 @@ public class Salvage {
     }
 
     private static List<ItemStack> dropItems(ItemStack mainItem, EntityPlayer user, Object[] entryList,
-                                             float chanceModifier, float chance) {
+            float chanceModifier, float chance) {
         List<ItemStack> items = new ArrayList<ItemStack>();
         for (Object entry : entryList) {
             if (entry != null) {
@@ -83,7 +85,7 @@ public class Salvage {
     }
 
     private static List<ItemStack> dropItemStack(ItemStack mainItem, EntityPlayer user, List<ItemStack> items,
-                                                 ItemStack entry, float chanceModifier, float chance) {
+            ItemStack entry, float chanceModifier, float chance) {
         for (int a = 0; a < entry.stackSize; a++) {
             if (random.nextFloat() * chanceModifier < chance) {
                 boolean canSalvage = true;

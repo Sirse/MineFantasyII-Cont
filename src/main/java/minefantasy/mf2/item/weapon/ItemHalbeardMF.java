@@ -9,12 +9,11 @@ import net.minecraft.util.DamageSource;
  * @author Anonymous Productions
  */
 public class ItemHalbeardMF extends ItemSpearMF {
+
     /**
-     * The halbeard is the heavy counterpart for the spear: It has increased damage,
-     * knockback distance and parry arc
+     * The halbeard is the heavy counterpart for the spear: It has increased damage, knockback distance and parry arc
      * <p>
-     * Halbeards use a swinging attack rather than a stab, but will still stab when
-     * sprinting
+     * Halbeards use a swinging attack rather than a stab, but will still stab when sprinting
      */
     public ItemHalbeardMF(String name, ToolMaterial material, int rarity, float weight) {
         super(name, material, rarity, weight);

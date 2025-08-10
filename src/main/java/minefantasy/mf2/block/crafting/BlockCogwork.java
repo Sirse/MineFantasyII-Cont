@@ -1,13 +1,5 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.PowerArmour;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.entity.EntityCogwork;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -18,7 +10,17 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.PowerArmour;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class BlockCogwork extends BlockDirectional {
+
     @SideOnly(Side.CLIENT)
     private IIcon toptex;
     @SideOnly(Side.CLIENT)
@@ -49,15 +51,15 @@ public class BlockCogwork extends BlockDirectional {
     public IIcon getIcon(int side, int meta) {
         return side == 1 ? this.toptex
                 : (side == 0 ? this.toptex
-                : (meta == 2 && side == 2 ? this.facetex
-                : (meta == 3 && side == 5 ? this.facetex
-                : (meta == 0 && side == 3 ? this.facetex
-                : (meta == 1 && side == 4 ? this.facetex : this.blockIcon)))));
+                        : (meta == 2 && side == 2 ? this.facetex
+                                : (meta == 3 && side == 5 ? this.facetex
+                                        : (meta == 0 && side == 3 ? this.facetex
+                                                : (meta == 1 && side == 4 ? this.facetex : this.blockIcon)))));
     }
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         if (!world.isRemote && ToolHelper.getCrafterTool(player.getHeldItem()).equalsIgnoreCase("spanner")) {
             return tryBuild(player, world, x, y, z);
         }

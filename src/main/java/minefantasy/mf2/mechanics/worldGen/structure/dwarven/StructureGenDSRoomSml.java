@@ -1,9 +1,5 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityChest;
@@ -11,7 +7,13 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+
 public class StructureGenDSRoomSml extends StructureModuleMF {
+
     public StructureGenDSRoomSml(World world, StructureCoordinates position) {
         super(world, position);
     }
@@ -112,27 +114,27 @@ public class StructureGenDSRoomSml extends StructureModuleMF {
 
     private Object[] getFloor(int width, int depth, int x, int z) {
         if (x == -(width - 1) || x == (width - 1) || z == 1 || z == depth - 1) {
-            return new Object[]{BlockListMF.reinforced_stone, 0};
+            return new Object[] { BlockListMF.reinforced_stone, 0 };
         }
-        return new Object[]{BlockListMF.cobble_pavement, 0};
+        return new Object[] { BlockListMF.cobble_pavement, 0 };
     }
 
     private Object[] getCeiling(int width, int depth, int x, int z) {
         if (x == -(width - 1) || x == (width - 1) || z == 1 || z == depth - 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getWalls(int width, int depth, int x, int z) {
         if (x == -width || x == width || z == depth || z == 0) {
             if ((x == -width && (z == depth || z == 0)) || (x == width && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     private void buildHomeFurnishings(int width, int depth, int height) {
@@ -162,8 +164,8 @@ public class StructureGenDSRoomSml extends StructureModuleMF {
         TileEntityChest tile = (TileEntityChest) getTileEntity(x, y, z, direction);
 
         if (tile != null) {
-            WeightedRandomChestContent.generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile,
-                    2 + rand.nextInt(3));
+            WeightedRandomChestContent
+                    .generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile, 2 + rand.nextInt(3));
         }
     }
 }

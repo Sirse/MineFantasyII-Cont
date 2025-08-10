@@ -1,21 +1,22 @@
 package minefantasy.mf2.api.helpers;
 
-import minefantasy.mf2.api.archery.IArrowRetrieve;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.util.ArrayList;
-import java.util.List;
+import minefantasy.mf2.api.archery.IArrowRetrieve;
 
 public class ArrowEffectsMF {
     // THE ARROW STICKING CODE IS EXPERIMENTAL AND NOT ACTIVE BY DEFAULT
 
     /**
-     * Sticks an arrow into an entity THIS WILL ONLY BE DROPPED ON LIVING ENTITIES.
-     * (This does not render arrows, simply drops them when an enemy is killed)
+     * Sticks an arrow into an entity THIS WILL ONLY BE DROPPED ON LIVING ENTITIES. (This does not render arrows, simply
+     * drops them when an enemy is killed)
      *
      * @param hit        the entity the arrow hit
      * @param projectile the arrow entity, it will get the item to drop
@@ -25,8 +26,8 @@ public class ArrowEffectsMF {
     }
 
     /**
-     * Sticks an arrow into an entity THIS WILL ONLY BE DROPPED ON LIVING ENTITIES.
-     * (This does not render arrows, simply drops them when an enemy is killed)
+     * Sticks an arrow into an entity THIS WILL ONLY BE DROPPED ON LIVING ENTITIES. (This does not render arrows, simply
+     * drops them when an enemy is killed)
      *
      * @param hit        the entity the arrow hit
      * @param arrow      the item that gets dropped when "hit" is killed
@@ -51,8 +52,7 @@ public class ArrowEffectsMF {
     }
 
     /**
-     * Gets the arrow dropped when an enemy is killed. MODS NEED TO ADD THEIR OWN
-     * SUPPORT
+     * Gets the arrow dropped when an enemy is killed. MODS NEED TO ADD THEIR OWN SUPPORT
      *
      * @param arrow the arrow fired
      */
@@ -84,8 +84,8 @@ public class ArrowEffectsMF {
     }
 
     /**
-     * Gets the list of items that arrows have stuck in from the "stickArrowIn"
-     * method; THIS IS ONLY CALLED BY LIVING ENTITIES
+     * Gets the list of items that arrows have stuck in from the "stickArrowIn" method; THIS IS ONLY CALLED BY LIVING
+     * ENTITIES
      *
      * @param entity the entity killed
      */

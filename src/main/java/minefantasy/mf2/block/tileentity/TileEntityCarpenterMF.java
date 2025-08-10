@@ -1,5 +1,18 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.WorldServer;
+
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenter;
@@ -12,20 +25,9 @@ import minefantasy.mf2.item.armour.ItemArmourMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.CarpenterPacket;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
-import net.minecraft.util.StatCollector;
-
-import java.util.Random;
 
 public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICarpenter {
+
     public final int width = 4;
     public final int height = 4;
     public float progressMax;
@@ -97,8 +99,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
         nbt.setTag("Items", savedItems);
 
-    nbt.setFloat("Progress", progress);
-    nbt.setFloat("ProgressMax", progressMax);
+        nbt.setFloat("Progress", progress);
+        nbt.setFloat("ProgressMax", progressMax);
         nbt.setString("toolTypeRequired", toolTypeRequired);
         nbt.setString("craftSound", craftSound);
         nbt.setString("researchRequired", researchRequired);
@@ -170,12 +172,10 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -207,8 +207,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     public boolean tryCraft(EntityPlayer user) {
-        if (user == null)
-            return false;
+        if (user == null) return false;
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
         int hammerTier = ToolHelper.getCrafterTier(user.getHeldItem());
@@ -216,17 +215,17 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
             if (user.getHeldItem() != null) {
                 user.getHeldItem().damageItem(1, user);
                 if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
-                    if (worldObj.isRemote)
-                        user.renderBrokenItemStack(user.getHeldItem());
+                    if (worldObj.isRemote) user.renderBrokenItemStack(user.getHeldItem());
 
                     user.destroyCurrentEquippedItem();
                 }
             }
-            if (worldObj.isRemote)
-                return true;
+            if (worldObj.isRemote) return true;
 
-            if (doesPlayerKnowCraft(user) && canCraft() && toolType.equalsIgnoreCase(toolTypeRequired)
-                    && tier >= CarpenterTierRequired && hammerTier >= hammerTierRequired) {
+            if (doesPlayerKnowCraft(user) && canCraft()
+                    && toolType.equalsIgnoreCase(toolTypeRequired)
+                    && tier >= CarpenterTierRequired
+                    && hammerTier >= hammerTierRequired) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getUseSound(), 1.0F, 1.0F);
                 float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem());
 
@@ -332,7 +331,11 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 }
 
                 itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(worldObj, xCoord + f, yCoord + f1, zCoord + f2,
+                EntityItem entityitem = new EntityItem(
+                        worldObj,
+                        xCoord + f,
+                        yCoord + f1,
+                        zCoord + f2,
                         new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                 if (itemstack.hasTagCompound()) {
@@ -350,19 +353,19 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
     public void syncData() {
 
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new CarpenterPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new CarpenterPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-					new CarpenterPacket(this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new CarpenterPacket(this).generatePacket()); }
+         */
     }
 
     public String getResultName() {
@@ -461,8 +464,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
             return null;
         }
 
-        if (ticksExisted <= 1)
-            return null;
+        if (ticksExisted <= 1) return null;
 
         for (int a = 0; a < getOutputSlotNum(); a++) {
             craftMatrix.setInventorySlotContents(a, inventory[a]);
@@ -484,8 +486,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
             if (recipe != null && oldRecipe != null && !recipe.isItemEqual(oldRecipe)) {
                 progress = 0;
             }
-            if (progress > progressMax)
-                progress = progressMax - 1;
+            if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
     }
@@ -513,12 +514,14 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     @Override
-    public void setHotOutput(boolean i) {
-    }
+    public void setHotOutput(boolean i) {}
 
     public void setContainer(ContainerCarpenterMF container) {
         syncCarpenter = container;
-        craftMatrix = new CarpenterCraftMatrix(this, syncCarpenter, ShapelessCarpenterRecipes.globalWidth,
+        craftMatrix = new CarpenterCraftMatrix(
+                this,
+                syncCarpenter,
+                ShapelessCarpenterRecipes.globalWidth,
                 ShapelessCarpenterRecipes.globalHeight);
     }
 

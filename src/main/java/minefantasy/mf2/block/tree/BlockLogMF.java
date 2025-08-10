@@ -1,9 +1,7 @@
 package minefantasy.mf2.block.tree;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -13,9 +11,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
 
 public class BlockLogMF extends BlockLog {
+
     private IIcon sideTex, topTex;
     private String name;
     private Random rand = new Random();

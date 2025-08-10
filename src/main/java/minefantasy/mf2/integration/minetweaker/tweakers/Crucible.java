@@ -1,5 +1,8 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedAlloyRecipe;
@@ -10,9 +13,6 @@ import minetweaker.api.item.IItemStack;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @ZenClass("mods.minefantasy.Crucible")
 public class Crucible {

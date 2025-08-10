@@ -1,6 +1,7 @@
 package minefantasy.mf2.item;
 
-import minefantasy.mf2.api.heating.IQuenchBlock;
+import java.util.Random;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,9 +12,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import minefantasy.mf2.api.heating.IQuenchBlock;
 
 public class ItemHide extends ItemComponentMF {
+
     private final Item result;
     private float hardness;
     private Random rand = new Random();
@@ -59,7 +61,11 @@ public class ItemHide extends ItemComponentMF {
             world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
             if (rand.nextFloat() * 2 * hardness < 1.0F) {
                 item.stackSize--;
-                EntityItem resultItem = new EntityItem(world, player.posX, player.posY, player.posZ,
+                EntityItem resultItem = new EntityItem(
+                        world,
+                        player.posX,
+                        player.posY,
+                        player.posZ,
                         new ItemStack(result));
                 world.spawnEntityInWorld(resultItem);
             }

@@ -1,15 +1,17 @@
 package minefantasy.mf2.integration.nei;
 
-import codechicken.nei.ItemList;
-import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemStack;
+
+import codechicken.nei.ItemList;
+import codechicken.nei.PositionedStack;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+
 public class MFPositionedStack extends PositionedStack {
+
     public boolean permutated = false;
 
     public MFPositionedStack(Object object, int x, int y) {
@@ -22,13 +24,11 @@ public class MFPositionedStack extends PositionedStack {
 
     @Override
     public void generatePermutations() {
-        if (permutated)
-            return;
+        if (permutated) return;
 
         ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
         for (ItemStack item : items) {
-            if (item == null || item.getItem() == null)
-                continue;
+            if (item == null || item.getItem() == null) continue;
 
             if (item.getItemDamage() == Short.MAX_VALUE) {
                 List<ItemStack> permutations = ItemList.itemMap.get(item.getItem());
@@ -52,8 +52,7 @@ public class MFPositionedStack extends PositionedStack {
         }
         items = stacks.toArray(new ItemStack[0]);
 
-        if (items.length == 0)
-            items = new ItemStack[]{new ItemStack(Blocks.fire)};
+        if (items.length == 0) items = new ItemStack[] { new ItemStack(Blocks.fire) };
 
         permutated = true;
         setPermutationToRender(0);

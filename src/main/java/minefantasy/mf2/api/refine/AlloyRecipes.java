@@ -1,11 +1,12 @@
 package minefantasy.mf2.api.refine;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.item.ItemStack;
+
 public class AlloyRecipes {
+
     public static List<Alloy> alloys = new ArrayList<Alloy>();
 
     public static Alloy addAlloy(ItemStack out, int level, List in) {
@@ -32,8 +33,8 @@ public class AlloyRecipes {
     }
 
     /**
-     * Adds an alloy, and duplicates it so the ratio can be copied eg a recipe with
-     * 2 'x' ore and 1 'y' ore can be made with 4 'x' ore and 2 'y' ore...
+     * Adds an alloy, and duplicates it so the ratio can be copied eg a recipe with 2 'x' ore and 1 'y' ore can be made
+     * with 4 'x' ore and 2 'y' ore...
      *
      * @param the amount of times the ratio can be added
      */

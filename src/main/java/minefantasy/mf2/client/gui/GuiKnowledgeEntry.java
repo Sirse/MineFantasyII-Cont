@@ -1,12 +1,5 @@
 package minefantasy.mf2.client.gui;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.knowledge.InformationBase;
-import minefantasy.mf2.api.knowledge.client.EntryPage;
-import minefantasy.mf2.api.knowledge.client.EntryPageCraft;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
@@ -15,10 +8,20 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.knowledge.InformationBase;
+import minefantasy.mf2.api.knowledge.client.EntryPage;
+import minefantasy.mf2.api.knowledge.client.EntryPageCraft;
 
 @SideOnly(Side.CLIENT)
 public class GuiKnowledgeEntry extends GuiScreen {
+
     private static boolean lastTick = true;
     private static boolean canTick = true;
     // GuiScreenBook
@@ -45,12 +48,26 @@ public class GuiKnowledgeEntry extends GuiScreen {
         int yPoint = (this.height - this.bookImageHeight) / 2;
 
         this.buttonList.clear();
-        this.buttonList.add(this.buttonDone = new GuiButton(0, this.width / 2 - 100,
-                4 + yPoint + this.bookImageHeight - 16, 200, 20, I18n.format("gui.done", new Object[0])));
-        this.buttonList.add(this.buttonNextPage = new GuiKnowledgeEntry.NextPageButton(1, xPoint + bookImageWidth - 22,
-                yPoint + 209, true));
-        this.buttonList.add(this.buttonPreviousPage = new GuiKnowledgeEntry.NextPageButton(2,
-                xPoint - bookImageWidth + 4, yPoint + 209, false));
+        this.buttonList.add(
+                this.buttonDone = new GuiButton(
+                        0,
+                        this.width / 2 - 100,
+                        4 + yPoint + this.bookImageHeight - 16,
+                        200,
+                        20,
+                        I18n.format("gui.done", new Object[0])));
+        this.buttonList.add(
+                this.buttonNextPage = new GuiKnowledgeEntry.NextPageButton(
+                        1,
+                        xPoint + bookImageWidth - 22,
+                        yPoint + 209,
+                        true));
+        this.buttonList.add(
+                this.buttonPreviousPage = new GuiKnowledgeEntry.NextPageButton(
+                        2,
+                        xPoint - bookImageWidth + 4,
+                        yPoint + 209,
+                        false));
         this.updateButtons();
     }
 
@@ -99,8 +116,8 @@ public class GuiKnowledgeEntry extends GuiScreen {
             }
         }
 
-        String s = I18n.format("book.pageIndicator",
-                new Object[]{Integer.valueOf(num + 1), Integer.valueOf(this.pages)});
+        String s = I18n
+                .format("book.pageIndicator", new Object[] { Integer.valueOf(num + 1), Integer.valueOf(this.pages) });
         int l = mc.fontRenderer.getStringWidth(s) / 2;
         this.fontRendererObj.drawString(s, xPoint + (bookImageWidth / 2) - l, yPoint + bookImageHeight - 16, 0);
     }
@@ -139,6 +156,7 @@ public class GuiKnowledgeEntry extends GuiScreen {
 
     @SideOnly(Side.CLIENT)
     static class NextPageButton extends GuiButton {
+
         private final boolean isNextPage;
 
         public NextPageButton(int p_i1079_1_, int p_i1079_2_, int p_i1079_3_, boolean p_i1079_4_) {
@@ -151,7 +169,8 @@ public class GuiKnowledgeEntry extends GuiScreen {
          */
         public void drawButton(Minecraft mc, int x, int y) {
             if (this.visible) {
-                boolean flag = x >= this.xPosition && y >= this.yPosition && x < this.xPosition + this.width
+                boolean flag = x >= this.xPosition && y >= this.yPosition
+                        && x < this.xPosition + this.width
                         && y < this.yPosition + this.height;
                 GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                 mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/book.png"));

@@ -1,12 +1,13 @@
 package minefantasy.mf2.item;
 
-import minefantasy.mf2.item.food.FoodListMF;
+import java.util.Random;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import minefantasy.mf2.item.food.FoodListMF;
 
 public class ItemBurntFood extends ItemComponentMF {
 

@@ -1,8 +1,9 @@
 package minefantasy.mf2.commands;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,18 +11,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
 
 public class CommandMF implements ICommand {
 
     private final List materials;
 
-    private final List aliases = new ArrayList<String>() {{
-        add("mf");
-        add("minefantasy");
-    }};
+    private final List aliases = new ArrayList<String>() {
+
+        {
+            add("mf");
+            add("minefantasy");
+        }
+    };
 
     public CommandMF() {
         materials = setupMaterialsList();
@@ -58,7 +62,8 @@ public class CommandMF implements ICommand {
             return;
         }
         EntityPlayer player = (EntityPlayer) iCommandSender;
-        boolean hasPerms = player.capabilities.isCreativeMode || iCommandSender.canCommandSenderUseCommand(2, getCommandName());
+        boolean hasPerms = player.capabilities.isCreativeMode
+                || iCommandSender.canCommandSenderUseCommand(2, getCommandName());
         if (!hasPerms) {
             player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.mf.no_permission")));
             return;
@@ -95,7 +100,8 @@ public class CommandMF implements ICommand {
 
         CustomMaterial material = CustomMaterial.getMaterial(strings[2]);
         if (material == null) {
-            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.material")));
+            player.addChatMessage(
+                    new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.material")));
             return;
         }
 
@@ -108,7 +114,8 @@ public class CommandMF implements ICommand {
         try {
             int qualityLvl = Integer.parseInt(strings[2]);
             if (qualityLvl < 0 || qualityLvl > 200) {
-                player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.quality")));
+                player.addChatMessage(
+                        new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.quality")));
                 return;
             }
             ItemStack updated = ToolHelper.setQuality(equippedItem, qualityLvl);

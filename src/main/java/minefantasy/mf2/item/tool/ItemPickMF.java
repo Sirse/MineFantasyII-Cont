@@ -1,15 +1,9 @@
 package minefantasy.mf2.item.tool;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -25,14 +19,23 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemPickMF extends ItemPickaxe implements IToolMaterial {
+
     protected int itemRarity;
     private String name;
     private float baseDamage = 2F;
@@ -60,8 +63,7 @@ public class ItemPickMF extends ItemPickaxe implements IToolMaterial {
     }
 
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
-        if (!world.isRemote)
-            return item;
+        if (!world.isRemote) return item;
 
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
 
@@ -123,7 +125,8 @@ public class ItemPickMF extends ItemPickaxe implements IToolMaterial {
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;
@@ -205,7 +208,7 @@ public class ItemPickMF extends ItemPickaxe implements IToolMaterial {
     public float func_150893_a(ItemStack stack, Block block) {
         return block.getMaterial() != Material.iron && block.getMaterial() != Material.anvil
                 && block.getMaterial() != Material.rock ? super.func_150893_a(stack, block)
-                : CustomToolHelper.getEfficiency(stack, this.efficiencyOnProperMaterial, efficiencyMod);
+                        : CustomToolHelper.getEfficiency(stack, this.efficiencyOnProperMaterial, efficiencyMod);
     }
 
     @Override

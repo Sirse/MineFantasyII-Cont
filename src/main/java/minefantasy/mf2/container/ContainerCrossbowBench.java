@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityCrossbowBench;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityCrossbowBench;
+
 public class ContainerCrossbowBench extends ContainerMF {
+
     private static final int STOCK_SLOT = 0;
     private static final int MECHANISM_SLOT = 1;
     private static final int MOD_SLOT = 2;

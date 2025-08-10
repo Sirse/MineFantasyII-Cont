@@ -1,11 +1,8 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
-import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
-import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
-import minefantasy.mf2.api.heating.Heatable;
-import minefantasy.mf2.api.helpers.GuiHelper;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
@@ -13,13 +10,19 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import java.util.ArrayList;
-import java.util.List;
+import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
+import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
+import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.helpers.GuiHelper;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 public class EntryPageRecipeAnvil extends EntryPage {
+
     private Minecraft mc = Minecraft.getMinecraft();
     private IAnvilRecipe[] recipes;
     private int recipeID;
@@ -49,8 +52,12 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
         IAnvilRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : recipes[recipeID];
         String cft = "<" + StatCollector.translateToLocal("method.anvil") + ">";
-        mc.fontRenderer.drawSplitString(cft,
-                posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2), posY + 150, 117, 0);
+        mc.fontRenderer.drawSplitString(
+                cft,
+                posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2),
+                posY + 150,
+                117,
+                0);
         renderRecipe(parent, x, y, f, posX, posY, recipe);
 
         if (tooltipStack != null) {
@@ -60,8 +67,7 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
             for (String s : tooltipData) {
                 String s_ = s;
-                if (!first)
-                    s_ = EnumChatFormatting.GRAY + s;
+                if (!first) s_ = EnumChatFormatting.GRAY + s;
                 parsedTooltip.add(s_);
                 first = false;
             }
@@ -72,11 +78,16 @@ public class EntryPageRecipeAnvil extends EntryPage {
     }
 
     private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, IAnvilRecipe recipe) {
-        if (recipe == null)
-            return;
+        if (recipe == null) return;
 
         GL11.glColor3f(255, 255, 255);
-        GuiHelper.renderToolIcon(parent, recipe.getToolType(), recipe.getRecipeHammer(), posX + 34, posY + 51, true,
+        GuiHelper.renderToolIcon(
+                parent,
+                recipe.getToolType(),
+                recipe.getRecipeHammer(),
+                posX + 34,
+                posY + 51,
+                true,
                 true);
         GuiHelper.renderToolIcon(parent, "anvil", recipe.getAnvil(), posX + 124, posY + 51, true, true);
 
@@ -85,24 +96,38 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
             for (int y = 0; y < shaped.recipeHeight; y++) {
                 for (int x = 0; x < shaped.recipeWidth; x++) {
-                    renderItemAtGridPos(parent, 1 + x, 1 + y, shaped.recipeItems[y * shaped.recipeWidth + x], true,
-                            posX, posY, mx, my);
+                    renderItemAtGridPos(
+                            parent,
+                            1 + x,
+                            1 + y,
+                            shaped.recipeItems[y * shaped.recipeWidth + x],
+                            true,
+                            posX,
+                            posY,
+                            mx,
+                            my);
                 }
             }
         } else if (recipe instanceof ShapelessAnvilRecipes) {
             ShapelessAnvilRecipes shapeless = (ShapelessAnvilRecipes) recipe;
 
-            drawGrid:
-            {
+            drawGrid: {
                 for (int y = 0; y < 6; y++) {
                     for (int x = 0; x < 4; x++) {
                         int index = y * 6 + x;
 
-                        if (index >= shapeless.recipeItems.size())
-                            break drawGrid;
+                        if (index >= shapeless.recipeItems.size()) break drawGrid;
 
-                        renderItemAtGridPos(parent, 1 + x, 1 + y, (ItemStack) shapeless.recipeItems.get(index), true,
-                                posX, posY, mx, my);
+                        renderItemAtGridPos(
+                                parent,
+                                1 + x,
+                                1 + y,
+                                (ItemStack) shapeless.recipeItems.get(index),
+                                true,
+                                posX,
+                                posY,
+                                mx,
+                                my);
                     }
                 }
             }
@@ -119,15 +144,12 @@ public class EntryPageRecipeAnvil extends EntryPage {
     }
 
     public void renderResult(GuiScreen gui, ItemStack stack, boolean accountForContainer, int xOrigin, int yOrigin,
-                             int mx, int my, boolean hot) {
-        if (stack == null || stack.getItem() == null)
-            return;
+            int mx, int my, boolean hot) {
+        if (stack == null || stack.getItem() == null) return;
         stack = stack.copy();
 
-        if (stack.getItemDamage() == Short.MAX_VALUE)
-            stack.setItemDamage(0);
-        if (stack.getItemDamage() == -1)
-            stack.setItemDamage(0);
+        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
+        if (stack.getItemDamage() == -1) stack.setItemDamage(0);
 
         int xPos = xOrigin + 80;
         int yPos = yOrigin + 42;
@@ -136,9 +158,8 @@ public class EntryPageRecipeAnvil extends EntryPage {
     }
 
     public void renderItemAtGridPos(GuiScreen gui, int x, int y, ItemStack stack, boolean accountForContainer,
-                                    int xOrigin, int yOrigin, int mx, int my) {
-        if (stack == null || stack.getItem() == null)
-            return;
+            int xOrigin, int yOrigin, int mx, int my) {
+        if (stack == null || stack.getItem() == null) return;
 
         boolean heatable = Heatable.canHeatItem(stack);
 
@@ -146,10 +167,8 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
         int gridSize = 18;
 
-        if (stack.getItemDamage() == Short.MAX_VALUE)
-            stack.setItemDamage(0);
-        if (stack.getItemDamage() == -1)
-            stack.setItemDamage(0);
+        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
+        if (stack.getItemDamage() == -1) stack.setItemDamage(0);
 
         x -= 1;
         y -= 1;
@@ -160,7 +179,7 @@ public class EntryPageRecipeAnvil extends EntryPage {
     }
 
     public void renderItem(GuiScreen gui, int xPos, int yPos, ItemStack stack, boolean accountForContainer, int mx,
-                           int my, boolean heatable) {
+            int my, boolean heatable) {
         if (heatable) {
             GL11.glPushMatrix();
             GL11.glColor3f(255, 255, 255);
@@ -181,10 +200,18 @@ public class EntryPageRecipeAnvil extends EntryPage {
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
-        render.renderItemAndEffectIntoGUI(Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(), stack, xPos, yPos);
-        render.renderItemOverlayIntoGUI(Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(), stack, xPos, yPos);
+        render.renderItemAndEffectIntoGUI(
+                Minecraft.getMinecraft().fontRenderer,
+                Minecraft.getMinecraft().getTextureManager(),
+                stack,
+                xPos,
+                yPos);
+        render.renderItemOverlayIntoGUI(
+                Minecraft.getMinecraft().fontRenderer,
+                Minecraft.getMinecraft().getTextureManager(),
+                stack,
+                xPos,
+                yPos);
         RenderHelper.disableStandardItemLighting();
         GL11.glPopMatrix();
 
@@ -192,6 +219,5 @@ public class EntryPageRecipeAnvil extends EntryPage {
     }
 
     @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-    }
+    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
 }

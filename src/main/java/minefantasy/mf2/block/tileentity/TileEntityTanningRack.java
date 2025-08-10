@@ -1,13 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.SkillList;
-import minefantasy.mf2.block.crafting.BlockEngineerTanner;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.container.ContainerTanner;
-import minefantasy.mf2.item.list.ComponentListMF;
+import java.util.Random;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,9 +11,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.Random;
+import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.SkillList;
+import minefantasy.mf2.block.crafting.BlockEngineerTanner;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.container.ContainerTanner;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class TileEntityTanningRack extends TileEntity implements IInventory {
+
     public final ContainerTanner container;
     public ItemStack[] items = new ItemStack[2];
     public float progress;
@@ -73,7 +75,12 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                         player.destroyCurrentEquippedItem();
                     }
                 } else {
-                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "tile.piston.out", 0.75F,
+                    worldObj.playSoundEffect(
+                            xCoord + 0.5D,
+                            yCoord + 0.5D,
+                            zCoord + 0.5D,
+                            "tile.piston.out",
+                            0.75F,
                             0.85F);
                     acTime = 1.0F;
                 }
@@ -87,7 +94,12 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                     progress += efficiency;
                 }
                 if (toolType.equalsIgnoreCase("shears")) {
-                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "mob.sheep.shear", 1.0F,
+                    worldObj.playSoundEffect(
+                            xCoord + 0.5D,
+                            yCoord + 0.5D,
+                            zCoord + 0.5D,
+                            "mob.sheep.shear",
+                            1.0F,
                             1.0F);
                 } else {
                     worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "dig.cloth", 1.0F, 1.0F);
@@ -105,8 +117,13 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                     if (isShabbyRack() && rand.nextInt(10) == 0 && !worldObj.isRemote) {
                         for (int a = 0; a < rand.nextInt(10); a++) {
                             ItemStack plank = ComponentListMF.plank.construct("ScrapWood");
-                            worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "mob.zombie.woodbreak",
-                                    1.0F, 1.5F);
+                            worldObj.playSoundEffect(
+                                    xCoord + 0.5,
+                                    yCoord + 0.5,
+                                    zCoord + 0.5,
+                                    "mob.zombie.woodbreak",
+                                    1.0F,
+                                    1.5F);
                             dropItem(plank);
                         }
                         worldObj.setBlockToAir(xCoord, yCoord, zCoord);
@@ -127,7 +144,12 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                     setInventorySlotContents(0, item2);
                     tryDecrMainItem(player);
                     updateRecipe();
-                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "mob.horse.leather", 1.0F,
+                    worldObj.playSoundEffect(
+                            xCoord + 0.5D,
+                            yCoord + 0.5D,
+                            zCoord + 0.5D,
+                            "mob.horse.leather",
+                            1.0F,
                             1.0F);
                     return true;
                 }
@@ -177,8 +199,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     }
 
     public int getProgressBar(int i) {
-        if (maxProgress <= 0)
-            return 0;
+        if (maxProgress <= 0) return 0;
         return (int) (i / maxProgress * progress);
     }
 
@@ -236,8 +257,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     }
 
     // INVENTORY
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     @Override
     public int getSizeInventory() {
@@ -305,12 +325,10 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -335,7 +353,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                 }
 
                 itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(worldObj, xCoord + f, yCoord + f1, zCoord + f2,
+                EntityItem entityitem = new EntityItem(
+                        worldObj,
+                        xCoord + f,
+                        yCoord + f1,
+                        zCoord + f2,
                         new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                 if (itemstack.hasTagCompound()) {

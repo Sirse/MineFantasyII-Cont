@@ -1,16 +1,18 @@
 package minefantasy.mf2.entity.mob.ai;
 
-import minefantasy.mf2.entity.mob.EntityMinotaur;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import net.minecraft.command.IEntitySelector;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.ai.EntityAITarget;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import minefantasy.mf2.entity.mob.EntityMinotaur;
 
 public class AI_MinotaurFindTarget extends EntityAITarget {
+
     private final Class targetClass;
     private final int targetChance;
     private final AI_MinotaurFindTarget.Sorter theNearestAttackableTargetSorter;
@@ -27,7 +29,7 @@ public class AI_MinotaurFindTarget extends EntityAITarget {
     }
 
     public AI_MinotaurFindTarget(EntityMinotaur mob, Class target, int chance, boolean sight, boolean nearby,
-                                 final IEntitySelector selector) {
+            final IEntitySelector selector) {
         super(mob, sight, nearby);
         this.minotaur = mob;
         this.targetClass = target;
@@ -35,13 +37,14 @@ public class AI_MinotaurFindTarget extends EntityAITarget {
         this.theNearestAttackableTargetSorter = new AI_MinotaurFindTarget.Sorter(mob);
         this.setMutexBits(1);
         this.targetEntitySelector = new IEntitySelector() {
+
             public boolean isEntityApplicable(Entity target) {
                 if (target instanceof EntityMinotaur) {
                     return false;
                 }
                 return !(target instanceof EntityLivingBase) ? false
                         : (selector != null && !selector.isEntityApplicable(target) ? false
-                        : AI_MinotaurFindTarget.this.isSuitableTarget((EntityLivingBase) target, false));
+                                : AI_MinotaurFindTarget.this.isSuitableTarget((EntityLivingBase) target, false));
             }
         };
     }
@@ -61,8 +64,10 @@ public class AI_MinotaurFindTarget extends EntityAITarget {
                 }
             }
 
-            List list = this.taskOwner.worldObj.selectEntitiesWithinAABB(this.targetClass,
-                    this.taskOwner.boundingBox.expand(d0, 4.0D, d0), this.targetEntitySelector);
+            List list = this.taskOwner.worldObj.selectEntitiesWithinAABB(
+                    this.targetClass,
+                    this.taskOwner.boundingBox.expand(d0, 4.0D, d0),
+                    this.targetEntitySelector);
             Collections.sort(list, this.theNearestAttackableTargetSorter);
 
             if (list.isEmpty()) {
@@ -83,6 +88,7 @@ public class AI_MinotaurFindTarget extends EntityAITarget {
     }
 
     public static class Sorter implements Comparator {
+
         private final Entity theEntity;
 
         public Sorter(Entity p_i1662_1_) {

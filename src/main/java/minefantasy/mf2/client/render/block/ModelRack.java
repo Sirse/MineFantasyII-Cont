@@ -5,6 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelRack extends ModelBase {
+
     // fields
     ModelRenderer rStrut;
     ModelRenderer beam;

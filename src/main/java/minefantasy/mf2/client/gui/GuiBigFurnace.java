@@ -1,19 +1,22 @@
 package minefantasy.mf2.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.EntityPlayer;
+
+import org.lwjgl.opengl.GL11;
+
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
 import minefantasy.mf2.container.ContainerBigFurnace;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.EntityPlayer;
-import org.lwjgl.opengl.GL11;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class GuiBigFurnace extends GuiContainer {
+
     private TileEntityBigFurnace smelter;
 
     public GuiBigFurnace(EntityPlayer play, TileEntityBigFurnace tile) {
@@ -21,8 +24,7 @@ public class GuiBigFurnace extends GuiContainer {
         smelter = tile;
     }
 
-    protected void drawGuiContainerForegroundLayer(int x, int y) {
-    }
+    protected void drawGuiContainerForegroundLayer(int x, int y) {}
 
     protected void drawGuiContainerBackgroundLayer(float f, int i, int j) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

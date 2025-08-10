@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.heating;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
+import java.util.HashMap;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
 
 public class Heatable {
+
     public static final int forgeMaximumMetalHeat = 5000;
     public static final String NBT_Item = "MFHeatable_ItemSave";
     // public static final String NBT_ItemID = "MFHeatable_ItemID";
@@ -56,11 +58,9 @@ public class Heatable {
     }
 
     public static Heatable loadStats(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
-        if (registerList.isEmpty())
-            return null;
+        if (registerList.isEmpty()) return null;
 
         Heatable stats = findRegister(item);
         if (stats != null) {
@@ -87,10 +87,8 @@ public class Heatable {
             int temp = getTemp(item);
             int work = item.getTagCompound().getInteger(NBT_WorkableTemp);
             int unstable = item.getTagCompound().getInteger(NBT_UnstableTemp);
-            if (temp > unstable)
-                return (byte) 2;
-            if (temp > work)
-                return (byte) 1;
+            if (temp > unstable) return (byte) 2;
+            if (temp > work) return (byte) 1;
         }
         return (byte) 0;
     }
@@ -101,8 +99,7 @@ public class Heatable {
         }
         NBTTagCompound tag = getNBT(item);
 
-        if (tag.hasKey(NBT_WorkableTemp))
-            return tag.getInteger(NBT_WorkableTemp);
+        if (tag.hasKey(NBT_WorkableTemp)) return tag.getInteger(NBT_WorkableTemp);
 
         return 0;
     }
@@ -113,8 +110,7 @@ public class Heatable {
         }
         NBTTagCompound tag = getNBT(item);
 
-        if (tag.hasKey(NBT_UnstableTemp))
-            return tag.getInteger(NBT_UnstableTemp);
+        if (tag.hasKey(NBT_UnstableTemp)) return tag.getInteger(NBT_UnstableTemp);
 
         return 0;
     }
@@ -125,8 +121,7 @@ public class Heatable {
         }
         NBTTagCompound tag = getNBT(item);
 
-        if (tag.hasKey(NBT_CurrentTemp))
-            return tag.getInteger(NBT_CurrentTemp);
+        if (tag.hasKey(NBT_CurrentTemp)) return tag.getInteger(NBT_CurrentTemp);
 
         return 0;
     }
@@ -135,8 +130,7 @@ public class Heatable {
      * Gets a hot item
      *
      * @param item   the hot item
-     * @param hazard the amount the source is hazardous (damaging the item): usually a
-     *               percent dura loss
+     * @param hazard the amount the source is hazardous (damaging the item): usually a percent dura loss
      * @return what item is heated
      */
     public static ItemStack getQuenchedItem(ItemStack item, float hazard) {
@@ -163,8 +157,7 @@ public class Heatable {
     }
 
     private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -201,8 +194,7 @@ public class Heatable {
     public int getWorkableStat(ItemStack item) {
         if (this.minTemperature == -1) {
             CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(item);
-            if (material != null)
-                return material.getHeatableStats()[0];
+            if (material != null) return material.getHeatableStats()[0];
         }
         return this.minTemperature;
     }
@@ -210,8 +202,7 @@ public class Heatable {
     public int getUnstableStat(ItemStack item) {
         if (this.unstableTemperature == -1) {
             CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(item);
-            if (material != null)
-                return material.getHeatableStats()[1];
+            if (material != null) return material.getHeatableStats()[1];
         }
         return this.unstableTemperature;
     }

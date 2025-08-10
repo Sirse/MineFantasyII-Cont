@@ -3,13 +3,14 @@ package minefantasy.mf2.material;
 import minefantasy.mf2.api.material.CustomMaterial;
 
 public class LeatherMaterial extends CustomMaterial {
+
     public LeatherMaterial(String name, int tier, float hardness, float durability, float flexibility, float sharpness,
-                           float resistance, float density) {
+            float resistance, float density) {
         super(name, "leather", tier, hardness, durability, flexibility, sharpness, resistance, density);
     }
 
     public static CustomMaterial getOrAddWood(String name, int tier, float hardness, float durability,
-                                              float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
+            float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
         if (getMaterial(name) != null) {
             return CustomMaterial.getMaterial(name);
         }

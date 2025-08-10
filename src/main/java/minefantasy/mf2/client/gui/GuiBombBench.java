@@ -1,17 +1,20 @@
 package minefantasy.mf2.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityBombBench;
 import minefantasy.mf2.container.ContainerBombBench;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiBombBench extends GuiContainer {
+
     private TileEntityBombBench tile;
 
     public GuiBombBench(InventoryPlayer user, TileEntityBombBench tile) {
@@ -21,8 +24,7 @@ public class GuiBombBench extends GuiContainer {
     }
 
     /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the
-     * items)
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {

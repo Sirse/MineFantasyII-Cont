@@ -1,15 +1,16 @@
 package minefantasy.mf2.mechanics;
 
-import minefantasy.mf2.entity.EntityBomb;
-import minefantasy.mf2.entity.EntityMine;
-import minefantasy.mf2.item.gadget.ItemBomb;
-import minefantasy.mf2.item.gadget.ItemMine;
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
+
+import minefantasy.mf2.entity.EntityBomb;
+import minefantasy.mf2.entity.EntityMine;
+import minefantasy.mf2.item.gadget.ItemBomb;
+import minefantasy.mf2.item.gadget.ItemMine;
 
 public class BombDispenser implements IBehaviorDispenseItem {
 
@@ -35,8 +36,11 @@ public class BombDispenser implements IBehaviorDispenseItem {
             float velocityModifier = 1.5F;
 
             if (!world.isRemote) {
-                EntityBomb bomb = new EntityBomb(world).setType(ItemBomb.getFilling(item), ItemBomb.getCasing(item),
-                        ItemBomb.getFuse(item), ItemBomb.getPowder(item));
+                EntityBomb bomb = new EntityBomb(world).setType(
+                        ItemBomb.getFilling(item),
+                        ItemBomb.getCasing(item),
+                        ItemBomb.getFuse(item),
+                        ItemBomb.getPowder(item));
                 bomb.setPosition(posX, posY, posZ);
                 bomb.setThrowableHeading(xVelocity, yVelocity, zVelocity, 1.0F, velocityModifier);
                 world.spawnEntityInWorld(bomb);
@@ -60,8 +64,11 @@ public class BombDispenser implements IBehaviorDispenseItem {
             float velocityModifier = 0.5F;
 
             if (!world.isRemote) {
-                EntityMine bomb = new EntityMine(world).setType(ItemBomb.getFilling(item), ItemBomb.getCasing(item),
-                        ItemBomb.getFuse(item), ItemBomb.getPowder(item));
+                EntityMine bomb = new EntityMine(world).setType(
+                        ItemBomb.getFilling(item),
+                        ItemBomb.getCasing(item),
+                        ItemBomb.getFuse(item),
+                        ItemBomb.getPowder(item));
                 bomb.setPosition(posX, posY, posZ);
                 bomb.setThrowableHeading(xVelocity, yVelocity, zVelocity, 1.0F, velocityModifier);
                 world.spawnEntityInWorld(bomb);

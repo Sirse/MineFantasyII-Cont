@@ -1,9 +1,8 @@
 package minefantasy.mf2.block.food;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.item.food.FoodListMF;
+import java.util.ArrayList;
+import java.util.Random;
+
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -19,10 +18,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
 
-import java.util.ArrayList;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.item.food.FoodListMF;
 
 public class BlockBerryBush extends BlockBush implements IShearable {
+
     @SideOnly(Side.CLIENT)
     protected int field_150127_b;
     int[] field_150128_a;
@@ -98,11 +100,10 @@ public class BlockBerryBush extends BlockBush implements IShearable {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         int meta = world.getBlockMetadata(x, y, z);
         if (meta == 0) {
-            if (world.isRemote)
-                return true;
+            if (world.isRemote) return true;
 
             world.setBlockMetadataWithNotify(x, y, z, 1, 2);
 
@@ -121,7 +122,11 @@ public class BlockBerryBush extends BlockBush implements IShearable {
                     }
 
                     itemstack.stackSize -= j1;
-                    EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                    EntityItem entityitem = new EntityItem(
+                            world,
+                            x + f,
+                            y + f1,
+                            z + f2,
                             new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                     if (itemstack.hasTagCompound()) {
@@ -143,8 +148,7 @@ public class BlockBerryBush extends BlockBush implements IShearable {
 
     @Override
     public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-        return new ArrayList<ItemStack>() {
-        };
+        return new ArrayList<ItemStack>() {};
     }
 
     @Override

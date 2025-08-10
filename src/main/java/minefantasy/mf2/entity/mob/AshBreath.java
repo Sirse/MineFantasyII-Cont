@@ -1,9 +1,5 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.entity.EntityDragonBreath;
-import minefantasy.mf2.entity.EntitySmoke;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
@@ -11,6 +7,11 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.entity.EntityDragonBreath;
+import minefantasy.mf2.entity.EntitySmoke;
 
 public class AshBreath extends DragonBreath {
 
@@ -44,6 +45,5 @@ public class AshBreath extends DragonBreath {
     }
 
     @Override
-    public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {
-    }
+    public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {}
 }

@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelBarStack extends ModelBase {
+
     private ModelRenderer[] bar = new ModelRenderer[64];
 
     public ModelBarStack() {

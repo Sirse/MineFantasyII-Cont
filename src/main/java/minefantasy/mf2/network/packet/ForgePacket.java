@@ -1,12 +1,14 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityForge;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityForge;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class ForgePacket extends PacketMF {
+
     public static final String packetName = "MF2_ForgePacket";
     private int[] coords = new int[3];
     private float[] fuels = new float[2];
@@ -14,17 +16,16 @@ public class ForgePacket extends PacketMF {
     private int workableState;
 
     public ForgePacket(TileEntityForge tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
-        fuels = new float[]{tile.fuel, tile.maxFuel};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
+        fuels = new float[] { tile.fuel, tile.maxFuel };
         if (fuels[0] > fuels[1]) {
             fuels[0] = fuels[1];
         }
-        temps = new float[]{tile.temperature, tile.fuelTemperature, tile.getHeat()};
+        temps = new float[] { tile.temperature, tile.fuelTemperature, tile.getHeat() };
         workableState = tile.getWorkableState();
     }
 
-    public ForgePacket() {
-    }
+    public ForgePacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.crafting.refine;
 
-import minefantasy.mf2.util.Utils;
+import java.util.HashSet;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.HashSet;
+import minefantasy.mf2.util.Utils;
 
 public class QuernRecipes {
+
     public static HashSet<QuernRecipes> recipeList = new HashSet<QuernRecipes>();
     public final ItemStack input, result;
     public final boolean consumePot;

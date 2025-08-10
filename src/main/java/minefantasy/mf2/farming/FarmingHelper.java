@@ -1,14 +1,16 @@
 package minefantasy.mf2.farming;
 
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.farming.CustomHoeEntry;
-import minefantasy.mf2.util.XSTRandom;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemHoe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.farming.CustomHoeEntry;
+import minefantasy.mf2.util.XSTRandom;
+
 public class FarmingHelper {
+
     private static final XSTRandom rand = new XSTRandom();
     public static boolean isEnabled = true;
     public static float hoeFailChanceCfg = 1.0F;
@@ -32,8 +34,7 @@ public class FarmingHelper {
             return false;
         }
         float chance = 20F + (world.difficultySetting.getDifficultyId() * 10F);
-        if (scythe)
-            chance *= 2F;
+        if (scythe) chance *= 2F;
         return rand.nextFloat() * 100F <= chance * farmBreakCfg;
     }
 

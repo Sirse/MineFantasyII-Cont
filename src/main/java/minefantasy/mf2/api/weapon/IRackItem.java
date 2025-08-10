@@ -1,7 +1,8 @@
 package minefantasy.mf2.api.weapon;
 
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import net.minecraft.item.ItemStack;
+
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 
 public interface IRackItem {
 

@@ -1,7 +1,7 @@
 package minefantasy.mf2.block.basic;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.Item;
@@ -10,9 +10,11 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockOreMF extends Block {
+
     public int rarity;
     private int xp;
     private Item drop;
@@ -33,7 +35,7 @@ public class BlockOreMF extends Block {
     }
 
     public BlockOreMF(String name, int harvestLevel, int rarity, Item drop, int min, int max, int xp,
-                      Material material) {
+            Material material) {
         super(material);
         this.xp = xp;
         this.drop = drop;
@@ -67,8 +69,7 @@ public class BlockOreMF extends Block {
     }
 
     /**
-     * Returns the usual quantity dropped by the block plus a bonus of 1 to 'i'
-     * (inclusive).
+     * Returns the usual quantity dropped by the block plus a bonus of 1 to 'i' (inclusive).
      */
     @Override
     public int quantityDroppedWithBonus(int fortune, Random rand) {

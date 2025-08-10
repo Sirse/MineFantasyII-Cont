@@ -1,24 +1,25 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityBloomery;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityBloomery;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class BloomeryPacket extends PacketMF {
+
     public static final String packetName = "MF2_BloomeryPacket";
     private int[] coords = new int[3];
     private boolean renderBloom, isActive;
 
     public BloomeryPacket(TileEntityBloomery tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         renderBloom = tile.hasBloom();
         isActive = tile.isActive;
     }
 
-    public BloomeryPacket() {
-    }
+    public BloomeryPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

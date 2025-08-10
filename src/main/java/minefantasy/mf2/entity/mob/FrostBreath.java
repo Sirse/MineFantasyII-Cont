@@ -1,10 +1,5 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.config.ConfigMobs;
-import minefantasy.mf2.entity.EntityDragonBreath;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,6 +10,12 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.config.ConfigMobs;
+import minefantasy.mf2.entity.EntityDragonBreath;
 
 public class FrostBreath extends DragonBreath {
 
@@ -58,8 +59,7 @@ public class FrostBreath extends DragonBreath {
                     world.setBlock(x, y + 1, z, Blocks.snow_layer);
                 }
 
-                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing"))
-                    return;
+                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
                 if (hit == Blocks.water || hit == Blocks.flowing_water) {
                     world.setBlock(x, y, z, Blocks.ice);
                 }

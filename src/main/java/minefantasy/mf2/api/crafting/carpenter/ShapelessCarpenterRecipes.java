@@ -1,19 +1,21 @@
 package minefantasy.mf2.api.crafting.carpenter;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
 public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
+
     public static final int globalWidth = 4;
     public static final int globalHeight = 4;
     /**
@@ -40,7 +42,7 @@ public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
     private final Skill skillUsed;
 
     public ShapelessCarpenterRecipes(ItemStack output, String toolType, float exp, int hammer, int anvi, int time,
-                                     List components, boolean hot, String sound, String research, Skill skill) {
+            List components, boolean hot, String sound, String research, Skill skill) {
         this.research = research;
         this.outputHot = hot;
         this.recipeOutput = output;
@@ -57,15 +59,13 @@ public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
     public static int getTemp(ItemStack item) {
         NBTTagCompound tag = getNBT(item);
 
-        if (tag.hasKey("MFtemp"))
-            return tag.getInteger("MFtemp");
+        if (tag.hasKey("MFtemp")) return tag.getInteger("MFtemp");
 
         return 0;
     }
 
     private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -100,7 +100,7 @@ public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
                         }
                         if (inputItem.getItem() == recipeItem.getItem()
                                 && (recipeItem.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                                || inputItem.getItemDamage() == recipeItem.getItemDamage())) {
+                                        || inputItem.getItemDamage() == recipeItem.getItemDamage())) {
                             var6 = true;
                             var2.remove(recipeItem);
                             break;

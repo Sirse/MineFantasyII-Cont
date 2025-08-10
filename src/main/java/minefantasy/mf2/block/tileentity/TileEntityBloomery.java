@@ -1,5 +1,18 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
@@ -15,20 +28,9 @@ import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.BloomeryPacket;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-
-import java.util.Random;
 
 public class TileEntityBloomery extends TileEntity implements IInventory {
+
     public float progress, progressMax;
     public boolean hasBloom, isActive;
     private ItemStack[] inv = new ItemStack[3];
@@ -47,10 +49,8 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
         ItemStack input = inv[0];
         ItemStack coal = inv[1];
 
-        if (hasBloom())
-            return null;// Cannot smelt if a bloom exists
-        if (input == null || coal == null)
-            return null;// Needs input
+        if (hasBloom()) return null;// Cannot smelt if a bloom exists
+        if (input == null || coal == null) return null;// Needs input
 
         if (!hasEnoughCarbon(input, coal)) {
             return null;
@@ -95,10 +95,13 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new BloomeryPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new BloomeryPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 
     /**
@@ -154,8 +157,7 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
         String toolType = ToolHelper.getCrafterTool(held);
         float pwr = ToolHelper.getCrafterEfficiency(held);
         if (toolType.equalsIgnoreCase("hammer") || toolType.equalsIgnoreCase("hvyHammer")) {
-            if (user.worldObj.isRemote)
-                return true;
+            if (user.worldObj.isRemote) return true;
 
             held.damageItem(1, user);
             if (held.getItemDamage() >= held.getMaxDamage()) {
@@ -180,8 +182,13 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
                 entityDropItem(worldObj, xCoord, yCoord, zCoord, drop);
                 syncData();
             }
-            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "minefantasy2:block.anvilsucceed",
-                    0.25F, 1.0F);
+            worldObj.playSoundEffect(
+                    xCoord + 0.5D,
+                    yCoord + 0.5D,
+                    zCoord + 0.5D,
+                    "minefantasy2:block.anvilsucceed",
+                    0.25F,
+                    1.0F);
 
             return true;
         }
@@ -271,12 +278,10 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {

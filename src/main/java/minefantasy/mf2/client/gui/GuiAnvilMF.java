@@ -1,5 +1,12 @@
 package minefantasy.mf2.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
@@ -8,14 +15,10 @@ import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 import minefantasy.mf2.container.ContainerAnvilMF;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiAnvilMF extends GuiContainer {
+
     private TileEntityAnvilMF tile;
     private int regularXSize = 176;
     private int xInvOffset = 28;
@@ -28,15 +31,15 @@ public class GuiAnvilMF extends GuiContainer {
     }
 
     /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the
-     * items)
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {
         boolean knowsCraft = tile.doesPlayerKnowCraft(mc.thePlayer);
         String resultName = tile.getResultName();
         String s = MineFantasyII.isDebug() ? "Anvil Crafting"
-                : knowsCraft ? (resultName.startsWith("gui.") ? StatCollector.translateToLocal(resultName) : resultName) : "????";
+                : knowsCraft ? (resultName.startsWith("gui.") ? StatCollector.translateToLocal(resultName) : resultName)
+                        : "????";
         this.fontRendererObj.drawString(s, 10 + xInvOffset, 8, 0);
 
         int xPoint = (this.width - this.xSize) / 2 + 30;
@@ -47,21 +50,26 @@ public class GuiAnvilMF extends GuiContainer {
                 if (x < xPoint && x > xPoint - 20 && y < yPoint + 20 && y > yPoint) {
                     String s2 = StatCollector.translateToLocal("tooltype." + tile.getToolNeeded()) + ", "
                             + (tile.getToolTierNeeded() > -1
-                            ? StatCollector.translateToLocal("attribute.mfcrafttier.name") + " "
-                            + tile.getToolTierNeeded()
-                            : StatCollector.translateToLocal("attribute.nomfcrafttier.name"));
-                    this.fontRendererObj.drawStringWithShadow(s2, -18 + xInvOffset, -12,
+                                    ? StatCollector.translateToLocal("attribute.mfcrafttier.name") + " "
+                                            + tile.getToolTierNeeded()
+                                    : StatCollector.translateToLocal("attribute.nomfcrafttier.name"));
+                    this.fontRendererObj.drawStringWithShadow(
+                            s2,
+                            -18 + xInvOffset,
+                            -12,
                             isToolSufficient() ? 16777215 : GuiHelper.getColourForRGB(150, 0, 0));
                 }
             }
             if (x < xPoint + regularXSize + 20 && x > xPoint + regularXSize && y < yPoint + 20 && y > yPoint) {
                 String s2 = StatCollector.translateToLocal("tooltype.anvil") + ", "
                         + (tile.getAnvilTierNeeded() > -1
-                        ? StatCollector.translateToLocal("attribute.mfcrafttier.name") + " "
-                        + tile.getAnvilTierNeeded()
-                        : StatCollector.translateToLocal("attribute.nomfcrafttier.name"));
-                this.fontRendererObj.drawStringWithShadow(s2,
-                        regularXSize - fontRendererObj.getStringWidth(s2) + 18 + xInvOffset, -12,
+                                ? StatCollector.translateToLocal("attribute.mfcrafttier.name") + " "
+                                        + tile.getAnvilTierNeeded()
+                                : StatCollector.translateToLocal("attribute.nomfcrafttier.name"));
+                this.fontRendererObj.drawStringWithShadow(
+                        s2,
+                        regularXSize - fontRendererObj.getStringWidth(s2) + 18 + xInvOffset,
+                        -12,
                         isBlockSufficient() ? 16777215 : GuiHelper.getColourForRGB(150, 0, 0));
             }
         }
@@ -80,13 +88,24 @@ public class GuiAnvilMF extends GuiContainer {
             int progressWidth = (int) (160F / tile.progressMax * tile.progress);
             this.drawTexturedModalRect(xPoint + 8 + xInvOffset, yPoint + 21, 0, 210, progressWidth, 3);
         }
-        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null && !tile.getResultName().equalsIgnoreCase("")) {
-            GuiHelper.renderToolIcon(this, "anvil", tile.getAnvilTierNeeded(), xPoint + regularXSize + xInvOffset,
-                    yPoint, isBlockSufficient());
+        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null
+                && !tile.getResultName().equalsIgnoreCase("")) {
+            GuiHelper.renderToolIcon(
+                    this,
+                    "anvil",
+                    tile.getAnvilTierNeeded(),
+                    xPoint + regularXSize + xInvOffset,
+                    yPoint,
+                    isBlockSufficient());
 
             if (tile.getToolNeeded() != null) {
-                GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPoint - 20 + xInvOffset,
-                        yPoint, isToolSufficient());
+                GuiHelper.renderToolIcon(
+                        this,
+                        tile.getToolNeeded(),
+                        tile.getToolTierNeeded(),
+                        xPoint - 20 + xInvOffset,
+                        yPoint,
+                        isToolSufficient());
             }
         }
     }
@@ -97,8 +116,8 @@ public class GuiAnvilMF extends GuiContainer {
 
     private boolean isToolSufficient() {
         if (mc.thePlayer != null) {
-            return ToolHelper.isToolSufficient(mc.thePlayer.getHeldItem(), tile.getToolNeeded(),
-                    tile.getToolTierNeeded());
+            return ToolHelper
+                    .isToolSufficient(mc.thePlayer.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
         }
         return false;
     }

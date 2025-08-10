@@ -1,9 +1,8 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.armour.IGasProtector;
-import minefantasy.mf2.api.helpers.PowerArmour;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,10 +16,13 @@ import net.minecraft.util.*;
 import net.minecraft.util.MovingObjectPosition.MovingObjectType;
 import net.minecraft.world.World;
 
-import java.util.List;
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.armour.IGasProtector;
+import minefantasy.mf2.api.helpers.PowerArmour;
 
 public class EntitySmoke extends Entity {
+
     public EntityLivingBase shootingEntity;
     public double accelerationX;
     public double accelerationY;
@@ -51,8 +53,7 @@ public class EntitySmoke extends Entity {
     }
 
     public static boolean canPoison(Entity hit, Random rand) {
-        if (!(hit instanceof EntityLivingBase))
-            return false;
+        if (!(hit instanceof EntityLivingBase)) return false;
 
         ItemStack helmet = ((EntityLivingBase) hit).getEquipmentInSlot(4);
         if (helmet != null && helmet.getItem() instanceof IGasProtector) {
@@ -77,13 +78,11 @@ public class EntitySmoke extends Entity {
         return false;
     }
 
-    protected void entityInit() {
-    }
+    protected void entityInit() {}
 
     /**
-     * Checks if the entity is in range to render by using the past in distance and
-     * comparing it to its average edge length * 64 * renderDistanceWeight Args:
-     * distance
+     * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
+     * length * 64 * renderDistanceWeight Args: distance
      */
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double dist) {
@@ -103,8 +102,8 @@ public class EntitySmoke extends Entity {
             super.onUpdate();
 
             if (this.inGround) {
-                if (this.worldObj.getBlock(this.field_145795_e, this.field_145793_f,
-                        this.field_145794_g) == this.field_145796_h) {
+                if (this.worldObj.getBlock(this.field_145795_e, this.field_145793_f, this.field_145794_g)
+                        == this.field_145796_h) {
                     ++this.ticksAlive;
 
                     if (this.ticksAlive == 600) {
@@ -125,20 +124,23 @@ public class EntitySmoke extends Entity {
             }
 
             Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            Vec3 vec31 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
             MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
             vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            vec31 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
             if (movingobjectposition != null) {
-                vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord,
+                vec31 = Vec3.createVectorHelper(
+                        movingobjectposition.hitVec.xCoord,
+                        movingobjectposition.hitVec.yCoord,
                         movingobjectposition.hitVec.zCoord);
             }
 
             Entity entity = null;
-            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this,
+            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(
+                    this,
                     this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
 
@@ -220,8 +222,7 @@ public class EntitySmoke extends Entity {
     }
 
     /**
-     * Return the motion factor for this projectile. The factor is multiplied by the
-     * original motion.
+     * Return the motion factor for this projectile. The factor is multiplied by the original motion.
      */
     protected float getMotionFactor() {
         return 0.95F;
@@ -265,7 +266,7 @@ public class EntitySmoke extends Entity {
         nbt.setShort("zTile", (short) this.field_145794_g);
         nbt.setByte("inTile", (byte) Block.getIdFromBlock(this.field_145796_h));
         nbt.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-        nbt.setTag("direction", this.newDoubleNBTList(new double[]{this.motionX, this.motionY, this.motionZ}));
+        nbt.setTag("direction", this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
     }
 
     /**
@@ -289,8 +290,7 @@ public class EntitySmoke extends Entity {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     @Override
     public boolean canBeCollidedWith() {
@@ -310,6 +310,5 @@ public class EntitySmoke extends Entity {
     }
 
     @Override
-    public void setFire(int i) {
-    }
+    public void setFire(int i) {}
 }

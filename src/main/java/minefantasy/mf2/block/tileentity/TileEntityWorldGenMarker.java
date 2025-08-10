@@ -1,14 +1,16 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.config.ConfigWorldGen;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.chunk.Chunk;
 
+import minefantasy.mf2.config.ConfigWorldGen;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+
 public class TileEntityWorldGenMarker extends TileEntity {
+
     public String className, type;
     public int ticks = 0, length = 0, deviation = 0, prevID, prevMeta;
 
@@ -17,7 +19,15 @@ public class TileEntityWorldGenMarker extends TileEntity {
         if (!worldObj.isRemote && areChunksLoaded() && ticks >= getSpawnTime()) {
             Block block = Block.getBlockById(prevID);
             worldObj.setBlock(xCoord, yCoord, zCoord, block != null ? block : Blocks.air, prevMeta, 2);
-            StructureModuleMF.placeStructure(className, type, length, deviation, worldObj, xCoord, yCoord, zCoord,
+            StructureModuleMF.placeStructure(
+                    className,
+                    type,
+                    length,
+                    deviation,
+                    worldObj,
+                    xCoord,
+                    yCoord,
+                    zCoord,
                     this.getBlockMetadata());
         }
 
@@ -25,7 +35,9 @@ public class TileEntityWorldGenMarker extends TileEntity {
     }
 
     private boolean areChunksLoaded() {
-        return chunkLoaded(0, 0) && chunkLoaded(-16, 0) && chunkLoaded(16, 0) && chunkLoaded(0, -16)
+        return chunkLoaded(0, 0) && chunkLoaded(-16, 0)
+                && chunkLoaded(16, 0)
+                && chunkLoaded(0, -16)
                 && chunkLoaded(0, 16);
     }
 

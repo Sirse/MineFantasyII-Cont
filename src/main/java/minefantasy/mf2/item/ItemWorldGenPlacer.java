@@ -1,14 +1,7 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientAlter;
-import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientForge;
-import minefantasy.mf2.mechanics.worldGen.structure.WorldGenStructureBase;
-import minefantasy.mf2.mechanics.worldGen.structure.dwarven.WorldGenDwarvenStronghold;
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,10 +11,19 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientAlter;
+import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientForge;
+import minefantasy.mf2.mechanics.worldGen.structure.WorldGenStructureBase;
+import minefantasy.mf2.mechanics.worldGen.structure.dwarven.WorldGenDwarvenStronghold;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class ItemWorldGenPlacer extends Item {
-    private static final String[] types = new String[]{"AncientForge", "AncientAlter", "DwarvenStronghold"};
+
+    private static final String[] types = new String[] { "AncientForge", "AncientAlter", "DwarvenStronghold" };
     public IIcon[] icons;
 
     public ItemWorldGenPlacer() {
@@ -32,7 +34,7 @@ public class ItemWorldGenPlacer extends Item {
 
     @Override
     public boolean onItemUse(ItemStack item, EntityPlayer user, World world, int x, int y, int z, int side,
-                             float offsetX, float offsetY, float offsetZ) {
+            float offsetX, float offsetY, float offsetZ) {
         if (side == 0) {
             --y;
         }
@@ -93,8 +95,7 @@ public class ItemWorldGenPlacer extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubItems(Item item, CreativeTabs tab, List list) {
-        for (int id = 0; id < types.length; id++)
-            list.add(new ItemStack(item, 1, id));
+        for (int id = 0; id < types.length; id++) list.add(new ItemStack(item, 1, id));
     }
 
     private WorldGenStructureBase getWorldGen(int meta) {

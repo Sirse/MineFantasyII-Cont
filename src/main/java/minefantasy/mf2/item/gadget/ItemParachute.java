@@ -1,15 +1,17 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.entity.EntityParachute;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.entity.EntityParachute;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class ItemParachute extends Item {
+
     public ItemParachute() {
         String name = "parachute";
         this.maxStackSize = 1;

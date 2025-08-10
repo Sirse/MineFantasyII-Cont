@@ -1,5 +1,12 @@
 package minefantasy.mf2.block.tileentity.decor;
 
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.WorldServer;
+
 import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.archery.IAmmo;
 import minefantasy.mf2.api.archery.IFirearm;
@@ -11,14 +18,9 @@ import minefantasy.mf2.item.ItemBandage;
 import minefantasy.mf2.item.gadget.ItemSyringe;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.AmmoBoxPacket;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemFood;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
 
 public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetre {
+
     public int angle, stock;
     public ItemStack ammo;
     private byte storageSize = -1;
@@ -172,8 +174,13 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
 
     private void open() {
         angle = 16;
-        this.worldObj.playSoundEffect(this.xCoord + 0.5D, this.yCoord + 0.25D, this.zCoord + 0.5D, "random.chestclosed",
-                0.5F, this.worldObj.rand.nextFloat() * 0.1F + 1.4F);
+        this.worldObj.playSoundEffect(
+                this.xCoord + 0.5D,
+                this.yCoord + 0.25D,
+                this.zCoord + 0.5D,
+                "random.chestclosed",
+                0.5F,
+                this.worldObj.rand.nextFloat() * 0.1F + 1.4F);
     }
 
     @Override
@@ -182,8 +189,7 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         if (ticksExisted == 20 || ticksExisted % 100 == 0) {
             syncData();
         }
-        if (angle > 0)
-            --angle;
+        if (angle > 0) --angle;
     }
 
     @Override
@@ -214,12 +220,15 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         // Validate current contents before sync
         setContentsValidated(ammo, stock);
 
-        NetworkUtils.sendToWatchers(new AmmoBoxPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new AmmoBoxPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 
     /**
-     * Validates and applies ammo/stock ensuring type acceptance and capacity bounds.
-     * Returns true if state changed.
+     * Validates and applies ammo/stock ensuring type acceptance and capacity bounds. Returns true if state changed.
      */
     public boolean setContentsValidated(ItemStack newAmmo, int newStock) {
         ItemStack validatedAmmo = newAmmo;
@@ -237,7 +246,8 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
             validatedAmmo.stackSize = validatedAmmo.getMaxStackSize();
         }
 
-        boolean changed = this.ammo != validatedAmmo || this.stock != validatedStock || this.ammo != null && !areItemStacksEqual(this.ammo, validatedAmmo);
+        boolean changed = this.ammo != validatedAmmo || this.stock != validatedStock
+                || this.ammo != null && !areItemStacksEqual(this.ammo, validatedAmmo);
         this.ammo = validatedAmmo;
         this.stock = validatedStock;
         return changed;
@@ -269,8 +279,7 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
     }
 
     private boolean areItemStacksEqual(ItemStack i1, ItemStack i2) {
-        if (i1 == null || i2 == null)
-            return false;
+        if (i1 == null || i2 == null) return false;
 
         return i1.isItemEqual(i2) && ItemStack.areItemStackTagsEqual(i1, i2);
     }

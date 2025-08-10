@@ -4,6 +4,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryCrafting;
 
 public class AnvilCraftMatrix extends InventoryCrafting {
+
     private IAnvil anvil;
 
     public AnvilCraftMatrix(IAnvil anvil, Container instance, int xSize, int ySize) {

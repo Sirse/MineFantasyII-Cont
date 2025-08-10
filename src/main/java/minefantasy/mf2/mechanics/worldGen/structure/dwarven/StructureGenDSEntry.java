@@ -1,16 +1,18 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.entity.mob.EntityMinotaur;
-import minefantasy.mf2.entity.mob.MinotaurBreed;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.entity.mob.EntityMinotaur;
+import minefantasy.mf2.entity.mob.MinotaurBreed;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+
 public class StructureGenDSEntry extends StructureModuleMF {
+
     private static Block floor = BlockListMF.cobble_pavement;
     public boolean isSurfaceBuild;
     private String lootType = ChestGenHooks.DUNGEON_CHEST;
@@ -143,15 +145,15 @@ public class StructureGenDSEntry extends StructureModuleMF {
         }
         if (x == -(radius - 1) || x == (radius - 1)) {
             if (z == (int) Math.ceil((float) depth / 2)) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
             if ((x == -(radius - 1) && (z == (depth - 1) || z == 1))
                     || (x == (radius - 1) && (z == (depth - 1) || z == 1))) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         return null;
     }
@@ -161,44 +163,44 @@ public class StructureGenDSEntry extends StructureModuleMF {
             return null;
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getFloor(int radius, int depth, int x, int z) {
         if (z < 2 && x >= -1 && x <= 1) {
-            return new Object[]{floor, false};
+            return new Object[] { floor, false };
         }
         if (x == -radius || x == radius || z == depth || z == 0) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{floor, false};
+        return new Object[] { floor, false };
     }
 
     private Object[] getFoundation(int radius, int depth, int x, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if (x == -radius || x == radius || x == 0) {
                 if (z == depth || z == Math.ceil((float) depth / 2) || z == 0) {
-                    return new Object[]{BlockListMF.reinforced_stone, false};
+                    return new Object[] { BlockListMF.reinforced_stone, false };
                 }
             }
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getWalls(int radius, int depth, int x, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if ((x == -radius && (z == depth || z == 0)) || (x == radius && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     public StructureModuleMF setLoot(String loot) {

@@ -1,6 +1,7 @@
 package minefantasy.mf2.item.archery;
 
 public enum EnumBowType {
+
     /**
      * Standard bow Reinforced with metal
      */

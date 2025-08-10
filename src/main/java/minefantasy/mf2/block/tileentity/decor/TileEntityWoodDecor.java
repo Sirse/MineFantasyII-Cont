@@ -1,15 +1,17 @@
 package minefantasy.mf2.block.tileentity.decor;
 
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.decor.BlockWoodDecor;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.WoodDecorPacket;
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.decor.BlockWoodDecor;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.WoodDecorPacket;
+
 public abstract class TileEntityWoodDecor extends TileEntity {
+
     private String tex;
     private CustomMaterial material;
 
@@ -78,6 +80,10 @@ public abstract class TileEntityWoodDecor extends TileEntity {
     }
 
     public void sendPacketToClient() {
-        NetworkUtils.sendToWatchers(new WoodDecorPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new WoodDecorPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 }

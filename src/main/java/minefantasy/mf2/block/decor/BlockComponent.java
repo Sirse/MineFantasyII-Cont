@@ -1,10 +1,7 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityComponent;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -24,11 +21,16 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityComponent;
 
 public class BlockComponent extends BlockContainer {
+
     public static int component_RI = 118;
-    private Random rand = new Random();
+    private final Random rand = new Random();
 
     public BlockComponent() {
         super(Material.circuits);
@@ -39,16 +41,8 @@ public class BlockComponent extends BlockContainer {
         this.setBlockBounds(1 / 16F, 0F, 1 / 16F, 15 / 16F, 12 / 16F, 15 / 16F);
     }
 
-    private static TileEntityComponent getTile(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
-            return (TileEntityComponent) tile;
-        }
-        return null;
-    }
-
     public static int placeComponent(EntityPlayer user, ItemStack item, World world, int x, int y, int z, String type,
-                                     String tex, int dir) {
+            String tex, int dir) {
         if (world.isAirBlock(x, y, z) && canBuildOn(world, x, y - 1, z)) {
             world.setBlock(x, y, z, BlockListMF.components, dir, 2);
 
@@ -67,14 +61,14 @@ public class BlockComponent extends BlockContainer {
 
     public static boolean canBuildOn(World world, int x, int y, int z) {
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             return ((TileEntityComponent) tile).isFull();
         }
         return world.isSideSolid(x, y, z, ForgeDirection.UP);
     }
 
-    public static int useComponent(ItemStack item, String type, String tex, World world, EntityPlayer user,
-                                   MovingObjectPosition movingobjectposition) {
+    public static int useComponent(ItemStack item, String type, String tex, EntityPlayer user,
+            MovingObjectPosition movingobjectposition) {
         if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             int i = movingobjectposition.blockX;
             int j = movingobjectposition.blockY;
@@ -113,21 +107,14 @@ public class BlockComponent extends BlockContainer {
     }
 
     public static int getStorageSize(String id) {
-        if (id == null)
-            return 0;
+        if (id == null) return 0;
 
-        if (id.equalsIgnoreCase("bar"))
-            return 64;
-        if (id.equalsIgnoreCase("plank"))
-            return 64;
-        if (id.equalsIgnoreCase("pot"))
-            return 64;
-        if (id.equalsIgnoreCase("jug"))
-            return 32;
-        if (id.equalsIgnoreCase("sheet"))
-            return 16;
-        if (id.equalsIgnoreCase("bigplate"))
-            return 8;
+        if (id.equalsIgnoreCase("bar")) return 64;
+        if (id.equalsIgnoreCase("plank")) return 64;
+        if (id.equalsIgnoreCase("pot")) return 64;
+        if (id.equalsIgnoreCase("jug")) return 32;
+        if (id.equalsIgnoreCase("sheet")) return 16;
+        if (id.equalsIgnoreCase("bigplate")) return 8;
 
         return 0;
     }
@@ -176,7 +163,7 @@ public class BlockComponent extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         useBlock(world, x, y, z, user, false);
         return true;
     }
@@ -184,24 +171,24 @@ public class BlockComponent extends BlockContainer {
     private void useBlock(World world, int x, int y, int z, EntityPlayer user, boolean leftClick) {
         ItemStack held = user.getHeldItem();
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             ((TileEntityComponent) tile).interact(user, held, leftClick);
         }
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             ((TileEntityComponent) tile).checkStack();
         }
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             if (((TileEntityComponent) tile).item != null) {
                 ItemStack item = ((TileEntityComponent) tile).item.copy();
                 item.stackSize = 1;
@@ -219,7 +206,7 @@ public class BlockComponent extends BlockContainer {
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             TileEntityComponent component = (TileEntityComponent) tile;
 
             if (component.item != null) {
@@ -248,7 +235,11 @@ public class BlockComponent extends BlockContainer {
                 }
 
                 itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                EntityItem entityitem = new EntityItem(
+                        world,
+                        x + f,
+                        y + f1,
+                        z + f2,
                         new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                 if (itemstack.hasTagCompound()) {
@@ -267,14 +258,13 @@ public class BlockComponent extends BlockContainer {
     private AxisAlignedBB getBoundingBox(World world, int x, int y, int z) {
         float height = 1.0F;
         TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityComponent) {
+        if (tile instanceof TileEntityComponent) {
             height = ((TileEntityComponent) tile).getBlockHeight();
         }
         return AxisAlignedBB.getBoundingBox(x + 0.0625D, y + 0D, z + 0.0625D, x + 0.9375D, y + height, z + 0.9375D);
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
         return getBoundingBox(world, x, y, z);
     }
@@ -284,7 +274,6 @@ public class BlockComponent extends BlockContainer {
      */
     @SideOnly(Side.CLIENT)
     @Override
-    @SuppressWarnings("deprecation")
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
         return getBoundingBox(world, x, y, z);
     }

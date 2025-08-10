@@ -1,11 +1,13 @@
 package minefantasy.mf2.api.knowledge;
 
-import minefantasy.mf2.api.rpg.Skill;
-import net.minecraft.util.StatCollector;
-
 import java.util.*;
 
+import net.minecraft.util.StatCollector;
+
+import minefantasy.mf2.api.rpg.Skill;
+
 public class InformationPage {
+
     private static LinkedList<InformationPage> infoPages = new LinkedList<InformationPage>();
     public final Skill baseSkill;
     private String name;
@@ -33,8 +35,7 @@ public class InformationPage {
      * Will return an achievement page by its index on the list.
      *
      * @param index The page's index.
-     * @return the achievement page corresponding to the index or null if invalid
-     * index
+     * @return the achievement page corresponding to the index or null if invalid index
      */
     public static InformationPage getInfoPage(int index) {
         return infoPages.get(index);

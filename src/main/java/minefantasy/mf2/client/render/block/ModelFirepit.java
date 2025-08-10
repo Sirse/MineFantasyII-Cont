@@ -1,10 +1,12 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.block.tileentity.TileEntityFirepit;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
+import minefantasy.mf2.block.tileentity.TileEntityFirepit;
+
 public class ModelFirepit extends ModelBase {
+
     private final ModelRenderer Base;
     private final ModelRenderer Plank1;
     private final ModelRenderer Plank2;

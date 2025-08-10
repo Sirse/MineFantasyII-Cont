@@ -1,9 +1,5 @@
 package minefantasy.mf2.client.render.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.mob.EntityDragon;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.entity.Entity;
@@ -11,10 +7,17 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.boss.BossStatus;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.mob.EntityDragon;
 
 @SideOnly(Side.CLIENT)
 public class RenderDragon extends RenderLiving {
+
     private static ModelBase dragonModel = new ModelDragon();
     private static ModelBase venomModel = new ModelVenomDragon();
     private static ModelBase frostModel = new ModelFrostDragon();
@@ -42,7 +45,7 @@ public class RenderDragon extends RenderLiving {
         String breed = ((EntityDragon) entity).getType().breedName;
         this.mainModel = breed.equalsIgnoreCase("ash") ? ashModel
                 : breed.equalsIgnoreCase("white") ? frostModel
-                : breed.equalsIgnoreCase("green") ? venomModel : dragonModel;
+                        : breed.equalsIgnoreCase("green") ? venomModel : dragonModel;
         super.doRender(entity, x, y, z, f, 1);
         BossStatus.setBossStatus((EntityDragon) entity, ((EntityDragon) entity).getType().tier == 4);
     }

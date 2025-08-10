@@ -1,16 +1,17 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 
 public class TileEntityTroughRenderer extends TileEntitySpecialRenderer {
+
     private ModelTrough model;
 
     public TileEntityTroughRenderer() {

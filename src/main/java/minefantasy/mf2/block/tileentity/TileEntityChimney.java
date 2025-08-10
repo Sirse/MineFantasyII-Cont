@@ -1,8 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.refine.ISmokeCarrier;
-import minefantasy.mf2.api.refine.SmokeMechanics;
-import minefantasy.mf2.block.refining.BlockChimney;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
@@ -10,9 +9,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
+import minefantasy.mf2.api.refine.ISmokeCarrier;
+import minefantasy.mf2.api.refine.SmokeMechanics;
+import minefantasy.mf2.block.refining.BlockChimney;
 
 public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
+
     public Block maskBlock = Blocks.air;
     public int maskMeta = 0;
     public int ticksExisted;
@@ -27,12 +29,11 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
         super.updateEntity();
         ++ticksExisted;
         ++ticksExistedTemp;
-        if (lastSharedInt > 0)
-            --lastSharedInt;
+        if (lastSharedInt > 0) --lastSharedInt;
 
         /*
-         * TODO Custom Tex if(ticksExistedTemp == 20) {
-         * MineFantasyII.debugMsg("Chimney Loaded R = " + worldObj.isRemote); sync(); }
+         * TODO Custom Tex if(ticksExistedTemp == 20) { MineFantasyII.debugMsg("Chimney Loaded R = " +
+         * worldObj.isRemote); sync(); }
          */
         if (smokeStorage > 0) {
             if (!isPipeChimney()) {
@@ -55,12 +56,12 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     }
 
     private boolean tryShareSmoke() {
-        if (!isPipeChimney())
-            return false;
+        if (!isPipeChimney()) return false;
         if (tryPassTo(0, 1, 0, true, false)) {
             return true;// Up First
         }
-        if (tryPassTo(-1, 0, 0, false, true) || tryPassTo(1, 0, 0, false, true) || tryPassTo(0, 0, -1, false, true)
+        if (tryPassTo(-1, 0, 0, false, true) || tryPassTo(1, 0, 0, false, true)
+                || tryPassTo(0, 0, -1, false, true)
                 || tryPassTo(0, 0, 1, false, true)) {
             return true;// Sides
         }
@@ -126,10 +127,9 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
     public void setBlock(int id, int subId) {
         /*
-         * TODO Custom Tex maskMeta = subId; Block newblock = Block.getBlockById(id);
-         * if(newblock != null) { maskBlock = newblock; } if(worldObj != null &&
-         * worldObj.isRemote) { worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord,
-         * zCoord, xCoord, yCoord, zCoord); }
+         * TODO Custom Tex maskMeta = subId; Block newblock = Block.getBlockById(id); if(newblock != null) { maskBlock =
+         * newblock; } if(worldObj != null && worldObj.isRemote) { worldObj.markBlockRangeForRenderUpdate(xCoord,
+         * yCoord, zCoord, xCoord, yCoord, zCoord); }
          */
     }
 
@@ -153,23 +153,18 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
     public void sync() {
         /*
-         * TODO Custom Tex MineFantasyII.debugMsg("Block For Chimney = " +
-         * maskBlock.getUnlocalizedName() + " R = " + worldObj.isRemote);
-         * if(!worldObj.isRemote) { MineFantasyII.debugMsg("Syncing Chimney " + xCoord +
-         * ", " + yCoord + ", " + zCoord); List<EntityPlayer> players =
-         * ((WorldServer)worldObj).playerEntities; for(int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i);
-         * ((WorldServer)worldObj).getEntityTracker().func_151248_b(player, new
-         * ChimneyPacket(this).generatePacket()); } }
-         * MineFantasyII.debugMsg("Syncing Render " + xCoord + ", " + yCoord + ", " +
-         * zCoord); worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord,
-         * xCoord, yCoord, zCoord);
+         * TODO Custom Tex MineFantasyII.debugMsg("Block For Chimney = " + maskBlock.getUnlocalizedName() + " R = " +
+         * worldObj.isRemote); if(!worldObj.isRemote) { MineFantasyII.debugMsg("Syncing Chimney " + xCoord + ", " +
+         * yCoord + ", " + zCoord); List<EntityPlayer> players = ((WorldServer)worldObj).playerEntities; for(int i = 0;
+         * i < players.size(); i++) { EntityPlayer player = players.get(i);
+         * ((WorldServer)worldObj).getEntityTracker().func_151248_b(player, new ChimneyPacket(this).generatePacket()); }
+         * } MineFantasyII.debugMsg("Syncing Render " + xCoord + ", " + yCoord + ", " + zCoord);
+         * worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
          */
     }
 
     public BlockChimney getActiveBlock() {
-        if (worldObj == null)
-            return null;
+        if (worldObj == null) return null;
 
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 

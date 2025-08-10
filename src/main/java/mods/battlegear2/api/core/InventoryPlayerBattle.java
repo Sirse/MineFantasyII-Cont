@@ -1,7 +1,5 @@
 package mods.battlegear2.api.core;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -10,9 +8,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+
 /**
- * User: nerd-boy Date: 15/07/13 Time: 3:08 PM Replacement for the player
- * inventory
+ * User: nerd-boy Date: 15/07/13 Time: 3:08 PM Replacement for the player inventory
  */
 public class InventoryPlayerBattle extends InventoryPlayer {
 
@@ -41,8 +41,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
      * Returns a new slot index according to the type
      *
      * @param type determines which inventory array to expand
-     * @return the new slot index, or Integer.MIN_VALUE if it is not possible to
-     * expand further
+     * @return the new slot index, or Integer.MIN_VALUE if it is not possible to expand further
      */
     public int requestNewSlot(InventorySlotType type) {
         ItemStack[] temp;
@@ -103,8 +102,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     @Override
     @SideOnly(Side.CLIENT)
     public void func_146030_a(Item par1, int par2, boolean par3, boolean par4) {
-        if (!isBattlemode())
-            super.func_146030_a(par1, par2, par3, par4);
+        if (!isBattlemode()) super.func_146030_a(par1, par2, par3, par4);
     }
 
     @Override
@@ -121,8 +119,7 @@ public class InventoryPlayerBattle extends InventoryPlayer {
             }
 
             // noinspection StatementWithEmptyBody
-            for (currentItem -= direction; currentItem < OFFSET; currentItem += WEAPON_SETS) {
-            }
+            for (currentItem -= direction; currentItem < OFFSET; currentItem += WEAPON_SETS) {}
 
             while (currentItem >= OFFSET + WEAPON_SETS) {
                 currentItem -= WEAPON_SETS;
@@ -152,23 +149,22 @@ public class InventoryPlayerBattle extends InventoryPlayer {
     }
 
     /**
-     * Decrement the number of animations remaining. Only called on client side.
-     * This is used to handle the animation of receiving a block.
+     * Decrement the number of animations remaining. Only called on client side. This is used to handle the animation of
+     * receiving a block.
      */
     @Override
     public void decrementAnimations() {
         super.decrementAnimations();
         for (int i = 0; i < this.extraItems.length; ++i) {
             if (this.extraItems[i] != null) {
-                this.extraItems[i].updateAnimation(this.player.worldObj, this.player, i,
-                        this.currentItem + OFFSET == i);
+                this.extraItems[i]
+                        .updateAnimation(this.player.worldObj, this.player, i, this.currentItem + OFFSET == i);
             }
         }
     }
 
     /**
-     * removed one item of specified itemID from inventory (if it is in a stack, the
-     * stack size will reduce with 1)
+     * removed one item of specified itemID from inventory (if it is in a stack, the stack size will reduce with 1)
      */
     @Override
     public boolean consumeInventoryItem(Item par1) {

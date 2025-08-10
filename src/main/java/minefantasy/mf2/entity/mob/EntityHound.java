@@ -1,10 +1,5 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.entity.mob.ai.AI_CommonSprint;
-import minefantasy.mf2.entity.mob.ai.hound.AI_HoundBeg;
-import minefantasy.mf2.entity.mob.ai.hound.AI_HoundFollow;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockColored;
 import net.minecraft.entity.Entity;
@@ -30,7 +25,14 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.entity.mob.ai.AI_CommonSprint;
+import minefantasy.mf2.entity.mob.ai.hound.AI_HoundBeg;
+import minefantasy.mf2.entity.mob.ai.hound.AI_HoundFollow;
+
 public class EntityHound extends EntityTameable {
+
     // Animations
     public float jawMove;
     public int eatAnimation;
@@ -155,9 +157,9 @@ public class EntityHound extends EntityTameable {
     protected String getLivingSound() {
         return this.isAngry() ? "mob.wolf.growl"
                 : (this.rand.nextInt(3) == 0
-                ? (this.isTamed() && this.dataWatcher.getWatchableObjectFloat(18) < 10.0F ? "mob.wolf.whine"
-                : "mob.wolf.panting")
-                : "mob.wolf.bark");
+                        ? (this.isTamed() && this.dataWatcher.getWatchableObjectFloat(18) < 10.0F ? "mob.wolf.whine"
+                                : "mob.wolf.panting")
+                        : "mob.wolf.bark");
     }
 
     /**
@@ -190,9 +192,8 @@ public class EntityHound extends EntityTameable {
     }
 
     /**
-     * Called frequently so the entity can update its state every tick as required.
-     * For example, zombies and skeletons use this to react to sunlight and start to
-     * burn.
+     * Called frequently so the entity can update its state every tick as required. For example, zombies and skeletons
+     * use this to react to sunlight and start to burn.
      */
     @Override
     public void onLivingUpdate() {
@@ -231,7 +232,9 @@ public class EntityHound extends EntityTameable {
             this.prevTimeWolfIsShaking = 0.0F;
         } else if ((this.isShaking || this.field_70928_h) && this.field_70928_h) {
             if (this.timeWolfIsShaking == 0.0F) {
-                this.playSound("mob.wolf.shake", this.getSoundVolume(),
+                this.playSound(
+                        "mob.wolf.shake",
+                        this.getSoundVolume(),
                         (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
             }
 
@@ -252,8 +255,14 @@ public class EntityHound extends EntityTameable {
                 for (int j = 0; j < i; ++j) {
                     float f1 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
                     float f2 = (this.rand.nextFloat() * 2.0F - 1.0F) * this.width * 0.5F;
-                    this.worldObj.spawnParticle("splash", this.posX + f1, f + 0.8F, this.posZ + f2, this.motionX,
-                            this.motionY, this.motionZ);
+                    this.worldObj.spawnParticle(
+                            "splash",
+                            this.posX + f1,
+                            f + 0.8F,
+                            this.posZ + f2,
+                            this.motionX,
+                            this.motionY,
+                            this.motionZ);
                 }
             }
         }
@@ -265,13 +274,13 @@ public class EntityHound extends EntityTameable {
     }
 
     /**
-     * Used when calculating the amount of shading to apply while the wolf is
-     * shaking.
+     * Used when calculating the amount of shading to apply while the wolf is shaking.
      */
     @SideOnly(Side.CLIENT)
     public float getShadingWhileShaking(float p_70915_1_) {
         return 0.75F + (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * p_70915_1_)
-                / 2.0F * 0.25F;
+                / 2.0F
+                * 0.25F;
     }
 
     @SideOnly(Side.CLIENT)
@@ -285,7 +294,8 @@ public class EntityHound extends EntityTameable {
             f2 = 1.0F;
         }
 
-        return MathHelper.sin(f2 * (float) Math.PI) * MathHelper.sin(f2 * (float) Math.PI * 11.0F) * 0.15F
+        return MathHelper.sin(f2 * (float) Math.PI) * MathHelper.sin(f2 * (float) Math.PI * 11.0F)
+                * 0.15F
                 * (float) Math.PI;
     }
 
@@ -300,8 +310,8 @@ public class EntityHound extends EntityTameable {
     }
 
     /**
-     * The speed it takes to move the entityliving's rotationPitch through the
-     * faceEntity method. This is only currently use in wolves.
+     * The speed it takes to move the entityliving's rotationPitch through the faceEntity method. This is only currently
+     * use in wolves.
      */
     @Override
     public int getVerticalFaceSpeed() {
@@ -345,8 +355,7 @@ public class EntityHound extends EntityTameable {
     }
 
     /**
-     * Called when a player interacts with a mob. e.g. gets milk from a cow, gets
-     * into the saddle on a pig.
+     * Called when a player interacts with a mob. e.g. gets milk from a cow, gets into the saddle on a pig.
      */
     @Override
     public boolean interact(EntityPlayer user) {
@@ -439,13 +448,13 @@ public class EntityHound extends EntityTameable {
     public float getTailRotation() {
         return this.isAngry() ? 1.5393804F
                 : (this.isTamed()
-                ? (0.55F - (20.0F - this.dataWatcher.getWatchableObjectFloat(18)) * 0.02F) * (float) Math.PI
-                : ((float) Math.PI / 5F));
+                        ? (0.55F - (20.0F - this.dataWatcher.getWatchableObjectFloat(18)) * 0.02F) * (float) Math.PI
+                        : ((float) Math.PI / 5F));
     }
 
     /**
-     * Checks if the parameter is an item which this animal can be fed to breed it
-     * (wheat, carrots or seeds depending on the animal type)
+     * Checks if the parameter is an item which this animal can be fed to breed it (wheat, carrots or seeds depending on
+     * the animal type)
      */
     @Override
     public boolean isBreedingItem(ItemStack item) {
@@ -559,7 +568,7 @@ public class EntityHound extends EntityTameable {
 
             return target instanceof EntityPlayer && owner instanceof EntityPlayer
                     && !((EntityPlayer) owner).canAttackPlayer((EntityPlayer) target) ? false
-                    : !(target instanceof EntityHorse) || !((EntityHorse) target).isTame();
+                            : !(target instanceof EntityHorse) || !((EntityHorse) target).isTame();
         } else {
             return false;
         }

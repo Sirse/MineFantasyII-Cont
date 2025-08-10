@@ -1,13 +1,15 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.material.BaseMaterialMF;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailPowered;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.material.BaseMaterialMF;
+
 public class BlockPowRailMF extends BlockRailPowered {
+
     private BaseMaterialMF baseMat;
     private boolean isPowered = true;
 

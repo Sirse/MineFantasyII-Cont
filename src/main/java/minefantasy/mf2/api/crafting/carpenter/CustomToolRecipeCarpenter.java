@@ -1,17 +1,19 @@
 package minefantasy.mf2.api.crafting.carpenter;
 
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.Skill;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * @author AnonymousProductions
  */
 public class CustomToolRecipeCarpenter extends ShapedCarpenterRecipes {
+
     public CustomToolRecipeCarpenter(int wdth, int heit, ItemStack[] inputs, ItemStack output, String toolType,
-                                     int time, int toolTier, int blockTier, float exp, boolean hot, String sound, String research, Skill skill) {
+            int time, int toolTier, int blockTier, float exp, boolean hot, String sound, String research, Skill skill) {
         super(wdth, heit, inputs, output, toolType, time, toolTier, blockTier, exp, hot, sound, research, skill);
     }
 
@@ -119,8 +121,8 @@ public class CustomToolRecipeCarpenter extends ShapedCarpenterRecipes {
             CustomMaterial.addMaterial(result, CustomToolHelper.slot_main, metal);
         }
         if (wood != null) {
-            CustomMaterial.addMaterial(result, metal == null ? CustomToolHelper.slot_main : CustomToolHelper.slot_haft,
-                    wood);
+            CustomMaterial
+                    .addMaterial(result, metal == null ? CustomToolHelper.slot_main : CustomToolHelper.slot_haft, wood);
         }
         return result;
     }

@@ -1,14 +1,16 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 
 public class TileEntityAnvilMFRenderer extends TileEntitySpecialRenderer {
 

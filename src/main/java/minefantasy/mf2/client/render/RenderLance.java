@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -13,18 +11,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 /**
  * @author Anonymous Productions
  */
 
 public class RenderLance implements IItemRenderer {
+
     private Minecraft mc;
     private RenderItem itemRenderer;
 
-    public RenderLance() {
-    }
+    public RenderLance() {}
 
     @Override
     public boolean handleRenderType(ItemStack item, ItemRenderType type) {
@@ -75,8 +77,15 @@ public class RenderLance implements IItemRenderer {
 
                 IIcon icon = item.getItem().getIcon(item, layer);
 
-                ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(),
-                        icon.getIconWidth(), icon.getIconHeight(), 1F / 16F);
+                ItemRenderer.renderItemIn2D(
+                        tessellator,
+                        icon.getMaxU(),
+                        icon.getMinV(),
+                        icon.getMinU(),
+                        icon.getMaxV(),
+                        icon.getIconWidth(),
+                        icon.getIconHeight(),
+                        1F / 16F);
             }
 
             if (item != null && item.hasEffect(0)) {

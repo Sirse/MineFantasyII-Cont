@@ -1,12 +1,14 @@
 package minefantasy.mf2.client.render.mob;
 
-import minefantasy.mf2.entity.mob.EntityDragon;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
+import minefantasy.mf2.entity.mob.EntityDragon;
+
 public class ModelFrostDragon extends ModelBase {
+
     public ModelRenderer Body;
     public ModelRenderer Tail1;
     public ModelRenderer Neckbase;
@@ -250,7 +252,10 @@ public class ModelFrostDragon extends ModelBase {
         this.Headlargehornlowerright = new ModelRenderer(this, 190, 500);
         this.Headlargehornlowerright.setRotationPoint(-1.6F, 0.0F, -3.0F);
         this.Headlargehornlowerright.addBox(-3.0F, 0.0F, 0.0F, 3, 2, 6, 0.0F);
-        this.setRotateAngle(Headlargehornlowerright, 0.18203784098300857F, -0.27314402793711257F,
+        this.setRotateAngle(
+                Headlargehornlowerright,
+                0.18203784098300857F,
+                -0.27314402793711257F,
                 -0.36425021489121656F);
         this.Tooth16 = new ModelRenderer(this, 180, 500);
         this.Tooth16.setRotationPoint(-2.5F, 0.4F, -4.5F);
@@ -947,7 +952,7 @@ public class ModelFrostDragon extends ModelBase {
     }
 
     public void setRotationAngles(EntityDragon dragon, float step1, float step2, float head1, float neckY, float neckX,
-                                  float head4) {
+            float head4) {
         super.setRotationAngles(step1, step2, head1, neckY, neckX, head4, dragon);
         float wingFlap = (float) Math.toRadians(dragon.wingFlap());
         float jawAngle = (float) Math.toRadians(dragon.getJawMove());

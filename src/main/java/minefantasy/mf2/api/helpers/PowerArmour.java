@@ -1,16 +1,18 @@
 package minefantasy.mf2.api.helpers;
 
-import minefantasy.mf2.api.armour.IPowerArmour;
-import minefantasy.mf2.api.heating.ForgeFuel;
-import minefantasy.mf2.api.heating.ForgeItemHandler;
-import minefantasy.mf2.block.crafting.BlockFrame;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.api.armour.IPowerArmour;
+import minefantasy.mf2.api.heating.ForgeFuel;
+import minefantasy.mf2.api.heating.ForgeItemHandler;
+import minefantasy.mf2.block.crafting.BlockFrame;
+
 public class PowerArmour {
+
     public static boolean isWearingCogwork(EntityLivingBase user) {
         return user.ridingEntity != null && user.ridingEntity instanceof IPowerArmour;
     }

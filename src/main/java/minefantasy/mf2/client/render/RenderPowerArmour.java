@@ -1,10 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.entity.EntityCogwork;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
@@ -23,11 +18,19 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.entity.EntityCogwork;
+
 @SideOnly(Side.CLIENT)
 public class RenderPowerArmour extends RendererLivingEntity {
+
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation(
             "textures/misc/enchanted_item_glint.png");
     protected ModelBiped cogworkSuit;
@@ -48,8 +51,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
     }
 
     /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless
-     * you call Render.bindEntityTexture.
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(int layer) {
         String tex = layer == 0 ? "base" : "plating";
@@ -61,8 +63,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
     }
 
     /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless
-     * you call Render.bindEntityTexture.
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
         return this.getEntityTexture(0);
@@ -73,12 +74,10 @@ public class RenderPowerArmour extends RendererLivingEntity {
     }
 
     /**
-     * Actually renders the given argument. This is a synthetic bridge method,
-     * always casting down its argument and then handing it off to a worker function
-     * which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity) and this method has signature public void
-     * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
-     * But JAD is pre 1.5 so doesn't do that.
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
     @Override
     public void doRender(Entity entity, double x, double y, double z, float f, float f1) {
@@ -92,8 +91,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
 
     @Override
     public void doRender(EntityLivingBase entity, double x, double y, double z, float f, float f1) {
-        if (MinecraftForge.EVENT_BUS.post(new RenderLivingEvent.Pre(entity, this, x, y, z)))
-            return;
+        if (MinecraftForge.EVENT_BUS.post(new RenderLivingEvent.Pre(entity, this, x, y, z))) return;
 
         boolean isFrame = true;
         EntityCogwork suit = this.getCogwork(entity);
@@ -128,7 +126,9 @@ public class RenderPowerArmour extends RendererLivingEntity {
 
             if (entity.isRiding() && entity.ridingEntity instanceof EntityLivingBase) {
                 EntityLivingBase entitylivingbase1 = (EntityLivingBase) entity.ridingEntity;
-                f2 = this.interpolateRotation(entitylivingbase1.prevRenderYawOffset, entitylivingbase1.renderYawOffset,
+                f2 = this.interpolateRotation(
+                        entitylivingbase1.prevRenderYawOffset,
+                        entitylivingbase1.renderYawOffset,
                         f1);
                 f4 = MathHelper.wrapAngleTo180_float(f3 - f2);
 
@@ -294,8 +294,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
             }
 
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        } catch (Exception exception) {
-        }
+        } catch (Exception exception) {}
 
         OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -330,12 +329,12 @@ public class RenderPowerArmour extends RendererLivingEntity {
 
     @Override
     protected void renderModel(EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_, float p_77036_4_,
-                               float p_77036_5_, float p_77036_6_, float p_77036_7_) {
+            float p_77036_5_, float p_77036_6_, float p_77036_7_) {
         this.renderModel(0, p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
     }
 
     protected void renderModel(int layer, EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_,
-                               float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_) {
+            float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_) {
         this.bindEntityTexture(layer);
 
         if (!p_77036_1_.isInvisible()) {
@@ -353,7 +352,13 @@ public class RenderPowerArmour extends RendererLivingEntity {
             GL11.glPopMatrix();
             GL11.glDepthMask(true);
         } else {
-            this.mainModel.setRotationAngles(p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_,
+            this.mainModel.setRotationAngles(
+                    p_77036_2_,
+                    p_77036_3_,
+                    p_77036_4_,
+                    p_77036_5_,
+                    p_77036_6_,
+                    p_77036_7_,
                     p_77036_1_);
         }
     }
@@ -405,7 +410,8 @@ public class RenderPowerArmour extends RendererLivingEntity {
             net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient
                     .getItemRenderer(itemstack, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(
-                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, itemstack,
+                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED,
+                    itemstack,
                     net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
             if (item instanceof ItemBlock
@@ -495,7 +501,8 @@ public class RenderPowerArmour extends RendererLivingEntity {
             net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient
                     .getItemRenderer(held, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(
-                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, held,
+                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED,
+                    held,
                     net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
             if (is3D || held.getItem() instanceof ItemBlock

@@ -1,7 +1,7 @@
 package minefantasy.mf2.block.tree;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.mechanics.worldGen.WorldGenMFTree;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.IGrowable;
@@ -12,9 +12,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.mechanics.worldGen.WorldGenMFTree;
 
 public class BlockSaplingMF extends BlockBush implements IGrowable {
+
     private final Block log, leaves;
     private float growthModifier;
     private String name;
@@ -60,8 +62,7 @@ public class BlockSaplingMF extends BlockBush implements IGrowable {
     }
 
     public void tryGrow(World world, int x, int y, int z, Random rand) {
-        if (!net.minecraftforge.event.terraingen.TerrainGen.saplingGrowTree(world, rand, x, y, z))
-            return;
+        if (!net.minecraftforge.event.terraingen.TerrainGen.saplingGrowTree(world, rand, x, y, z)) return;
         int l = world.getBlockMetadata(x, y, z) & 7;
         Object treegen = new WorldGenMFTree(true, log, leaves);
         int i1 = 0;
@@ -84,7 +85,7 @@ public class BlockSaplingMF extends BlockBush implements IGrowable {
     }
 
     public boolean func_149880_a(World p_149880_1_, int p_149880_2_, int p_149880_3_, int p_149880_4_,
-                                 int p_149880_5_) {
+            int p_149880_5_) {
         return p_149880_1_.getBlock(p_149880_2_, p_149880_3_, p_149880_4_) == this
                 && (p_149880_1_.getBlockMetadata(p_149880_2_, p_149880_3_, p_149880_4_) & 7) == p_149880_5_;
     }
@@ -97,17 +98,17 @@ public class BlockSaplingMF extends BlockBush implements IGrowable {
     }
 
     public boolean func_149851_a(World p_149851_1_, int p_149851_2_, int p_149851_3_, int p_149851_4_,
-                                 boolean p_149851_5_) {
+            boolean p_149851_5_) {
         return true;
     }
 
     public boolean func_149852_a(World p_149852_1_, Random p_149852_2_, int p_149852_3_, int p_149852_4_,
-                                 int p_149852_5_) {
+            int p_149852_5_) {
         return p_149852_1_.rand.nextFloat() < (0.45D) / growthModifier;
     }
 
     public void func_149853_b(World p_149853_1_, Random p_149853_2_, int p_149853_3_, int p_149853_4_,
-                              int p_149853_5_) {
+            int p_149853_5_) {
         this.initGrow(p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, p_149853_2_);
     }
 }

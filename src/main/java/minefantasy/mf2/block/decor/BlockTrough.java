@@ -1,11 +1,5 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,7 +10,15 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class BlockTrough extends BlockWoodDecor {
+
     public static final String NBT_fill = "Fill_Level";
     public static int trough_RI = 107;
 
@@ -83,13 +85,18 @@ public class BlockTrough extends BlockWoodDecor {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         ItemStack held = user.getHeldItem();
         TileEntity tile = world.getTileEntity(x, y, z);
         if (tile != null && tile instanceof TileEntityTrough) {
             if (((TileEntityTrough) tile).interact(user, held)) {
-                world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "random.splash",
-                        0.125F + user.getRNG().nextFloat() / 4F, 0.5F + user.getRNG().nextFloat());
+                world.playSoundEffect(
+                        x + 0.5D,
+                        y + 0.5D,
+                        z + 0.5D,
+                        "random.splash",
+                        0.125F + user.getRNG().nextFloat() / 4F,
+                        0.5F + user.getRNG().nextFloat());
                 ((TileEntityTrough) tile).syncData();
                 return true;
             }

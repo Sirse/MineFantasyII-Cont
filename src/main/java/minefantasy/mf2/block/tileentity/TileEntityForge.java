@@ -1,5 +1,19 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.WorldServer;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.IBasicMetre;
@@ -15,21 +29,9 @@ import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.ForgePacket;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityFurnace;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.WorldServer;
-
-import java.util.Random;
 
 public class TileEntityForge extends TileEntity implements IInventory, IBasicMetre, IHeatSource, IBellowsUseable {
+
     public static final float maxTemperature = 5000;
     public float fuel;
     public float maxFuel = 6000;// 5m
@@ -51,18 +53,15 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         blockMetadata = 0;
     }
 
-    public TileEntityForge() {
-    }
+    public TileEntityForge() {}
 
     @Override
     public void updateEntity() {
         ++ticksExisted;
 
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        if (justShared > 0)
-            --justShared;
+        if (justShared > 0) --justShared;
         super.updateEntity();
 
         if (ticksExisted % 20 == 0) {
@@ -131,13 +130,11 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     private void shareTo(int x, int z) {
-        if (fuel <= 0)
-            return;
+        if (fuel <= 0) return;
 
         int share = 2;
         TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null)
-            return;
+        if (tile == null) return;
 
         if (tile instanceof TileEntityForge) {
             TileEntityForge forge = (TileEntityForge) tile;
@@ -165,8 +162,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
             fuel -= 0.2F;
         }
 
-        if (fuel < 0)
-            fuel = 0;
+        if (fuel < 0) fuel = 0;
     }
 
     private boolean isBurning() {
@@ -321,8 +317,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         inv[slot] = item;
     }
 
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     @Override
     public String getInventoryName() {
@@ -345,12 +340,10 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -358,8 +351,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     public BlockForge getActiveBlock() {
-        if (worldObj == null)
-            return null;
+        if (worldObj == null) return null;
 
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 
@@ -372,8 +364,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     @SideOnly(Side.CLIENT)
     public String getTextureName() {
         BlockForge forge = getActiveBlock();
-        if (forge == null)
-            return "forge_" + texTypeForRender;
+        if (forge == null) return "forge_" + texTypeForRender;
 
         return "forge_" + forge.type + (shouldRenderFlame() ? "_active" : "");
     }
@@ -461,10 +452,8 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
             temps[0] = (int) (size / this.maxTemperature * this.temperature);
             temps[1] = (int) (size / this.maxTemperature * this.fuelTemperature);
         }
-        if (temps[0] > size)
-            temps[0] = size;
-        if (temps[1] > size)
-            temps[1] = size;
+        if (temps[0] > size) temps[0] = size;
+        if (temps[1] > size) temps[1] = size;
         return temps;
     }
 
@@ -475,20 +464,22 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
 
     @Override
     public String getLocalisedName() {
-        return (int) this.temperature + "C " + StatCollector.translateToLocal(
-                workableState >= 2 ? "state.unstable" : workableState == 1 ? "state.workable" : "forge.fuel.name");
+        return (int) this.temperature + "C "
+                + StatCollector.translateToLocal(
+                        workableState >= 2 ? "state.unstable"
+                                : workableState == 1 ? "state.workable" : "forge.fuel.name");
     }
 
     public boolean[] showSides() {
         if (worldObj == null) {
-            return new boolean[]{true, true, true, true};
+            return new boolean[] { true, true, true, true };
         }
         boolean front = !isForge(0, 0, 1);
         boolean left = !isForge(-1, 0, 0);
         boolean right = !isForge(1, 0, 0);
         boolean back = !isForge(0, 0, -1);
 
-        return new boolean[]{front, left, right, back};
+        return new boolean[] { front, left, right, back };
     }
 
     private boolean isForge(int x, int y, int z) {
@@ -497,23 +488,23 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
 
     private void syncData() {
 
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new ForgePacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new ForgePacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player, new ForgePacket(this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new ForgePacket(this).generatePacket()); }
+         */
     }
 
     public void onUsedWithBellows(float powerLevel) {
-        if (!isBurning())
-            return;
+        if (!isBurning()) return;
         if (justShared > 0) {
             return;
         }
@@ -527,8 +518,14 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         }
 
         for (int a = 0; a < 10; a++) {
-            worldObj.spawnParticle("flame", xCoord + (rand.nextDouble() * 0.8D) + 0.1D, yCoord + 0.4D,
-                    zCoord + (rand.nextDouble() * 0.8D) + 0.1D, 0, 0.01, 0);
+            worldObj.spawnParticle(
+                    "flame",
+                    xCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                    yCoord + 0.4D,
+                    zCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                    0,
+                    0.01,
+                    0);
         }
 
         pumpBellows(-1, 0, powerLevel * 0.9F);
@@ -539,13 +536,11 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     private void pumpBellows(int x, int z, float pump) {
-        if (fuel <= 0)
-            return;
+        if (fuel <= 0) return;
 
         // int share = 2;
         TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null)
-            return;
+        if (tile == null) return;
 
         if (tile instanceof TileEntityForge) {
             TileEntityForge forge = (TileEntityForge) tile;
@@ -561,17 +556,14 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     /*
-     * private void averageAllItems() { /* int temp = 0; int items = 0;
-     * for(ItemStack item: inv) { if(item != null && item.getItem() instanceof
-     * IHotItem) { ++items; temp += ItemHeated.getTemp(item); } } int average =
-     * (int)((float)temp / items); for(ItemStack item: inv) { if(item != null &&
-     * item.getItem() instanceof IHotItem) { ItemHeated.setTemp(item, average); } }
-     * }
+     * private void averageAllItems() { /* int temp = 0; int items = 0; for(ItemStack item: inv) { if(item != null &&
+     * item.getItem() instanceof IHotItem) { ++items; temp += ItemHeated.getTemp(item); } } int average =
+     * (int)((float)temp / items); for(ItemStack item: inv) { if(item != null && item.getItem() instanceof IHotItem) {
+     * ItemHeated.setTemp(item, average); } } }
      */
 
     public boolean hasBlockAbove() {
-        if (worldObj == null)
-            return false;
+        if (worldObj == null) return false;
 
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
         if (tile != null && tile instanceof IHeatUser) {
@@ -590,7 +582,8 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
             return true;
         } else if (contents.getItem() instanceof ItemHeated) {
             ItemStack hot = Heatable.getItem(contents);
-            if (hot != null && hot.isItemEqual(held) && ItemStack.areItemStackTagsEqual(held, hot)
+            if (hot != null && hot.isItemEqual(held)
+                    && ItemStack.areItemStackTagsEqual(held, hot)
                     && contents.stackSize < contents.getMaxStackSize()) {
                 contents.stackSize++;
                 return true;

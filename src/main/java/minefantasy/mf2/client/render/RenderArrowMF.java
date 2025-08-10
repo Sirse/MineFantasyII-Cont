@@ -1,26 +1,35 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.EntityArrowMF;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.EntityArrowMF;
+
 @SideOnly(Side.CLIENT)
 public class RenderArrowMF extends Render {
+
     public void renderArrow(EntityArrowMF arrow, double x, double y, double z, float xr, float yr) {
         this.loadTexture(arrow.getTexture() + ".png");
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
-        GL11.glRotatef(arrow.prevRotationYaw + (arrow.rotationYaw - arrow.prevRotationYaw) * yr - 90.0F, 0.0F, 1.0F,
+        GL11.glRotatef(
+                arrow.prevRotationYaw + (arrow.rotationYaw - arrow.prevRotationYaw) * yr - 90.0F,
+                0.0F,
+                1.0F,
                 0.0F);
-        GL11.glRotatef(arrow.prevRotationPitch + (arrow.rotationPitch - arrow.prevRotationPitch) * yr, 0.0F, 0.0F,
+        GL11.glRotatef(
+                arrow.prevRotationPitch + (arrow.rotationPitch - arrow.prevRotationPitch) * yr,
+                0.0F,
+                0.0F,
                 1.0F);
         Tessellator var10 = Tessellator.instance;
         byte var11 = 0;
@@ -75,12 +84,10 @@ public class RenderArrowMF extends Render {
     }
 
     /**
-     * Actually renders the given argument. This is a synthetic bridge method,
-     * always casting down its argument and then handing it off to a worker function
-     * which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity) and this method has signature public void
-     * doRender(T entity, double d, double d1, double d2, float f, float f1). But
-     * JAD is pre 1.5 so doesn't do that.
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
     @Override
     public void doRender(Entity entity, double x, double y, double z, float xr, float yr) {

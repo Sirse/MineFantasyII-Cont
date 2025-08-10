@@ -1,14 +1,15 @@
 package minefantasy.mf2.api.knowledge;
 
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-
 public class ResearchArtefacts {
+
     public static void addArtefact(Object input, InformationBase research) {
         addArtefact(input, research.getUnlocalisedName());
     }
@@ -23,8 +24,7 @@ public class ResearchArtefacts {
 
     public static ArrayList<String> getResearchNames(ItemStack item) {
         ArrayList<String> names = new ArrayList<String>();
-        if (item == null)
-            return names;
+        if (item == null) return names;
 
         for (int i : OreDictionary.getOreIDs(item)) {
             String name = OreDictionary.getOreName(i);
@@ -37,8 +37,7 @@ public class ResearchArtefacts {
     }
 
     public static ItemStack convert(Object input) {
-        if (input == null)
-            return null;
+        if (input == null) return null;
 
         ItemStack itemstack = null;
         if (input instanceof ItemStack) {

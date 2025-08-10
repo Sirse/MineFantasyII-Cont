@@ -1,11 +1,12 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
+
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.entity.mob.EntityMinotaur;
 import minefantasy.mf2.entity.mob.MinotaurBreed;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
 
 public class StructureGenDSIntersection extends StructureGenDSHall {
 
@@ -30,8 +31,8 @@ public class StructureGenDSIntersection extends StructureGenDSHall {
     }
 
     private boolean[] getRandomIntersectionPattern() {
-        boolean[][] groups = new boolean[][]{new boolean[]{true, true, true}, new boolean[]{true, true, false},
-                new boolean[]{true, false, true}, new boolean[]{false, true, true},};
+        boolean[][] groups = new boolean[][] { new boolean[] { true, true, true }, new boolean[] { true, true, false },
+                new boolean[] { true, false, true }, new boolean[] { false, true, true }, };
 
         return groups[rand.nextInt(groups.length)];
     }
@@ -51,8 +52,7 @@ public class StructureGenDSIntersection extends StructureGenDSHall {
         return 4;
     }
 
-    protected void tryPlaceMinorRoom(int x, int y, int z, int d) {
-    }
+    protected void tryPlaceMinorRoom(int x, int y, int z, int d) {}
 
     @Override
     protected Object[] getTrim(int radius, int depth, int x, int z) {
@@ -63,9 +63,9 @@ public class StructureGenDSIntersection extends StructureGenDSHall {
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
             if ((x == -(radius - 1) && (z == (depth - 1) || z == 1))
                     || (x == (radius - 1) && (z == (depth - 1) || z == 1))) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         return null;
     }
@@ -76,36 +76,36 @@ public class StructureGenDSIntersection extends StructureGenDSHall {
             return null;
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     @Override
     protected Object[] getFloor(int radius, int depth, int x, int z) {
         if (z == 0 && x >= -1 && x <= 1) {
-            return new Object[]{floor, false};
+            return new Object[] { floor, false };
         }
         if (x == -radius || x == radius || z == depth || z == 0) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{floor, false};
+        return new Object[] { floor, false };
     }
 
     @Override
     protected Object[] getWalls(int radius, int height, int depth, int x, int y, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if ((x == -radius && (z == depth || z == 0)) || (x == radius && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return y == height / 2 ? new Object[]{BlockListMF.reinforced_stone, "Hall"}
-                    : new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return y == height / 2 ? new Object[] { BlockListMF.reinforced_stone, "Hall" }
+                    : new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     @Override

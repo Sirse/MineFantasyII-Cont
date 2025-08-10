@@ -1,13 +1,16 @@
 package minefantasy.mf2.client.render.block;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import minefantasy.mf2.block.crafting.BlockFirepit;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
+
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import minefantasy.mf2.block.crafting.BlockFirepit;
+
 public class RenderFirepit implements ISimpleBlockRenderingHandler {
+
     private static final TileEntityFirepitRenderer invModel = new TileEntityFirepitRenderer();
 
     @Override
@@ -20,7 +23,7 @@ public class RenderFirepit implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
-                                    RenderBlocks renderer) {
+            RenderBlocks renderer) {
         return false;
     }
 

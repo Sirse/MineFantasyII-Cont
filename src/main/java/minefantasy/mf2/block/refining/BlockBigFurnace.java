@@ -1,12 +1,7 @@
 package minefantasy.mf2.block.refining;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -22,21 +17,26 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockBigFurnace extends BlockContainer {
+
     public static int furn_RI = 114;
     /**
-     * This flag is used to prevent the furnace inventory to be dropped upon block
-     * removal, is used internally when the furnace block changes from idle to
-     * active and vice-versa.
+     * This flag is used to prevent the furnace inventory to be dropped upon block removal, is used internally when the
+     * furnace block changes from idle to active and vice-versa.
      */
     private static boolean keepFurnaceInventory = false;
     public final boolean isHeater;
     public final int tier;
     /**
-     * Is the random generator used by furnace to drop the inventory contents in
-     * random directions.
+     * Is the random generator used by furnace to drop the inventory contents in random directions.
      */
     private Random rand = new Random();
 
@@ -91,7 +91,7 @@ public class BlockBigFurnace extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         if (world.isRemote) {
             return true;
         } else {
@@ -149,7 +149,11 @@ public class BlockBigFurnace extends BlockContainer {
                             }
 
                             var7.stackSize -= var11;
-                            EntityItem var12 = new EntityItem(world, x + var8, y + var9, z + var10,
+                            EntityItem var12 = new EntityItem(
+                                    world,
+                                    x + var8,
+                                    y + var9,
+                                    z + var10,
                                     new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
 
                             if (var7.hasTagCompound()) {
@@ -172,6 +176,5 @@ public class BlockBigFurnace extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister reg) {
-    }
+    public void registerBlockIcons(IIconRegister reg) {}
 }

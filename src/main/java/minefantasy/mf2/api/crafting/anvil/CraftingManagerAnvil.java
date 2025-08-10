@@ -1,17 +1,19 @@
 package minefantasy.mf2.api.crafting.anvil;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.*;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
 public class CraftingManagerAnvil {
+
     /**
      * The static instance of this class
      */
@@ -34,21 +36,21 @@ public class CraftingManagerAnvil {
         return instance;
     }
 
-    public IAnvilRecipe addRecipe(ItemStack result, Skill skill, String research, boolean hot, String tool,
-                                  int hammer, int anvil, int time, Object... input) {
+    public IAnvilRecipe addRecipe(ItemStack result, Skill skill, String research, boolean hot, String tool, int hammer,
+            int anvil, int time, Object... input) {
         return addRecipe(result, skill, research, hot, tool, hammer, anvil, time, (byte) 0, input);
     }
 
-    public IAnvilRecipe addToolRecipe(ItemStack result, Skill skill, String research, boolean hot,
-                                      String tool, int hammer, int anvil, int time, Object... input) {
+    public IAnvilRecipe addToolRecipe(ItemStack result, Skill skill, String research, boolean hot, String tool,
+            int hammer, int anvil, int time, Object... input) {
         return addRecipe(result, skill, research, hot, tool, hammer, anvil, time, (byte) 1, input);
     }
 
     /**
      * Adds a recipe. See spreadsheet on first page for details.
      */
-    private IAnvilRecipe addRecipe(ItemStack result, Skill skill, String research, boolean hot, String tool,
-                                   int hammer, int anvil, int time, byte recipeType, Object... input) {
+    private IAnvilRecipe addRecipe(ItemStack result, Skill skill, String research, boolean hot, String tool, int hammer,
+            int anvil, int time, byte recipeType, Object... input) {
         String var3 = "";
         int var4 = 0;
         int var5 = 0;
@@ -106,18 +108,16 @@ public class CraftingManagerAnvil {
 
         IAnvilRecipe recipe;
         if (recipeType == (byte) 1) {
-            recipe = new CustomToolRecipe(var5, var6, var15, result, tool, time, hammer, anvil, hot, research,
-                    skill);
+            recipe = new CustomToolRecipe(var5, var6, var15, result, tool, time, hammer, anvil, hot, research, skill);
         } else {
-            recipe = new ShapedAnvilRecipes(var5, var6, var15, result, tool, time, hammer, anvil, hot, research,
-                    skill);
+            recipe = new ShapedAnvilRecipes(var5, var6, var15, result, tool, time, hammer, anvil, hot, research, skill);
         }
         this.recipes.add(recipe);
         return recipe;
     }
 
-    public IAnvilRecipe addShapelessRecipe(ItemStack output, Skill skill, String research, boolean hot,
-                                           String tool, int hammer, int anvil, int time, Object... input) {
+    public IAnvilRecipe addShapelessRecipe(ItemStack output, Skill skill, String research, boolean hot, String tool,
+            int hammer, int anvil, int time, Object... input) {
         ArrayList var3 = new ArrayList();
         Object[] var4 = input;
         int var5 = input.length;
@@ -138,8 +138,7 @@ public class CraftingManagerAnvil {
             }
         }
 
-        IAnvilRecipe recipe = new ShapelessAnvilRecipes(output, tool, hammer, anvil, time, var3, hot,
-                research, skill);
+        IAnvilRecipe recipe = new ShapelessAnvilRecipes(output, tool, hammer, anvil, time, var3, hot, research, skill);
         this.recipes.add(recipe);
         return recipe;
     }
@@ -194,11 +193,14 @@ public class CraftingManagerAnvil {
     }
 
     private boolean canRepair(ItemStack item1, ItemStack item2) {
-        if (item1.getItem() == item2.getItem() && item1.stackSize == 1 && item2.stackSize == 1
+        if (item1.getItem() == item2.getItem() && item1.stackSize == 1
+                && item2.stackSize == 1
                 && item1.getItem().isRepairable()) {
             return true;
         }
-        if (item1.getItem() == item2.getItem() && item1.stackSize == 1 && item2.stackSize == 1 && item1.isItemDamaged()
+        if (item1.getItem() == item2.getItem() && item1.stackSize == 1
+                && item2.stackSize == 1
+                && item1.isItemDamaged()
                 && CustomToolHelper.areToolsSame(item1, item2)) {
             return true;
         }
@@ -231,7 +233,9 @@ public class CraftingManagerAnvil {
             }
         }
 
-        if (var2 == 2 && var3.getItem() == var4.getItem() && var3.stackSize == 1 && var4.stackSize == 1
+        if (var2 == 2 && var3.getItem() == var4.getItem()
+                && var3.stackSize == 1
+                && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
             Item var10 = var3.getItem();
             int var12 = var10.getMaxDamage() - var3.getItemDamageForDisplay();

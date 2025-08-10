@@ -1,15 +1,16 @@
 package minefantasy.mf2.network;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
-import io.netty.buffer.ByteBuf;
+import java.lang.reflect.Method;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
-import java.lang.reflect.Method;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import io.netty.buffer.ByteBuf;
 
 /**
  * Here I used code in Railcraft.
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
  */
 
 public class NetworkUtils {
+
     private static final Class playerInstanceClass;
     private static final Method getOrCreateChunkWatcher;
     private static final Method sendToAllPlayersWatchingChunk;
@@ -25,8 +27,18 @@ public class NetworkUtils {
     static {
         try {
             playerInstanceClass = PlayerManager.class.getDeclaredClasses()[0];
-            getOrCreateChunkWatcher = ReflectionHelper.findMethod(PlayerManager.class, null, new String[]{"func_72690_a", "getOrCreateChunkWatcher"}, int.class, int.class, boolean.class);
-            sendToAllPlayersWatchingChunk = ReflectionHelper.findMethod(playerInstanceClass, null, new String[]{"func_151251_a", "sendToAllPlayersWatchingChunk"}, Packet.class);
+            getOrCreateChunkWatcher = ReflectionHelper.findMethod(
+                    PlayerManager.class,
+                    null,
+                    new String[] { "func_72690_a", "getOrCreateChunkWatcher" },
+                    int.class,
+                    int.class,
+                    boolean.class);
+            sendToAllPlayersWatchingChunk = ReflectionHelper.findMethod(
+                    playerInstanceClass,
+                    null,
+                    new String[] { "func_151251_a", "sendToAllPlayersWatchingChunk" },
+                    Packet.class);
             getOrCreateChunkWatcher.setAccessible(true);
             sendToAllPlayersWatchingChunk.setAccessible(true);
         } catch (Exception ex) {
@@ -36,9 +48,9 @@ public class NetworkUtils {
 
     public static void sendToWatchers(Packet packet, WorldServer world, int worldX, int worldZ) {
         try {
-            Object playerInstance = getOrCreateChunkWatcher.invoke(world.getPlayerManager(), worldX >> 4, worldZ >> 4, false);
-            if (playerInstance != null)
-                sendToAllPlayersWatchingChunk.invoke(playerInstance, packet);
+            Object playerInstance = getOrCreateChunkWatcher
+                    .invoke(world.getPlayerManager(), worldX >> 4, worldZ >> 4, false);
+            if (playerInstance != null) sendToAllPlayersWatchingChunk.invoke(playerInstance, packet);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -51,7 +63,7 @@ public class NetworkUtils {
     }
 
     public static int[] readCoords(ByteBuf buf) {
-        return new int[]{buf.readInt(), buf.readInt(), buf.readInt()};
+        return new int[] { buf.readInt(), buf.readInt(), buf.readInt() };
     }
 
     public static boolean isServer(EntityPlayer player) {

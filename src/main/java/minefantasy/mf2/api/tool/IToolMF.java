@@ -3,9 +3,9 @@ package minefantasy.mf2.api.tool;
 import net.minecraft.item.ItemStack;
 
 public interface IToolMF {
+
     /**
-     * Gets the efficienty of this tool for processing (recommended to use
-     * ToolMaterial.getEfficiencyOnProperMaterial())
+     * Gets the efficienty of this tool for processing (recommended to use ToolMaterial.getEfficiencyOnProperMaterial())
      */
     public float getEfficiency(ItemStack item);
 

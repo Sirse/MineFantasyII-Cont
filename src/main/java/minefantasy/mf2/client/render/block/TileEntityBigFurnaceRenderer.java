@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,16 +8,21 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
+
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class TileEntityBigFurnaceRenderer extends TileEntitySpecialRenderer {
+
     private ModelBigFurnace model;
 
     public TileEntityBigFurnaceRenderer() {

@@ -1,11 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import minefantasy.mf2.api.heating.TongsHelper;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.block.decor.BlockComponent;
-import minefantasy.mf2.item.ItemComponentMF;
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -13,9 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.item.ItemComponentMF;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class ItemJug extends ItemComponentMF {
+
     private String type;
     private Random rand = new Random();
 
@@ -73,8 +75,7 @@ public class ItemJug extends ItemComponentMF {
     }
 
     /**
-     * returns the action that specifies what animation to play when the items is
-     * being used
+     * returns the action that specifies what animation to play when the items is being used
      */
     @Override
     public EnumAction getItemUseAction(ItemStack item) {
@@ -114,7 +115,11 @@ public class ItemJug extends ItemComponentMF {
         if (!world.isRemote) {
             world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
             item.stackSize--;
-            EntityItem resultItem = new EntityItem(world, player.posX, player.posY, player.posZ,
+            EntityItem resultItem = new EntityItem(
+                    world,
+                    player.posX,
+                    player.posY,
+                    player.posZ,
                     new ItemStack(FoodListMF.jug_water));
             world.spawnEntityInWorld(resultItem);
         }
@@ -131,8 +136,7 @@ public class ItemJug extends ItemComponentMF {
             if (movingobjectposition == null) {
                 return item;
             } else {
-                int placed = BlockComponent.useComponent(item, storageType, blocktex, world, user,
-                        movingobjectposition);
+                int placed = BlockComponent.useComponent(item, storageType, blocktex, user, movingobjectposition);
                 if (placed > 0) {
                     item.stackSize -= placed;
                     return item;

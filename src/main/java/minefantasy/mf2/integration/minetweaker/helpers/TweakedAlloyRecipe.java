@@ -1,15 +1,16 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.refine.Alloy;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class TweakedAlloyRecipe extends Alloy {
 
@@ -41,17 +42,14 @@ public class TweakedAlloyRecipe extends Alloy {
                             break;
                         }
                     }
-                    if (matches)
-                        break;
+                    if (matches) break;
                 }
-                if (!matches)
-                    return false;
+                if (!matches) return false;
             }
         }
         boolean empty = true;
         for (Object o : check2) {
-            if (o != null)
-                empty = false;
+            if (o != null) empty = false;
         }
         return empty;
     }

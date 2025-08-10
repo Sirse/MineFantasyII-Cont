@@ -1,5 +1,16 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
@@ -9,15 +20,6 @@ import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class RecipeHandlerBloom extends TemplateRecipeHandler {
 
@@ -84,6 +86,7 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
     }
 
     private static class FuelPair {
+
         private PositionedStack stack;
 
         private FuelPair(ItemStack fuel) {
@@ -92,6 +95,7 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
     }
 
     private class SmeltingPair extends CachedRecipe {
+
         private PositionedStack ingred;
         private PositionedStack result;
 

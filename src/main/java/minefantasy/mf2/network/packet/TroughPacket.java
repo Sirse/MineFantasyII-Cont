@@ -1,23 +1,24 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class TroughPacket extends PacketMF {
+
     public static final String packetName = "MF2_TroughPacket";
     private int[] coords = new int[3];
     private int fill;
 
     public TroughPacket(TileEntityTrough tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         fill = tile.fill;
     }
 
-    public TroughPacket() {
-    }
+    public TroughPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

@@ -1,12 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.entity.EntityCogwork;
-import minefantasy.mf2.entity.mob.EntityDragon;
-import minefantasy.mf2.entity.mob.EntityHound;
-import minefantasy.mf2.entity.mob.EntityMinotaur;
-import minefantasy.mf2.item.ItemComponentMF;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -23,10 +18,17 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.entity.mob.EntityDragon;
+import minefantasy.mf2.entity.mob.EntityHound;
+import minefantasy.mf2.entity.mob.EntityMinotaur;
+import minefantasy.mf2.item.ItemComponentMF;
 
 public class MobSpawnerMF extends ItemComponentMF {
-    public String[] types = new String[]{"dragon", "minotaur", "hound", "cogwork"};
+
+    public String[] types = new String[] { "dragon", "minotaur", "hound", "cogwork" };
     public IIcon[] icons;
 
     public MobSpawnerMF() {
@@ -38,8 +40,9 @@ public class MobSpawnerMF extends ItemComponentMF {
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack item, EntityPlayer user, List list, boolean extra) {
-        list.add(StatCollector
-                .translateToLocal("item.spawn_" + types[Math.min(types.length - 1, item.getItemDamage())] + ".desc"));
+        list.add(
+                StatCollector.translateToLocal(
+                        "item.spawn_" + types[Math.min(types.length - 1, item.getItemDamage())] + ".desc"));
     }
 
     @Override
@@ -58,7 +61,7 @@ public class MobSpawnerMF extends ItemComponentMF {
 
     @Override
     public boolean onItemUse(ItemStack item, EntityPlayer user, World world, int blockX, int blockY, int blockZ,
-                             int face, float ox, float oy, float oz) {
+            int face, float ox, float oy, float oz) {
         if (world.isRemote) {
             return true;
         } else {
@@ -91,8 +94,8 @@ public class MobSpawnerMF extends ItemComponentMF {
     private Entity spawnCreature(World world, int itemDamage, double x, double y, double z) {
         EntityLivingBase entityliving = getLiving(world, itemDamage);
 
-        entityliving.setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F),
-                0.0F);
+        entityliving
+                .setLocationAndAngles(x, y, z, MathHelper.wrapAngleTo180_float(world.rand.nextFloat() * 360.0F), 0.0F);
         entityliving.rotationYawHead = entityliving.rotationYaw;
         entityliving.renderYawOffset = entityliving.rotationYaw;
         if (entityliving instanceof EntityLiving) {

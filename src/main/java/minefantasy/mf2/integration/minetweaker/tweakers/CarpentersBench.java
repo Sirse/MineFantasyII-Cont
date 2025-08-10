@@ -19,16 +19,36 @@ public class CarpentersBench {
 
     @ZenMethod
     public static void addShapedRecipe(@NotNull IItemStack output, String skill, String research, String sound,
-                                       double exp, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds) {
-        MineTweakerAPI.apply(new CarpentersAction(output, RPGElements.getSkillByName(skill), research, sound,
-                (float) exp, tool, hammer, anvil, time, ingreds));
+            double exp, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds) {
+        MineTweakerAPI.apply(
+                new CarpentersAction(
+                        output,
+                        RPGElements.getSkillByName(skill),
+                        research,
+                        sound,
+                        (float) exp,
+                        tool,
+                        hammer,
+                        anvil,
+                        time,
+                        ingreds));
     }
 
     @ZenMethod
     public static void addShapelessRecipe(@NotNull IItemStack output, String skill, String research, String sound,
-                                          double exp, String tool, int hammer, int anvil, int time, IIngredient[] ingreds) {
-        MineTweakerAPI.apply(new CarpentersAction(output, RPGElements.getSkillByName(skill), research, sound,
-                (float) exp, tool, hammer, anvil, time, ingreds));
+            double exp, String tool, int hammer, int anvil, int time, IIngredient[] ingreds) {
+        MineTweakerAPI.apply(
+                new CarpentersAction(
+                        output,
+                        RPGElements.getSkillByName(skill),
+                        research,
+                        sound,
+                        (float) exp,
+                        tool,
+                        hammer,
+                        anvil,
+                        time,
+                        ingreds));
     }
 
     public static class CarpentersAction implements IUndoableAction {
@@ -47,7 +67,7 @@ public class CarpentersBench {
         // {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','recipe','s','t','u','v','w','x','y','z'};
 
         public CarpentersAction(IItemStack out, Skill s, String research, String sound, float exp, String tool,
-                                int hammer, int anvil, int time, IIngredient[][] ingreds) {
+                int hammer, int anvil, int time, IIngredient[][] ingreds) {
             this.out = out;
             this.s = s;
             this.research = research;
@@ -63,7 +83,7 @@ public class CarpentersBench {
         }
 
         public CarpentersAction(IItemStack out, Skill s, String research, String sound, float exp, String tool,
-                                int hammer, int anvil, int time, IIngredient[] ingreds) {
+                int hammer, int anvil, int time, IIngredient[] ingreds) {
             this.out = out;
             this.s = s;
             this.research = research;

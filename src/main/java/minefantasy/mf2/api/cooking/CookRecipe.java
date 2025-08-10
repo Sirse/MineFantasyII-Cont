@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.cooking;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
+import java.util.HashMap;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
 
 public class CookRecipe {
+
     public static final HashMap<String, CookRecipe> recipeList = new HashMap<String, CookRecipe>();
     public static Item burnt_food = null;
     public static boolean canCookBasics = true;
@@ -28,7 +30,7 @@ public class CookRecipe {
     }
 
     public static CookRecipe addRecipe(ItemStack in, ItemStack out, int min, int max, int time, boolean bake,
-                                       boolean canBurn) {
+            boolean canBurn) {
         return addRecipe(in, out, new ItemStack(burnt_food), min, max, time, bake, canBurn);
     }
 
@@ -42,7 +44,7 @@ public class CookRecipe {
      * @param bake   whether it needs to be enclosed in an oven
      */
     public static CookRecipe addRecipe(ItemStack in, ItemStack out, ItemStack burnt, int min, int max, int time,
-                                       boolean bake, boolean canBurn) {
+            boolean bake, boolean canBurn) {
         return addRecipe(in, out, burnt, min, max, time, time / 2, bake, canBurn);
     }
 
@@ -56,7 +58,7 @@ public class CookRecipe {
      * @param bake   whether it needs to be enclosed in an oven
      */
     public static CookRecipe addRecipe(ItemStack in, ItemStack out, ItemStack burnt, int min, int max, int time,
-                                       int burntime, boolean bake, boolean canBurn) {
+            int burntime, boolean bake, boolean canBurn) {
         CookRecipe recipe = new CookRecipe(out, burnt, min, max, time, bake, canBurn);
         recipeList.put(CustomToolHelper.getReferenceName(in), recipe);
 
@@ -67,8 +69,7 @@ public class CookRecipe {
     }
 
     public static CookRecipe getResult(ItemStack item, boolean oven) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         CookRecipe result = recipeList.get(CustomToolHelper.getReferenceName(item));
         if (result != null && result.isBaking == oven) {

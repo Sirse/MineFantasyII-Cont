@@ -1,14 +1,15 @@
 package minefantasy.mf2.api.helpers;
 
-import minefantasy.mf2.api.crafting.CustomCrafterEntry;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.api.tool.IToolMF;
-import minefantasy.mf2.api.weapon.ISharpenable;
+import java.util.ArrayList;
+
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import java.util.ArrayList;
+import minefantasy.mf2.api.crafting.CustomCrafterEntry;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.tool.IToolMF;
+import minefantasy.mf2.api.weapon.ISharpenable;
 
 public class ToolHelper {
     // CRAFTER TOOLS//
@@ -57,8 +58,7 @@ public class ToolHelper {
     }
 
     /**
-     * Compares an itemstack to see if the item is made from the said material ONLY
-     * APPLIES TO IToolMaterial in api.
+     * Compares an itemstack to see if the item is made from the said material ONLY APPLIES TO IToolMaterial in api.
      */
     public static boolean isItemMaterial(ItemStack stack, ToolMaterial material) {
         if (stack != null) {
@@ -73,8 +73,7 @@ public class ToolHelper {
     }
 
     public static ItemStack setQuality(ItemStack item, float qualityLvl) {
-        if (item.getMaxStackSize() > 0)
-            return item;
+        if (item.getMaxStackSize() > 0) return item;
 
         NBTTagCompound nbt = getOrCreateNBT(item);
         nbt.setFloat("MFCraftQuality", qualityLvl);
@@ -221,8 +220,7 @@ public class ToolHelper {
     }
 
     public static boolean canBeSharpened(ItemStack itemstack, float level) {
-        if (itemstack == null)
-            return false;
+        if (itemstack == null) return false;
         return false;
     }
 
@@ -249,7 +247,7 @@ public class ToolHelper {
 
     // maxSharpness, maxBuff, sharpnessModifier
     public static float[] getSharpnessTraits(ItemStack item) {
-        float[] list = new float[]{100, 20F, 3F};
+        float[] list = new float[] { 100, 20F, 3F };
 
         if (item != null && item.getItem() instanceof ISharpenable) {
             ISharpenable instance = (ISharpenable) item.getItem();

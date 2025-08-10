@@ -1,12 +1,14 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityBombBench;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityBombBench;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class BombBenchPacket extends PacketMF {
+
     public static final String packetName = "MF2_BombBenchPkt";
     private int[] coords = new int[3];
     private float progress;
@@ -14,14 +16,13 @@ public class BombBenchPacket extends PacketMF {
     private boolean hasRecipe;
 
     public BombBenchPacket(TileEntityBombBench tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         progress = tile.progress;
         maxProgress = tile.maxProgress;
         hasRecipe = tile.hasRecipe;
     }
 
-    public BombBenchPacket() {
-    }
+    public BombBenchPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

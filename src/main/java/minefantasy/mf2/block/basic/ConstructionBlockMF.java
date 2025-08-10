@@ -1,7 +1,7 @@
 package minefantasy.mf2.block.basic;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
 import net.minecraft.block.material.Material;
@@ -12,16 +12,17 @@ import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
 
 public class ConstructionBlockMF extends Block {
 
-    public static final String[] m_names = new String[]{"", "_cobblestone", "_brick", "_pavement"};
+    public static final String[] m_names = new String[] { "", "_cobblestone", "_brick", "_pavement" };
     public IIcon[] m_icons = new IIcon[4];
     public Block[] stairblocks = new Block[4];
 
     public ConstructionBlockMF(String unlocName) {
-        this(unlocName, new String[]{"", "_cobblestone", "_brick", "_pavement"});
+        this(unlocName, new String[] { "", "_cobblestone", "_brick", "_pavement" });
     }
 
     public ConstructionBlockMF(String unlocName, String... types) {
@@ -36,8 +37,10 @@ public class ConstructionBlockMF extends Block {
         this.setCreativeTab(CreativeTabs.tabBlock);
         GameRegistry.registerBlock(this, ItemConstBlock.class, unlocName);
         for (int i = 0; i < m_names.length; i++) {
-            GameRegistry.registerBlock(stairblocks[i] = new StairsConstBlock(unlocName + m_names[i] + "_stair", this, i)
-                    .setHardness(1.5F).setResistance(10F), unlocName + m_names[i] + "_stair");
+            GameRegistry.registerBlock(
+                    stairblocks[i] = new StairsConstBlock(unlocName + m_names[i] + "_stair", this, i).setHardness(1.5F)
+                            .setResistance(10F),
+                    unlocName + m_names[i] + "_stair");
         }
 
         setHardness(1.5F);
@@ -53,8 +56,7 @@ public class ConstructionBlockMF extends Block {
     @Override
     public Block setHardness(float level) {
         if (stairblocks != null) {
-            for (Block stairblock : stairblocks)
-                stairblock.setHardness(level);
+            for (Block stairblock : stairblocks) stairblock.setHardness(level);
         }
         return super.setHardness(level);
     }
@@ -62,8 +64,7 @@ public class ConstructionBlockMF extends Block {
     @Override
     public Block setResistance(float level) {
         if (stairblocks != null) {
-            for (Block stairblock : stairblocks)
-                stairblock.setResistance(level);
+            for (Block stairblock : stairblocks) stairblock.setResistance(level);
         }
         return super.setResistance(level);
     }
@@ -73,20 +74,20 @@ public class ConstructionBlockMF extends Block {
     public void addConstructRecipes() {
         GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(this, 1, 0), 0);
 
-        GameRegistry.addRecipe(new ItemStack(this, 4, 3), new Object[]{"XX", "XX", 'X', new ItemStack(this, 1, 1)});
-        GameRegistry.addRecipe(new ItemStack(this, 4, 2),
-                new Object[]{"X X", "   ", "X X", 'X', new ItemStack(this, 1, 1)});
-        GameRegistry.addRecipe(new ItemStack(this, 1, 1), new Object[]{"X", 'X', new ItemStack(this, 1, 2)});
-        GameRegistry.addRecipe(new ItemStack(this, 1, 1), new Object[]{"X", 'X', new ItemStack(this, 1, 3)});
-        for (int i = 0; i < 4; i++)
-            GameRegistry.addRecipe(new ItemStack(stairblocks[i], 4),
-                    new Object[]{"  X", " XX", "XXX", 'X', new ItemStack(this, 1, i)});
+        GameRegistry.addRecipe(new ItemStack(this, 4, 3), new Object[] { "XX", "XX", 'X', new ItemStack(this, 1, 1) });
+        GameRegistry.addRecipe(
+                new ItemStack(this, 4, 2),
+                new Object[] { "X X", "   ", "X X", 'X', new ItemStack(this, 1, 1) });
+        GameRegistry.addRecipe(new ItemStack(this, 1, 1), new Object[] { "X", 'X', new ItemStack(this, 1, 2) });
+        GameRegistry.addRecipe(new ItemStack(this, 1, 1), new Object[] { "X", 'X', new ItemStack(this, 1, 3) });
+        for (int i = 0; i < 4; i++) GameRegistry.addRecipe(
+                new ItemStack(stairblocks[i], 4),
+                new Object[] { "  X", " XX", "XXX", 'X', new ItemStack(this, 1, i) });
     }
 
     @Override
     public int damageDropped(int meta) {
-        if (meta == 0)
-            return 1;
+        if (meta == 0) return 1;
 
         return meta;
     }
@@ -135,6 +136,7 @@ public class ConstructionBlockMF extends Block {
     }
 
     public static class StairsConstBlock extends BlockStairs {
+
         private final Block base;
 
         public StairsConstBlock(String unlocalizedName, Block baseBlock, int metaOfBaseBlock) {
@@ -150,7 +152,7 @@ public class ConstructionBlockMF extends Block {
         }
 
         public void addRecipe() {
-            GameRegistry.addRecipe(new ItemStack(this, 4), new Object[]{"B  ", "BB ", "BBB", 'B', this.base});
+            GameRegistry.addRecipe(new ItemStack(this, 4), new Object[] { "B  ", "BB ", "BBB", 'B', this.base });
         }
 
         public Block register(String name) {

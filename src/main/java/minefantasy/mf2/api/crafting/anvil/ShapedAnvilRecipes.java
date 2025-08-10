@@ -1,17 +1,19 @@
 package minefantasy.mf2.api.crafting.anvil;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.rpg.Skill;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * @author AnonymousProductions
  */
 public class ShapedAnvilRecipes implements IAnvilRecipe {
+
     public final int recipeHammer;
     public final boolean outputHot;
     /**
@@ -40,7 +42,7 @@ public class ShapedAnvilRecipes implements IAnvilRecipe {
     public ItemStack recipeOutput;
 
     public ShapedAnvilRecipes(int wdth, int heit, ItemStack[] inputs, ItemStack output, String toolType, int time,
-                              int hammer, int anvi, boolean hot, String research, Skill skill) {
+            int hammer, int anvi, boolean hot, String research, Skill skill) {
         this.outputHot = hot;
         this.recipeWidth = wdth;
         this.anvil = anvi;
@@ -55,8 +57,7 @@ public class ShapedAnvilRecipes implements IAnvilRecipe {
     }
 
     private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -148,8 +149,7 @@ public class ShapedAnvilRecipes implements IAnvilRecipe {
     }
 
     protected ItemStack getHotItem(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
         if (!(item.getItem() instanceof IHotItem)) {
             return item;
         }

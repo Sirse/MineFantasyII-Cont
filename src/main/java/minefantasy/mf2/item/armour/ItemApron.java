@@ -1,10 +1,12 @@
 package minefantasy.mf2.item.armour;
 
-import minefantasy.mf2.material.BaseMaterialMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.material.BaseMaterialMF;
+
 public class ItemApron extends ItemClothingMF {
+
     public ItemApron(String name, BaseMaterialMF material, String tex, int rarity) {
         super(name, material, 1, tex, rarity);
     }

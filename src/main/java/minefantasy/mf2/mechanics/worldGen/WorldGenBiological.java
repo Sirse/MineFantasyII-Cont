@@ -1,8 +1,7 @@
 package minefantasy.mf2.mechanics.worldGen;
 
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.config.ConfigWorldGen;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.MathHelper;
@@ -10,45 +9,83 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeGenBase;
 
-import java.util.Random;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.config.ConfigWorldGen;
 
 public class WorldGenBiological {
+
     public static void generate(Random seed, int chunkX, int chunkZ, World world, int dimension) {
         boolean debug = world.getWorldInfo().getTerrainType() == WorldType.FLAT && MineFantasyII.isDebug();
 
         BiomeGenBase biome = world.getBiomeGenForCoords(chunkX * 16, chunkZ * 16);
-        if (debug || isBiomeInConstraint(biome, ConfigWorldGen.berryMinTemp, ConfigWorldGen.berryMaxTemp,
-                ConfigWorldGen.berryMinRain, ConfigWorldGen.berryMaxRain)) {
+        if (debug || isBiomeInConstraint(
+                biome,
+                ConfigWorldGen.berryMinTemp,
+                ConfigWorldGen.berryMaxTemp,
+                ConfigWorldGen.berryMinRain,
+                ConfigWorldGen.berryMaxRain)) {
             generatePlant(seed, chunkX, chunkZ, world, BlockListMF.berryBush, 0, ConfigWorldGen.berryRarity, 6);
         }
-        if (debug || isBiomeInConstraint(biome, ConfigWorldGen.yewMinTemp, ConfigWorldGen.yewMaxTemp,
-                ConfigWorldGen.yewMinRain, ConfigWorldGen.yewMaxRain)) {
-            generateTree(seed, chunkX, chunkZ, world, BlockListMF.log_yew, BlockListMF.leaves_yew,
+        if (debug || isBiomeInConstraint(
+                biome,
+                ConfigWorldGen.yewMinTemp,
+                ConfigWorldGen.yewMaxTemp,
+                ConfigWorldGen.yewMinRain,
+                ConfigWorldGen.yewMaxRain)) {
+            generateTree(
+                    seed,
+                    chunkX,
+                    chunkZ,
+                    world,
+                    BlockListMF.log_yew,
+                    BlockListMF.leaves_yew,
                     ConfigWorldGen.yewRarity);
         }
-        if (debug || isBiomeInConstraint(biome, ConfigWorldGen.ironbarkMinTemp, ConfigWorldGen.ironbarkMaxTemp,
-                ConfigWorldGen.ironbarkMinRain, ConfigWorldGen.ironbarkMaxRain)) {
-            generateTree(seed, chunkX, chunkZ, world, BlockListMF.log_ironbark, BlockListMF.leaves_ironbark,
+        if (debug || isBiomeInConstraint(
+                biome,
+                ConfigWorldGen.ironbarkMinTemp,
+                ConfigWorldGen.ironbarkMaxTemp,
+                ConfigWorldGen.ironbarkMinRain,
+                ConfigWorldGen.ironbarkMaxRain)) {
+            generateTree(
+                    seed,
+                    chunkX,
+                    chunkZ,
+                    world,
+                    BlockListMF.log_ironbark,
+                    BlockListMF.leaves_ironbark,
                     ConfigWorldGen.ironbarkRarity);
         }
-        if (debug || isBiomeInConstraint(biome, ConfigWorldGen.ebonyMinTemp, ConfigWorldGen.ebonyMaxTemp,
-                ConfigWorldGen.ebonyMinRain, ConfigWorldGen.ebonyMaxRain)) {
-            generateTree(seed, chunkX, chunkZ, world, BlockListMF.log_ebony, BlockListMF.leaves_ebony,
+        if (debug || isBiomeInConstraint(
+                biome,
+                ConfigWorldGen.ebonyMinTemp,
+                ConfigWorldGen.ebonyMaxTemp,
+                ConfigWorldGen.ebonyMinRain,
+                ConfigWorldGen.ebonyMaxRain)) {
+            generateTree(
+                    seed,
+                    chunkX,
+                    chunkZ,
+                    world,
+                    BlockListMF.log_ebony,
+                    BlockListMF.leaves_ebony,
                     ConfigWorldGen.ebonyRarity);
         }
     }
 
     public static boolean isBiomeInConstraint(BiomeGenBase biome, float tempMin, float tempMax, float rainMin,
-                                              float rainMax) {
+            float rainMax) {
         if (biome != null) {
-            return biome.temperature >= tempMin && biome.temperature < tempMax && biome.rainfall >= rainMin
+            return biome.temperature >= tempMin && biome.temperature < tempMax
+                    && biome.rainfall >= rainMin
                     && biome.rainfall < rainMax;
         }
         return false;
     }
 
     private static void generatePlant(Random seed, int chunkX, int chunkZ, World world, Block plant, int meta,
-                                      float chance, int count) {
+            float chance, int count) {
         boolean doGen = world.getWorldInfo().getTerrainType() != WorldType.FLAT;
         if (doGen && seed.nextFloat() < chance) {
             for (int a = 0; a < count; a++) {
@@ -61,7 +98,7 @@ public class WorldGenBiological {
     }
 
     private static void generateTree(Random seed, int chunkX, int chunkZ, World world, Block log, Block leaves,
-                                     float chance) {
+            float chance) {
         boolean doGen = world.getWorldInfo().getTerrainType() != WorldType.FLAT
                 || (doGen = MineFantasyII.isDebug() && world.getWorldInfo().getTerrainType() == WorldType.FLAT);
         if (doGen && seed.nextFloat() < chance) {
@@ -73,8 +110,8 @@ public class WorldGenBiological {
     }
 
     private static void generateOreWithNeighbour(Random seed, int chunkX, int chunkZ, World world, Block ore, Block bed,
-                                                 Material neighbour, int size, int frequencyMin, int frequencyMax, float rarity, int layerMin,
-                                                 int layerMax) {
+            Material neighbour, int size, int frequencyMin, int frequencyMax, float rarity, int layerMin,
+            int layerMax) {
         int frequency = MathHelper.getRandomIntegerInRange(seed, frequencyMin, frequencyMax);
         if (seed.nextFloat() < rarity) {
             for (int count = 0; count < frequency; count++) {
@@ -83,15 +120,14 @@ public class WorldGenBiological {
                 int z = chunkZ * 16 + seed.nextInt(16);
 
                 if (isNeibourNear(world, x, y, z, neighbour)) {
-                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {
-                    }
+                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {}
                 }
             }
         }
     }
 
     private static void generateOreWithNeighbour(Random seed, int chunkX, int chunkZ, World world, Block ore, Block bed,
-                                                 Block neighbour, int size, int frequencyMin, int frequencyMax, float rarity, int layerMin, int layerMax) {
+            Block neighbour, int size, int frequencyMin, int frequencyMax, float rarity, int layerMin, int layerMax) {
         int frequency = MathHelper.getRandomIntegerInRange(seed, frequencyMin, frequencyMax);
         if (seed.nextFloat() < rarity) {
             for (int count = 0; count < frequency; count++) {
@@ -100,8 +136,7 @@ public class WorldGenBiological {
                 int z = chunkZ * 16 + seed.nextInt(16);
 
                 if (isNeibourNear(world, x, y, z, neighbour)) {
-                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {
-                    }
+                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {}
                 }
             }
         }
@@ -109,8 +144,10 @@ public class WorldGenBiological {
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Block neighbour) {
         return world.getBlock(x - 1, y, z) == neighbour || world.getBlock(+1, y, z) == neighbour
-                || world.getBlock(x, y - 1, z) == neighbour || world.getBlock(x, y + 1, z) == neighbour
-                || world.getBlock(x, y, z - 1) == neighbour || world.getBlock(x, y, z + 1) == neighbour;
+                || world.getBlock(x, y - 1, z) == neighbour
+                || world.getBlock(x, y + 1, z) == neighbour
+                || world.getBlock(x, y, z - 1) == neighbour
+                || world.getBlock(x, y, z + 1) == neighbour;
     }
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Material neighbour) {

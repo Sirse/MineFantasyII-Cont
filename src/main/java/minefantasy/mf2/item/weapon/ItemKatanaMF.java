@@ -1,25 +1,26 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.weapon.WeaponClass;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.weapon.WeaponClass;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemKatanaMF extends ItemHeavyWeaponMF {
+
     private Random rand = new Random();
 
     /**
-     * Katanas are heavy counterparts to Tantos, unlike most heavy weapons: these
-     * act more like light-weapons
+     * Katanas are heavy counterparts to Tantos, unlike most heavy weapons: these act more like light-weapons
      */
     public ItemKatanaMF(String name, ToolMaterial material, int rarity, float weight) {
         super(material, name, rarity, weight);
@@ -97,7 +98,8 @@ public class ItemKatanaMF extends ItemHeavyWeaponMF {
 
     @Override
     public void onProperHit(EntityLivingBase user, ItemStack weapon, Entity hit, float dam) {
-        if (user.motionY < 0 && !user.onGround && (!(user instanceof EntityPlayer) || user.isSneaking())
+        if (user.motionY < 0 && !user.onGround
+                && (!(user instanceof EntityPlayer) || user.isSneaking())
                 && tryPerformAbility(user, cleave_cost)) {
             hurtInRange(user, 4D);
             if (hit instanceof EntityLivingBase) {

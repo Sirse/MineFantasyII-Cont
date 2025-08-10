@@ -1,13 +1,15 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 
 public class RackCommand extends PacketMF {
+
     public static final String packetName = "MF2_Command_Rack";
     private EntityPlayer user;
     private TileEntityRack rack;
@@ -19,8 +21,7 @@ public class RackCommand extends PacketMF {
         this.user = user;
     }
 
-    public RackCommand() {
-    }
+    public RackCommand() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
@@ -38,7 +39,7 @@ public class RackCommand extends PacketMF {
             return;
         }
 
-        if (!NetworkUtils.isWithinDistanceSq(player, new int[]{x, y, z}, 64)) {
+        if (!NetworkUtils.isWithinDistanceSq(player, new int[] { x, y, z }, 64)) {
             return;
         }
         rack = (TileEntityRack) tile;

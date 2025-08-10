@@ -6,6 +6,7 @@ import java.util.Comparator;
  * @author AnonymousProductions
  */
 class RecipeSorterAnvil implements Comparator {
+
     final CraftingManagerAnvil craftingManager;
 
     RecipeSorterAnvil(CraftingManagerAnvil manager) {
@@ -15,8 +16,8 @@ class RecipeSorterAnvil implements Comparator {
     public int compareRecipes(IAnvilRecipe recipe1, IAnvilRecipe recipe2) {
         return recipe1 instanceof ShapelessAnvilRecipes && recipe2 instanceof ShapedAnvilRecipes ? 1
                 : (recipe2 instanceof ShapelessAnvilRecipes && recipe1 instanceof ShapedAnvilRecipes ? -1
-                : (recipe2.getRecipeSize() < recipe1.getRecipeSize() ? -1
-                : (recipe2.getRecipeSize() > recipe1.getRecipeSize() ? 1 : 0)));
+                        : (recipe2.getRecipeSize() < recipe1.getRecipeSize() ? -1
+                                : (recipe2.getRecipeSize() > recipe1.getRecipeSize() ? 1 : 0)));
     }
 
     @Override

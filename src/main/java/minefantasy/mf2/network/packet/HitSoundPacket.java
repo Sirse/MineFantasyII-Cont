@@ -1,13 +1,15 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.config.ConfigClient;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class HitSoundPacket extends PacketMF {
+
     public static final String packetName = "MF2_Hitsound";
     private String sound;
     private int entId;
@@ -17,8 +19,7 @@ public class HitSoundPacket extends PacketMF {
         this.entId = hit.getEntityId();
     }
 
-    public HitSoundPacket() {
-    }
+    public HitSoundPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

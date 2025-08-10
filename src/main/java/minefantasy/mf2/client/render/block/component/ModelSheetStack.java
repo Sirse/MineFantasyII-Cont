@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelSheetStack extends ModelBase {
+
     private ModelRenderer[] sheet = new ModelRenderer[16];
 
     public ModelSheetStack() {

@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 
 public interface IArrowMF {
+
     /**
      * Gets the damage modifier (1.0 = Flint arrow)
      */
@@ -15,8 +16,7 @@ public interface IArrowMF {
     public abstract float getGravityModifier(ItemStack arrow);
 
     /**
-     * Gets the chance the arrow will break on impace (0.0 = no chance, 1.0 = 100%
-     * chance)
+     * Gets the chance the arrow will break on impace (0.0 = no chance, 1.0 = 100% chance)
      */
     public abstract float getBreakChance(Entity entityArrow, ItemStack arrow);
 

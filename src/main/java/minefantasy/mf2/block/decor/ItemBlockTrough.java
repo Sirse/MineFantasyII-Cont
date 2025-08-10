@@ -1,12 +1,10 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tool.IStorageBlock;
-import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -19,12 +17,16 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tool.IStorageBlock;
+import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 
 public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
+
     private Random rand = new Random();
 
     public ItemBlockTrough(Block base) {
@@ -42,8 +44,10 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
         }
         CustomMaterial material = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
         if (material != null) {
-            list.add(StatCollector.translateToLocalFormatted("attribute.fill.capacity.name",
-                    TileEntityTrough.getCapacity(material.tier) * TileEntityTrough.capacityScale));
+            list.add(
+                    StatCollector.translateToLocalFormatted(
+                            "attribute.fill.capacity.name",
+                            TileEntityTrough.getCapacity(material.tier) * TileEntityTrough.capacityScale));
         }
     }
 
@@ -73,7 +77,7 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
 
     @Override
     public boolean onItemUse(ItemStack item, EntityPlayer player, World world, int x, int y, int z, int side, float f,
-                             float f1, float f2) {
+            float f1, float f2) {
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
 
         if (movingobjectposition == null) {
@@ -94,7 +98,10 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
 
                 if (isWaterSource(world, i, j, k)) {
                     gather(player);
-                    world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F,
+                    world.playSoundAtEntity(
+                            player,
+                            "random.splash",
+                            0.125F + rand.nextFloat() / 4F,
                             0.5F + rand.nextFloat());
                     return false;
                 }

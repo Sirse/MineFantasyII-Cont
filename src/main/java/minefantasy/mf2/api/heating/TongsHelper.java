@@ -10,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class TongsHelper {
+
     /**
      * Determines if an item is held
      */

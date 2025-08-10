@@ -1,5 +1,12 @@
 package minefantasy.mf2.entity.list;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
+
 import cpw.mods.fml.common.registry.EntityRegistry;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.config.ConfigMobs;
@@ -8,14 +15,9 @@ import minefantasy.mf2.entity.mob.DragonBreath;
 import minefantasy.mf2.entity.mob.EntityDragon;
 import minefantasy.mf2.entity.mob.EntityHound;
 import minefantasy.mf2.entity.mob.EntityMinotaur;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
 
 public class MobListMF {
+
     public static void register() {
         DragonBreath.init();
         addEntity(10, EntityDragon.class, "MF_Dragon");
@@ -28,7 +30,12 @@ public class MobListMF {
             addSpawn(EntityMinotaur.class, ConfigMobs.minotaurSpawnrate, 1, 1, EnumCreatureType.monster);
         }
         if (ConfigMobs.minotaurSpawnrateNether > 0) {
-            addSpawn(EntityMinotaur.class, ConfigMobs.minotaurSpawnrateNether, 1, 1, EnumCreatureType.monster,
+            addSpawn(
+                    EntityMinotaur.class,
+                    ConfigMobs.minotaurSpawnrateNether,
+                    1,
+                    1,
+                    EnumCreatureType.monster,
                     Type.NETHER);
         }
     }
@@ -38,7 +45,7 @@ public class MobListMF {
     }
 
     public static void addSpawn(Class<? extends EntityLiving> entityClass, int weightedProb, int min, int max,
-                                EnumCreatureType typeOfCreature) {
+            EnumCreatureType typeOfCreature) {
         for (BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
             if (biome != null) {
                 if (BiomeDictionary.isBiomeRegistered(biome)) {
@@ -59,7 +66,7 @@ public class MobListMF {
     }
 
     public static void addSpawn(Class<? extends EntityLiving> entityClass, int weightedProb, int min, int max,
-                                EnumCreatureType typeOfCreature, BiomeDictionary.Type type) {
+            EnumCreatureType typeOfCreature, BiomeDictionary.Type type) {
         for (BiomeGenBase biome : BiomeGenBase.getBiomeGenArray()) {
             if (biome != null) {
                 if (BiomeDictionary.isBiomeRegistered(biome)) {

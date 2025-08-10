@@ -1,8 +1,7 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.weapon.IDamageType;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -14,9 +13,12 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.weapon.IDamageType;
 
 public class EntityShrapnel extends Entity implements IDamageType {
+
     public EntityLivingBase shootingEntity;
     public double accelerationX;
     public double accelerationY;
@@ -63,13 +65,11 @@ public class EntityShrapnel extends Entity implements IDamageType {
     }
 
     @Override
-    protected void entityInit() {
-    }
+    protected void entityInit() {}
 
     /**
-     * Checks if the entity is in range to render by using the past in distance and
-     * comparing it to its average edge length * 64 * renderDistanceWeight Args:
-     * distance
+     * Checks if the entity is in range to render by using the past in distance and comparing it to its average edge
+     * length * 64 * renderDistanceWeight Args: distance
      */
     @Override
     @SideOnly(Side.CLIENT)
@@ -101,25 +101,27 @@ public class EntityShrapnel extends Entity implements IDamageType {
                 return;
             } else {
                 ++this.ticksInAir;
-                if (ticksInAir >= 10)
-                    setDead();
+                if (ticksInAir >= 10) setDead();
             }
 
             Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            Vec3 vec31 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
             MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31);
             vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-            vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY,
-                    this.posZ + this.motionZ);
+            vec31 = Vec3
+                    .createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
             if (movingobjectposition != null) {
-                vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord,
+                vec31 = Vec3.createVectorHelper(
+                        movingobjectposition.hitVec.xCoord,
+                        movingobjectposition.hitVec.yCoord,
                         movingobjectposition.hitVec.zCoord);
             }
 
             Entity entity = null;
-            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this,
+            List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(
+                    this,
                     this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
             double d0 = 0.0D;
 
@@ -181,8 +183,14 @@ public class EntityShrapnel extends Entity implements IDamageType {
             if (this.isInWater()) {
                 for (int j = 0; j < 4; ++j) {
                     float f3 = 0.25F;
-                    this.worldObj.spawnParticle("bubble", this.posX - this.motionX * f3, this.posY - this.motionY * f3,
-                            this.posZ - this.motionZ * f3, this.motionX, this.motionY, this.motionZ);
+                    this.worldObj.spawnParticle(
+                            "bubble",
+                            this.posX - this.motionX * f3,
+                            this.posY - this.motionY * f3,
+                            this.posZ - this.motionZ * f3,
+                            this.motionX,
+                            this.motionY,
+                            this.motionZ);
                 }
 
                 f2 = 0.8F;
@@ -200,8 +208,7 @@ public class EntityShrapnel extends Entity implements IDamageType {
     }
 
     /**
-     * Return the motion factor for this projectile. The factor is multiplied by the
-     * original motion.
+     * Return the motion factor for this projectile. The factor is multiplied by the original motion.
      */
     protected float getMotionFactor() {
         return 0.95F;
@@ -226,8 +233,8 @@ public class EntityShrapnel extends Entity implements IDamageType {
         p_70014_1_.setShort("zTile", (short) this.field_145794_g);
         p_70014_1_.setByte("inTile", (byte) Block.getIdFromBlock(this.field_145796_h));
         p_70014_1_.setByte("inGround", (byte) (this.inGround ? 1 : 0));
-        p_70014_1_.setTag("direction",
-                this.newDoubleNBTList(new double[]{this.motionX, this.motionY, this.motionZ}));
+        p_70014_1_
+                .setTag("direction", this.newDoubleNBTList(new double[] { this.motionX, this.motionY, this.motionZ }));
     }
 
     /**
@@ -252,8 +259,7 @@ public class EntityShrapnel extends Entity implements IDamageType {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     @Override
     public boolean canBeCollidedWith() {
@@ -292,7 +298,7 @@ public class EntityShrapnel extends Entity implements IDamageType {
 
     @Override
     public float[] getDamageRatio(Object... implement) {
-        return isBurning() ? new float[]{0, 1, 0} : new float[]{0, 1, 1};// 50/50 blunt and piercing, fire bombs
+        return isBurning() ? new float[] { 0, 1, 0 } : new float[] { 0, 1, 1 };// 50/50 blunt and piercing, fire bombs
         // are full blunt
     }
 

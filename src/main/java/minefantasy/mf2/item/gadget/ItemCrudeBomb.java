@@ -1,10 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.crafting.ISpecialSalvage;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.ToolListMF;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
@@ -13,9 +10,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.ISpecialSalvage;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 public class ItemCrudeBomb extends ItemBomb implements ISpecialSalvage {
+
     private IIcon basicIcon;
 
     public ItemCrudeBomb(String name) {
@@ -80,7 +82,7 @@ public class ItemCrudeBomb extends ItemBomb implements ISpecialSalvage {
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{Items.paper, ComponentListMF.thread, ComponentListMF.blackpowder};
+        return new Object[] { Items.paper, ComponentListMF.thread, ComponentListMF.blackpowder };
     }
 
     @Override

@@ -1,16 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.crafting.IBasicMetre;
-import minefantasy.mf2.api.crafting.engineer.IBombComponent;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.api.rpg.SkillList;
-import minefantasy.mf2.item.gadget.ItemBomb;
-import minefantasy.mf2.item.gadget.ItemExplodingArrow;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.knowledge.KnowledgeListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BombBenchPacket;
+import java.util.Random;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -24,9 +15,20 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldServer;
 
-import java.util.Random;
+import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.crafting.engineer.IBombComponent;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.rpg.SkillList;
+import minefantasy.mf2.item.gadget.ItemBomb;
+import minefantasy.mf2.item.gadget.ItemExplodingArrow;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.knowledge.KnowledgeListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.BombBenchPacket;
 
 public class TileEntityBombBench extends TileEntity implements IInventory, ISidedInventory, IBasicMetre {
+
     public float progress;
     public float maxProgress = 25F;
     public boolean hasRecipe;
@@ -63,7 +65,8 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
 
     public boolean tryCraft(EntityPlayer user, boolean pressUsed) {
         boolean sticky = !pressUsed && ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.stickybomb)
-                && user.getHeldItem() != null && user.getHeldItem().getItem() == Items.slime_ball;
+                && user.getHeldItem() != null
+                && user.getHeldItem().getItem() == Items.slime_ball;
         if (!worldObj.isRemote && sticky && applySlime()) {
             user.inventory.consumeInventoryItem(Items.slime_ball);
             return true;
@@ -75,7 +78,12 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
             progress = 0F;
         } else if ((pressUsed || ToolHelper.getCrafterTool(user.getHeldItem()).equalsIgnoreCase("spanner"))) {
             if (!pressUsed && user.getHeldItem() != null) {
-                worldObj.playSoundEffect(xCoord + 0.5, yCoord, zCoord + 0.5, "minefantasy2:block.twistbolt", 0.25F,
+                worldObj.playSoundEffect(
+                        xCoord + 0.5,
+                        yCoord,
+                        zCoord + 0.5,
+                        "minefantasy2:block.twistbolt",
+                        0.25F,
                         1.0F);
                 user.getHeldItem().damageItem(1, user);
                 if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
@@ -119,7 +127,11 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
                                 }
                             }
                             if (cont != null && !worldObj.isRemote) {
-                                EntityItem ei = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5,
+                                EntityItem ei = new EntityItem(
+                                        worldObj,
+                                        xCoord + 0.5,
+                                        yCoord + 0.5,
+                                        zCoord + 0.5,
                                         cont);
                                 worldObj.spawnEntityInWorld(ei);
                             }
@@ -161,19 +173,19 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new BombBenchPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new BombBenchPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-					new BombBenchPacket(this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new BombBenchPacket(this).generatePacket()); }
+         */
     }
 
     private boolean areItemsEqual(ItemStack bomb1, ItemStack bomb2) {
@@ -192,8 +204,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
         return bomb1.isItemEqual(bomb2);
     }
 
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     private ItemStack findResult() {
         boolean isArrow = isMatch(0, "arrow") || isMatch(0, "bolt");
@@ -220,8 +231,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
             } else {
                 return null;
             }
-        } else
-            return null;
+        } else return null;
         if (com2 != null) {
             if (com2.equalsIgnoreCase("filling")) {
                 filling = getComponentTier(inv[2]);
@@ -237,8 +247,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
                     return null;
                 }
             }
-        } else
-            return null;
+        } else return null;
 
         if (design != null && isArrow && powder > -1) {
             return ItemExplodingArrow.createBombArrow(design, powder, filling);
@@ -336,16 +345,15 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
-        if (this.isMatch(item, "bolt") || this.isMatch(item, "arrow") || this.isMatch(item, "bombcase")
+        if (this.isMatch(item, "bolt") || this.isMatch(item, "arrow")
+                || this.isMatch(item, "bombcase")
                 || this.isMatch(item, "minecase")) {
             return slot == 0;
         }
@@ -404,7 +412,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[]{0, 1, 2, 3, 4};
+        return new int[] { 0, 1, 2, 3, 4 };
     }
 
     @Override

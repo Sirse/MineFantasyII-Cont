@@ -1,5 +1,11 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -7,15 +13,10 @@ import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import minetweaker.mc1710.item.MCItemStack;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @ZenClass("mods.minefantasy.BlastFurnace")
 public class BlastFurnace {
@@ -46,6 +47,7 @@ public class BlastFurnace {
     }
 
     private static class AddRecipeAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
 
@@ -71,7 +73,8 @@ public class BlastFurnace {
         @Override
         public void undo() {
             for (IIngredient ingredient : input.getItems()) {
-                BlastFurnaceRecipes.smelting().removeRecipe(MineTweakerMC.getItemStack(ingredient), MineTweakerMC.getItemStack(output));
+                BlastFurnaceRecipes.smelting()
+                        .removeRecipe(MineTweakerMC.getItemStack(ingredient), MineTweakerMC.getItemStack(output));
             }
         }
 
@@ -92,6 +95,7 @@ public class BlastFurnace {
     }
 
     private static class RemoveAction implements IUndoableAction {
+
         private final List<ItemStack> items;
         private final List<ItemStack> values;
 

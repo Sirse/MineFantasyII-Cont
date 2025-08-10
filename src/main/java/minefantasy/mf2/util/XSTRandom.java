@@ -1,59 +1,48 @@
 package minefantasy.mf2.util;
+
 /**
- * A subclass of java.util.random that implements the Xorshift random number
- * generator
+ * A subclass of java.util.random that implements the Xorshift random number generator
  * <p>
- * - it is 30% faster than the generator from Java's library - it produces
- * random sequences of higher quality than java.util.Random - this class also
- * provides a clone() function
+ * - it is 30% faster than the generator from Java's library - it produces random sequences of higher quality than
+ * java.util.Random - this class also provides a clone() function
  * <p>
- * Usage: XSRandom rand = new XSRandom(); //Instantiation x = rand.nextInt();
- * //pull a random number
+ * Usage: XSRandom rand = new XSRandom(); //Instantiation x = rand.nextInt(); //pull a random number
  * <p>
- * To use the class in legacy code, you may also instantiate an XSRandom object
- * and assign it to a java.util.Random object: java.util.Random rand = new
- * XSRandom();
+ * To use the class in legacy code, you may also instantiate an XSRandom object and assign it to a java.util.Random
+ * object: java.util.Random rand = new XSRandom();
  * <p>
- * for an explanation of the algorithm, see
- * http://demesos.blogspot.com/2011/09/pseudo-random-number-generators.html
+ * for an explanation of the algorithm, see http://demesos.blogspot.com/2011/09/pseudo-random-number-generators.html
  *
- * @author Wilfried Elmenreich University of Klagenfurt/Lakeside Labs
- * http://www.elmenreich.tk
- * <p>
- * This code is released under the GNU Lesser General Public License Version 3
- * http://www.gnu.org/licenses/lgpl-3.0.txt
+ * @author Wilfried Elmenreich University of Klagenfurt/Lakeside Labs http://www.elmenreich.tk
+ *         <p>
+ *         This code is released under the GNU Lesser General Public License Version 3
+ *         http://www.gnu.org/licenses/lgpl-3.0.txt
  */
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * XSTR - Xorshift ThermiteRandom
- * Modified by Bogdan-G
- * 03.06.2016
- * version 0.0.4
+ * XSTR - Xorshift ThermiteRandom Modified by Bogdan-G 03.06.2016 version 0.0.4
  */
 
 public class XSTRandom extends Random {
 
     private static final long serialVersionUID = 6208727693524452904L;
-    private static final double DOUBLE_UNIT = 0x1.0p-53;  // 1.0  / (1L << 53)
+    private static final double DOUBLE_UNIT = 0x1.0p-53; // 1.0 / (1L << 53)
     private static final float FLOAT_UNIT = 0x1.0p-24f; // 1.0f / (1 << 24)
-    private static final AtomicLong seedUniquifier
-            = new AtomicLong(8682522807148012L);
+    private static final AtomicLong seedUniquifier = new AtomicLong(8682522807148012L);
     boolean haveNextNextGaussian = false;
 
     /*
-     MODIFIED BY: Robotia
-     Modification: Implemented Random class seed generator
+     * MODIFIED BY: Robotia Modification: Implemented Random class seed generator
      */
     double nextNextGaussian = 0;
     private long seed;
     private long last;
 
     /**
-     * Creates a new pseudo random number generator. The seed is initialized to
-     * the current time, as if by
+     * Creates a new pseudo random number generator. The seed is initialized to the current time, as if by
      * <code>setSeed(System.currentTimeMillis());</code>.
      */
     public XSTRandom() {
@@ -61,8 +50,8 @@ public class XSTRandom extends Random {
     }
 
     /**
-     * Creates a new pseudo random number generator, starting with the specified
-     * seed, using <code>setSeed(seed);</code>.
+     * Creates a new pseudo random number generator, starting with the specified seed, using
+     * <code>setSeed(seed);</code>.
      *
      * @param seed the initial seed
      */
@@ -73,7 +62,7 @@ public class XSTRandom extends Random {
     private static long seedUniquifier() {
         // L'Ecuyer, "Tables of Linear Congruential Generators of
         // Different Sizes and Good Lattice Structure", 1999
-        for (; ; ) {
+        for (;;) {
             long current = seedUniquifier.get();
             long next = current * 181783497276652981L;
             if (seedUniquifier.compareAndSet(current, next)) {
@@ -100,9 +89,8 @@ public class XSTRandom extends Random {
     }
 
     /**
-     * Sets the seed for this pseudo random number generator. As described
-     * above, two instances of the same random class, starting with the same
-     * seed, produce the same results, if the same methods are called.
+     * Sets the seed for this pseudo random number generator. As described above, two instances of the same random
+     * class, starting with the same seed, produce the same results, if the same methods are called.
      *
      * @param seed the new seed
      */
@@ -119,9 +107,8 @@ public class XSTRandom extends Random {
     }
 
     /**
-     * Implementation of George Marsaglia's elegant Xorshift random generator
-     * 30% faster and better quality than the built-in java.util.random see also
-     * see http://www.javamex.com/tutorials/random_numbers/xorshift.shtml
+     * Implementation of George Marsaglia's elegant Xorshift random generator 30% faster and better quality than the
+     * built-in java.util.random see also see http://www.javamex.com/tutorials/random_numbers/xorshift.shtml
      *
      * @param nbits
      * @return
@@ -156,57 +143,49 @@ public class XSTRandom extends Random {
     }
 
     /**
-     * Returns a pseudorandom, uniformly distributed {@code int} value between 0
-     * (inclusive) and the specified value (exclusive), drawn from this random
-     * number generator's sequence. The general contract of {@code nextInt} is
-     * that one {@code int} value in the specified range is pseudorandomly
-     * generated and returned. All {@code bound} possible {@code int} values are
-     * produced with (approximately) equal probability. The method
-     * {@code nextInt(int bound)} is implemented by class {@code Random} as if
-     * by:
+     * Returns a pseudorandom, uniformly distributed {@code int} value between 0 (inclusive) and the specified value
+     * (exclusive), drawn from this random number generator's sequence. The general contract of {@code nextInt} is that
+     * one {@code int} value in the specified range is pseudorandomly generated and returned. All {@code bound} possible
+     * {@code int} values are produced with (approximately) equal probability. The method {@code nextInt(int bound)} is
+     * implemented by class {@code Random} as if by:
+     *
      * <pre> {@code
+     *
      * public int nextInt(int bound) {
-     *   if (bound <= 0)
-     *     throw new IllegalArgumentException("bound must be positive");
+     *     if (bound <= 0) throw new IllegalArgumentException("bound must be positive");
      *
-     *   if ((bound & -bound) == bound)  // i.e., bound is a power of 2
-     *     return (int)((bound * (long)next(31)) >> 31);
+     *     if ((bound & -bound) == bound) // i.e., bound is a power of 2
+     *         return (int) ((bound * (long) next(31)) >> 31);
      *
-     *   int bits, val;
-     *   do {
-     *       bits = next(31);
-     *       val = bits % bound;
-     *   } while (bits - val + (bound-1) < 0);
-     *   return val;
-     * }}</pre>
+     *     int bits, val;
+     *     do {
+     *         bits = next(31);
+     *         val = bits % bound;
+     *     } while (bits - val + (bound - 1) < 0);
+     *     return val;
+     * }
+     * }</pre>
      * <p>
-     * <p>The hedge "approx
-     * imately" is used in the foregoing description only because the next
-     * method is only approximately an unbiased source of independently chosen
-     * bits. If it were a perfect source of randomly chosen bits, then the
-     * algorithm shown would choose {@code int} values from the stated range
-     * with perfect uniformity.
      * <p>
-     * The algorithm is slightly tricky. It rejects values that would result in
-     * an uneven distribution (due to the fact that 2^31 is not divisible by n).
-     * The probability of a value being rejected depends on n. The worst case is
-     * n=2^30+1, for which the probability of a reject is 1/2, and the expected
-     * number of iterations before the loop terminates is 2.
+     * The hedge "approx imately" is used in the foregoing description only because the next method is only
+     * approximately an unbiased source of independently chosen bits. If it were a perfect source of randomly chosen
+     * bits, then the algorithm shown would choose {@code int} values from the stated range with perfect uniformity.
      * <p>
-     * The algorithm treats the case where n is a power of two specially: it
-     * returns the correct number of high-order bits from the underlying
-     * pseudo-random number generator. In the absence of special treatment, the
-     * correct number of <i>low-order</i> bits would be returned. Linear
-     * congruential pseudo-random number generators such as the one implemented
-     * by this class are known to have short periods in the sequence of values
-     * of their low-order bits. Thus, this special case greatly increases the
-     * length of the sequence of values returned by successive calls to this
-     * method if n is a small power of two.
+     * The algorithm is slightly tricky. It rejects values that would result in an uneven distribution (due to the fact
+     * that 2^31 is not divisible by n). The probability of a value being rejected depends on n. The worst case is
+     * n=2^30+1, for which the probability of a reject is 1/2, and the expected number of iterations before the loop
+     * terminates is 2.
+     * <p>
+     * The algorithm treats the case where n is a power of two specially: it returns the correct number of high-order
+     * bits from the underlying pseudo-random number generator. In the absence of special treatment, the correct number
+     * of <i>low-order</i> bits would be returned. Linear congruential pseudo-random number generators such as the one
+     * implemented by this class are known to have short periods in the sequence of values of their low-order bits.
+     * Thus, this special case greatly increases the length of the sequence of values returned by successive calls to
+     * this method if n is a small power of two.
      *
      * @param bound the upper bound (exclusive). Must be positive.
-     * @return the next pseudorandom, uniformly distributed {@code int} value
-     * between zero (inclusive) and {@code bound} (exclusive) from this random
-     * number generator's sequence
+     * @return the next pseudorandom, uniformly distributed {@code int} value between zero (inclusive) and {@code bound}
+     *         (exclusive) from this random number generator's sequence
      * @throws IllegalArgumentException if bound is not positive
      * @since 1.2
      */
@@ -233,10 +212,9 @@ public class XSTRandom extends Random {
     }
 
     public void nextBytes(byte[] bytes_arr) {
-        for (int iba = 0, lenba = bytes_arr.length; iba < lenba; )
-            for (int rndba = nextInt(),
-                 nba = Math.min(lenba - iba, Integer.SIZE / Byte.SIZE);
-                 nba-- > 0; rndba >>= Byte.SIZE)
+        for (int iba = 0, lenba = bytes_arr.length; iba < lenba;)
+            for (int rndba = nextInt(), nba = Math.min(lenba - iba, Integer.SIZE / Byte.SIZE); nba--
+                    > 0; rndba >>= Byte.SIZE)
                 bytes_arr[iba++] = (byte) rndba;
     }
 }

@@ -1,12 +1,14 @@
 package minefantasy.mf2.block.basic;
 
-import minefantasy.mf2.item.list.ToolListMF;
 import net.minecraft.block.Block;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.item.list.ToolListMF;
+
 public class ItemOreblockMF extends ItemBlock {
+
     private BlockOreMF ore;
 
     public ItemOreblockMF(Block block) {

@@ -14,15 +14,15 @@ import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
 public abstract class EntityMobMF extends EntityCreature implements IMob {
+
     public EntityMobMF(World world) {
         super(world);
         this.experienceValue = 5;
     }
 
     /**
-     * Called frequently so the entity can update its state every tick as required.
-     * For example, zombies and skeletons use this to react to sunlight and start to
-     * burn.
+     * Called frequently so the entity can update its state every tick as required. For example, zombies and skeletons
+     * use this to react to sunlight and start to burn.
      */
     @Override
     public void onLivingUpdate() {
@@ -60,8 +60,8 @@ public abstract class EntityMobMF extends EntityCreature implements IMob {
     }
 
     /**
-     * Finds the closest player within 16 blocks to attack, or null if this Entity
-     * isn't interested in attacking (Animals, Spiders at day, peaceful PigZombies).
+     * Finds the closest player within 16 blocks to attack, or null if this Entity isn't interested in attacking
+     * (Animals, Spiders at day, peaceful PigZombies).
      */
     @Override
     protected Entity findPlayerToAttack() {
@@ -132,7 +132,9 @@ public abstract class EntityMobMF extends EntityCreature implements IMob {
 
         if (flag) {
             if (i > 0) {
-                target.addVelocity(-MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F, 0.1D,
+                target.addVelocity(
+                        -MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F,
+                        0.1D,
                         MathHelper.cos(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F);
                 this.motionX *= 0.6D;
                 this.motionZ *= 0.6D;
@@ -155,12 +157,12 @@ public abstract class EntityMobMF extends EntityCreature implements IMob {
     }
 
     /**
-     * Basic mob attack. Default to touch of death in EntityCreature. Overridden by
-     * each mob to define their attack.
+     * Basic mob attack. Default to touch of death in EntityCreature. Overridden by each mob to define their attack.
      */
     @Override
     protected void attackEntity(Entity target, float dam) {
-        if (this.attackTime <= 0 && dam < 2.0F && target.boundingBox.maxY > this.boundingBox.minY
+        if (this.attackTime <= 0 && dam < 2.0F
+                && target.boundingBox.maxY > this.boundingBox.minY
                 && target.boundingBox.minY < this.boundingBox.maxY) {
             this.attackTime = 20;
             this.attackEntityAsMob(target);
@@ -168,8 +170,8 @@ public abstract class EntityMobMF extends EntityCreature implements IMob {
     }
 
     /**
-     * Takes a coordinate in and returns a weight to determine how likely this
-     * creature will try to path to the block. Args: x, y, z
+     * Takes a coordinate in and returns a weight to determine how likely this creature will try to path to the block.
+     * Args: x, y, z
      */
     @Override
     public float getBlockPathWeight(int x, int y, int z) {
@@ -201,8 +203,7 @@ public abstract class EntityMobMF extends EntityCreature implements IMob {
     }
 
     /**
-     * Checks if the entity's current position is a valid location to spawn this
-     * entity.
+     * Checks if the entity's current position is a valid location to spawn this entity.
      */
     @Override
     public boolean getCanSpawnHere() {

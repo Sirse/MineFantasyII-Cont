@@ -1,17 +1,19 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.entity.EntityDragonBreath;
+import java.util.ArrayList;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.entity.EntityDragonBreath;
 
 public abstract class DragonBreath {
+
     public static ArrayList<DragonBreath> projectiles = new ArrayList<DragonBreath>();
 
     public static int nextID = 0;
@@ -52,7 +54,8 @@ public abstract class DragonBreath {
     public abstract String getTexture(EntityDragonBreath instance);
 
     public void onHitEntity(Entity entityHit, EntityDragonBreath instance) {
-        entityHit.attackEntityFrom(getDamageSource(instance, instance.shootingEntity),
+        entityHit.attackEntityFrom(
+                getDamageSource(instance, instance.shootingEntity),
                 modifyDamage(entityHit, instance.getDamage()));
     }
 
@@ -60,6 +63,5 @@ public abstract class DragonBreath {
         return dam;
     }
 
-    public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {
-    }
+    public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {}
 }

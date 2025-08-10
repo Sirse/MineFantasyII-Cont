@@ -1,16 +1,5 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.armour.ArmourDesign;
-import minefantasy.mf2.api.armour.IPowerArmour;
-import minefantasy.mf2.api.helpers.*;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.config.ConfigArmour;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.ClientProxyMF;
-import minefantasy.mf2.network.packet.CogworkControlPacket;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -31,7 +20,20 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ForgeHooks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.armour.ArmourDesign;
+import minefantasy.mf2.api.armour.IPowerArmour;
+import minefantasy.mf2.api.helpers.*;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.config.ConfigArmour;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.network.ClientProxyMF;
+import minefantasy.mf2.network.packet.CogworkControlPacket;
+
 public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
+
     public static final float base_armour_units = 30F;
     private static final float general_step_height = 1.0F;
     private static final float base_frame_weight = 100F;
@@ -41,7 +43,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     public static float rating_modifier = 1.0F;
     public static float health_modifier = 1.0F;
     private int noMoveTime = 0;
-    private ItemStack[] items = new ItemStack[]{};
+    private ItemStack[] items = new ItemStack[] {};
     private float forwardControl, strafeControl;
     private boolean jumpControl;
     private int jumpTimer = 0;
@@ -114,8 +116,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    public void setCurrentItemOrArmor(int p_70062_1_, ItemStack p_70062_2_) {
-    }
+    public void setCurrentItemOrArmor(int p_70062_1_, ItemStack p_70062_2_) {}
 
     @Override
     public ItemStack[] getLastActiveItems() {
@@ -139,8 +140,8 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         setFuel(fuel);
 
         /*
-         * if(isSprinting()) { if(riddenByEntity == null || this.getMoveForward() <= 0
-         * || !isPowered()) { setSprinting(false); } }
+         * if(isSprinting()) { if(riddenByEntity == null || this.getMoveForward() <= 0 || !isPowered()) {
+         * setSprinting(false); } }
          */
         if (this.riddenByEntity != null) {
             stepHeight = general_step_height;
@@ -181,9 +182,12 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                 if (block.getMaterial() != Material.air) {
                     this.worldObj.spawnParticle(
                             "blockcrack_" + Block.getIdFromBlock(block) + "_" + this.worldObj.getBlockMetadata(i, j, k),
-                            this.posX + (this.rand.nextFloat() - 0.5D) * this.width, this.boundingBox.minY + 0.1D,
+                            this.posX + (this.rand.nextFloat() - 0.5D) * this.width,
+                            this.boundingBox.minY + 0.1D,
                             this.posZ + (this.rand.nextFloat() - 0.5D) * this.width,
-                            4.0D * (this.rand.nextFloat() - 0.5D), 0.5D, (this.rand.nextFloat() - 0.5D) * 4.0D);
+                            4.0D * (this.rand.nextFloat() - 0.5D),
+                            0.5D,
+                            (this.rand.nextFloat() - 0.5D) * 4.0D);
                 }
                 if (!worldObj.isRemote && ConfigArmour.cogworkGrief) {
                     damageBlock(block, i, j, k, worldObj.getBlockMetadata(i, j, k));
@@ -231,18 +235,18 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         }
         if (block.getMaterial() == Material.glass) {
             worldObj.setBlockToAir(x, y, z);
-            this.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F,
-                    0.9F + (rand.nextFloat() * 0.2F));
+            this.worldObj
+                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
         if (block == Blocks.ice) {
             worldObj.setBlock(x, y, z, Blocks.water, 0, 2);
-            this.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F,
-                    0.9F + (rand.nextFloat() * 0.2F));
+            this.worldObj
+                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
         if (block.getMaterial() == Material.leaves) {
             worldObj.setBlock(x, y, z, Blocks.water, 0, 2);
-            this.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F,
-                    0.9F + (rand.nextFloat() * 0.2F));
+            this.worldObj
+                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
     }
 
@@ -250,27 +254,25 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         if (block.getBlockHardness(worldObj, x, y, z) == 0
                 && (block.getMaterial() == Material.vine || block.getMaterial() == Material.plants)) {
             worldObj.setBlockToAir(x, y, z);
-            this.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F,
-                    0.9F + (rand.nextFloat() * 0.2F));
+            this.worldObj
+                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
         if (block == Blocks.snow_layer) {
             worldObj.setBlockToAir(x, y, z);
-            this.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.cloth", 1.0F,
-                    0.9F + (rand.nextFloat() * 0.2F));
+            this.worldObj
+                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.cloth", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
     }
 
     @Override
-    public void knockBack(Entity hitter, float f, double d, double d1) {
-    }
+    public void knockBack(Entity hitter, float f, double d, double d1) {}
 
     public CustomMaterial getPlating() {
         return CustomMaterial.getMaterial(getCustomMaterial());
     }
 
     public void updateRider() {
-        if (!isPowered())
-            return;
+        if (!isPowered()) return;
 
         if (worldObj.isRemote && riddenByEntity != null && riddenByEntity instanceof EntityPlayer) {
             float forward = ((EntityPlayer) riddenByEntity).moveForward;
@@ -350,8 +352,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     public void setJumpControl(boolean b) {
-        this.jumpControl = b;
-        ;
+        this.jumpControl = b;;
     }
 
     protected void applyEntityAttributes() {
@@ -468,8 +469,8 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                     }
                     float damagePercent = 1F - (getHealth() / getMaxHealth());
                     if (!worldObj.isRemote) {
-                        ItemStack armour = ComponentListMF.cogwork_armour.createComm(getPlating().name, 1,
-                                damagePercent);
+                        ItemStack armour = ComponentListMF.cogwork_armour
+                                .createComm(getPlating().name, 1, damagePercent);
                         if (!user.capabilities.isCreativeMode && !user.inventory.addItemStackToInventory(armour)) {
                             this.entityDropItem(armour, 0.0F);
                         }
@@ -583,8 +584,10 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
             d0 = this.posY;
             this.motionY -= 0.03D;
 
-            if (this.isCollidedHorizontally && this.isOffsetPositionInLiquid(this.motionX,
-                    this.motionY + 0.6000000238418579D - this.posY + d0, this.motionZ)) {
+            if (this.isCollidedHorizontally && this.isOffsetPositionInLiquid(
+                    this.motionX,
+                    this.motionY + 0.6000000238418579D - this.posY + d0,
+                    this.motionZ)) {
                 this.motionY = 0.30000001192092896D;
             }
         }
@@ -592,7 +595,8 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
             float f2 = 0.91F;
 
             if (this.onGround) {
-                f2 = this.worldObj.getBlock(MathHelper.floor_double(this.posX),
+                f2 = this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
                         MathHelper.floor_double(this.boundingBox.minY) - 1,
                         MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
             }
@@ -616,7 +620,8 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
             f2 = 0.91F;
 
             if (this.onGround) {
-                f2 = this.worldObj.getBlock(MathHelper.floor_double(this.posX),
+                f2 = this.worldObj.getBlock(
+                        MathHelper.floor_double(this.posX),
                         MathHelper.floor_double(this.boundingBox.minY) - 1,
                         MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
             }
@@ -727,12 +732,10 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    protected void updatePotionEffects() {
-    }
+    protected void updatePotionEffects() {}
 
     @Override
-    public void addPotionEffect(PotionEffect effect) {
-    }
+    public void addPotionEffect(PotionEffect effect) {}
 
     @Override
     public boolean isPotionApplicable(PotionEffect effect) {
@@ -741,8 +744,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void performHurtAnimation() {
-    }
+    public void performHurtAnimation() {}
 
     @Override
     public float getAIMoveSpeed() {
@@ -819,8 +821,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    public void setFire(int i) {
-    }
+    public void setFire(int i) {}
 
     @Override
     protected void damageEntity(DamageSource source, float dam) {
@@ -858,7 +859,9 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
             this.setHealth(hp);
 
             if (!source.isFireDamage()) {
-                this.playSound("mob.irongolem.hit", 1.0F,
+                this.playSound(
+                        "mob.irongolem.hit",
+                        1.0F,
                         (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
             }
         }
@@ -869,8 +872,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    public void heal(float amount) {
-    }
+    public void heal(float amount) {}
 
     @SideOnly(Side.CLIENT)
     public int getMetreScaled(int i) {
@@ -901,19 +903,25 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         float force = (float) Math.hypot(motionX, motionZ) * modifier;
         TacticalManager.knockbackEntity(hit, this, force, force / 4F);
         hit.attackEntityFrom(
-                DamageSource.causeMobDamage((riddenByEntity != null && riddenByEntity instanceof EntityLivingBase)
-                        ? (EntityLivingBase) riddenByEntity
-                        : this),
+                DamageSource.causeMobDamage(
+                        (riddenByEntity != null && riddenByEntity instanceof EntityLivingBase)
+                                ? (EntityLivingBase) riddenByEntity
+                                : this),
                 force);
     }
 
     /**
-     * returns a new explosion. Does initiation (at time of writing Explosion is not
-     * finished)
+     * returns a new explosion. Does initiation (at time of writing Explosion is not finished)
      */
     public Shockwave newShockwave(double x, double y, double z, float power, boolean fire, boolean grief) {
-        Shockwave explosion = new Shockwave("humanstomp", worldObj,
-                this.riddenByEntity != null ? this.riddenByEntity : this, x, y, z, power);
+        Shockwave explosion = new Shockwave(
+                "humanstomp",
+                worldObj,
+                this.riddenByEntity != null ? this.riddenByEntity : this,
+                x,
+                y,
+                z,
+                power);
         explosion.isFlaming = fire;
         explosion.isGriefing = grief;
         explosion.isSmoking = grief;

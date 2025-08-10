@@ -1,12 +1,14 @@
 package minefantasy.mf2.client.render.mob;
 
-import minefantasy.mf2.entity.mob.EntityHound;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
+
 import org.lwjgl.opengl.GL11;
+
+import minefantasy.mf2.entity.mob.EntityHound;
 
 public class ModelHound extends ModelBase {
 
@@ -194,9 +196,8 @@ public class ModelHound extends ModelBase {
     }
 
     /**
-     * Used for easily adding entity-dependent animations. The second and third
-     * float params here are the same second and third as in the setRotationAngles
-     * method.
+     * Used for easily adding entity-dependent animations. The second and third float params here are the same second
+     * and third as in the setRotationAngles method.
      */
     @Override
     public void setLivingAnimations(EntityLivingBase living, float step1, float step2, float z) {
@@ -270,8 +271,7 @@ public class ModelHound extends ModelBase {
     public void setRotationAngles(EntityHound wolf, float f1, float f2, float f3, float f4, float f5, float f6) {
         super.setRotationAngles(f1, f2, f3, f4, f5, f6, wolf);
         int neck = wolf.eatAnimation;
-        if (neck < -15)
-            neck = -15;
+        if (neck < -15) neck = -15;
 
         float neckAngle = f5 + (4F * neck);
         float jawAngle = neckAngle + (1.5F * wolf.jawMove);

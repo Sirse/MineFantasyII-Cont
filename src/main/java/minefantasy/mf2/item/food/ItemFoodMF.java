@@ -1,14 +1,8 @@
 package minefantasy.mf2.item.food;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.hunger.HungerSystemMF;
-import minefantasy.mf2.item.ClientItemsMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
+import java.text.DecimalFormat;
+import java.util.List;
+
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
@@ -23,10 +17,18 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.text.DecimalFormat;
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.hunger.HungerSystemMF;
+import minefantasy.mf2.item.ClientItemsMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 public class ItemFoodMF extends ItemFood {
+
     public static final DecimalFormat decimal_format = new DecimalFormat("#.#");
     private static final String eatDelayNBT = "MF_EatenFoodDelay";
     private static final String leftOverNbt = "MF_Food_leftover";
@@ -136,8 +138,7 @@ public class ItemFoodMF extends ItemFood {
     }
 
     /**
-     * Grade Sugar, Carbs and Fats from 0-1 and tier does the rest 0 means
-     * non-existent
+     * Grade Sugar, Carbs and Fats from 0-1 and tier does the rest 0 means non-existent
      *
      * @param sugar restore stamina and add regen
      * @param carbs increase max stamina for 1 hr
@@ -148,8 +149,7 @@ public class ItemFoodMF extends ItemFood {
     }
 
     /**
-     * New system for setting food vales: Values should be based on tier value (t1,
-     * t2, t3,...,tx) 0 means non-existent
+     * New system for setting food vales: Values should be based on tier value (t1, t2, t3,...,tx) 0 means non-existent
      *
      * @param sugar restore stamina and add regen
      * @param carbs increase max stamina for 1 hr
@@ -204,31 +204,48 @@ public class ItemFoodMF extends ItemFood {
             list.add("");
             list.add(EnumChatFormatting.WHITE + StatCollector.translateToLocal("food.stat.list.name"));
             if (mfSaturation > 0) {
-                list.add(StatCollector.translateToLocalFormatted("food.stat.saturation.name",
-                        decimal_format.format(mfSaturation)));
+                list.add(
+                        StatCollector.translateToLocalFormatted(
+                                "food.stat.saturation.name",
+                                decimal_format.format(mfSaturation)));
             }
             if (staminaRestore > 0) {
                 list.add(StatCollector.translateToLocalFormatted("food.stat.staminaPlus.name", (int) staminaRestore));
             }
             if (staminaBuff > 0) {
                 if (staminaInHours) {
-                    list.add(StatCollector.translateToLocalFormatted("food.stat.staminabuffHours.name",
-                            decimal_format.format(staminaBuff), decimal_format.format(staminaSeconds / 3600F)));
+                    list.add(
+                            StatCollector.translateToLocalFormatted(
+                                    "food.stat.staminabuffHours.name",
+                                    decimal_format.format(staminaBuff),
+                                    decimal_format.format(staminaSeconds / 3600F)));
                 } else if (staminaInMinutes) {
-                    list.add(StatCollector.translateToLocalFormatted("food.stat.staminabuffMinutes.name",
-                            decimal_format.format(staminaBuff), decimal_format.format(staminaSeconds / 60F)));
+                    list.add(
+                            StatCollector.translateToLocalFormatted(
+                                    "food.stat.staminabuffMinutes.name",
+                                    decimal_format.format(staminaBuff),
+                                    decimal_format.format(staminaSeconds / 60F)));
                 } else {
-                    list.add(StatCollector.translateToLocalFormatted("food.stat.staminabuffSeconds.name",
-                            decimal_format.format(staminaBuff), decimal_format.format(staminaSeconds)));
+                    list.add(
+                            StatCollector.translateToLocalFormatted(
+                                    "food.stat.staminabuffSeconds.name",
+                                    decimal_format.format(staminaBuff),
+                                    decimal_format.format(staminaSeconds)));
                 }
             }
             if (staminaRegenBuff > 0) {
                 if (staminaRegenInMinutes) {
-                    list.add(StatCollector.translateToLocalFormatted("food.stat.staminabuffRegenMinutes.name",
-                            decimal_format.format(staminaRegenBuff), decimal_format.format(staminaRegenSeconds / 60F)));
+                    list.add(
+                            StatCollector.translateToLocalFormatted(
+                                    "food.stat.staminabuffRegenMinutes.name",
+                                    decimal_format.format(staminaRegenBuff),
+                                    decimal_format.format(staminaRegenSeconds / 60F)));
                 } else {
-                    list.add(StatCollector.translateToLocalFormatted("food.stat.staminabuffRegenSeconds.name",
-                            decimal_format.format(staminaRegenBuff), decimal_format.format(staminaRegenSeconds)));
+                    list.add(
+                            StatCollector.translateToLocalFormatted(
+                                    "food.stat.staminabuffRegenSeconds.name",
+                                    decimal_format.format(staminaRegenBuff),
+                                    decimal_format.format(staminaRegenSeconds)));
                 }
             }
         }

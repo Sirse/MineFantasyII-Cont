@@ -1,11 +1,13 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.crafting.IRecipe;
 
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+
 public class EntryPageCraft extends EntryPage {
+
     private Minecraft mc = Minecraft.getMinecraft();
     private IRecipe[] recipes;
     private int recipeID;
@@ -28,7 +30,7 @@ public class EntryPageCraft extends EntryPage {
     }
 
     private void renderRecipe(GuiScreen parent, int x, int y, float f, int posX, int posY, IRecipe recipe) {
-        if(recipe == null) {
+        if (recipe == null) {
             return;
         }
         // TODO: Render Grid
@@ -43,6 +45,5 @@ public class EntryPageCraft extends EntryPage {
     }
 
     @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-    }
+    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
 }

@@ -1,8 +1,5 @@
 package mods.battlegear2.api;
 
-import cpw.mods.fml.common.eventhandler.Cancelable;
-import mods.battlegear2.api.quiver.IArrowContainer2;
-import mods.battlegear2.api.shield.IShield;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
@@ -13,6 +10,10 @@ import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+
+import cpw.mods.fml.common.eventhandler.Cancelable;
+import mods.battlegear2.api.quiver.IArrowContainer2;
+import mods.battlegear2.api.shield.IShield;
 
 public abstract class PlayerEventChild extends PlayerEvent {
 
@@ -43,10 +44,10 @@ public abstract class PlayerEventChild extends PlayerEvent {
     }
 
     /**
-     * Event fired when a shield successfully blocks an attack (in @link
-     * LivingHurtEvent)
+     * Event fired when a shield successfully blocks an attack (in @link LivingHurtEvent)
      */
     public static class ShieldBlockEvent extends PlayerEventChild {
+
         public final ItemStack shield;
         public final DamageSource source;
         public final float ammount; // use same name as other Forge events
@@ -69,13 +70,13 @@ public abstract class PlayerEventChild extends PlayerEvent {
     }
 
     /**
-     * Called when a player right clicks in battlemode The parent event can be
-     * either {@link PlayerInteractEvent} or {@link EntityInteractEvent} if the
-     * OffhandAttackEvent allowed swinging Both ItemStack can be null If cancelled,
+     * Called when a player right clicks in battlemode The parent event can be either {@link PlayerInteractEvent} or
+     * {@link EntityInteractEvent} if the OffhandAttackEvent allowed swinging Both ItemStack can be null If cancelled,
      * no offhand swinging will be performed
      */
     @Cancelable
     public static class OffhandSwingEvent extends PlayerEventChild {
+
         public final ItemStack mainHand;
         public final ItemStack offHand;
 
@@ -87,9 +88,8 @@ public abstract class PlayerEventChild extends PlayerEvent {
     }
 
     /**
-     * Called when a player right clicks an entity in battlemode Both ItemStack can
-     * be null Cancelling will prevent any further processing and prevails over the
-     * boolean fields
+     * Called when a player right clicks an entity in battlemode Both ItemStack can be null Cancelling will prevent any
+     * further processing and prevails over the boolean fields
      */
     @Cancelable
     public static class OffhandAttackEvent extends PlayerEventChild {
@@ -123,6 +123,7 @@ public abstract class PlayerEventChild extends PlayerEvent {
     }
 
     public static class QuiverArrowEvent extends PlayerEventChild {
+
         /**
          * The event from which this occurred
          */
@@ -155,11 +156,12 @@ public abstract class PlayerEventChild extends PlayerEvent {
         }
 
         /**
-         * Event fired after an arrow has been selected and taken from a
-         * {@link IArrowContainer2}, before it is actually spawned
+         * Event fired after an arrow has been selected and taken from a {@link IArrowContainer2}, before it is actually
+         * spawned
          */
         @Cancelable
         public static class Firing extends QuiverArrowEvent {
+
             /**
              * The quiver from which the arrow was pulled from
              */
@@ -194,12 +196,12 @@ public abstract class PlayerEventChild extends PlayerEvent {
         }
 
         /**
-         * The DEFAULT result for this event is the vanilla charge calculated value Use
-         * setNewCharge to override the value with the one provided Change the event
-         * result to DENY to prevent further processing
+         * The DEFAULT result for this event is the vanilla charge calculated value Use setNewCharge to override the
+         * value with the one provided Change the event result to DENY to prevent further processing
          */
         @HasResult
         public static class ChargeCalculations extends QuiverArrowEvent {
+
             /**
              * Returned value if the result is set to allow
              */

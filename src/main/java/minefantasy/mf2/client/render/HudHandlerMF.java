@@ -1,17 +1,19 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.item.archery.ItemBowMF;
-import minefantasy.mf2.item.gadget.IScope;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.FOVUpdateEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.item.archery.ItemBowMF;
+import minefantasy.mf2.item.gadget.IScope;
+
 @SideOnly(Side.CLIENT)
 public class HudHandlerMF {
+
     private final MineFantasyHUD inGameGUI = new MineFantasyHUD();
 
     @SubscribeEvent

@@ -1,11 +1,7 @@
 package minefantasy.mf2.block.refining;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityChimney;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -15,9 +11,15 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityChimney;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockChimney extends BlockContainer {
+
     public static int pipe_RI = 117;
     public IIcon bottomTex;
     public IIcon sideTex;
@@ -86,34 +88,24 @@ public class BlockChimney extends BlockContainer {
     }
 
     /*
-     *
-     * @SideOnly(Side.CLIENT) public IIcon getIcon(IBlockAccess world, int x, int y,
-     * int z, int side) { TileEntityChimney chimney =
-     * (TileEntityChimney)world.getTileEntity(x, y, z); if(chimney != null &&
-     * chimney.maskBlock != null && chimney.maskBlock != Blocks.air) { return
-     * chimney.maskBlock.getIcon(side, chimney.maskMeta); } return getIcon(side,
-     * world.getBlockMetadata(x, y, z)); }
-     *
-     * @Override public boolean onBlockActivated(World world, int x, int y, int z,
-     * EntityPlayer user, int side, float xOffset, float yOffset, float zOffset) {
-     * int m = world.getBlockMetadata(x, y, z); TileEntityChimney chimney =
-     * getTile(world, x, y, z);
-     *
-     * if(chimney != null) { ItemStack held = user.getHeldItem(); if(!world.isRemote
-     * && held != null && held.getItem() instanceof ItemBlock) { ItemBlock item =
-     * (ItemBlock)held.getItem(); if(item.field_150939_a.isNormalCube()) {
-     * chimney.maskBlock = item.field_150939_a; chimney.maskMeta =
-     * item.getMetadata(held.getItemDamage()); chimney.sync(); world.setBlock(x, y,
-     * z, BlockListMF.chimney_wide, m, 2); return true; } } } return false; }
-     *
-     * @Override public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-     * if(!isWide) { super.getSubBlocks(item, tab, list); } }
+     * @SideOnly(Side.CLIENT) public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
+     * TileEntityChimney chimney = (TileEntityChimney)world.getTileEntity(x, y, z); if(chimney != null &&
+     * chimney.maskBlock != null && chimney.maskBlock != Blocks.air) { return chimney.maskBlock.getIcon(side,
+     * chimney.maskMeta); } return getIcon(side, world.getBlockMetadata(x, y, z)); }
+     * @Override public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float
+     * xOffset, float yOffset, float zOffset) { int m = world.getBlockMetadata(x, y, z); TileEntityChimney chimney =
+     * getTile(world, x, y, z); if(chimney != null) { ItemStack held = user.getHeldItem(); if(!world.isRemote && held !=
+     * null && held.getItem() instanceof ItemBlock) { ItemBlock item = (ItemBlock)held.getItem();
+     * if(item.field_150939_a.isNormalCube()) { chimney.maskBlock = item.field_150939_a; chimney.maskMeta =
+     * item.getMetadata(held.getItemDamage()); chimney.sync(); world.setBlock(x, y, z, BlockListMF.chimney_wide, m, 2);
+     * return true; } } } return false; }
+     * @Override public void getSubBlocks(Item item, CreativeTabs tab, List list) { if(!isWide) {
+     * super.getSubBlocks(item, tab, list); } }
      */
     @Override
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister reg) {
-        if (isPipe)
-            return;
+        if (isPipe) return;
 
         sideTex = reg.registerIcon("minefantasy2:chimney/chimney_" + chimneyType + "_side" + (isWide ? "Wide" : ""));
         bottomTex = reg.registerIcon("minefantasy2:chimney/chimney_" + chimneyType + "_top" + (isWide ? "Wide" : ""));

@@ -1,13 +1,16 @@
 package minefantasy.mf2.client.render.block;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import minefantasy.mf2.block.crafting.BlockBombPress;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
+
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import minefantasy.mf2.block.crafting.BlockBombPress;
+
 public class RenderBombPress implements ISimpleBlockRenderingHandler {
+
     private static final TileEntityBombPressRenderer invModel = new TileEntityBombPressRenderer();
 
     @Override
@@ -20,7 +23,7 @@ public class RenderBombPress implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
-                                    RenderBlocks renderer) {
+            RenderBlocks renderer) {
         return false;
     }
 

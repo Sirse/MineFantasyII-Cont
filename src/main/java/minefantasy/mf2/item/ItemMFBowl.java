@@ -1,7 +1,7 @@
 package minefantasy.mf2.item;
 
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.Random;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,9 +11,11 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
-import java.util.Random;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class ItemMFBowl extends ItemComponentMF {
+
     private Random rand = new Random();
 
     public ItemMFBowl(String name) {
@@ -54,7 +56,11 @@ public class ItemMFBowl extends ItemComponentMF {
         if (!world.isRemote) {
             world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
             item.stackSize--;
-            EntityItem resultItem = new EntityItem(world, player.posX, player.posY, player.posZ,
+            EntityItem resultItem = new EntityItem(
+                    world,
+                    player.posX,
+                    player.posY,
+                    player.posZ,
                     new ItemStack(FoodListMF.bowl_water_salt));
             world.spawnEntityInWorld(resultItem);
         }

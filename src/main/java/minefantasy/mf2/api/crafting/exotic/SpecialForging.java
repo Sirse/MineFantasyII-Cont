@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.crafting.exotic;
 
-import minefantasy.mf2.api.crafting.Salvage;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
+import java.util.HashMap;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.crafting.Salvage;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
 
 public class SpecialForging {
+
     public static HashMap<Item, Item> dragonforgeCrafts = new HashMap<Item, Item>();
     public static HashMap<String, Item> specialCrafts = new HashMap<String, Item>();
 

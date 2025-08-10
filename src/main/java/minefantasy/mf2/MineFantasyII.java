@@ -1,5 +1,12 @@
 package minefantasy.mf2;
 
+import java.io.File;
+
+import net.minecraft.init.Items;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
@@ -33,26 +40,30 @@ import minefantasy.mf2.recipe.BasicRecipesMF;
 import minefantasy.mf2.recipe.RecipeRemover;
 import minefantasy.mf2.util.BukkitUtils;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.init.Items;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-
-import java.io.File;
 
 /**
  * @author Anonymous Productions
  */
-@Mod(modid = MineFantasyII.MODID, name = MineFantasyII.NAME, dependencies = "required-after:Forge@[7.0,);" + "required-after:FML@[5.0.5,);" + "after:NotEnoughItems;" + "after:MineTweaker3;" + "after:BuildCraft|Core;" + "after:CoFHCore;" + "after:battlegear2", version = MineFantasyII.VERSION)
+@Mod(
+        modid = MineFantasyII.MODID,
+        name = MineFantasyII.NAME,
+        dependencies = "required-after:Forge@[7.0,);" + "required-after:FML@[5.0.5,);"
+                + "after:NotEnoughItems;"
+                + "after:MineTweaker3;"
+                + "after:BuildCraft|Core;"
+                + "after:CoFHCore;"
+                + "after:battlegear2",
+        version = MineFantasyII.VERSION)
 public class MineFantasyII {
+
     public static final String MODID = "minefantasy2";
     public static final String NAME = "MineFantasyII";
     public static final String VERSION = "@VERSION@";
     public static final WorldGenMFBase worldGenManager = new WorldGenMFBase();
 
-    @SidedProxy(clientSide = "minefantasy.mf2.network.ClientProxyMF", serverSide = "minefantasy.mf2.network.CommonProxyMF")
+    @SidedProxy(
+            clientSide = "minefantasy.mf2.network.ClientProxyMF",
+            serverSide = "minefantasy.mf2.network.CommonProxyMF")
     public static CommonProxyMF proxy;
     public static PacketHandlerMF packetHandler;
 
@@ -184,8 +195,12 @@ public class MineFantasyII {
     }
 
     private void registerBiomeStuff(BiomeGenBase biome) {
-        if (WorldGenBiological.isBiomeInConstraint(biome, ConfigWorldGen.berryMinTemp, ConfigWorldGen.berryMaxTemp,
-                ConfigWorldGen.berryMinRain, ConfigWorldGen.berryMaxRain)) {
+        if (WorldGenBiological.isBiomeInConstraint(
+                biome,
+                ConfigWorldGen.berryMinTemp,
+                ConfigWorldGen.berryMaxTemp,
+                ConfigWorldGen.berryMinRain,
+                ConfigWorldGen.berryMaxRain)) {
             biome.addFlower(BlockListMF.berryBush, 0, 5);
         }
     }

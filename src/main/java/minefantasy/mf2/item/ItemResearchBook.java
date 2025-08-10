@@ -1,5 +1,13 @@
 package minefantasy.mf2.item;
 
+import java.util.List;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -7,15 +15,9 @@ import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-
-import java.util.List;
 
 public class ItemResearchBook extends Item {
+
     public ItemResearchBook() {
         super();
         setMaxStackSize(1);
@@ -32,8 +34,7 @@ public class ItemResearchBook extends Item {
     }
 
     /**
-     * Called whenever this item is equipped and the right mouse button is pressed.
-     * Args: itemStack, world, entityPlayer
+     * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {

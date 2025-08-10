@@ -1,16 +1,19 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityForge;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityForge;
 
 public class TileEntityForgeRenderer extends TileEntitySpecialRenderer {
+
     private ModelForge model;
     private ModelForgeTop topModel;
     private Random random = new Random();
@@ -29,7 +32,7 @@ public class TileEntityForgeRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderModelAt(TileEntityForge tile, String tex, int meta, double d, double d1, double d2, float f,
-                              boolean inv, boolean hasFuel) {
+            boolean inv, boolean hasFuel) {
         int i = meta;
 
         int j = 90 * i;

@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityResearch;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityResearch;
+
 public class ContainerResearch extends ContainerMF {
+
     private static final int INPUT_SLOT = 0;
     private static final int RESEARCH_SLOT_COUNT = 1;
 

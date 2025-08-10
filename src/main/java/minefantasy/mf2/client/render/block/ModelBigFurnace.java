@@ -5,6 +5,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 public class ModelBigFurnace extends ModelBase {
+
     ModelRenderer Wall4t;
     ModelRenderer Wall1;
     ModelRenderer Wall2;

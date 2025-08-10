@@ -1,11 +1,13 @@
 package minefantasy.mf2.api.knowledge.client;
 
+import net.minecraft.client.gui.GuiScreen;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.gui.GuiScreen;
 
 @SideOnly(Side.CLIENT)
 public abstract class EntryPage {
+
     public static final int universalBookImageWidth = 178;
     public static final int universalBookImageHeight = 227;
 

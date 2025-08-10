@@ -1,12 +1,8 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.ArrayList;
+import java.util.Random;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,10 +14,16 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
+import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class BlockAmmoBox extends BlockWoodDecor {
+
     public static final String NBT_Ammo = "Ammo", NBT_Stock = "Stock";
     public static int ammo_RI = 116;
     /**
@@ -121,7 +123,7 @@ public class BlockAmmoBox extends BlockWoodDecor {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (!world.isRemote) {
             TileEntity tile = world.getTileEntity(x, y, z);
             if (tile instanceof TileEntityAmmoBox) {

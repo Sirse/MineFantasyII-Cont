@@ -1,42 +1,9 @@
 package minefantasy.mf2.mechanics;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.armour.IPowerArmour;
-import minefantasy.mf2.api.armour.ISpecialArmourMF;
-import minefantasy.mf2.api.armour.ItemArmourMFBase;
-import minefantasy.mf2.api.heating.IHotItem;
-import minefantasy.mf2.api.heating.TongsHelper;
-import minefantasy.mf2.api.helpers.*;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.rpg.LevelupEvent;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.SyncSkillEvent;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.tool.IHuntingItem;
-import minefantasy.mf2.api.tool.ISmithTongs;
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.client.render.RenderPowerArmour;
-import minefantasy.mf2.config.ConfigExperiment;
-import minefantasy.mf2.config.ConfigHardcore;
-import minefantasy.mf2.config.ConfigStamina;
-import minefantasy.mf2.entity.EntityCogwork;
-import minefantasy.mf2.entity.EntityItemUnbreakable;
-import minefantasy.mf2.entity.mob.EntityDragon;
-import minefantasy.mf2.farming.FarmingHelper;
-import minefantasy.mf2.integration.CustomStone;
-import minefantasy.mf2.item.ClientItemsMF;
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.item.weapon.ItemWeaponMF;
-import minefantasy.mf2.network.packet.LevelupPacket;
-import minefantasy.mf2.network.packet.SkillPacket;
-import minefantasy.mf2.util.MFLogUtil;
-import minefantasy.mf2.util.XSTRandom;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.client.Minecraft;
@@ -74,9 +41,43 @@ import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.armour.IPowerArmour;
+import minefantasy.mf2.api.armour.ISpecialArmourMF;
+import minefantasy.mf2.api.armour.ItemArmourMFBase;
+import minefantasy.mf2.api.heating.IHotItem;
+import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.helpers.*;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.rpg.LevelupEvent;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.SyncSkillEvent;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.tool.IHuntingItem;
+import minefantasy.mf2.api.tool.ISmithTongs;
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.client.render.RenderPowerArmour;
+import minefantasy.mf2.config.ConfigExperiment;
+import minefantasy.mf2.config.ConfigHardcore;
+import minefantasy.mf2.config.ConfigStamina;
+import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.entity.EntityItemUnbreakable;
+import minefantasy.mf2.entity.mob.EntityDragon;
+import minefantasy.mf2.farming.FarmingHelper;
+import minefantasy.mf2.integration.CustomStone;
+import minefantasy.mf2.item.ClientItemsMF;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.item.weapon.ItemWeaponMF;
+import minefantasy.mf2.network.packet.LevelupPacket;
+import minefantasy.mf2.network.packet.SkillPacket;
+import minefantasy.mf2.util.MFLogUtil;
+import minefantasy.mf2.util.XSTRandom;
 
 public class EventManagerMF {
 
@@ -127,8 +128,11 @@ public class EventManagerMF {
                 String d2 = ItemWeaponMF.decimal_format.format(d);
                 attatch += " (" + (d > 0 ? "+" : "") + d2 + ")";
             }
-            list.add(EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.rating." + id) + " "
-                    + rating + attatch);
+            list.add(
+                    EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.rating." + id)
+                            + " "
+                            + rating
+                            + attatch);
         }
     }
 
@@ -151,7 +155,7 @@ public class EventManagerMF {
     }
 
     public static void addSingleDR(ItemStack armour, EntityPlayer user, int id, List<String> list, boolean extra,
-                                   boolean advanced) {
+            boolean advanced) {
         int slot = ((ItemArmor) armour.getItem()).armorType;
         String attatch = "";
 
@@ -171,11 +175,17 @@ public class EventManagerMF {
                 attatch += " (" + (d > 0 ? "+" : "") + d2 + ")";
             }
             if (advanced) {
-                list.add(EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.rating." + id) + " "
-                        + rating + attatch);
+                list.add(
+                        EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.rating." + id)
+                                + " "
+                                + rating
+                                + attatch);
             } else {
-                list.add(EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.protection") + ": "
-                        + rating + attatch);
+                list.add(
+                        EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.armour.protection")
+                                + ": "
+                                + rating
+                                + attatch);
             }
         }
     }
@@ -277,7 +287,8 @@ public class EventManagerMF {
             EntitySkeleton skeleton = (EntitySkeleton) dropper;
 
             if ((skeleton.getHeldItem() == null || !(skeleton.getHeldItem().getItem() instanceof ItemBow))
-                    && event.drops != null && !event.drops.isEmpty()) {
+                    && event.drops != null
+                    && !event.drops.isEmpty()) {
                 Iterator<EntityItem> list = event.drops.iterator();
 
                 while (list.hasNext()) {
@@ -316,8 +327,8 @@ public class EventManagerMF {
     }
 
     private Item getHideFor(EntityLivingBase mob) {
-        Item[] hide = new Item[]{ComponentListMF.rawhideSmall, ComponentListMF.rawhideMedium,
-                ComponentListMF.rawhideLarge};
+        Item[] hide = new Item[] { ComponentListMF.rawhideSmall, ComponentListMF.rawhideMedium,
+                ComponentListMF.rawhideLarge };
         int size = getHideSizeFor(mob);
         if (mob.isChild()) {
             size--;
@@ -357,8 +368,10 @@ public class EventManagerMF {
     }
 
     private boolean shouldAnimalDropHide(EntityLivingBase mob) {
-        if (mob instanceof EntityWolf || mob instanceof EntityCow || mob instanceof EntityPig
-                || mob instanceof EntitySheep || mob instanceof EntityHorse) {
+        if (mob instanceof EntityWolf || mob instanceof EntityCow
+                || mob instanceof EntityPig
+                || mob instanceof EntitySheep
+                || mob instanceof EntityHorse) {
             return true;
         }
         return false;
@@ -366,12 +379,16 @@ public class EventManagerMF {
 
     @SubscribeEvent
     public void onDeath(LivingDeathEvent event) {
-        if (!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityDragon && event.source != null
-                && event.source.getEntity() != null && event.source.getEntity() instanceof EntityPlayer) {
+        if (!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityDragon
+                && event.source != null
+                && event.source.getEntity() != null
+                && event.source.getEntity() instanceof EntityPlayer) {
             PlayerTickHandlerMF.addDragonKill((EntityPlayer) event.source.getEntity());
         }
-        if (!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer && event.source != null
-                && event.source.getEntity() != null && event.source.getEntity() instanceof EntityDragon) {
+        if (!event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer
+                && event.source != null
+                && event.source.getEntity() != null
+                && event.source.getEntity() instanceof EntityDragon) {
             PlayerTickHandlerMF.addDragonEnemyPts((EntityPlayer) event.entityLiving, -1);
         }
         Entity dropper = event.entity;
@@ -500,8 +517,7 @@ public class EventManagerMF {
     }
 
     private void dropBook(EntityLivingBase dead, int id) {
-        if (dead.worldObj.isRemote)
-            return;
+        if (dead.worldObj.isRemote) return;
         Item book = null;
         if (id == 0) {
             float chance = random.nextFloat();
@@ -555,7 +571,12 @@ public class EventManagerMF {
         Block block = event.world.getBlock(event.x, event.y, event.z);
         if (block != Blocks.farmland && FarmingHelper.didHoeFail(event.current, event.world, block == Blocks.grass)) {
             event.entityPlayer.swingItem();
-            event.world.playAuxSFXAtEntity(event.entityPlayer, 2001, event.x, event.y, event.z,
+            event.world.playAuxSFXAtEntity(
+                    event.entityPlayer,
+                    2001,
+                    event.x,
+                    event.y,
+                    event.z,
                     Block.getIdFromBlock(block) + (event.world.getBlockMetadata(event.x, event.y, event.z) << 12));
             event.setCanceled(true);
         }
@@ -584,16 +605,28 @@ public class EventManagerMF {
 
         if (broken != null && ConfigHardcore.HCCallowRocks) {
             if (held == null && CustomStone.isStone(broken)) {
-                entityDropItem(event.world, event.x, event.y, event.z,
+                entityDropItem(
+                        event.world,
+                        event.x,
+                        event.y,
+                        event.z,
                         new ItemStack(ComponentListMF.sharp_rock, random.nextInt(3) + 1));
             }
             if (held != null && held.getItem() == ComponentListMF.sharp_rock && broken instanceof BlockLeavesBase) {
                 if (random.nextInt(5) == 0) {
-                    entityDropItem(event.world, event.x, event.y, event.z,
+                    entityDropItem(
+                            event.world,
+                            event.x,
+                            event.y,
+                            event.z,
                             new ItemStack(Items.stick, random.nextInt(3) + 1));
                 }
                 if (random.nextInt(3) == 0) {
-                    entityDropItem(event.world, event.x, event.y, event.z,
+                    entityDropItem(
+                            event.world,
+                            event.x,
+                            event.y,
+                            event.z,
                             new ItemStack(ComponentListMF.vine, random.nextInt(3) + 1));
                 }
             }
@@ -642,8 +675,7 @@ public class EventManagerMF {
                         if (!hasInfo && s.startsWith("ingot")) {
                             String s2 = s.substring(5, s.length());
                             CustomMaterial material = CustomMaterial.getMaterial(s2);
-                            if (material != null)
-                                hasInfo = true;
+                            if (material != null) hasInfo = true;
 
                             CustomToolHelper.addComponentString(event.itemStack, event.toolTip, material);
                         }
@@ -653,8 +685,9 @@ public class EventManagerMF {
 
                                 if (!ResearchLogic.hasInfoUnlocked(event.entityPlayer, knowledge)) {
                                     saidArtefact = true;
-                                    event.toolTip.add(EnumChatFormatting.AQUA
-                                            + StatCollector.translateToLocal("info.hasKnowledge"));
+                                    event.toolTip.add(
+                                            EnumChatFormatting.AQUA
+                                                    + StatCollector.translateToLocal("info.hasKnowledge"));
                                 }
                             }
                         } else if (displayOreDict) {
@@ -676,7 +709,10 @@ public class EventManagerMF {
             }
             if (event.itemStack.getItem() instanceof ItemArmor
                     && (!(event.itemStack.getItem() instanceof ItemArmourMFBase) || ClientItemsMF.showSpecials(
-                    event.itemStack, event.entityPlayer, event.toolTip, event.showAdvancedItemTooltips))) {
+                            event.itemStack,
+                            event.entityPlayer,
+                            event.toolTip,
+                            event.showAdvancedItemTooltips))) {
                 addArmourDR(event.itemStack, event.entityPlayer, event.toolTip, event.showAdvancedItemTooltips);
             }
             if (ArmourCalculator.advancedDamageTypes && ArmourCalculator.getRatioForWeapon(event.itemStack) != null) {
@@ -689,17 +725,18 @@ public class EventManagerMF {
                 String name = event.itemStack.getTagCompound().getString("MF_CraftedByName");
                 boolean special = MineFantasyII.isNameModder(name);// Mod creators have highlights
 
-                event.toolTip.add((special ? EnumChatFormatting.GREEN : "")
-                        + StatCollector.translateToLocal("attribute.mfcraftedbyname.name") + ": " + name
-                        + EnumChatFormatting.GRAY);
+                event.toolTip.add(
+                        (special ? EnumChatFormatting.GREEN : "") + StatCollector.translateToLocal(
+                                "attribute.mfcraftedbyname.name") + ": " + name + EnumChatFormatting.GRAY);
             }
             WeaponClass WC = WeaponClass.findClassForAny(event.itemStack);
             if (WC != null && RPGElements.isSystemActive && WC.parentSkill != null) {
                 event.toolTip.add(StatCollector.translateToLocal("weaponclass." + WC.name.toLowerCase()));
                 float skillMod = RPGElements.getWeaponModifier(event.entityPlayer, WC.parentSkill) * 100F;
-                if (skillMod > 100)
-                    event.toolTip.add(StatCollector.translateToLocal("rpg.skillmod")
-                            + ItemWeaponMF.decimal_format.format(skillMod - 100) + "%");
+                if (skillMod > 100) event.toolTip.add(
+                        StatCollector.translateToLocal("rpg.skillmod")
+                                + ItemWeaponMF.decimal_format.format(skillMod - 100)
+                                + "%");
 
             }
         }
@@ -730,8 +767,9 @@ public class EventManagerMF {
         int tier = ToolHelper.getCrafterTier(tool);
         float efficiency = ToolHelper.getCrafterEfficiency(tool);
 
-        list.add(StatCollector.translateToLocal("attribute.mfcrafttool.name") + ": "
-                + StatCollector.translateToLocal("tooltype." + toolType));
+        list.add(
+                StatCollector.translateToLocal("attribute.mfcrafttool.name") + ": "
+                        + StatCollector.translateToLocal("tooltype." + toolType));
         list.add(StatCollector.translateToLocal("attribute.mfcrafttier.name") + ": " + tier);
         list.add(StatCollector.translateToLocal("attribute.mfcrafteff.name") + ": " + efficiency);
     }
@@ -799,10 +837,10 @@ public class EventManagerMF {
     public void levelup(LevelupEvent event) {
         EntityPlayer player = event.thePlayer;
         if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker().func_151248_b(player,
-                    new LevelupPacket(player, event.theSkill, event.theLevel).generatePacket());
-            ((WorldServer) player.worldObj).getEntityTracker().func_151248_b(player,
-                    new SkillPacket(player, event.theSkill).generatePacket());
+            ((WorldServer) player.worldObj).getEntityTracker()
+                    .func_151248_b(player, new LevelupPacket(player, event.theSkill, event.theLevel).generatePacket());
+            ((WorldServer) player.worldObj).getEntityTracker()
+                    .func_151248_b(player, new SkillPacket(player, event.theSkill).generatePacket());
         }
     }
 
@@ -810,8 +848,8 @@ public class EventManagerMF {
     public void syncSkill(SyncSkillEvent event) {
         EntityPlayer player = event.thePlayer;
         if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker().func_151248_b(player,
-                    new SkillPacket(player, event.theSkill).generatePacket());
+            ((WorldServer) player.worldObj).getEntityTracker()
+                    .func_151248_b(player, new SkillPacket(player, event.theSkill).generatePacket());
         }
     }
 
@@ -881,7 +919,8 @@ public class EventManagerMF {
 
             if (event.entity instanceof EntityPlayer && !(event.entity == mc.thePlayer
                     && (mc.currentScreen instanceof GuiContainerCreative || mc.currentScreen instanceof GuiInventory))
-                    && PowerArmour.isWearingCogwork(event.entity) && mc.gameSettings.thirdPersonView != 0) {
+                    && PowerArmour.isWearingCogwork(event.entity)
+                    && mc.gameSettings.thirdPersonView != 0) {
                 IPowerArmour cogwork = (IPowerArmour) event.entity.ridingEntity;
                 renderHead = cogwork.isArmoured("left_leg");
                 renderBody = cogwork.isArmoured("right_leg");
@@ -893,7 +932,7 @@ public class EventManagerMF {
 
             if (event.renderer instanceof RenderPlayer) {
                 RenderPlayer RP = (RenderPlayer) event.renderer;
-                ModelBiped[] layers = new ModelBiped[]{RP.modelArmor, RP.modelArmorChestplate};
+                ModelBiped[] layers = new ModelBiped[] { RP.modelArmor, RP.modelArmorChestplate };
 
                 for (ModelBiped model : layers) {
                     model.bipedHead.isHidden = model.bipedHeadwear.isHidden = model.bipedEars.isHidden = renderHead;

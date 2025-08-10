@@ -1,7 +1,12 @@
 package minefantasy.mf2.container;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -10,12 +15,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public abstract class ContainerMF extends Container {
 
@@ -73,8 +74,8 @@ public abstract class ContainerMF extends Container {
     }
 
     /**
-     * Adds the player's main inventory and hotbar slots to the container.
-     * This method is intended to be called from subclasses.
+     * Adds the player's main inventory and hotbar slots to the container. This method is intended to be called from
+     * subclasses.
      *
      * @param playerInventory The player's inventory.
      * @param xOffset         The horizontal offset for the slots.
@@ -128,8 +129,8 @@ public abstract class ContainerMF extends Container {
     }
 
     /**
-     * Try moving between main (27 slots) and hotbar (9 slots) depending on where the item currently is.
-     * fromIndex is the slot index in this container.
+     * Try moving between main (27 slots) and hotbar (9 slots) depending on where the item currently is. fromIndex is
+     * the slot index in this container.
      */
     protected boolean bounceBetweenMainAndHotbar(ItemStack stack, int mainStart, int fromIndex) {
         int mainEnd = mainStart + 27; // exclusive
@@ -147,8 +148,8 @@ public abstract class ContainerMF extends Container {
     }
 
     /**
-     * Optional hook invoked by containers after a successful transfer.
-     * Default is no-op; override in subclasses that need to notify their tile.
+     * Optional hook invoked by containers after a successful transfer. Default is no-op; override in subclasses that
+     * need to notify their tile.
      */
     protected void onPostTransfer(EntityPlayer player, Slot slot, ItemStack moved) {
         // no-op by default
@@ -160,6 +161,7 @@ public abstract class ContainerMF extends Container {
      * @param <T> The type of the data.
      */
     private static class TrackedData<T> {
+
         private final Supplier<T> getter;
         private final Consumer<T> setter;
         private final Function<T, Integer> toInt;
@@ -207,6 +209,7 @@ public abstract class ContainerMF extends Container {
      * A generic output-only slot: forbids placing any items into it.
      */
     public static class SlotOutput extends Slot {
+
         public SlotOutput(IInventory inventory, int id, int x, int y) {
             super(inventory, id, x, y);
         }
@@ -221,6 +224,7 @@ public abstract class ContainerMF extends Container {
      * A generic slot that defers validity checks to the backing IInventory's isItemValidForSlot.
      */
     public static class SlotFiltered extends Slot {
+
         private final IInventory backing;
 
         public SlotFiltered(IInventory inventory, int id, int x, int y) {

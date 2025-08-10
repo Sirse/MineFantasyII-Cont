@@ -1,23 +1,24 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class TannerPacket extends PacketMF {
+
     public static final String packetName = "MF2_TannerPacket";
     private int[] coords = new int[3];
     private float animation;
 
     public TannerPacket(TileEntityTanningRack tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         animation = tile.acTime;
     }
 
-    public TannerPacket() {
-    }
+    public TannerPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

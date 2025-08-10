@@ -1,5 +1,10 @@
 package minefantasy.mf2.knowledge;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchArtefacts;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -8,12 +13,9 @@ import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.list.ToolListMF;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class ArtefactListMF {
+
     public static void init() {
         ((ItemArtefact) ComponentListMF.artefacts).registerAll();
         addArtisanry();
@@ -71,7 +73,11 @@ public class ArtefactListMF {
         add(KnowledgeListMF.cake, FoodListMF.flour, Items.egg);
         add(KnowledgeListMF.carrotcake, FoodListMF.flour, Items.egg, Items.carrot);
         add(KnowledgeListMF.chococake, FoodListMF.flour, Items.egg, new ItemStack(Items.dye, 1, 3));
-        add(KnowledgeListMF.bfcake, FoodListMF.flour, Items.egg, new ItemStack(Items.dye, 1, 3),
+        add(
+                KnowledgeListMF.bfcake,
+                FoodListMF.flour,
+                Items.egg,
+                new ItemStack(Items.dye, 1, 3),
                 FoodListMF.berriesJuicy);
 
         add(KnowledgeListMF.bandageadv, Blocks.wool, Items.leather);
@@ -97,9 +103,20 @@ public class ArtefactListMF {
         add(KnowledgeListMF.coalflux, Items.coal, ComponentListMF.flux);
         add(KnowledgeListMF.smeltIron, Blocks.iron_ore);
         add(KnowledgeListMF.crucible2, ComponentListMF.fireclay);
-        add(KnowledgeListMF.blastfurn, Items.iron_ingot, Blocks.iron_ore, Blocks.furnace, BlockListMF.bloomery,
-                BlockListMF.limestone, ComponentListMF.kaolinite);
-        add(KnowledgeListMF.bigfurn, Items.iron_ingot, Blocks.furnace, BlockListMF.bloomery, ComponentListMF.kaolinite,
+        add(
+                KnowledgeListMF.blastfurn,
+                Items.iron_ingot,
+                Blocks.iron_ore,
+                Blocks.furnace,
+                BlockListMF.bloomery,
+                BlockListMF.limestone,
+                ComponentListMF.kaolinite);
+        add(
+                KnowledgeListMF.bigfurn,
+                Items.iron_ingot,
+                Blocks.furnace,
+                BlockListMF.bloomery,
+                ComponentListMF.kaolinite,
                 Items.coal);
         for (ItemStack pig : OreDictionary.getOres("ingotPigIron")) {
             add(KnowledgeListMF.smeltSteel, pig);
@@ -113,10 +130,20 @@ public class ArtefactListMF {
         }
         for (ItemStack black : OreDictionary.getOres("ingotBlackSteel")) {
             for (ItemStack silver : OreDictionary.getOres("ingotSilver")) {
-                add(KnowledgeListMF.smeltBlueSteel, Items.blaze_powder, silver, black, new ItemStack(Items.dye, 1, 4),
+                add(
+                        KnowledgeListMF.smeltBlueSteel,
+                        Items.blaze_powder,
+                        silver,
+                        black,
+                        new ItemStack(Items.dye, 1, 4),
                         ComponentListMF.flux_strong);
             }
-            add(KnowledgeListMF.smeltRedSteel, Items.blaze_powder, Items.gold_ingot, Items.redstone, black,
+            add(
+                    KnowledgeListMF.smeltRedSteel,
+                    Items.blaze_powder,
+                    Items.gold_ingot,
+                    Items.redstone,
+                    black,
                     ComponentListMF.flux_strong);
         }
 

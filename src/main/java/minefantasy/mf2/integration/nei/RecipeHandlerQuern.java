@@ -1,14 +1,16 @@
 package minefantasy.mf2.integration.nei;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.item.list.ComponentListMF;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
 
 public class RecipeHandlerQuern extends TemplateRecipeHandler {
 
@@ -64,6 +66,7 @@ public class RecipeHandlerQuern extends TemplateRecipeHandler {
     }
 
     private class CachedQuernRecipe extends CachedRecipe {
+
         private ItemStack input, output;
         private boolean consumePot;
 

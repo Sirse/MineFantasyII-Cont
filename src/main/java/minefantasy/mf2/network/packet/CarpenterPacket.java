@@ -1,13 +1,15 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityCarpenterMF;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 
 public class CarpenterPacket extends PacketMF {
+
     public static final String packetName = "MF2_CarpenterPacket";
     private int[] coords = new int[3];
     private String toolNeeded;
@@ -16,18 +18,17 @@ public class CarpenterPacket extends PacketMF {
     private String research;
 
     public CarpenterPacket(TileEntityCarpenterMF tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         toolNeeded = tile.getToolNeeded();
-        progress = new float[]{tile.progress, tile.progressMax};
-        tiers = new int[]{tile.getToolTierNeeded(), tile.getCarpenterTierNeeded()};
+        progress = new float[] { tile.progress, tile.progressMax };
+        tiers = new int[] { tile.getToolTierNeeded(), tile.getCarpenterTierNeeded() };
         if (progress[1] <= 0) {
             progress[1] = 0;
         }
         research = tile.getResearchNeeded();
     }
 
-    public CarpenterPacket() {
-    }
+    public CarpenterPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

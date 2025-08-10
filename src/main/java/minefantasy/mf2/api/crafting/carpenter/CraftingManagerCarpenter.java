@@ -1,16 +1,18 @@
 package minefantasy.mf2.api.crafting.carpenter;
 
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.*;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.*;
+import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
 public class CraftingManagerCarpenter {
+
     /**
      * The static instance of this class
      */
@@ -37,12 +39,12 @@ public class CraftingManagerCarpenter {
      * Adds a recipe. See spreadsheet on first page for details.
      */
     public ICarpenterRecipe addRecipe(ItemStack result, Skill skill, String research, String sound, float exp,
-                                      String tool, int hammer, int anvil, int time, Object... input) {
+            String tool, int hammer, int anvil, int time, Object... input) {
         return addRecipe(result, skill, research, sound, exp, tool, hammer, anvil, time, (byte) 0, input);
     }
 
     public ICarpenterRecipe addToolRecipe(ItemStack result, Skill skill, String research, String sound, float exp,
-                                          String tool, int hammer, int anvil, int time, Object... input) {
+            String tool, int hammer, int anvil, int time, Object... input) {
         return addRecipe(result, skill, research, sound, exp, tool, hammer, anvil, time, (byte) 1, input);
     }
 
@@ -50,7 +52,7 @@ public class CraftingManagerCarpenter {
      * Adds a recipe. See spreadsheet on first page for details.
      */
     public ICarpenterRecipe addRecipe(ItemStack result, Skill skill, String research, String sound, float exp,
-                                      String tool, int hammer, int anvil, int time, byte id, Object... input) {
+            String tool, int hammer, int anvil, int time, byte id, Object... input) {
         String var3 = "";
         int var4 = 0;
         int var5 = 0;
@@ -108,18 +110,42 @@ public class CraftingManagerCarpenter {
         ICarpenterRecipe recipe;
 
         if (id == (byte) 1) {
-            recipe = new CustomToolRecipeCarpenter(var5, var6, var15, result, tool, time, hammer, anvil, exp, false,
-                    sound, research, skill);
+            recipe = new CustomToolRecipeCarpenter(
+                    var5,
+                    var6,
+                    var15,
+                    result,
+                    tool,
+                    time,
+                    hammer,
+                    anvil,
+                    exp,
+                    false,
+                    sound,
+                    research,
+                    skill);
         } else {
-            recipe = new ShapedCarpenterRecipes(var5, var6, var15, result, tool, time, hammer, anvil, exp, false, sound,
-                    research, skill);
+            recipe = new ShapedCarpenterRecipes(
+                    var5,
+                    var6,
+                    var15,
+                    result,
+                    tool,
+                    time,
+                    hammer,
+                    anvil,
+                    exp,
+                    false,
+                    sound,
+                    research,
+                    skill);
         }
         this.recipes.add(recipe);
         return recipe;
     }
 
     public ICarpenterRecipe addShapelessRecipe(ItemStack output, Skill skill, String research, String sound,
-                                               float experience, String tool, int hammer, int anvil, int time, Object... input) {
+            float experience, String tool, int hammer, int anvil, int time, Object... input) {
         ArrayList var3 = new ArrayList();
         Object[] var4 = input;
         int var5 = input.length;
@@ -140,8 +166,18 @@ public class CraftingManagerCarpenter {
             }
         }
 
-        ICarpenterRecipe recipe = new ShapelessCarpenterRecipes(output, tool, experience, hammer, anvil, time, var3,
-                false, sound, research, skill);
+        ICarpenterRecipe recipe = new ShapelessCarpenterRecipes(
+                output,
+                tool,
+                experience,
+                hammer,
+                anvil,
+                time,
+                var3,
+                false,
+                sound,
+                research,
+                skill);
         this.recipes.add(recipe);
         return recipe;
     }
@@ -167,7 +203,9 @@ public class CraftingManagerCarpenter {
             }
         }
 
-        if (var2 == 2 && var3.getItem() == var4.getItem() && var3.stackSize == 1 && var4.stackSize == 1
+        if (var2 == 2 && var3.getItem() == var4.getItem()
+                && var3.stackSize == 1
+                && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
             Item var10 = var3.getItem();
             int var12 = var10.getMaxDamage() - var3.getItemDamageForDisplay();
@@ -223,7 +261,9 @@ public class CraftingManagerCarpenter {
             }
         }
 
-        if (var2 == 2 && var3.getItem() == var4.getItem() && var3.stackSize == 1 && var4.stackSize == 1
+        if (var2 == 2 && var3.getItem() == var4.getItem()
+                && var3.stackSize == 1
+                && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
             Item var10 = var3.getItem();
             int var12 = var10.getMaxDamage() - var3.getItemDamageForDisplay();

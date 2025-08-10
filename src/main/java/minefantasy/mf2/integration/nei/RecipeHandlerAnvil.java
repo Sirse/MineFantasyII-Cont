@@ -1,5 +1,17 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
@@ -13,16 +25,6 @@ import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class RecipeHandlerAnvil extends TemplateRecipeHandler {
 
@@ -67,23 +69,19 @@ public class RecipeHandlerAnvil extends TemplateRecipeHandler {
             }
         }
 
-        /*if (inputStack.getItem() instanceof ISpecialCraftItem) {
-            for (Map.Entry<String, Item> entry : SpecialForging.specialCrafts.entrySet()) {
-                ItemStack dragonForgedStack = new ItemStack(entry.getValue());
-                if (CustomToolHelper.areEqual(dragonForgedStack, inputStack)) {
-                    String design = ((ISpecialCraftItem)entry.getValue()).getDesign(dragonForgedStack);
-                    for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
-                        ItemStack ingridient = new ItemStack(SpecialForging.getSpecialCraft(design, irecipe.getRecipeOutput()));
-                        if(ingridient != null) {
-                            hiddenStack = CustomToolHelper.tryDeconstruct(ingridient, inputStack);
-                        }
-                    }
-                }
-            }
-        }*/
+        /*
+         * if (inputStack.getItem() instanceof ISpecialCraftItem) { for (Map.Entry<String, Item> entry :
+         * SpecialForging.specialCrafts.entrySet()) { ItemStack dragonForgedStack = new ItemStack(entry.getValue()); if
+         * (CustomToolHelper.areEqual(dragonForgedStack, inputStack)) { String design =
+         * ((ISpecialCraftItem)entry.getValue()).getDesign(dragonForgedStack); for (IAnvilRecipe irecipe :
+         * (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) { ItemStack ingridient = new
+         * ItemStack(SpecialForging.getSpecialCraft(design, irecipe.getRecipeOutput())); if(ingridient != null) {
+         * hiddenStack = CustomToolHelper.tryDeconstruct(ingridient, inputStack); } } } } }
+         */
 
         for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
-            if ((hiddenStack != null && CustomToolHelper.areEqual(irecipe.getRecipeOutput(), hiddenStack)) || CustomToolHelper.areEqual(irecipe.getRecipeOutput(), inputStack)) {
+            if ((hiddenStack != null && CustomToolHelper.areEqual(irecipe.getRecipeOutput(), hiddenStack))
+                    || CustomToolHelper.areEqual(irecipe.getRecipeOutput(), inputStack)) {
                 if (ResearchLogic.hasInfoUnlocked(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                     CachedAnvilRecipe recipe = handleRecipe(irecipe, inputStack);
 
@@ -130,7 +128,8 @@ public class RecipeHandlerAnvil extends TemplateRecipeHandler {
         return null;
     }
 
-    //TODO: Implement wood permutations, add additional helper method for custom material support in crafting and usage handlers
+    // TODO: Implement wood permutations, add additional helper method for custom material support in crafting and usage
+    // handlers
     private class CachedAnvilRecipe extends CachedRecipe {
 
         private final ArrayList<PositionedStack> ingredients = new ArrayList<PositionedStack>();

@@ -1,11 +1,13 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class StaminaPacket extends PacketMF {
+
     public static final String packetName = "MF2_Staminabar";
     private float[] value;
 
@@ -13,8 +15,7 @@ public class StaminaPacket extends PacketMF {
         this.value = value;
     }
 
-    public StaminaPacket() {
-    }
+    public StaminaPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
@@ -22,7 +23,7 @@ public class StaminaPacket extends PacketMF {
             return;
         }
 
-        value = new float[]{StaminaBar.getDefaultMax(player), StaminaBar.getDefaultMax(player), 0, 0F};
+        value = new float[] { StaminaBar.getDefaultMax(player), StaminaBar.getDefaultMax(player), 0, 0F };
         value[0] = packet.readFloat();
         value[1] = packet.readFloat();
         value[2] = packet.readFloat();

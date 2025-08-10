@@ -1,14 +1,8 @@
 package minefantasy.mf2.block.refining;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.knowledge.KnowledgeListMF;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -26,10 +20,18 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.List;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 public class BlockBFH extends BlockContainer {
+
     private static boolean keepInventory;
     public IIcon bottomTex;
     public IIcon sideTex;
@@ -71,8 +73,14 @@ public class BlockBFH extends BlockContainer {
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(World world, int x, int y, int z, Random rand) {
         if (isActive && rand.nextInt(20) == 0) {
-            world.playSound(x + 0.5F, y + 0.5F, z + 0.5F, "fire.fire", 1.0F + rand.nextFloat(),
-                    rand.nextFloat() * 0.7F + 0.3F, false);
+            world.playSound(
+                    x + 0.5F,
+                    y + 0.5F,
+                    z + 0.5F,
+                    "fire.fire",
+                    1.0F + rand.nextFloat(),
+                    rand.nextFloat() * 0.7F + 0.3F,
+                    false);
         }
     }
 
@@ -95,14 +103,12 @@ public class BlockBFH extends BlockContainer {
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbour) {
         TileEntityBlastFH tile = getTile(world, x, y, z);
-        if (tile != null)
-            tile.updateBuild();
+        if (tile != null) tile.updateBuild();
     }
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepInventory)
-            return;
+        if (keepInventory) return;
 
         TileEntityBlastFH tile = getTile(world, x, y, z);
 
@@ -123,7 +129,11 @@ public class BlockBFH extends BlockContainer {
                         }
 
                         itemstack.stackSize -= j1;
-                        EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                        EntityItem entityitem = new EntityItem(
+                                world,
+                                x + f,
+                                y + f1,
+                                z + f2,
                                 new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                         if (itemstack.hasTagCompound()) {
@@ -157,7 +167,7 @@ public class BlockBFH extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (!ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.blastfurn)) {
             if (world.isRemote)
                 user.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("knowledge.unknownUse")));

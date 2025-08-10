@@ -1,14 +1,16 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+
 public class StructureGenDSStairs extends StructureModuleMF {
+
     /**
      * The minimal height for a stairway to be created
      */
@@ -80,8 +82,12 @@ public class StructureGenDSStairs extends StructureModuleMF {
                     int meta = (Integer) blockarray[1];
                     placeBlock((Block) blockarray[0], meta, x, -z - 1, z);
 
-                    placeBlock(BlockListMF.reinforced_stone_bricks, StructureGenAncientForge.getRandomMetadata(rand), x,
-                            -z - 2, z);
+                    placeBlock(
+                            BlockListMF.reinforced_stone_bricks,
+                            StructureGenAncientForge.getRandomMetadata(rand),
+                            x,
+                            -z - 2,
+                            z);
 
                     if (x == (width_span - 1) || x == -(width_span - 1)) {
                         placeBlock(BlockListMF.reinforced_stone, 0, x, -z, z);
@@ -208,43 +214,43 @@ public class StructureGenDSStairs extends StructureModuleMF {
 
         if (x == -(radius - 1) || x == (radius - 1)) {
             if (z == Math.floor((float) depth / 2)) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         return null;
     }
 
     protected Object[] getCeiling(int radius, int depth, int x, int z) {
-        return x == 0 ? new Object[]{BlockListMF.reinforced_stone, false}
-                : new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return x == 0 ? new Object[] { BlockListMF.reinforced_stone, false }
+                : new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     protected Object[] getFloor(int radius, int depth, int x, int z) {
         if (x >= -1 && x <= 1) {
             if (z >= depth - 1) {
-                return new Object[]{BlockListMF.cobble_pavement, 0};
+                return new Object[] { BlockListMF.cobble_pavement, 0 };
             }
-            return new Object[]{BlockListMF.cobble_pavement_stair, Integer.valueOf(getStairDirection(reverse()))};
+            return new Object[] { BlockListMF.cobble_pavement_stair, Integer.valueOf(getStairDirection(reverse())) };
         }
         if (x == -radius || x == radius || z == depth || z == 0) {
-            return new Object[]{BlockListMF.reinforced_stone, Integer.valueOf(0)};
+            return new Object[] { BlockListMF.reinforced_stone, Integer.valueOf(0) };
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, Integer.valueOf(0)};
+            return new Object[] { BlockListMF.reinforced_stone, Integer.valueOf(0) };
         }
-        return new Object[]{BlockListMF.cobble_pavement, 0};
+        return new Object[] { BlockListMF.cobble_pavement, 0 };
     }
 
     protected Object[] getWalls(int radius, int height, int depth, int x, int y, int z) {
         if (x != -radius && x != radius && z == 0) {
-            return new Object[]{Blocks.air, false};
+            return new Object[] { Blocks.air, false };
         }
         if (x == -radius || x == radius || z == depth) {
-            return y == height / 2 ? new Object[]{BlockListMF.reinforced_stone, "Hall"}
-                    : new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return y == height / 2 ? new Object[] { BlockListMF.reinforced_stone, "Hall" }
+                    : new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     public StructureModuleMF setLoot(String loot) {

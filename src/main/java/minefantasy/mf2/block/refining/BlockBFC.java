@@ -1,13 +1,7 @@
 package minefantasy.mf2.block.refining;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.knowledge.KnowledgeListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -23,9 +17,17 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 public class BlockBFC extends BlockContainer {
+
     public IIcon bottomTex;
     public IIcon sideTex;
     private Random rand = new Random();
@@ -52,8 +54,7 @@ public class BlockBFC extends BlockContainer {
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbour) {
         TileEntityBlastFC tile = getTile(world, x, y, z);
-        if (tile != null)
-            tile.updateBuild();
+        if (tile != null) tile.updateBuild();
     }
 
     @Override
@@ -77,7 +78,11 @@ public class BlockBFC extends BlockContainer {
                         }
 
                         itemstack.stackSize -= j1;
-                        EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                        EntityItem entityitem = new EntityItem(
+                                world,
+                                x + f,
+                                y + f1,
+                                z + f2,
                                 new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                         if (itemstack.hasTagCompound()) {
@@ -111,7 +116,7 @@ public class BlockBFC extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (!ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.blastfurn)) {
             if (world.isRemote)
                 user.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("knowledge.unknownUse")));

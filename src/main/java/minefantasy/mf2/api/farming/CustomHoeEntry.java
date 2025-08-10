@@ -1,12 +1,14 @@
 package minefantasy.mf2.api.farming;
 
-import minefantasy.mf2.api.MineFantasyAPI;
+import java.util.HashMap;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.MineFantasyAPI;
 
 public class CustomHoeEntry {
+
     public static HashMap<Integer, CustomHoeEntry> entries = new HashMap<Integer, CustomHoeEntry>();
     public int itemID;
     /**

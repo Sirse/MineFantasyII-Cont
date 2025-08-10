@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.crafting.tanning;
 
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class TanningRecipe {
+
     public static final ArrayList<TanningRecipe> recipeList = new ArrayList<TanningRecipe>();
     public int tier;
     public float time;
@@ -52,8 +54,7 @@ public class TanningRecipe {
     }
 
     public static TanningRecipe getRecipe(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         for (int a = 0; a < recipeList.size(); a++) {
             TanningRecipe recipe = recipeList.get(a);

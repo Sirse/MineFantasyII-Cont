@@ -1,12 +1,14 @@
 package minefantasy.mf2.block.basic;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.material.BaseMaterialMF;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.material.BaseMaterialMF;
+
 public class BlockMetalMF extends Block {
+
     public BlockMetalMF(BaseMaterialMF material) {
         super(Material.iron);
 

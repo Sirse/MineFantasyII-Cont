@@ -1,15 +1,17 @@
 package minefantasy.mf2.mechanics.worldGen;
 
-import cpw.mods.fml.common.IWorldGenerator;
+import java.util.Random;
+
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 
-import java.util.Random;
+import cpw.mods.fml.common.IWorldGenerator;
 
 public class WorldGenMFBase implements IWorldGenerator {
+
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator,
-                         IChunkProvider chunkProvider) {
+            IChunkProvider chunkProvider) {
         generate(random, chunkX, chunkZ, world, world.provider.dimensionId);
     }
 

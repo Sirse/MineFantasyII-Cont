@@ -1,14 +1,8 @@
 package minefantasy.mf2.entity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.item.gadget.EnumCasingType;
-import minefantasy.mf2.item.gadget.EnumExplosiveType;
-import minefantasy.mf2.item.gadget.EnumFuseType;
-import minefantasy.mf2.item.gadget.EnumPowderType;
-import minefantasy.mf2.mechanics.CombatMechanics;
-import minefantasy.mf2.util.BukkitUtils;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -23,10 +17,18 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.item.gadget.EnumCasingType;
+import minefantasy.mf2.item.gadget.EnumExplosiveType;
+import minefantasy.mf2.item.gadget.EnumFuseType;
+import minefantasy.mf2.item.gadget.EnumPowderType;
+import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityBomb extends Entity {
+
     private final int typeId = 2;
     /**
      * How long the fuse is
@@ -46,8 +48,12 @@ public class EntityBomb extends Entity {
         this(world);
         this.thrower = thrower;
 
-        this.setLocationAndAngles(thrower.posX, thrower.posY + thrower.getEyeHeight(), thrower.posZ,
-                thrower.rotationYaw, thrower.rotationPitch);
+        this.setLocationAndAngles(
+                thrower.posX,
+                thrower.posY + thrower.getEyeHeight(),
+                thrower.posZ,
+                thrower.rotationYaw,
+                thrower.rotationPitch);
         this.posX -= MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
         this.posY -= 0.10000000149011612D;
         this.posZ -= MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
@@ -57,9 +63,11 @@ public class EntityBomb extends Entity {
 
         float f = 0.4F;
         this.motionX = -MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI) * f;
+                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI)
+                * f;
         this.motionZ = MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI) * f;
+                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI)
+                * f;
         this.motionY = -MathHelper.sin((this.rotationPitch + this.getThrownOffset()) / 180.0F * (float) Math.PI) * f;
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, force, 1.0F);
 
@@ -112,8 +120,8 @@ public class EntityBomb extends Entity {
     }
 
     /**
-     * returns if this entity triggers Block.onEntityWalking on the blocks they walk
-     * on. used for spiders and wolves to prevent them from trampling crops
+     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
+     * prevent them from trampling crops
      */
     @Override
     protected boolean canTriggerWalking() {
@@ -121,8 +129,7 @@ public class EntityBomb extends Entity {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     @Override
     public boolean canBeCollidedWith() {
@@ -195,8 +202,8 @@ public class EntityBomb extends Entity {
 
         if (object instanceof EntityChicken) {
             EntityChicken chook = (EntityChicken) object;
-            Entity target = worldObj.findNearestEntityWithinAABB(IMob.class, chook.boundingBox.expand(64, 8, 64),
-                    chook);
+            Entity target = worldObj
+                    .findNearestEntityWithinAABB(IMob.class, chook.boundingBox.expand(64, 8, 64), chook);
             if (target != null) {
                 if (target instanceof EntityLivingBase) {
                     chook.setCustomNameTag("Suicide Chook!");
@@ -290,10 +297,8 @@ public class EntityBomb extends Entity {
 
                         if (getCasing() != 2 && distanceToEntity > radius / 2) {
                             double sc = distanceToEntity - (radius / 2);
-                            if (sc < 0)
-                                sc = 0;
-                            if (sc > (radius / 2))
-                                sc = (radius / 2);
+                            if (sc < 0) sc = 0;
+                            if (sc > (radius / 2)) sc = (radius / 2);
                             dam *= (sc / (radius / 2));
                         }
                         if (!(entityHit instanceof EntityItem)) {
@@ -320,8 +325,13 @@ public class EntityBomb extends Entity {
         if (t > 0) {
             for (int a = 0; a < 16; a++) {
                 float range = 0.6F;
-                EntityShrapnel shrapnel = new EntityShrapnel(worldObj, posX, posY + 0.5D, posZ,
-                        (rand.nextDouble() - 0.5) * range, (rand.nextDouble() - 0.5F) * range,
+                EntityShrapnel shrapnel = new EntityShrapnel(
+                        worldObj,
+                        posX,
+                        posY + 0.5D,
+                        posZ,
+                        (rand.nextDouble() - 0.5) * range,
+                        (rand.nextDouble() - 0.5F) * range,
                         (rand.nextDouble() - 0.5) * range);
 
                 if (t == 2) {

@@ -1,20 +1,22 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.crafting.ISalvageDrop;
-import minefantasy.mf2.api.crafting.engineer.IBombComponent;
-import minefantasy.mf2.item.ItemComponentMF;
+import java.util.HashMap;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import java.util.HashMap;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.ISalvageDrop;
+import minefantasy.mf2.api.crafting.engineer.IBombComponent;
+import minefantasy.mf2.item.ItemComponentMF;
 
 public class ItemBombComponent extends ItemComponentMF implements IBombComponent, ISalvageDrop {
+
     private static HashMap<String, Item> components = new HashMap<String, Item>();
 
     private byte tier;

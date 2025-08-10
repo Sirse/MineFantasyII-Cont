@@ -1,19 +1,22 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.EntityShrapnel;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.EntityShrapnel;
+
 @SideOnly(Side.CLIENT)
 public class RenderShrapnel extends Render {
+
     private String tex;
 
     public RenderShrapnel(String tex) {
@@ -33,9 +36,15 @@ public class RenderShrapnel extends Render {
         this.loadTexture("textures/projectile/" + tex + ".png");
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
-        GL11.glRotatef(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * yr - 90.0F, 0.0F, 1.0F,
+        GL11.glRotatef(
+                entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * yr - 90.0F,
+                0.0F,
+                1.0F,
                 0.0F);
-        GL11.glRotatef(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * yr, 0.0F, 0.0F,
+        GL11.glRotatef(
+                entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * yr,
+                0.0F,
+                0.0F,
                 1.0F);
         Tessellator var10 = Tessellator.instance;
         byte var11 = 0;

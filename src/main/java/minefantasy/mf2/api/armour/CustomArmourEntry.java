@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.armour;
 
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
+import java.util.HashMap;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
 
 public class CustomArmourEntry {
+
     public static HashMap<Integer, CustomArmourEntry> entries = new HashMap<Integer, CustomArmourEntry>();
     public boolean alterSpeed;
     public int itemID;
@@ -34,8 +36,8 @@ public class CustomArmourEntry {
     }
 
     /**
-     * Registers an item to a template of an ArmourDesign, while dividing the suit
-     * into the 4 pieces If it's unable to divide it, it simply quarters it's value
+     * Registers an item to a template of an ArmourDesign, while dividing the suit into the 4 pieces If it's unable to
+     * divide it, it simply quarters it's value
      *
      * @param piece    the item to register
      * @param template the ArmourDesign to work off
@@ -45,8 +47,8 @@ public class CustomArmourEntry {
     }
 
     /**
-     * Registers an item to a template of an ArmourDesign, while dividing the suit
-     * into the 4 pieces If it's unable to divide it, it simply quarters it's value
+     * Registers an item to a template of an ArmourDesign, while dividing the suit into the 4 pieces If it's unable to
+     * divide it, it simply quarters it's value
      *
      * @param piece     the item to register
      * @param template  the ArmourDesign to work off
@@ -82,8 +84,18 @@ public class CustomArmourEntry {
     public static void registerItem(Item piece, float weight, float bulk, boolean alterSpeed, String AC) {
         int id = Item.getIdFromItem(piece);
 
-        MineFantasyAPI.debugMsg("Added Custom " + AC + " armour: " + piece.getUnlocalizedName() + "(" + id
-                + ") Traits = " + weight + "," + bulk + " alter speed = " + alterSpeed);
+        MineFantasyAPI.debugMsg(
+                "Added Custom " + AC
+                        + " armour: "
+                        + piece.getUnlocalizedName()
+                        + "("
+                        + id
+                        + ") Traits = "
+                        + weight
+                        + ","
+                        + bulk
+                        + " alter speed = "
+                        + alterSpeed);
         entries.put(id, new CustomArmourEntry(id, weight, bulk, alterSpeed, AC));
     }
 
@@ -107,10 +119,10 @@ public class CustomArmourEntry {
     public static float[] getEntryVars(ItemStack piece) {
         CustomArmourEntry entry = getEntry(piece);
         if (entry != null) {
-            return new float[]{entry.weight, entry.bulkiness};
+            return new float[] { entry.weight, entry.bulkiness };
         }
         ArmourDesign deft = ArmourCalculator.getDefaultAD(piece);
-        return new float[]{deft.getWeight(), deft.getBulk()};
+        return new float[] { deft.getWeight(), deft.getBulk() };
     }
 
     /**

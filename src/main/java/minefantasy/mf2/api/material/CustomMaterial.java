@@ -1,24 +1,26 @@
 package minefantasy.mf2.api.material;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class CustomMaterial {
+
     public static final String NBTBase = "MF_CustomMaterials";
     public static final DecimalFormat decimal_format = new DecimalFormat("#.#");
     public static final DecimalFormat decimal_format_grams = new DecimalFormat("#");
     /**
      * Min and Max workable temps
      */
-    public static final int[] flameResistArray = new int[]{100, 300};
+    public static final int[] flameResistArray = new int[] { 100, 300 };
     public static HashMap<String, CustomMaterial> materialList = new HashMap<String, CustomMaterial>();
     public static HashMap<String, ArrayList<CustomMaterial>> typeList = new HashMap<String, ArrayList<CustomMaterial>>();
     public final String name, type;
@@ -26,7 +28,7 @@ public class CustomMaterial {
     /**
      * The material colour
      */
-    public int[] colourRGB = new int[]{255, 255, 255};
+    public int[] colourRGB = new int[] { 255, 255, 255 };
     /**
      * Base threshold for armour rating
      */
@@ -57,11 +59,11 @@ public class CustomMaterial {
     public int crafterAnvilTier = 0;
     public float craftTimeModifier = 1.0F;
     public float meltingPoint;
-    private float[] armourProtection = new float[]{1.0F, 1.0F, 1.0F};
+    private float[] armourProtection = new float[] { 1.0F, 1.0F, 1.0F };
     private boolean unbreakable = false;
 
     public CustomMaterial(String name, String type, int tier, float hardness, float durability, float flexibility,
-                          float resistance, float sharpness, float density) {
+            float resistance, float sharpness, float density) {
         this.name = name;
         this.type = type;
         this.tier = tier;
@@ -92,8 +94,7 @@ public class CustomMaterial {
      * Gets a material by name
      */
     public static CustomMaterial getMaterial(String name) {
-        if (name == null)
-            return null;
+        if (name == null) return null;
 
         return materialList.get(name.toLowerCase());
     }
@@ -107,12 +108,12 @@ public class CustomMaterial {
      * @param hardness    How hard the material is to break
      * @param flexibility How well the material can bend and retract
      * @param sharpness   How well it can be sharpened
-     * @param resistance  How well it can handle destructive elements like fire and
-     *                    corrosion, and increased heating temperature
+     * @param resistance  How well it can handle destructive elements like fire and corrosion, and increased heating
+     *                    temperature
      * @param density     how dense the element is, increasing mass per unit. (KG/Units)
      */
     public static CustomMaterial getOrAddMaterial(String name, String type, int tier, float hardness, float durability,
-                                                  float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
+            float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
         if (getMaterial(name) != null) {
             return getMaterial(name);
         }
@@ -192,7 +193,7 @@ public class CustomMaterial {
     }
 
     public CustomMaterial setArmourStats(float cutting, float blunt, float piercing) {
-        armourProtection = new float[]{cutting, blunt, piercing};
+        armourProtection = new float[] { cutting, blunt, piercing };
         return this;
     }
 
@@ -202,7 +203,7 @@ public class CustomMaterial {
     }
 
     public CustomMaterial setColour(int red, int green, int blue) {
-        colourRGB = new int[]{red, green, blue};
+        colourRGB = new int[] { red, green, blue };
         return this;
     }
 
@@ -262,7 +263,7 @@ public class CustomMaterial {
         int workableTemp = (int) meltingPoint;
         int unstableTemp = (int) (workableTemp * 1.5F);
         int maxTemp = (int) (workableTemp * 2F);
-        return new int[]{workableTemp, unstableTemp, maxTemp};
+        return new int[] { workableTemp, unstableTemp, maxTemp };
     }
 
     // Returns if the material is a hard wood

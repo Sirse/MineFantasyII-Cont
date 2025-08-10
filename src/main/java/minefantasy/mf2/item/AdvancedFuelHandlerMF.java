@@ -1,13 +1,14 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.common.IFuelHandler;
-import minefantasy.mf2.api.crafting.MineFantasyFuels;
-import minefantasy.mf2.item.list.ComponentListMF;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import cpw.mods.fml.common.IFuelHandler;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class AdvancedFuelHandlerMF implements IFuelHandler {
 

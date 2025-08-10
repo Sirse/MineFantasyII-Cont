@@ -1,20 +1,10 @@
 package minefantasy.mf2.item.tool.advanced;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.api.weapon.IDamageType;
-import minefantasy.mf2.api.weapon.IRackItem;
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
-import minefantasy.mf2.farming.FarmingHelper;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.util.BukkitUtils;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -32,15 +22,28 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.weapon.IDamageType;
+import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+import minefantasy.mf2.farming.FarmingHelper;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.util.BukkitUtils;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRackItem {
+
     protected int itemRarity;
     private Random rand = new Random();
     private ToolMaterial toolMaterial;
@@ -76,8 +79,7 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
     private boolean cutGrass(World world, int x, int y, int z, int r, EntityPlayer entity, boolean leaf) {
         boolean flag = false;
         ItemStack item = entity.getHeldItem();
-        if (item == null)
-            return false;
+        if (item == null) return false;
 
         for (int x2 = -r; x2 <= r; x2++) {
             for (int y2 = -r; y2 <= r; y2++) {
@@ -97,7 +99,12 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
 
                                 ArrayList<ItemStack> items = block.getDrops(world, x + x2, y + y2, z + z2, meta, 0);
                                 world.setBlockToAir(x + x2, y + y2, z + z2);
-                                world.playAuxSFXAtEntity(entity, 2001, x + x2, y + y2, z + z2,
+                                world.playAuxSFXAtEntity(
+                                        entity,
+                                        2001,
+                                        x + x2,
+                                        y + y2,
+                                        z + z2,
                                         Block.getIdFromBlock(block)
                                                 + (world.getBlockMetadata(x + x2, y + y2, z + z2) << 16));
                                 tryBreakFarmland(world, x + x2, y + y2 - 1, z + z2);
@@ -143,8 +150,7 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
         if (!leaf) {
             if (str <= 0.0F) {
                 return m == Material.vine || m == Material.plants || m == Material.grass;
-            } else
-                return false;
+            } else return false;
         }
         return m == Material.leaves || m == Material.vine;
     }
@@ -158,7 +164,7 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
 
     @Override
     public boolean onItemUse(ItemStack hoe, EntityPlayer player, World world, int x, int y, int z, int facing,
-                             float pitch, float yaw, float pan) {
+            float pitch, float yaw, float pan) {
         if (!player.canPlayerEdit(x, y, z, facing, hoe) || !ItemLumberAxe.canAcceptCost(player)) {
             return false;
         } else {
@@ -183,7 +189,7 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
 
     @Override
     public float[] getDamageRatio(Object... implement) {
-        return new float[]{1, 0, 2};
+        return new float[] { 1, 0, 2 };
     }
 
     @Override
@@ -211,7 +217,8 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;

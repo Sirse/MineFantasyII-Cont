@@ -1,10 +1,11 @@
 package minefantasy.mf2.api.armour;
 
-import net.minecraft.item.Item;
-
 import java.util.HashMap;
 
+import net.minecraft.item.Item;
+
 public class CustomDamageRatioEntry {
+
     public static HashMap<Integer, CustomDamageRatioEntry> entries = new HashMap<Integer, CustomDamageRatioEntry>();
     public static HashMap<String, CustomDamageRatioEntry> entriesProj = new HashMap<String, CustomDamageRatioEntry>();
 
@@ -62,6 +63,6 @@ public class CustomDamageRatioEntry {
      * Gets the ratio for an entity, null if it's not found
      */
     public static float[] getTraits(String id) {
-        return entriesProj.get(id) != null ? entriesProj.get(id).vars : new float[]{1, 1, 1};
+        return entriesProj.get(id) != null ? entriesProj.get(id).vars : new float[] { 1, 1, 1 };
     }
 }

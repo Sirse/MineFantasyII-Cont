@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.refine;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
+import java.util.HashMap;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
 
 public class BigFurnaceRecipes {
+
     public static HashMap<String, BigFurnaceRecipes> recipeList = new HashMap<String, BigFurnaceRecipes>();
     public final ItemStack input, result;
     public final int tier;
@@ -34,12 +36,10 @@ public class BigFurnaceRecipes {
     }
 
     public static BigFurnaceRecipes getResult(ItemStack input) {
-        if (input == null)
-            return null;
+        if (input == null) return null;
 
         BigFurnaceRecipes specific = recipeList.get(CustomToolHelper.getReferenceName(input));
-        if (specific != null)
-            return specific;
+        if (specific != null) return specific;
 
         return recipeList.get(CustomToolHelper.getReferenceName(input, "any"));
     }

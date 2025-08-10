@@ -1,18 +1,21 @@
 package minefantasy.mf2.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemBlock;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.container.ContainerCrucible;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemBlock;
-import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiCrucible extends GuiContainer {
+
     private TileEntityCrucible tile;
 
     public GuiCrucible(InventoryPlayer user, TileEntityCrucible tile) {
@@ -22,12 +25,10 @@ public class GuiCrucible extends GuiContainer {
     }
 
     /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the
-     * items)
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
     @Override
-    protected void drawGuiContainerForegroundLayer(int x, int y) {
-    }
+    protected void drawGuiContainerForegroundLayer(int x, int y) {}
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
@@ -39,7 +40,8 @@ public class GuiCrucible extends GuiContainer {
 
         if (tile.getStackInSlot(tile.getSizeInventory() - 1) != null
                 && !(tile.getStackInSlot(tile.getSizeInventory() - 1).getItem() instanceof ItemBlock)
-                && ConfigHardcore.HCCreduceIngots && !tile.isAuto()) {
+                && ConfigHardcore.HCCreduceIngots
+                && !tile.isAuto()) {
             this.drawTexturedModalRect(xPoint + 128, yPoint + 31, 225, 2, 18, 18);
         }
 

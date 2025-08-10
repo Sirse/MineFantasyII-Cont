@@ -1,9 +1,7 @@
 package minefantasy.mf2.block.decor;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
-import minefantasy.mf2.material.BaseMaterialMF;
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -13,9 +11,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
 
 public abstract class BlockWoodDecor extends BlockContainer {
+
     private final String texture;
 
     public BlockWoodDecor(String texture) {

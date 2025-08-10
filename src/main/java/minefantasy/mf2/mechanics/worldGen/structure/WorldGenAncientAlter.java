@@ -3,8 +3,8 @@ package minefantasy.mf2.mechanics.worldGen.structure;
 import net.minecraft.world.World;
 
 public class WorldGenAncientAlter extends WorldGenStructureBase {
-    public WorldGenAncientAlter() {
-    }
+
+    public WorldGenAncientAlter() {}
 
     @Override
     protected StructureModuleMF getStartPiece(World world, int x, int y, int z, int direction) {
@@ -29,6 +29,6 @@ public class WorldGenAncientAlter extends WorldGenStructureBase {
 
     @Override
     protected int[] getYGenBounds(World world) {
-        return new int[]{64, 255};
+        return new int[] { 64, 255 };
     }
 }

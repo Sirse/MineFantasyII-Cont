@@ -1,9 +1,11 @@
 package minefantasy.mf2.item;
 
-import minefantasy.mf2.api.crafting.exotic.ISpecialCraftItem;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.exotic.ISpecialCraftItem;
+
 public class ItemSpecialDesign extends ItemComponentMF implements ISpecialCraftItem {
+
     private String design;
 
     public ItemSpecialDesign(String name, int rarity, String design) {

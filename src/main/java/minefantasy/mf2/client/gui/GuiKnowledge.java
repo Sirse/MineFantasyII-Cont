@@ -1,5 +1,25 @@
 package minefantasy.mf2.client.gui;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiOptionButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.*;
+
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
@@ -13,27 +33,10 @@ import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.network.packet.ResearchRequest;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiOptionButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.*;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public class GuiKnowledge extends GuiScreen {
+
     private static final int field_146572_y = InformationList.minDisplayColumn * 24 - 112;
     private static final int field_146571_z = InformationList.minDisplayRow * 24 - 112;
     private static final int field_146559_A = InformationList.maxDisplayColumn * 24 - 77;
@@ -76,7 +79,8 @@ public class GuiKnowledge extends GuiScreen {
         short short1 = 141;
         short short2 = 141;
         GuiKnowledge.field_146569_s = GuiKnowledge.field_146567_u = GuiKnowledge.field_146565_w = KnowledgeListMF.gettingStarted.displayColumn
-                * 24 - short1 / 2 - 12;
+                * 24 - short1 / 2
+                - 12;
         GuiKnowledge.field_146568_t = GuiKnowledge.field_146566_v = GuiKnowledge.field_146573_x = KnowledgeListMF.gettingStarted.displayRow
                 * 24 - short2 / 2;
         informationList.clear();
@@ -102,18 +106,42 @@ public class GuiKnowledge extends GuiScreen {
         int j1 = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
 
         this.buttonList.clear();
-        this.buttonList.add(new GuiOptionButton(1, this.width / 2 + 24, this.height / 2 + 101, 80, 20,
-                I18n.format("gui.done", new Object[0])));
-        this.buttonList.add(button = new GuiButton(2, (width - field_146555_f) / 2 + 24, height / 2 + 101, 125, 20,
-                InformationPage.getTitle(currentPage)));
+        this.buttonList.add(
+                new GuiOptionButton(
+                        1,
+                        this.width / 2 + 24,
+                        this.height / 2 + 101,
+                        80,
+                        20,
+                        I18n.format("gui.done", new Object[0])));
+        this.buttonList.add(
+                button = new GuiButton(
+                        2,
+                        (width - field_146555_f) / 2 + 24,
+                        height / 2 + 101,
+                        125,
+                        20,
+                        InformationPage.getTitle(currentPage)));
 
         int purchasex = i1 + (field_146555_f - buyWidth) / 2;
         int purchasey = j1 + (field_146557_g - buyHeight) / 2;
         // PURCHASE SCREEN
-        this.buttonList.add(new GuiOptionButton(3, purchasex + 19, purchasey + 47, 80, 20,
-                I18n.format("gui.purchase", new Object[0])));
-        this.buttonList.add(new GuiOptionButton(4, purchasex + 125, purchasey + 47, 80, 20,
-                I18n.format("gui.cancel", new Object[0])));
+        this.buttonList.add(
+                new GuiOptionButton(
+                        3,
+                        purchasex + 19,
+                        purchasey + 47,
+                        80,
+                        20,
+                        I18n.format("gui.purchase", new Object[0])));
+        this.buttonList.add(
+                new GuiOptionButton(
+                        4,
+                        purchasex + 125,
+                        purchasey + 47,
+                        80,
+                        20,
+                        I18n.format("gui.cancel", new Object[0])));
     }
 
     @Override
@@ -155,8 +183,7 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     /**
-     * Fired when a key is typed. This is the equivalent of
-     * KeyListener.keyTyped(KeyEvent e).
+     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
     protected void keyTyped(char p_73869_1_, int p_73869_2_) {
@@ -182,8 +209,10 @@ public class GuiKnowledge extends GuiScreen {
                 int i1 = k + 8;
                 int j1 = l + 17;
 
-                if ((GuiKnowledge.field_146554_D == 0 || GuiKnowledge.field_146554_D == 1) && mx >= i1 && mx < i1 + 224
-                        && my >= j1 && my < j1 + 155) {
+                if ((GuiKnowledge.field_146554_D == 0 || GuiKnowledge.field_146554_D == 1) && mx >= i1
+                        && mx < i1 + 224
+                        && my >= j1
+                        && my < j1 + 155) {
                     if (GuiKnowledge.field_146554_D == 0) {
                         GuiKnowledge.field_146554_D = 1;
                     } else {
@@ -408,7 +437,8 @@ public class GuiKnowledge extends GuiScreen {
             i5 = achievement2.displayColumn * 24 - k;
             j5 = achievement2.displayRow * 24 - l;
 
-            if (i5 >= -24 && j5 >= -24 && i5 <= 224.0F * GuiKnowledge.field_146570_r
+            if (i5 >= -24 && j5 >= -24
+                    && i5 <= 224.0F * GuiKnowledge.field_146570_r
                     && j5 <= 155.0F * GuiKnowledge.field_146570_r) {
                 researchVisibility = ResearchLogic.func_150874_c(player, achievement2);
                 float f6;
@@ -455,8 +485,12 @@ public class GuiKnowledge extends GuiScreen {
 
                 GL11.glDisable(GL11.GL_LIGHTING); // Forge: Make sure Lighting is disabled. Fixes MC-33065
                 GL11.glEnable(GL11.GL_CULL_FACE);
-                renderitem.renderItemAndEffectIntoGUI(this.mc.fontRenderer, this.mc.getTextureManager(),
-                        achievement2.theItemStack, i5 + 3, j5 + 3);
+                renderitem.renderItemAndEffectIntoGUI(
+                        this.mc.fontRenderer,
+                        this.mc.getTextureManager(),
+                        achievement2.theItemStack,
+                        i5 + 3,
+                        j5 + 3);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 GL11.glDisable(GL11.GL_LIGHTING);
 
@@ -507,15 +541,17 @@ public class GuiKnowledge extends GuiScreen {
                 if (researchVisibility == 3) {
                     s1 = I18n.format("achievement.unknown", new Object[0]);
                     j4 = Math.max(this.fontRendererObj.getStringWidth(s1), 120);
-                    s = (new ChatComponentTranslation("achievement.requires",
-                            new Object[]{achievement.parentInfo.getDisplayName()})).getUnformattedText();
+                    s = (new ChatComponentTranslation(
+                            "achievement.requires",
+                            new Object[] { achievement.parentInfo.getDisplayName() })).getUnformattedText();
                     k4 = this.fontRendererObj.splitStringWidth(s, j4);
                     this.drawGradientRect(i5 - 3, j5 - 3, i5 + j4 + 3, j5 + k4 + 12 + 3, -1073741824, -1073741824);
                     this.fontRendererObj.drawSplitString(s, i5, j5 + 12, j4, -9416624);
                 } else if (researchVisibility < 3) {
                     j4 = Math.max(this.fontRendererObj.getStringWidth(s1), 120);
-                    s = (new ChatComponentTranslation("achievement.requires",
-                            new Object[]{achievement.parentInfo.getDisplayName()})).getUnformattedText();
+                    s = (new ChatComponentTranslation(
+                            "achievement.requires",
+                            new Object[] { achievement.parentInfo.getDisplayName() })).getUnformattedText();
                     k4 = this.fontRendererObj.splitStringWidth(s, j4);
                     this.drawGradientRect(i5 - 3, j5 - 3, i5 + j4 + 3, j5 + k4 + 12 + 3, -1073741824, -1073741824);
                     this.fontRendererObj.drawSplitString(s, i5, j5 + 12, j4, -9416624);
@@ -535,16 +571,25 @@ public class GuiKnowledge extends GuiScreen {
                 this.fontRendererObj.drawSplitString(s2, i5, j5 + 12, j4, -6250336);
 
                 if (ResearchLogic.hasInfoUnlocked(player, achievement)) {
-                    this.fontRendererObj.drawStringWithShadow(I18n.format("information.discovered", new Object[0]), i5,
-                            j5 + k5 + 4, -7302913);
+                    this.fontRendererObj.drawStringWithShadow(
+                            I18n.format("information.discovered", new Object[0]),
+                            i5,
+                            j5 + k5 + 4,
+                            -7302913);
                 } else if (InformationBase.easyResearch && ResearchLogic.canUnlockInfo(player, achievement)) {
-                    this.fontRendererObj.drawStringWithShadow(StatCollector.translateToLocal("information.buy"), i5,
-                            j5 + k5 + 4, -7302913);
+                    this.fontRendererObj.drawStringWithShadow(
+                            StatCollector.translateToLocal("information.buy"),
+                            i5,
+                            j5 + k5 + 4,
+                            -7302913);
                 }
             }
 
             if (s1 != null) {
-                this.fontRendererObj.drawStringWithShadow(s1, i5, j5,
+                this.fontRendererObj.drawStringWithShadow(
+                        s1,
+                        i5,
+                        j5,
                         ResearchLogic.canUnlockInfo(player, achievement) ? (achievement.getSpecial() ? -128 : -1)
                                 : (achievement.getSpecial() ? -8355776 : -8355712));
             }
@@ -556,8 +601,7 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     /**
-     * Returns true if this GUI should pause the game when it is displayed in
-     * single-player
+     * Returns true if this GUI should pause the game when it is displayed in single-player
      */
     @Override
     public boolean doesGuiPauseGame() {
@@ -565,7 +609,7 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     private int[] getVisibleRange() {
-        return new int[]{1, 2, 3};
+        return new int[] { 1, 2, 3 };
     }
 
     private void renderPurchaseScreen(int x, int y, int mx, int my) {
@@ -598,8 +642,11 @@ public class GuiKnowledge extends GuiScreen {
             mc.fontRenderer.drawString(selected.getDisplayName(), x + 22, y + 12, white, false);
 
             if (hasScroll) {
-                mc.fontRenderer.drawStringWithShadow(StatCollector.translateToLocal("knowledge.hasScroll"), x + 20,
-                        y + 32, red);
+                mc.fontRenderer.drawStringWithShadow(
+                        StatCollector.translateToLocal("knowledge.hasScroll"),
+                        x + 20,
+                        y + 32,
+                        red);
             } else {
                 for (int a = 0; a < requirements.length; a++) {
                     boolean isUnlocked = selected.isUnlocked(a, mc.thePlayer);
@@ -650,8 +697,7 @@ public class GuiKnowledge extends GuiScreen {
             int level = RPGElements.getLevel(mc.thePlayer, skill);
             int xp = skill.getXP(player)[0];
             int max = skill.getXP(player)[1];
-            if (xp > max)
-                xp = max;
+            if (xp > max) xp = max;
 
             float scale = (float) xp / (float) max;
             this.drawTexturedModalRect(x + 22, y + 13, 0, 156, (int) (78F * scale), 5);

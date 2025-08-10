@@ -1,11 +1,7 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.tool.ILighter;
-import minefantasy.mf2.block.tileentity.TileEntityFirepit;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -22,7 +18,12 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.tool.ILighter;
+import minefantasy.mf2.block.tileentity.TileEntityFirepit;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockFirepit extends BlockContainer {
 
@@ -47,7 +48,7 @@ public class BlockFirepit extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         TileEntityFirepit firepit = (TileEntityFirepit) world.getTileEntity(x, y, z);
 
         if (firepit != null) {
@@ -82,8 +83,7 @@ public class BlockFirepit extends BlockContainer {
                         if (held.stackSize <= 0) {
                             if (contain != null) {
                                 player.setCurrentItemOrArmor(0, contain);
-                            } else
-                                player.setCurrentItemOrArmor(0, null);
+                            } else player.setCurrentItemOrArmor(0, null);
                         } else if (contain != null) {
                             firepit.dropItem(player, contain);
                         }
@@ -91,7 +91,12 @@ public class BlockFirepit extends BlockContainer {
                     return true;
                 } else if (firepit.fuel > 0) {
                     if (held.getItem() instanceof ILighter) {
-                        world.playSoundEffect(x + 0.5D, y - 0.5D, z + 0.5D, "fire.ignite", 1.0F,
+                        world.playSoundEffect(
+                                x + 0.5D,
+                                y - 0.5D,
+                                z + 0.5D,
+                                "fire.ignite",
+                                1.0F,
                                 rand.nextFloat() * 0.4F + 0.8F);
                         world.spawnParticle("flame", x + 0.5D, y - 0.5D, z + 0.5D, 0F, 0F, 0F);
 
@@ -107,7 +112,12 @@ public class BlockFirepit extends BlockContainer {
                         }
                     }
                     if (held.getItem() instanceof ItemFlintAndSteel) {
-                        world.playSoundEffect(x + 0.5D, y - 0.5D, z + 0.5D, "fire.ignite", 1.0F,
+                        world.playSoundEffect(
+                                x + 0.5D,
+                                y - 0.5D,
+                                z + 0.5D,
+                                "fire.ignite",
+                                1.0F,
                                 rand.nextFloat() * 0.4F + 0.8F);
                         world.spawnParticle("flame", x + 0.5D, y - 0.5D, z + 0.5D, 0F, 0F, 0F);
 
@@ -198,7 +208,11 @@ public class BlockFirepit extends BlockContainer {
                 float zDrop = this.rand.nextFloat() * 0.8F + 0.1F;
 
                 for (int c = 0; c < charcoal; c++) {
-                    EntityItem drop = new EntityItem(world, x + xDrop, y + yDrop, z + zDrop,
+                    EntityItem drop = new EntityItem(
+                            world,
+                            x + xDrop,
+                            y + yDrop,
+                            z + zDrop,
                             new ItemStack(Items.coal, 1, 1));
 
                     float jumpFactor = 0.05F;

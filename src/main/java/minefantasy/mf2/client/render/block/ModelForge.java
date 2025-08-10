@@ -1,17 +1,19 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.block.tileentity.TileEntityForge;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
+import minefantasy.mf2.block.tileentity.TileEntityForge;
+
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelForge extends ModelBase {
+
     // fields
     ModelRenderer Back;
     ModelRenderer Right;
@@ -113,34 +115,26 @@ public class ModelForge extends ModelBase {
     }
 
     public void renderModel(TileEntityForge forge, float f, boolean hasFuel, float height) {
-        boolean[] sides = new boolean[]{true, true, true, true};
+        boolean[] sides = new boolean[] { true, true, true, true };
         if (forge != null) {
             sides = forge.showSides();
         }
 
-        if (sides[0])
-            front.render(f);
+        if (sides[0]) front.render(f);
 
-        if (sides[1])
-            Left.render(f);
+        if (sides[1]) Left.render(f);
 
-        if (sides[2])
-            Right.render(f);
+        if (sides[2]) Right.render(f);
 
-        if (sides[3])
-            Back.render(f);
+        if (sides[3]) Back.render(f);
 
-        if (sides[3] || sides[2])
-            cornerBR.render(f);
+        if (sides[3] || sides[2]) cornerBR.render(f);
 
-        if (sides[3] || sides[1])
-            cornerBL.render(f);
+        if (sides[3] || sides[1]) cornerBL.render(f);
 
-        if (sides[0] || sides[2])
-            cornerFR.render(f);
+        if (sides[0] || sides[2]) cornerFR.render(f);
 
-        if (sides[0] || sides[1])
-            cornerFL.render(f);
+        if (sides[0] || sides[1]) cornerFL.render(f);
         Base.render(f);
         if (hasFuel) {
             fuel.offsetY = -height * 0.3F + 0.3F;

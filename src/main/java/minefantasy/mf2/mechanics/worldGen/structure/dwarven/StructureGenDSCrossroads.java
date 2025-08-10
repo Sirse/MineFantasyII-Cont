@@ -1,17 +1,19 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
+import net.minecraftforge.common.ChestGenHooks;
+
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigWorldGen;
 import minefantasy.mf2.entity.mob.EntityMinotaur;
 import minefantasy.mf2.entity.mob.MinotaurBreed;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ChestGenHooks;
 
 public class StructureGenDSCrossroads extends StructureModuleMF {
+
     protected String lootType = ChestGenHooks.DUNGEON_CHEST;
     protected Block floor_block = BlockListMF.cobble_pavement;
 
@@ -111,7 +113,11 @@ public class StructureGenDSCrossroads extends StructureModuleMF {
                     placeBlock(BlockListMF.reinforced_stone, meta, x, 4, z);
                     if ((Block) blockarray[0] == BlockListMF.reinforced_stone_framed) {
                         for (int h = height - 1; h > 1; h--) {
-                            placeBlock(h == 5 ? Blocks.glowstone : BlockListMF.reinforced_stone, h == 2 ? 1 : 0, x, h,
+                            placeBlock(
+                                    h == 5 ? Blocks.glowstone : BlockListMF.reinforced_stone,
+                                    h == 2 ? 1 : 0,
+                                    x,
+                                    h,
                                     z);
                         }
                         placeBlock(BlockListMF.reinforced_stone_framed, 0, x, 1, z);
@@ -155,19 +161,19 @@ public class StructureGenDSCrossroads extends StructureModuleMF {
         }
         if (x == -(radius - 1) || x == (radius - 1)) {
             if (z == (int) Math.ceil((float) depth / 2) || z == (int) Math.floor((float) depth / 2)) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
             if ((x == -(radius - 1) && (z == (depth - 1) || z == 1))
                     || (x == (radius - 1) && (z == (depth - 1) || z == 1))) {
-                return new Object[]{BlockListMF.reinforced_stone_framed, false};
+                return new Object[] { BlockListMF.reinforced_stone_framed, false };
             }
             int m = 0;
             if (x == 0 || z == 5 || z == (depth - 5)) {
                 m = 1;
             }
-            return new Object[]{BlockListMF.reinforced_stone, m};
+            return new Object[] { BlockListMF.reinforced_stone, m };
         }
         return null;
     }
@@ -177,33 +183,33 @@ public class StructureGenDSCrossroads extends StructureModuleMF {
             return null;
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getFloor(int radius, int depth, int x, int z) {
         if (z < 2 && x >= -1 && x <= 1) {
-            return new Object[]{floor_block, false};
+            return new Object[] { floor_block, false };
         }
         if (x == -radius || x == radius || z == depth || z == 0) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
         if (x == -(radius - 1) || x == (radius - 1) || z == (depth - 1) || z == 1) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{floor_block, false};
+        return new Object[] { floor_block, false };
     }
 
     private Object[] getWalls(int radius, int depth, int x, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if ((x == -radius && (z == depth || z == 0)) || (x == radius && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     public StructureModuleMF setLoot(String loot) {

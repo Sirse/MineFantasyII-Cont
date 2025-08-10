@@ -1,14 +1,17 @@
 package minefantasy.mf2.client.render.block.component;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.tileentity.TileEntityComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.tileentity.TileEntityComponent;
+
 public class TileEntityComponentRenderer extends TileEntitySpecialRenderer {
+
     private ModelBarStack bars;
     private ModelSheetStack sheets;
     private ModelPlankStack planks;
@@ -42,7 +45,9 @@ public class TileEntityComponentRenderer extends TileEntitySpecialRenderer {
 
             CustomMaterial material = tile.material;
             if (material != null) {
-                GL11.glColor3f(material.colourRGB[0] / 255F, material.colourRGB[1] / 255F,
+                GL11.glColor3f(
+                        material.colourRGB[0] / 255F,
+                        material.colourRGB[1] / 255F,
                         material.colourRGB[2] / 255F);
             }
 

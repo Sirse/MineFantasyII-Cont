@@ -1,5 +1,19 @@
 package minefantasy.mf2.item.armour;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.oredict.OreDictionary;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
@@ -12,21 +26,9 @@ import minefantasy.mf2.item.list.CustomArmourListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.mechanics.CombatMechanics;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class ItemCustomArmour extends ItemArmourMF {
+
     private String specialDesign = "standard";
     private float ratingModifier = 1.0F;
     private IIcon plateIcon, detailIcon;
@@ -142,8 +144,7 @@ public class ItemCustomArmour extends ItemArmourMF {
             }
             return;
         }
-        if (this != CustomArmourListMF.standard_chain_boots)
-            return;
+        if (this != CustomArmourListMF.standard_chain_boots) return;
 
         while (iteratorMetal.hasNext()) {
             CustomMaterial customMat = (CustomMaterial) iteratorMetal.next();
@@ -197,8 +198,8 @@ public class ItemCustomArmour extends ItemArmourMF {
 
     @Override
     protected float getSpecialModifier(ItemStack armour, DamageSource source) {
-        float modifier = CombatMechanics.getSpecialModifier(this.getCustomMaterial(armour), this.specialDesign,
-                source.getEntity(), false);
+        float modifier = CombatMechanics
+                .getSpecialModifier(this.getCustomMaterial(armour), this.specialDesign, source.getEntity(), false);
 
         MFLogUtil.logDebug("Modifier = " + modifier);
 

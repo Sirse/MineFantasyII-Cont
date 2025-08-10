@@ -1,12 +1,14 @@
 package minefantasy.mf2.client.render.mob;
 
-import minefantasy.mf2.entity.mob.EntityDragon;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
+import minefantasy.mf2.entity.mob.EntityDragon;
+
 public class ModelVenomDragon extends ModelBase {
+
     public ModelRenderer Body;
     public ModelRenderer Tail1;
     public ModelRenderer Belly1;
@@ -1050,7 +1052,7 @@ public class ModelVenomDragon extends ModelBase {
     }
 
     public void setRotationAngles(EntityDragon dragon, float step1, float step2, float head1, float neckY, float neckX,
-                                  float head4) {
+            float head4) {
         super.setRotationAngles(step1, step2, head1, neckY, neckX, head4, dragon);
         float wingFlap = (float) Math.toRadians(dragon.wingFlap());
         float jawAngle = (float) Math.toRadians(dragon.getJawMove());

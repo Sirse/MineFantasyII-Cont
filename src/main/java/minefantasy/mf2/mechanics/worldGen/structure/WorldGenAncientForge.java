@@ -5,8 +5,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 
 public class WorldGenAncientForge extends WorldGenStructureBase {
-    public WorldGenAncientForge() {
-    }
+
+    public WorldGenAncientForge() {}
 
     @Override
     protected StructureModuleMF getStartPiece(World world, int x, int y, int z, int direction) {
@@ -52,6 +52,6 @@ public class WorldGenAncientForge extends WorldGenStructureBase {
 
     @Override
     protected int[] getYGenBounds(World world) {
-        return new int[]{64, 255};
+        return new int[] { 64, 255 };
     }
 }

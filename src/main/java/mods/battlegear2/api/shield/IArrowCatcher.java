@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
  * @author GotoLink
  */
 public interface IArrowCatcher {
+
     /**
      * @param shield     the {@link ItemStack} corresponding to the shield in use
      * @param player     the {@link EntityPlayer} holding the shield

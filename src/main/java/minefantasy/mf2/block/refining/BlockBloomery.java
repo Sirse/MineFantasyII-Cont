@@ -1,13 +1,7 @@
 package minefantasy.mf2.block.refining;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityBloomery;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.tool.ItemLighterMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -21,9 +15,17 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityBloomery;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.tool.ItemLighterMF;
 
 public class BlockBloomery extends BlockContainer {
+
     public static int bloomery_RI = 109;
     public IIcon bottomTex;
     public IIcon sideTex;
@@ -80,7 +82,11 @@ public class BlockBloomery extends BlockContainer {
                         }
 
                         itemstack.stackSize -= j1;
-                        EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                        EntityItem entityitem = new EntityItem(
+                                world,
+                                x + f,
+                                y + f1,
+                                z + f2,
                                 new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                         if (itemstack.hasTagCompound()) {
@@ -105,7 +111,7 @@ public class BlockBloomery extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         TileEntityBloomery tile = getTile(world, x, y, z);
         if (tile != null) {
             ItemStack held = user.getHeldItem();
@@ -119,8 +125,7 @@ public class BlockBloomery extends BlockContainer {
             if (!tile.isActive && !tile.hasBloom()) {
                 if (held != null && l != 0) {
                     user.playSound("fire.ignite", 1.0F, 1.0F);
-                    if (world.isRemote)
-                        return true;
+                    if (world.isRemote) return true;
                     if (l == 1 && tile.light(user)) {
                         held.damageItem(1, user);
                     }
@@ -147,8 +152,7 @@ public class BlockBloomery extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister reg) {
-    }
+    public void registerBlockIcons(IIconRegister reg) {}
 
     @Override
     public IIcon getIcon(int side, int meta) {

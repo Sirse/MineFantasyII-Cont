@@ -1,6 +1,7 @@
 package minefantasy.mf2.mechanics.worldGen;
 
-import minefantasy.mf2.block.list.BlockListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSapling;
 import net.minecraft.init.Blocks;
@@ -9,20 +10,21 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
+import minefantasy.mf2.block.list.BlockListMF;
 
 public class WorldGenMFTree extends WorldGenAbstractTree {
+
     /**
-     * Contains three sets of two values that provide complimentary indices for a
-     * given 'major' index - 1 and 2 for 0, 0 and 2 for 1, and 0 and 1 for 2.
+     * Contains three sets of two values that provide complimentary indices for a given 'major' index - 1 and 2 for 0, 0
+     * and 2 for 1, and 0 and 1 for 2.
      */
-    static final byte[] otherCoordPairs = new byte[]{(byte) 2, (byte) 0, (byte) 0, (byte) 1, (byte) 2, (byte) 1};
+    static final byte[] otherCoordPairs = new byte[] { (byte) 2, (byte) 0, (byte) 0, (byte) 1, (byte) 2, (byte) 1 };
     private final Block log, leaves;
     /**
      * Reference to the World object.
      */
     World worldObj;
-    int[] basePos = new int[]{0, 0, 0};
+    int[] basePos = new int[] { 0, 0, 0 };
     int heightLimit;
     int height;
     double heightAttenuation = 0.618D;
@@ -31,8 +33,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     double scaleWidth = 1.0D;
     double leafDensity = 1.0D;
     /**
-     * Currently always 1, can be set to 2 in the class constructor to generate a
-     * double-sized tree trunk for big trees.
+     * Currently always 1, can be set to 2 in the class constructor to generate a double-sized tree trunk for big trees.
      */
     int trunkSize = 1;
     /**
@@ -40,8 +41,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
      */
     int heightLimitLimit = 12;
     /**
-     * Sets the distance limit for how far away the generator will populate leaves
-     * from the base leaf node.
+     * Sets the distance limit for how far away the generator will populate leaves from the base leaf node.
      */
     int leafDistanceLimit = 4;
     /**
@@ -72,8 +72,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     /**
-     * Generates a list of leaf nodes for the tree, to be populated by
-     * generateLeaves.
+     * Generates a list of leaf nodes for the tree, to be populated by generateLeaves.
      */
     void generateLeafNodeList() {
         this.height = (int) (this.heightLimit * this.heightAttenuation);
@@ -112,13 +111,14 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
                     double d2 = worldObj.rand.nextFloat() * 2.0D * Math.PI;
                     int k1 = MathHelper.floor_double(d1 * Math.sin(d2) + this.basePos[0] + d0);
                     int l1 = MathHelper.floor_double(d1 * Math.cos(d2) + this.basePos[2] + d0);
-                    int[] aint1 = new int[]{k1, j, l1};
-                    int[] aint2 = new int[]{k1, j + this.leafDistanceLimit, l1};
+                    int[] aint1 = new int[] { k1, j, l1 };
+                    int[] aint2 = new int[] { k1, j + this.leafDistanceLimit, l1 };
 
                     if (this.checkBlockLine(aint1, aint2) == -1) {
-                        int[] aint3 = new int[]{this.basePos[0], this.basePos[1], this.basePos[2]};
-                        double d3 = Math.sqrt(Math.pow(Math.abs(this.basePos[0] - aint1[0]), 2.0D)
-                                + Math.pow(Math.abs(this.basePos[2] - aint1[2]), 2.0D));
+                        int[] aint3 = new int[] { this.basePos[0], this.basePos[1], this.basePos[2] };
+                        double d3 = Math.sqrt(
+                                Math.pow(Math.abs(this.basePos[0] - aint1[0]), 2.0D)
+                                        + Math.pow(Math.abs(this.basePos[2] - aint1[2]), 2.0D));
                         double d4 = d3 * this.branchSlope;
 
                         if (aint1[1] - d4 > l) {
@@ -150,8 +150,8 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
         int l = (int) (f + 0.618D);
         byte b1 = otherCoordPairs[b];
         byte b2 = otherCoordPairs[b + 3];
-        int[] aint = new int[]{x, y, z};
-        int[] aint1 = new int[]{0, 0, 0};
+        int[] aint = new int[] { x, y, z };
+        int[] aint1 = new int[] { 0, 0, 0 };
         int i1 = -l;
         int j1 = -l;
 
@@ -223,7 +223,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     void func_150530_a(int[] x, int[] y, Block block) {
-        int[] aint2 = new int[]{0, 0, 0};
+        int[] aint2 = new int[] { 0, 0, 0 };
         byte b0 = 0;
         byte b1;
 
@@ -248,7 +248,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
 
             double d0 = (double) aint2[b2] / (double) aint2[b1];
             double d1 = (double) aint2[b3] / (double) aint2[b1];
-            int[] aint3 = new int[]{0, 0, 0};
+            int[] aint3 = new int[] { 0, 0, 0 };
             int i = 0;
 
             for (int j = aint2[b1] + b4; i != j; i += b4) {
@@ -288,24 +288,23 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     /**
-     * Indicates whether or not a leaf node requires additional wood to be added to
-     * preserve integrity.
+     * Indicates whether or not a leaf node requires additional wood to be added to preserve integrity.
      */
     boolean leafNodeNeedsBase(int p_76493_1_) {
         return p_76493_1_ >= this.heightLimit * 0.2D;
     }
 
     /**
-     * Places the trunk for the big tree that is being generated. Able to generate
-     * double-sized trunks by changing a field that is always 1 to 2.
+     * Places the trunk for the big tree that is being generated. Able to generate double-sized trunks by changing a
+     * field that is always 1 to 2.
      */
     void generateTrunk() {
         int i = this.basePos[0];
         int j = this.basePos[1];
         int k = this.basePos[1] + this.height;
         int l = this.basePos[2];
-        int[] aint = new int[]{i, j, l};
-        int[] aint1 = new int[]{i, k, l};
+        int[] aint = new int[] { i, j, l };
+        int[] aint1 = new int[] { i, k, l };
         this.func_150530_a(aint, aint1, this.log);
 
         if (this.trunkSize == 2) {
@@ -322,16 +321,15 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     /**
-     * Generates additional wood blocks to fill out the bases of different leaf
-     * nodes that would otherwise degrade.
+     * Generates additional wood blocks to fill out the bases of different leaf nodes that would otherwise degrade.
      */
     void generateLeafNodeBases() {
         int i = 0;
         int j = this.leafNodes.length;
 
-        for (int[] aint = new int[]{this.basePos[0], this.basePos[1], this.basePos[2]}; i < j; ++i) {
+        for (int[] aint = new int[] { this.basePos[0], this.basePos[1], this.basePos[2] }; i < j; ++i) {
             int[] aint1 = this.leafNodes[i];
-            int[] aint2 = new int[]{aint1[0], aint1[1], aint1[2]};
+            int[] aint2 = new int[] { aint1[0], aint1[1], aint1[2] };
             aint[1] = aint1[3];
             int k = aint[1] - this.basePos[1];
 
@@ -342,12 +340,11 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     /**
-     * Checks a line of blocks in the world from the first coordinate to triplet to
-     * the second, returning the distance (in blocks) before a non-air, non-leaf
-     * block is encountered and/or the end is encountered.
+     * Checks a line of blocks in the world from the first coordinate to triplet to the second, returning the distance
+     * (in blocks) before a non-air, non-leaf block is encountered and/or the end is encountered.
      */
     int checkBlockLine(int[] p_76496_1_, int[] p_76496_2_) {
-        int[] aint2 = new int[]{0, 0, 0};
+        int[] aint2 = new int[] { 0, 0, 0 };
         byte b0 = 0;
         byte b1;
 
@@ -374,7 +371,7 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
 
             double d0 = (double) aint2[b2] / (double) aint2[b1];
             double d1 = (double) aint2[b3] / (double) aint2[b1];
-            int[] aint3 = new int[]{0, 0, 0};
+            int[] aint3 = new int[] { 0, 0, 0 };
             int i = 0;
             int j;
 
@@ -394,15 +391,20 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     }
 
     /**
-     * Returns a boolean indicating whether or not the current location for the
-     * tree, spanning basePos to to the height limit, is valid.
+     * Returns a boolean indicating whether or not the current location for the tree, spanning basePos to to the height
+     * limit, is valid.
      */
     boolean validTreeLocation() {
-        int[] aint = new int[]{this.basePos[0], this.basePos[1], this.basePos[2]};
-        int[] aint1 = new int[]{this.basePos[0], this.basePos[1] + this.heightLimit - 1, this.basePos[2]};
+        int[] aint = new int[] { this.basePos[0], this.basePos[1], this.basePos[2] };
+        int[] aint1 = new int[] { this.basePos[0], this.basePos[1] + this.heightLimit - 1, this.basePos[2] };
         Block block = this.worldObj.getBlock(this.basePos[0], this.basePos[1] - 1, this.basePos[2]);
 
-        boolean isSoil = block.canSustainPlant(worldObj, basePos[0], basePos[1] - 1, basePos[2], ForgeDirection.UP,
+        boolean isSoil = block.canSustainPlant(
+                worldObj,
+                basePos[0],
+                basePos[1] - 1,
+                basePos[2],
+                ForgeDirection.UP,
                 (BlockSapling) Blocks.sapling);
         if (!isSoil) {
             return false;

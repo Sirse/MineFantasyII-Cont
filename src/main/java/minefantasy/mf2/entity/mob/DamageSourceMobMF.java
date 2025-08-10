@@ -7,6 +7,7 @@ import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.IChatComponent;
 
 public class DamageSourceMobMF extends EntityDamageSource {
+
     protected Entity damageSourceEntity;
     private String attackName;
 
@@ -24,7 +25,8 @@ public class DamageSourceMobMF extends EntityDamageSource {
     @Override
     public IChatComponent func_151519_b(EntityLivingBase target) {
         String s = "death.attack." + this.damageType + "." + attackName;
-        return new ChatComponentTranslation(s,
-                new Object[]{target.func_145748_c_(), this.damageSourceEntity.func_145748_c_()});
+        return new ChatComponentTranslation(
+                s,
+                new Object[] { target.func_145748_c_(), this.damageSourceEntity.func_145748_c_() });
     }
 }

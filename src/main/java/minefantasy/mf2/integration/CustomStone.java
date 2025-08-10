@@ -1,12 +1,12 @@
 package minefantasy.mf2.integration;
 
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.ArrayList;
 
 public class CustomStone {
 

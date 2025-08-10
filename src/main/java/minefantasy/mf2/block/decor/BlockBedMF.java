@@ -1,10 +1,8 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
+import java.util.Iterator;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
@@ -21,11 +19,15 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 
-import java.util.Iterator;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
 
 public class BlockBedMF extends BlockDirectional {
-    public static final int[][] field_149981_a = new int[][]{{0, 1}, {-1, 0}, {0, -1}, {1, 0}};
+
+    public static final int[][] field_149981_a = new int[][] { { 0, 1 }, { -1, 0 }, { 0, -1 }, { 1, 0 } };
     @SideOnly(Side.CLIENT)
     private IIcon[] endTex;
     @SideOnly(Side.CLIENT)
@@ -101,7 +103,7 @@ public class BlockBedMF extends BlockDirectional {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int meta, float fx, float fy,
-                                    float fz) {
+            float fz) {
         if (world.isRemote) {
             return true;
         } else {
@@ -202,12 +204,12 @@ public class BlockBedMF extends BlockDirectional {
     @SideOnly(Side.CLIENT)
     @Override
     public void registerBlockIcons(IIconRegister register) {
-        this.topTex = new IIcon[]{register.registerIcon(this.getTextureName() + "_feet_top"),
-                register.registerIcon(this.getTextureName() + "_head_top")};
-        this.endTex = new IIcon[]{register.registerIcon(this.getTextureName() + "_feet_end"),
-                register.registerIcon(this.getTextureName() + "_head_end")};
-        this.sideTex = new IIcon[]{register.registerIcon(this.getTextureName() + "_feet_side"),
-                register.registerIcon(this.getTextureName() + "_head_side")};
+        this.topTex = new IIcon[] { register.registerIcon(this.getTextureName() + "_feet_top"),
+                register.registerIcon(this.getTextureName() + "_head_top") };
+        this.endTex = new IIcon[] { register.registerIcon(this.getTextureName() + "_feet_end"),
+                register.registerIcon(this.getTextureName() + "_head_end") };
+        this.sideTex = new IIcon[] { register.registerIcon(this.getTextureName() + "_feet_side"),
+                register.registerIcon(this.getTextureName() + "_head_side") };
         this.baseTex = register.registerIcon(this.getTextureName() + "_base");
     }
 
@@ -220,8 +222,7 @@ public class BlockBedMF extends BlockDirectional {
     }
 
     /**
-     * If this block doesn't render as an ordinary block it will return False
-     * (examples: signs, buttons, stairs, etc)
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
     @Override
     public boolean renderAsNormalBlock() {
@@ -229,9 +230,8 @@ public class BlockBedMF extends BlockDirectional {
     }
 
     /**
-     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or
-     * not to render the shared face of two adjacent blocks and also whether the
-     * player can attach torches, redstone wire, etc to this block.
+     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
      */
     @Override
     public boolean isOpaqueCube() {
@@ -247,9 +247,8 @@ public class BlockBedMF extends BlockDirectional {
     }
 
     /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which
-     * neighbor changed (coordinates passed are their own) Args: x, y, z, neighbor
-     * Block
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor Block
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbour) {
@@ -292,8 +291,8 @@ public class BlockBedMF extends BlockDirectional {
     }
 
     /**
-     * Returns the mobility information of the block, 0 = free, 1 = can't push but
-     * can move over, 2 = total immobility and stop pistons
+     * Returns the mobility information of the block, 0 = free, 1 = can't push but can move over, 2 = total immobility
+     * and stop pistons
      */
     @Override
     public int getMobilityFlag() {

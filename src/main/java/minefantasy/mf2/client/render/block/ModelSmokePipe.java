@@ -1,18 +1,20 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.block.tileentity.TileEntityChimney;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.block.tileentity.TileEntityChimney;
+
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelSmokePipe extends ModelBase {
+
     ModelRenderer centre;
     ModelRenderer north;
     ModelRenderer south;
@@ -86,18 +88,12 @@ public class ModelSmokePipe extends ModelBase {
             east.render(f);
             west.render(f);
         } else {
-            if (tile.canAccept(ForgeDirection.UP))
-                up.render(f);
-            if (tile.canAccept(ForgeDirection.DOWN))
-                down.render(f);
-            if (tile.canAccept(ForgeDirection.NORTH))
-                north.render(f);
-            if (tile.canAccept(ForgeDirection.SOUTH))
-                south.render(f);
-            if (tile.canAccept(ForgeDirection.EAST))
-                east.render(f);
-            if (tile.canAccept(ForgeDirection.WEST))
-                west.render(f);
+            if (tile.canAccept(ForgeDirection.UP)) up.render(f);
+            if (tile.canAccept(ForgeDirection.DOWN)) down.render(f);
+            if (tile.canAccept(ForgeDirection.NORTH)) north.render(f);
+            if (tile.canAccept(ForgeDirection.SOUTH)) south.render(f);
+            if (tile.canAccept(ForgeDirection.EAST)) east.render(f);
+            if (tile.canAccept(ForgeDirection.WEST)) west.render(f);
         }
     }
 }

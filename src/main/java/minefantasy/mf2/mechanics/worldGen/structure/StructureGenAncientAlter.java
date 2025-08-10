@@ -1,7 +1,5 @@
 package minefantasy.mf2.mechanics.worldGen.structure;
 
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -10,7 +8,11 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
+
 public class StructureGenAncientAlter extends StructureModuleMF {
+
     private String lootType = ChestGenHooks.DUNGEON_CHEST;
 
     public StructureGenAncientAlter(World world, int x, int y, int z, int d) {
@@ -71,25 +73,17 @@ public class StructureGenAncientAlter extends StructureModuleMF {
     }
 
     private Object[] getFoundation(int radius, int x, int z) {
-        if (x == -radius && z == -radius)
-            return null;
-        if (x == radius && z == -radius)
-            return null;
-        if (x == -radius && z == radius)
-            return null;
-        if (x == radius && z == radius)
-            return null;
+        if (x == -radius && z == -radius) return null;
+        if (x == radius && z == -radius) return null;
+        if (x == -radius && z == radius) return null;
+        if (x == radius && z == radius) return null;
 
-        if (x == 0 && z == -radius)
-            return new Object[]{Blocks.obsidian, false};
-        if (x == 0 && z == radius)
-            return new Object[]{Blocks.obsidian, false};
-        if (x == -radius && z == 0)
-            return new Object[]{Blocks.obsidian, false};
-        if (x == radius && z == 0)
-            return new Object[]{Blocks.obsidian, false};
+        if (x == 0 && z == -radius) return new Object[] { Blocks.obsidian, false };
+        if (x == 0 && z == radius) return new Object[] { Blocks.obsidian, false };
+        if (x == -radius && z == 0) return new Object[] { Blocks.obsidian, false };
+        if (x == radius && z == 0) return new Object[] { Blocks.obsidian, false };
 
-        return new Object[]{Blocks.stonebrick, true};
+        return new Object[] { Blocks.stonebrick, true };
     }
 
     private void placeChest(int x, int y, int z, String loot) {
@@ -98,7 +92,10 @@ public class StructureGenAncientAlter extends StructureModuleMF {
         TileEntityChest tileentitychest = (TileEntityChest) worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
         if (tileentitychest != null) {
-            WeightedRandomChestContent.generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tileentitychest,
+            WeightedRandomChestContent.generateChestContents(
+                    rand,
+                    ChestGenHooks.getItems(loot, rand),
+                    tileentitychest,
                     ChestGenHooks.getCount(loot, rand));
 
             int artId = rand.nextInt(tileentitychest.getSizeInventory());

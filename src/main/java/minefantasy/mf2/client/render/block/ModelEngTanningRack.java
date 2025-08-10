@@ -6,11 +6,12 @@ import net.minecraft.entity.Entity;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelEngTanningRack extends ModelBase {
+
     // fields
     ModelRenderer side2;
     ModelRenderer side1;

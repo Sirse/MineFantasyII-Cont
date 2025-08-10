@@ -1,8 +1,5 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.mechanics.EventManagerMF;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,15 +10,20 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.mechanics.EventManagerMF;
+
 /**
  * @author Anonymous Productions
  */
 public class ItemWaraxeMF extends ItemWeaponMF {
+
     private float injuryChance = 0.05F;
 
     /**
-     * The waraxe is for brutal players. It does more damage and a higher bonus when
-     * sprinting or jumping. Waraxes are pure damage
+     * The waraxe is for brutal players. It does more damage and a higher bonus when sprinting or jumping. Waraxes are
+     * pure damage
      * <p>
      * These are for the brutal player
      */
@@ -39,7 +41,7 @@ public class ItemWaraxeMF extends ItemWeaponMF {
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         float damage = super.modifyDamage(item, wielder, hit, initialDam, properHit);
         if (!(hit instanceof EntityLivingBase)) {
             return damage;
@@ -59,17 +61,15 @@ public class ItemWaraxeMF extends ItemWeaponMF {
         } else if (wielder.fallDistance > 0 && !wielder.isOnLadder() && tryPerformAbility(wielder, jump_cost))// JUMP: 2
         // points
         {
-            if (properHit)
-                brutalise(wielder, target, 1.0F);
+            if (properHit) brutalise(wielder, target, 1.0F);
             return damage * 1.25F;
         }
         return damage;
     }
 
     private float chargeAt(EntityLivingBase entityHitting, EntityLivingBase entityHit, boolean lunge, float dam,
-                           boolean properHit) {
-        if (properHit)
-            brutalise(entityHitting, entityHit, 1.0F);
+            boolean properHit) {
+        if (properHit) brutalise(entityHitting, entityHit, 1.0F);
 
         if (lunge) {
             float fallBonus = (Math.min(entityHitting.fallDistance, getMeleeDamage(entityHitting.getHeldItem()))) / 2F;

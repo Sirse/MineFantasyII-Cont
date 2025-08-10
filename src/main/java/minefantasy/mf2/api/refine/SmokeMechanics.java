@@ -1,12 +1,13 @@
 package minefantasy.mf2.api.refine;
 
+import java.util.Random;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
-
 public class SmokeMechanics {
+
     public static ISmokeHandler handler;
     /**
      * Do not use this from blocks, use emitSmoke instead Spawns smoke
@@ -38,8 +39,7 @@ public class SmokeMechanics {
     }
 
     /**
-     * Tries to emit smoke, sends it to chimneys if possible Returns -1 for fail, 0
-     * for shared, 1 for success
+     * Tries to emit smoke, sends it to chimneys if possible Returns -1 for fail, 0 for shared, 1 for success
      */
     public static int emitSmoke(World world, int x, int y, int z, int value) {
         TileEntity tile = world.getTileEntity(x, y + 1, z);// The above block

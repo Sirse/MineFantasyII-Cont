@@ -1,15 +1,7 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.heating.TongsHelper;
-import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.tool.crafting.ItemTongs;
-import minefantasy.mf2.material.BaseMaterialMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -25,9 +17,19 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.tool.crafting.ItemTongs;
+import minefantasy.mf2.material.BaseMaterialMF;
 
 public class BlockAnvilMF extends BlockContainer {
+
     public static int anvil_RI = 100;
 
     @SideOnly(Side.CLIENT)
@@ -80,11 +82,12 @@ public class BlockAnvilMF extends BlockContainer {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         ItemStack held = user.getHeldItem();
         TileEntityAnvilMF tile = getTile(world, x, y, z);
         if (tile != null) {
-            if (side == 1 && held != null && held.getItem() instanceof ItemTongs
+            if (side == 1 && held != null
+                    && held.getItem() instanceof ItemTongs
                     && onUsedTongs(world, user, held, tile)) {
                 return true;
             }
@@ -164,7 +167,11 @@ public class BlockAnvilMF extends BlockContainer {
                         }
 
                         itemstack.stackSize -= j1;
-                        EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                        EntityItem entityitem = new EntityItem(
+                                world,
+                                x + f,
+                                y + f1,
+                                z + f2,
                                 new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                         if (itemstack.hasTagCompound()) {
@@ -203,8 +210,7 @@ public class BlockAnvilMF extends BlockContainer {
     @SideOnly(Side.CLIENT)
     @Override
     public void registerBlockIcons(IIconRegister reg) {
-        if (tier != 0)
-            super.registerBlockIcons(reg);
+        if (tier != 0) super.registerBlockIcons(reg);
     }
 
     @Override

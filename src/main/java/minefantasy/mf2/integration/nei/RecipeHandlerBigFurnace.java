@@ -1,16 +1,18 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.ItemList;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
 
 public class RecipeHandlerBigFurnace extends TemplateRecipeHandler {
 
@@ -77,6 +79,7 @@ public class RecipeHandlerBigFurnace extends TemplateRecipeHandler {
     }
 
     private class RecipePair {
+
         private ItemStack inputStack;
         private ItemStack outputStack;
 

@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -14,8 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 
 public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
 
@@ -28,8 +30,7 @@ public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderAModelAt(TileEntityTanningRack tile, double d, double d1, double d2, float f) {
-        if (tile != null)
-            ;
+        if (tile != null);
         int i = 0;
         if (tile.getWorldObj() != null) {
             i = tile.blockMetadata;

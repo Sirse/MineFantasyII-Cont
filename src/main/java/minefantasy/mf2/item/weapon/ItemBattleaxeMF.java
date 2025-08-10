@@ -1,8 +1,5 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.mechanics.EventManagerMF;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,15 +10,19 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.mechanics.EventManagerMF;
+
 /**
  * @author Anonymous Productions
  */
 public class ItemBattleaxeMF extends ItemHeavyWeaponMF {
+
     private float injuryChance = 0.05F;
 
     /**
-     * A battleaxe is a heavy counterpart to the waraxe, it does more damage and
-     * knockback, can also parry easier
+     * A battleaxe is a heavy counterpart to the waraxe, it does more damage and knockback, can also parry easier
      */
     public ItemBattleaxeMF(String name, ToolMaterial material, int rarity, float weight) {
         super(material, name, rarity, weight);
@@ -37,7 +38,7 @@ public class ItemBattleaxeMF extends ItemHeavyWeaponMF {
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         float damage = super.modifyDamage(item, wielder, hit, initialDam, properHit);
         if (!(hit instanceof EntityLivingBase)) {
             return damage;
@@ -57,17 +58,15 @@ public class ItemBattleaxeMF extends ItemHeavyWeaponMF {
         } else if (wielder.fallDistance > 0 && !wielder.isOnLadder() && tryPerformAbility(wielder, jump_cost))// JUMP: 2
         // points
         {
-            if (properHit)
-                brutalise(wielder, target, 1.0F);
+            if (properHit) brutalise(wielder, target, 1.0F);
             return damage * 1.25F;
         }
         return damage;
     }
 
     private float chargeAt(EntityLivingBase entityHitting, EntityLivingBase entityHit, boolean lunge, float dam,
-                           boolean properHit) {
-        if (properHit)
-            brutalise(entityHitting, entityHit, 1.0F);
+            boolean properHit) {
+        if (properHit) brutalise(entityHitting, entityHit, 1.0F);
 
         if (lunge) {
             float fallBonus = (Math.min(entityHitting.fallDistance, getMeleeDamage(entityHitting.getHeldItem()))) / 2F;

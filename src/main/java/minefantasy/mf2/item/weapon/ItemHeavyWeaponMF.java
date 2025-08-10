@@ -1,17 +1,17 @@
 package minefantasy.mf2.item.weapon;
 
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
+import mods.battlegear2.api.weapons.IExtendedReachWeapon;
+
 public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtendedReachWeapon {
 
     /**
-     * Heavy weapons are larger varients of their own counterparts(sword, waraxe,
-     * mace and spear). These have 2x the durability, have a wider parry arc, and do
-     * 50% more damage.
+     * Heavy weapons are larger varients of their own counterparts(sword, waraxe, mace and spear). These have 2x the
+     * durability, have a wider parry arc, and do 50% more damage.
      * <p>
      * Heavy weapons weigh more and throw you off balance when used.
      */

@@ -1,12 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.crafting.IBasicMetre;
-import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.rpg.SkillList;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.CrossbowBenchPacket;
+import java.util.Random;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -17,9 +12,16 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldServer;
 
-import java.util.Random;
+import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.rpg.SkillList;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.CrossbowBenchPacket;
 
 public class TileEntityCrossbowBench extends TileEntity implements IInventory, ISidedInventory, IBasicMetre {
+
     public float progress;
     public float maxProgress = 25F;
     public boolean hasRecipe;
@@ -61,7 +63,12 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
             progress = 0F;
         } else if (ToolHelper.getCrafterTool(user.getHeldItem()).equalsIgnoreCase("spanner")) {
             if (user.getHeldItem() != null) {
-                worldObj.playSoundEffect(xCoord + 0.5, yCoord, zCoord + 0.5, "minefantasy2:block.twistbolt", 0.25F,
+                worldObj.playSoundEffect(
+                        xCoord + 0.5,
+                        yCoord,
+                        zCoord + 0.5,
+                        "minefantasy2:block.twistbolt",
+                        0.25F,
                         1.0F);
                 user.getHeldItem().damageItem(1, user);
                 if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
@@ -102,25 +109,24 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new CrossbowBenchPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new CrossbowBenchPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-					new CrossbowBenchPacket(this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new CrossbowBenchPacket(this).generatePacket()); }
+         */
     }
 
     // INVENORY
 
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     private ItemStack findResult() {
         ICrossbowPart stock = getCrossbowPart(inv[0]);
@@ -128,8 +134,7 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
         ICrossbowPart mod = getCrossbowPart(inv[2]);
         ICrossbowPart muzzle = getCrossbowPart(inv[3]);
 
-        if (stock == null || head == null)
-            return null;
+        if (stock == null || head == null) return null;
 
         return ToolListMF.crossbow_custom.constructCrossbow(stock, head, mod, muzzle);
     }
@@ -200,12 +205,10 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -267,7 +270,7 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[]{0, 1, 2, 3, 4};
+        return new int[] { 0, 1, 2, 3, 4 };
     }
 
     @Override

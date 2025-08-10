@@ -1,13 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.crafting.IHeatUser;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.Alloy;
-import minefantasy.mf2.api.refine.AlloyRecipes;
-import minefantasy.mf2.api.refine.SmokeMechanics;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.refining.BlockCrucible;
-import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.material.Material;
@@ -20,9 +14,17 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.Random;
+import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.refine.Alloy;
+import minefantasy.mf2.api.refine.AlloyRecipes;
+import minefantasy.mf2.api.refine.SmokeMechanics;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.refining.BlockCrucible;
+import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 
 public class TileEntityCrucible extends TileEntity implements IInventory, ISidedInventory, IHeatUser {
+
     // Constants
     private static final int GRID_SLOT_COUNT = 9;
     private static final int OUTPUT_SLOT = 9;
@@ -31,9 +33,9 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private static final float ADVANCED_PROGRESS_MAX = 2000F;
     private static final float SMELT_TEMPERATURE_THRESHOLD = 600F;
 
-    private final int[] gridSlots = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
-    private final int[] outputSlots = new int[]{OUTPUT_SLOT};
-    private final int[] allSlots = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    private final int[] gridSlots = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+    private final int[] outputSlots = new int[] { OUTPUT_SLOT };
+    private final int[] allSlots = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
     public float progress = 0;
     public float progressMax = BASE_PROGRESS_MAX;
@@ -225,9 +227,13 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
     public boolean isCoated() {
         if (this.getTier() >= 2) {
-            return isEnderAlter(-1, -1, -3) && isEnderAlter(-1, -1, 3) && isEnderAlter(-3, -1, -1)
-                    && isEnderAlter(3, -1, -1) && isEnderAlter(1, -1, -3) && isEnderAlter(1, -1, 3)
-                    && isEnderAlter(-3, -1, 1) && isEnderAlter(3, -1, 1);
+            return isEnderAlter(-1, -1, -3) && isEnderAlter(-1, -1, 3)
+                    && isEnderAlter(-3, -1, -1)
+                    && isEnderAlter(3, -1, -1)
+                    && isEnderAlter(1, -1, -3)
+                    && isEnderAlter(1, -1, 3)
+                    && isEnderAlter(-3, -1, 1)
+                    && isEnderAlter(3, -1, 1);
         }
         return isFirebrick(0, 0, -1) && isFirebrick(0, 0, 1) && isFirebrick(-1, 0, 0) && isFirebrick(1, 0, 0);
     }
@@ -348,12 +354,10 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {

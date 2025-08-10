@@ -1,18 +1,20 @@
 package minefantasy.mf2.material;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 public class MetalMaterial extends CustomMaterial {
+
     public MetalMaterial(String name, int tier, float hardness, float durability, float flexibility, float sharpness,
-                         float resistance, float density) {
+            float resistance, float density) {
         super(name, "metal", tier, hardness, durability, flexibility, resistance, sharpness, density);
         setArmourStats(1.0F, flexibility, 1F / flexibility);// Harder materials absorb blunt less but resist cutting and
         // piercing more
@@ -26,12 +28,12 @@ public class MetalMaterial extends CustomMaterial {
      * @param hardness    How hard the material is to break
      * @param flexibility How well the metal can bend
      * @param sharpness   How well the metal can be sharpened
-     * @param resistance  The resistance to elements such as fire and corrosion, right now
-     *                    its just 0-100 for armour resistance against elements
+     * @param resistance  The resistance to elements such as fire and corrosion, right now its just 0-100 for armour
+     *                    resistance against elements
      * @param density     The overall mass (Kg) for an ingot
      */
     public static CustomMaterial getOrAddMetal(String name, int tier, float durability, float flexibility,
-                                               float sharpness, float resistance, float density, int red, int green, int blue) {
+            float sharpness, float resistance, float density, int red, int green, int blue) {
         if (getMaterial(name) != null) {
             return CustomMaterial.getMaterial(name);
         }
@@ -41,7 +43,7 @@ public class MetalMaterial extends CustomMaterial {
     }
 
     public static CustomMaterial getOrAddMetal(String name, int tier, float hardness, float durability,
-                                               float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
+            float flexibility, float sharpness, float resistance, float density, int red, int green, int blue) {
         if (getMaterial(name) != null) {
             return CustomMaterial.getMaterial(name);
         }
@@ -51,9 +53,8 @@ public class MetalMaterial extends CustomMaterial {
 
     public static void init() {
         /*
-         * BaseMaterialMF WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5),
-         * IRON(2, 250, 6.0F, 2.0F, 14), EMERALD(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32,
-         * 12.0F, 0.0F, 22);
+         * BaseMaterialMF WOOD(0, 59, 2.0F, 0.0F, 15), STONE(1, 131, 4.0F, 1.0F, 5), IRON(2, 250, 6.0F, 2.0F, 14),
+         * EMERALD(3, 1561, 8.0F, 3.0F, 10), GOLD(0, 32, 12.0F, 0.0F, 22);
          */
 
         // Weak Mats Name T Dur Flx Shp Rst Wg

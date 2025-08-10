@@ -1,14 +1,15 @@
 package minefantasy.mf2.mechanics.worldGen;
 
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 
-import java.util.Random;
-
 public class WorldGenDuelMinable extends WorldGenerator {
+
     private Block ore, specialOre;
     /**
      * The number of blocks to generate.
@@ -23,7 +24,7 @@ public class WorldGenDuelMinable extends WorldGenerator {
     }
 
     public WorldGenDuelMinable(Block main, int mainMeta, int number, Block target, Block extra, int extraMeta,
-                               float chance) {
+            float chance) {
         this.ore = main;
         this.oreMeta = mainMeta;
         this.veinSize = number;

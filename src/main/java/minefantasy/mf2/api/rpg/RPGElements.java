@@ -1,14 +1,16 @@
 package minefantasy.mf2.api.rpg;
 
-import minefantasy.mf2.api.helpers.PlayerTagData;
-import minefantasy.mf2.util.XSTRandom;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+
+import minefantasy.mf2.api.helpers.PlayerTagData;
+import minefantasy.mf2.util.XSTRandom;
+
 public class RPGElements {
+
     private static final String statsName = "RPGStats_MF";
     public static boolean isSystemActive = true;
     public static float levelSpeedModifier = 1.0F;

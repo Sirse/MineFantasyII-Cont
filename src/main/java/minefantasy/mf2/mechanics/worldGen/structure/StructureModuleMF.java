@@ -1,8 +1,5 @@
 package minefantasy.mf2.mechanics.worldGen.structure;
 
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityWorldGenMarker;
-import minefantasy.mf2.util.XSTRandom;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
@@ -12,7 +9,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DungeonHooks;
 
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityWorldGenMarker;
+import minefantasy.mf2.util.XSTRandom;
+
 public abstract class StructureModuleMF {
+
     public final int xCoord;
     public final int yCoord;
     public final int zCoord;
@@ -50,13 +52,13 @@ public abstract class StructureModuleMF {
     }
 
     public static void placeStructure(String classname, String subtype, int lengthID, int deviation, World world, int x,
-                                      int y, int z, int dir) {
+            int y, int z, int dir) {
         try {
             Class oclass = Class.forName(classname);
 
             if (oclass != null) {
                 StructureModuleMF module = (StructureModuleMF) oclass
-                        .getConstructor(new Class[]{World.class, StructureCoordinates.class})
+                        .getConstructor(new Class[] { World.class, StructureCoordinates.class })
                         .newInstance(world, new StructureCoordinates(x, y, z, dir));
 
                 if (module != null) {
@@ -122,8 +124,7 @@ public abstract class StructureModuleMF {
     }
 
     /**
-     * Places a block and rotates it on it's base direction for pregen designed not
-     * to override the worldGen marker
+     * Places a block and rotates it on it's base direction for pregen designed not to override the worldGen marker
      *
      * @param id   The blockID
      * @param meta the block metadata
@@ -167,8 +168,8 @@ public abstract class StructureModuleMF {
 
     public void placeBlockIfAir(Block id, int meta, int xo, int yo, int zo) {
         int[] offset = offsetPos(xo, yo, zo, direction);
-        if (worldObj.getBlock(offset[0], offset[1], offset[2]).isReplaceable(worldObj, offset[0], offset[1],
-                offset[2])) {
+        if (worldObj.getBlock(offset[0], offset[1], offset[2])
+                .isReplaceable(worldObj, offset[0], offset[1], offset[2])) {
             worldObj.setBlock(offset[0], offset[1], offset[2], id, meta, 2);
         }
     }
@@ -179,8 +180,12 @@ public abstract class StructureModuleMF {
 
     public void placeEntity(Entity entity, int xo, int yo, int zo, int dir) {
         int[] offset = offsetPos(xo, yo, zo, dir);
-        entity.setLocationAndAngles(offset[0] + 0.5D, offset[1] + entity.height - 1.0F, offset[2] + 0.5D,
-                MathHelper.wrapAngleTo180_float(worldObj.rand.nextFloat() * 360.0F), 0.0F);
+        entity.setLocationAndAngles(
+                offset[0] + 0.5D,
+                offset[1] + entity.height - 1.0F,
+                offset[2] + 0.5D,
+                MathHelper.wrapAngleTo180_float(worldObj.rand.nextFloat() * 360.0F),
+                0.0F);
         worldObj.spawnEntityInWorld(entity);
     }
 
@@ -201,7 +206,7 @@ public abstract class StructureModuleMF {
      * @param relative   whether or not it must be stopped by concecutive blocks.
      */
     protected void buildFoundation(Block block, int meta, int x, int y, int z, int max, int penetrance,
-                                   boolean relative) {
+            boolean relative) {
         penetrance -= y;
         int init_penetrance = penetrance;
         while (-y < max) {
@@ -246,8 +251,8 @@ public abstract class StructureModuleMF {
 
     public float getHardness(int xo, int yo, int zo, int dir) {
         int[] offset = offsetPos(xo, yo, zo, dir);
-        return worldObj.getBlock(offset[0], offset[1], offset[2]).getBlockHardness(worldObj, offset[0], offset[1],
-                offset[2]);
+        return worldObj.getBlock(offset[0], offset[1], offset[2])
+                .getBlockHardness(worldObj, offset[0], offset[1], offset[2]);
     }
 
     public void notifyBlock(Block id, int xo, int yo, int zo, int dir) {
@@ -283,7 +288,7 @@ public abstract class StructureModuleMF {
                 break;
         }
 
-        return new int[]{x, y, z};
+        return new int[] { x, y, z };
     }
 
     protected void mapStructure(int x, int y, int z, Class<? extends StructureModuleMF> piece) {
@@ -348,6 +353,7 @@ public abstract class StructureModuleMF {
     }
 
     public static class StructureCoordinates {
+
         public final int posX, posY, posZ, direction;
 
         public StructureCoordinates(int x, int y, int z, int direction) {

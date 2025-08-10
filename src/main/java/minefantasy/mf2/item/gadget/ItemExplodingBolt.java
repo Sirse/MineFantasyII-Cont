@@ -1,5 +1,13 @@
 package minefantasy.mf2.item.gadget;
 
+import java.util.List;
+
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
 import minefantasy.mf2.api.crafting.ISpecialSalvage;
 import minefantasy.mf2.entity.EntityArrowMF;
 import minefantasy.mf2.item.archery.ArrowType;
@@ -8,13 +16,6 @@ import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-
-import java.util.List;
 
 public class ItemExplodingBolt extends ItemArrowMF implements ISpecialSalvage {
 
@@ -69,8 +70,8 @@ public class ItemExplodingBolt extends ItemArrowMF implements ISpecialSalvage {
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{ComponentListMF.bomb_casing_bolt,
+        return new Object[] { ComponentListMF.bomb_casing_bolt,
                 ItemBombComponent.getBombComponent("powder", ItemBomb.getPowder(item)),
-                ItemBombComponent.getBombComponent("filling", ItemBomb.getFilling(item)),};
+                ItemBombComponent.getBombComponent("filling", ItemBomb.getFilling(item)), };
     }
 }

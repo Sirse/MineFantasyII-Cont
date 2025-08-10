@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityRoast;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -17,10 +15,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityRoast;
+
 public class TileEntityRoastRenderer extends TileEntitySpecialRenderer {
+
     private final RenderBlocks blockrender = new RenderBlocks();
     private ModelOven ovenModel;
 
@@ -89,8 +92,7 @@ public class TileEntityRoastRenderer extends TileEntitySpecialRenderer {
     private void renderHungItem(TileEntityRoast tile, double d, double d1, double d2, float f) {
         Minecraft mc = Minecraft.getMinecraft();
         ItemStack itemstack = tile.getStackInSlot(0);
-        if (itemstack == null)
-            return;
+        if (itemstack == null) return;
         // Block
         if (itemstack.getItemSpriteNumber() == 0 && itemstack.getItem() instanceof ItemBlock
                 && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType())) {

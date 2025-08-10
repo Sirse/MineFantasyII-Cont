@@ -1,15 +1,16 @@
 package minefantasy.mf2.api.crafting.refine;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 public class BloomRecipe {// FurnaceRecipes
+
     public static HashMap<ItemStack, ItemStack> recipeList = new HashMap();
     public ItemStack result;
     public int time;

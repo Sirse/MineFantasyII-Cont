@@ -1,28 +1,37 @@
 package minefantasy.mf2.entity.mob;
 
-import minefantasy.mf2.config.ConfigMobs;
-import net.minecraft.world.biome.BiomeGenBase;
-
 import java.util.ArrayList;
 import java.util.Random;
 
+import net.minecraft.world.biome.BiomeGenBase;
+
+import minefantasy.mf2.config.ConfigMobs;
+
 public class DragonBreed {
-    private static final ArrayList<DragonBreed>[] breeds = new ArrayList[]{new ArrayList<DragonBreed>(),
+
+    private static final ArrayList<DragonBreed>[] breeds = new ArrayList[] { new ArrayList<DragonBreed>(),
             new ArrayList<DragonBreed>(), new ArrayList<DragonBreed>(), new ArrayList<DragonBreed>(),
-            new ArrayList<DragonBreed>()};
+            new ArrayList<DragonBreed>() };
 
     /*
-     * New System Breeds Red: Fire, plains and hills Green: Poison, swamps, forests
-     * and plains White: Frost, cold regions Black: Dire, nether
-     *
+     * New System Breeds Red: Fire, plains and hills Green: Poison, swamps, forests and plains White: Frost, cold
+     * regions Black: Dire, nether
      */
     public static DragonBreed YOUNGRED = new DragonBreed(0, "dragon_young", "red", "dragon_red", DragonBreath.fire)
             .setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 15, 200)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 1000, 0.05F).register();
-    public static DragonBreed YOUNGWHITE = new DragonBreed(0, "dragon_young", "white", "dragon_frost",
+    public static DragonBreed YOUNGWHITE = new DragonBreed(
+            0,
+            "dragon_young",
+            "white",
+            "dragon_frost",
             DragonBreath.frost).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 25, 200)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 800, 0.05F).register();
-    public static DragonBreed YOUNGGREEN = new DragonBreed(0, "dragon_young", "green", "dragon_green",
+    public static DragonBreed YOUNGGREEN = new DragonBreed(
+            0,
+            "dragon_young",
+            "green",
+            "dragon_green",
             DragonBreath.poison).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 35, 100)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 400, 0.05F).register();
     public static DragonBreed YOUNGASH = new DragonBreed(0, "dragon_young", "ash", "dragon_ash", DragonBreath.ash)
@@ -58,17 +67,29 @@ public class DragonBreed {
     public static DragonBreed ELDERRED = new DragonBreed(3, "dragon_elder", "red", "dragon_red", DragonBreath.fire)
             .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15, 300)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 400, 0.35F).register();
-    public static DragonBreed ELDERWHITE = new DragonBreed(3, "dragon_elder", "white", "dragon_frost",
+    public static DragonBreed ELDERWHITE = new DragonBreed(
+            3,
+            "dragon_elder",
+            "white",
+            "dragon_frost",
             DragonBreath.frost).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 25, 300)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 300, 0.35F).register();
-    public static DragonBreed ELDERGREEN = new DragonBreed(3, "dragon_elder", "green", "dragon_green",
+    public static DragonBreed ELDERGREEN = new DragonBreed(
+            3,
+            "dragon_elder",
+            "green",
+            "dragon_green",
             DragonBreath.poison).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 35, 200)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 200, 0.35F).register();
     public static DragonBreed ELDERASH = new DragonBreed(3, "dragon_elder", "ash", "dragon_ash", DragonBreath.ash)
             .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15, 300)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 100, 0.35F).setBlind().register();
 
-    public static DragonBreed ANCIENT = new DragonBreed(4, "dragon_ancient", "dire", "dragon_ancient",
+    public static DragonBreed ANCIENT = new DragonBreed(
+            4,
+            "dragon_ancient",
+            "dire",
+            "dragon_ancient",
             DragonBreath.fire).setCombat(ConfigMobs.ancientdragonHP, 2.0F, 5F, ConfigMobs.ancientdragonMD, 20, 300)
             .setProjectile(ConfigMobs.ancientdragonFD, ConfigMobs.ancientdragonFT, 400, 1.0F).register();
     private static Random rand = new Random();
@@ -107,7 +128,8 @@ public class DragonBreed {
     public static int getRandomDragon(EntityDragon dragon, int tier) {
         ArrayList<DragonBreed> pool = breeds[tier];
         BiomeGenBase biome = dragon.worldObj.getBiomeGenForCoords((int) (dragon.posX), (int) (dragon.posZ));
-        int id = getIdForBiome(biome,
+        int id = getIdForBiome(
+                biome,
                 dragon.worldObj.canLightningStrikeAt((int) dragon.posX, (int) dragon.posY, (int) dragon.posZ),
                 dragon.dimension);
         if (id >= pool.size()) {
@@ -121,19 +143,15 @@ public class DragonBreed {
             return rand.nextBoolean() ? 3 : 0;// Ash or Fire
         }
         BiomeGenBase.TempCategory category = biome.getTempCategory();
-        if (!biome.func_150559_j() && !biome.canSpawnLightningBolt())
-            return 3;// Ash
-        if (biome.getEnableSnow() || biome.temperature <= 0.25F || category == BiomeGenBase.TempCategory.COLD)
-            return 1;// Frost
-        if (biome.isHighHumidity() || (category == BiomeGenBase.TempCategory.MEDIUM && isRaining))
-            return 2;// Poison
-        if (category == BiomeGenBase.TempCategory.OCEAN)
-            return 2;// Poison
+        if (!biome.func_150559_j() && !biome.canSpawnLightningBolt()) return 3;// Ash
+        if (biome.getEnableSnow() || biome.temperature <= 0.25F || category == BiomeGenBase.TempCategory.COLD) return 1;// Frost
+        if (biome.isHighHumidity() || (category == BiomeGenBase.TempCategory.MEDIUM && isRaining)) return 2;// Poison
+        if (category == BiomeGenBase.TempCategory.OCEAN) return 2;// Poison
         return 0;// Fire
     }
 
     public DragonBreed setCombat(float health, float DT, float regenRate, float meleeDamage, int meleeSpeed,
-                                 int disengageChance) {
+            int disengageChance) {
         this.health = health;
         this.regenRate = regenRate;
         this.meleeDamage = meleeDamage;

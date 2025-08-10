@@ -1,11 +1,13 @@
 package minefantasy.mf2.hunger;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import minefantasy.mf2.api.MineFantasyAPI;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class HungerSystemMF {
+
     private static final String prevFoodNBT = "MF_previousFoodLevel";
     private static final String tempFoodNBT = "MF_tempFood";
     private static final String saturationNBT = "MF_saturationTicks";

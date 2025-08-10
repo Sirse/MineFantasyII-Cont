@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelJugStack extends ModelBase {
+
     private ModelRenderer[] jug = new ModelRenderer[32];
 
     public ModelJugStack() {

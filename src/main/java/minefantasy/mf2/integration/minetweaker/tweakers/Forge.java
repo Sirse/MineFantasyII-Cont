@@ -18,6 +18,7 @@ public class Forge {
     }
 
     private static class AddHeatableAction implements IUndoableAction {
+
         private final IIngredient input;
         private final int min, unstable, max;
 

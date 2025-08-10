@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.heating;
 
 public interface IQuenchBlock {
+
     /**
      * Quench an item
      *

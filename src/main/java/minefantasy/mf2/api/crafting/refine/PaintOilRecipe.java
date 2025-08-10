@@ -1,14 +1,15 @@
 package minefantasy.mf2.api.crafting.refine;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 public class PaintOilRecipe {// FurnaceRecipes
+
     public static HashMap<ItemStack, ItemStack> recipeList = new HashMap();
 
     /**

@@ -1,9 +1,10 @@
 package minefantasy.mf2.item;
 
+import net.minecraft.item.ItemStack;
+
 import cpw.mods.fml.common.IFuelHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.item.list.ComponentListMF;
-import net.minecraft.item.ItemStack;
 
 public class FuelHandlerMF implements IFuelHandler {
 

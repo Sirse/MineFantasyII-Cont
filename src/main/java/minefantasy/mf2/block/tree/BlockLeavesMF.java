@@ -1,9 +1,7 @@
 package minefantasy.mf2.block.tree;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -14,9 +12,13 @@ import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.IShearable;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
 
 public class BlockLeavesMF extends BlockLeaves implements IShearable {
+
     private String name;
     private Block sapling;
     private int dropRate;
@@ -85,7 +87,7 @@ public class BlockLeavesMF extends BlockLeaves implements IShearable {
 
     @Override
     public String[] func_150125_e() {
-        return new String[]{""};
+        return new String[] { "" };
     }
 
     @SideOnly(Side.CLIENT)

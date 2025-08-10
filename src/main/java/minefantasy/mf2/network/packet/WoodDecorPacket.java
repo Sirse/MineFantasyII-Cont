@@ -1,23 +1,24 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class WoodDecorPacket extends PacketMF {
+
     public static final String packetName = "MF2_WdDecorPkt";
     private int[] coords = new int[3];
     private String materialName;
 
     public WoodDecorPacket(TileEntityWoodDecor tile) {
-        this.coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        this.coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         this.materialName = tile.getMaterialName();
     }
 
-    public WoodDecorPacket() {
-    }
+    public WoodDecorPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

@@ -1,9 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import minefantasy.mf2.api.archery.AmmoMechanicsMF;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.item.gadget.ItemCrossbow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -13,14 +9,20 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.client.FMLClientHandler;
+import minefantasy.mf2.api.archery.AmmoMechanicsMF;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.item.gadget.ItemCrossbow;
+
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons.
- * though small bits of code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 
 public class RenderCrossbow implements IItemRenderer {
@@ -33,7 +35,7 @@ public class RenderCrossbow implements IItemRenderer {
     }
 
     public static void draw2dItem(Tessellator tessellator, float f, float f1, float f2, float f3, float thickness,
-                                  float res, float resSq) {
+            float res, float resSq) {
         float f4 = 1.0F;
         float f5 = 0.0625F * thickness;
         tessellator.startDrawingQuads();
@@ -179,8 +181,7 @@ public class RenderCrossbow implements IItemRenderer {
             GL11.glTranslatef(0F, 0F, 0.0625F / 2F);
         }
         Minecraft mc = FMLClientHandler.instance().getClient();
-        if (item != null)
-            mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
+        if (item != null) mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
 
         if (flip) {
             GL11.glRotatef(90, 1, 1, 0);
@@ -239,9 +240,8 @@ public class RenderCrossbow implements IItemRenderer {
     }
 
     private void renderIcon(Minecraft mc, ItemStack item, Tessellator tessellator, IIcon icon, float scale,
-                            boolean enchant) {
-        if (icon == null)
-            return;
+            boolean enchant) {
+        if (icon == null) return;
 
         float x1 = icon.getMinU();
         float x2 = icon.getMaxU();
@@ -251,15 +251,14 @@ public class RenderCrossbow implements IItemRenderer {
         float var11 = 0.3F;
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         /*
-         * GL11.glTranslatef(-var10, -var11, 0.0F); float var12 = 1.5F;
-         * GL11.glScalef(var12, var12, var12); GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F);
-         * GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F); GL11.glTranslatef(-0.9375F,
-         * -0.0625F, 0.0F);
+         * GL11.glTranslatef(-var10, -var11, 0.0F); float var12 = 1.5F; GL11.glScalef(var12, var12, var12);
+         * GL11.glRotatef(50.0F, 0.0F, 1.0F, 0.0F); GL11.glRotatef(335.0F, 0.0F, 0.0F, 1.0F);
+         * GL11.glTranslatef(-0.9375F, -0.0625F, 0.0F);
          */
 
         GL11.glScalef(scale, scale, scale);
-        ItemRenderer.renderItemIn2D(tessellator, x2, y1, x1, y2, (icon.getIconWidth()), (icon.getIconHeight()),
-                0.0625F);
+        ItemRenderer
+                .renderItemIn2D(tessellator, x2, y1, x1, y2, (icon.getIconWidth()), (icon.getIconHeight()), 0.0625F);
 
         if (enchant && item != null && item.isItemEnchanted()) {
             GL11.glDepthFunc(GL11.GL_EQUAL);
@@ -276,16 +275,30 @@ public class RenderCrossbow implements IItemRenderer {
             float var15 = System.currentTimeMillis() % 3000L / 3000.0F * 8.0F;
             GL11.glTranslatef(var15, 0.0F, 0.0F);
             GL11.glRotatef(-50.0F, 0.0F, 0.0F, 1.0F);
-            ItemRenderer.renderItemIn2D(tessellator, x2, y1, x1, y2, (int) (icon.getIconWidth() * scale),
-                    (int) (icon.getIconHeight() * scale), 0.0625F);
+            ItemRenderer.renderItemIn2D(
+                    tessellator,
+                    x2,
+                    y1,
+                    x1,
+                    y2,
+                    (int) (icon.getIconWidth() * scale),
+                    (int) (icon.getIconHeight() * scale),
+                    0.0625F);
             GL11.glPopMatrix();
             GL11.glPushMatrix();
             GL11.glScalef(var14, var14, var14);
             var15 = System.currentTimeMillis() % 4873L / 4873.0F * 8.0F;
             GL11.glTranslatef(-var15, 0.0F, 0.0F);
             GL11.glRotatef(10.0F, 0.0F, 0.0F, 1.0F);
-            ItemRenderer.renderItemIn2D(tessellator, x2, y1, x1, y2, (int) (icon.getIconWidth() * scale),
-                    (int) (icon.getIconHeight() * scale), 0.0625F);
+            ItemRenderer.renderItemIn2D(
+                    tessellator,
+                    x2,
+                    y1,
+                    x1,
+                    y2,
+                    (int) (icon.getIconWidth() * scale),
+                    (int) (icon.getIconHeight() * scale),
+                    0.0625F);
             GL11.glPopMatrix();
             GL11.glMatrixMode(GL11.GL_MODELVIEW);
             GL11.glDisable(GL11.GL_BLEND);

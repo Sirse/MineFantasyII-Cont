@@ -1,12 +1,5 @@
 package minefantasy.mf2.mechanics;
 
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.api.stamina.IStaminaWeapon;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.config.ConfigClient;
-import minefantasy.mf2.config.ConfigStamina;
-import minefantasy.mf2.network.packet.StaminaPacket;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -19,7 +12,16 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.stamina.IStaminaWeapon;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.config.ConfigClient;
+import minefantasy.mf2.config.ConfigStamina;
+import minefantasy.mf2.network.packet.StaminaPacket;
+
 public class StaminaMechanics {
+
     private static boolean hurtAdreneline = true;
     private static int bowSeconds = 30;
 
@@ -29,9 +31,9 @@ public class StaminaMechanics {
             ArmourCalculator.setTotalWeightOfWorn(entity, false);
         }
 
-        float[] packet = new float[]{StaminaBar.getStaminaValue(entity), StaminaBar.getBaseMaxStamina(entity),
-                StaminaBar.getFlashTime(entity), StaminaBar.getBonusStamina(entity)};
-        float[] values = new float[]{StaminaBar.getStaminaValue(entity), StaminaBar.getTotalMaxStamina(entity)};
+        float[] packet = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getBaseMaxStamina(entity),
+                StaminaBar.getFlashTime(entity), StaminaBar.getBonusStamina(entity) };
+        float[] values = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getTotalMaxStamina(entity) };
         if (entity.worldObj.isRemote && ConfigClient.playBreath) {
             if (!StaminaBar.isPercentStamAvailable(entity, 0.2F, false) && !entity.isInsideOfMaterial(Material.water)) {
                 if (entity.ticksExisted % 20 == 0) {
@@ -112,8 +114,8 @@ public class StaminaMechanics {
 
     private static void syncStamina(EntityPlayer player, float[] stam) {
         if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker().func_151248_b(player,
-                    new StaminaPacket(stam, player).generatePacket());
+            ((WorldServer) player.worldObj).getEntityTracker()
+                    .func_151248_b(player, new StaminaPacket(stam, player).generatePacket());
         }
     }
 

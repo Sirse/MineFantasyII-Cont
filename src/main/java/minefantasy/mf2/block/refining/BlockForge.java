@@ -1,5 +1,24 @@
 package minefantasy.mf2.block.refining;
 
+import java.util.List;
+import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -17,26 +36,9 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.tool.ItemLighterMF;
 import minefantasy.mf2.item.tool.crafting.ItemTongs;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-
-import java.util.List;
-import java.util.Random;
 
 public class BlockForge extends BlockContainer {
+
     public static int forge_RI = 104;
     private static boolean keepInventory;
     public final boolean isActive;
@@ -110,8 +112,7 @@ public class BlockForge extends BlockContainer {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepInventory)
-            return;
+        if (keepInventory) return;
 
         TileEntityForge tile = getTile(world, x, y, z);
 
@@ -132,7 +133,11 @@ public class BlockForge extends BlockContainer {
                         }
 
                         itemstack.stackSize -= j1;
-                        EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2,
+                        EntityItem entityitem = new EntityItem(
+                                world,
+                                x + f,
+                                y + f1,
+                                z + f2,
                                 new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                         if (itemstack.hasTagCompound()) {
@@ -163,7 +168,7 @@ public class BlockForge extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         ItemStack held = user.getHeldItem();
         TileEntityForge tile = getTile(world, x, y, z);
         if (tile != null) {
@@ -172,7 +177,8 @@ public class BlockForge extends BlockContainer {
                 user.attackEntityFrom(DamageSource.onFire, 1.0F);
             }
             if (held != null) {
-                if (side == 1 && held != null && held.getItem() instanceof ItemTongs
+                if (side == 1 && held != null
+                        && held.getItem() instanceof ItemTongs
                         && onUsedTongs(world, user, held, tile)) {
                     return true;
                 }
@@ -258,8 +264,7 @@ public class BlockForge extends BlockContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister reg) {
-    }
+    public void registerBlockIcons(IIconRegister reg) {}
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -302,9 +307,8 @@ public class BlockForge extends BlockContainer {
     }
 
     /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which
-     * neighbor changed (coordinates passed are their own) Args: x, y, z, neighbor
-     * Block
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor Block
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {

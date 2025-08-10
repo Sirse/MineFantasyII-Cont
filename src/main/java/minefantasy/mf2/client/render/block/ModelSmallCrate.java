@@ -4,11 +4,12 @@ import net.minecraft.client.model.ModelRenderer;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelSmallCrate extends ModelAmmoBox {
+
     public ModelSmallCrate() {
         textureWidth = 64;
         textureHeight = 32;

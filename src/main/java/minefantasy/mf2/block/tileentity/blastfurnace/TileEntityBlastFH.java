@@ -1,18 +1,20 @@
 package minefantasy.mf2.block.tileentity.blastfurnace;
 
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.block.refining.BlockBFH;
-import minefantasy.mf2.block.tileentity.TileEntityCrucible;
-import minefantasy.mf2.config.ConfigHardcore;
-import minefantasy.mf2.entity.EntityFireBlast;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.block.refining.BlockBFH;
+import minefantasy.mf2.block.tileentity.TileEntityCrucible;
+import minefantasy.mf2.config.ConfigHardcore;
+import minefantasy.mf2.entity.EntityFireBlast;
+
 public class TileEntityBlastFH extends TileEntityBlastFC {
+
     public static float maxProgress = 1200;
     public static int maxFurnaceHeight = 8;
     public int fuel;
@@ -55,12 +57,10 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             }
         }
         if (fireTime > 0) {
-            if (fuel > 0)
-                --fuel;
+            if (fuel > 0) --fuel;
             smokeStorage++;
             fireTime--;
-            if (ticksExisted % 2 == 0)
-                shootFire();
+            if (ticksExisted % 2 == 0) shootFire();
 
         }
         if (!worldObj.isRemote && wasBurning != isBurning()) {
@@ -116,8 +116,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
                 }
             }
         }
-        if (result.stackSize <= 0)
-            return;
+        if (result.stackSize <= 0) return;
 
         if (ConfigHardcore.HCCreduceIngots && rand.nextInt(3) == 0) {
             EntityItem entity = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, result);
@@ -142,8 +141,14 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     private void shootFire(int x, int y, int z) {
         double v = 0.125D;
-        EntityFireBlast fireball = new EntityFireBlast(worldObj, xCoord + 0.5 + x, yCoord, zCoord + 0.5 + z, x * v,
-                y * v, z * v);
+        EntityFireBlast fireball = new EntityFireBlast(
+                worldObj,
+                xCoord + 0.5 + x,
+                yCoord,
+                zCoord + 0.5 + z,
+                x * v,
+                y * v,
+                z * v);
         fireball.getEntityData().setString("Preset", "BlastFurnace");
         fireball.modifySpeed(0.5F);
         worldObj.spawnEntityInWorld(fireball);
@@ -206,7 +211,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return side > 0 ? new int[]{0} : new int[]{};
+        return side > 0 ? new int[] { 0 } : new int[] {};
     }
 
     @Override

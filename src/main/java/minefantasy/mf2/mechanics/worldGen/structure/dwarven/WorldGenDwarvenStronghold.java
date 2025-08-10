@@ -1,14 +1,15 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
-import minefantasy.mf2.mechanics.worldGen.structure.WorldGenStructureBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+import minefantasy.mf2.mechanics.worldGen.structure.WorldGenStructureBase;
+
 public class WorldGenDwarvenStronghold extends WorldGenStructureBase {
+
     /**
-     * A debug method used to allow strongholds to generate in the air, for easy
-     * observation of shape and size.
+     * A debug method used to allow strongholds to generate in the air, for easy observation of shape and size.
      */
     public static final boolean debug_air = false;
     /**
@@ -17,8 +18,7 @@ public class WorldGenDwarvenStronghold extends WorldGenStructureBase {
     public static float maxAir = 0.25F;
     private boolean isSurfaceBuild = false;
 
-    public WorldGenDwarvenStronghold() {
-    }
+    public WorldGenDwarvenStronghold() {}
 
     public void setSurfaceMode(boolean flag) {
         isSurfaceBuild = flag;
@@ -28,10 +28,8 @@ public class WorldGenDwarvenStronghold extends WorldGenStructureBase {
     protected StructureModuleMF getStartPiece(World world, int x, int y, int z, int direction) {
         return new StructureGenDSEntry(world, x, y - 1, z, direction, isSurfaceBuild);
         /*
-         * if(startPiece == null) { startPiece = new StructureGenDSEntry(world, x, y-1,
-         * z, direction, isSurfaceBuild); } startPiece.direction = direction; return
-         * startPiece;
-         *
+         * if(startPiece == null) { startPiece = new StructureGenDSEntry(world, x, y-1, z, direction, isSurfaceBuild); }
+         * startPiece.direction = direction; return startPiece;
          */
     }
 
@@ -71,6 +69,6 @@ public class WorldGenDwarvenStronghold extends WorldGenStructureBase {
 
     @Override
     protected int[] getYGenBounds(World world) {
-        return new int[]{60, 255};
+        return new int[] { 60, 255 };
     }
 }

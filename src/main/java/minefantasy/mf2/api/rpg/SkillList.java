@@ -28,6 +28,5 @@ public class SkillList {
     // public static Skill heavyarmour = new Skill("heavyarmour").register();
     // public static Skill block = new Skill("block").register();
 
-    public static void init() {
-    }
+    public static void init() {}
 }

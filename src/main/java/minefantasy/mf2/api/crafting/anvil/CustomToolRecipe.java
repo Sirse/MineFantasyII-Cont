@@ -1,18 +1,20 @@
 package minefantasy.mf2.api.crafting.anvil;
 
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.Skill;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * @author AnonymousProductions
  */
 public class CustomToolRecipe extends ShapedAnvilRecipes {
+
     public CustomToolRecipe(int wdth, int heit, ItemStack[] inputs, ItemStack output, String toolType, int time,
-                            int hammer, int anvi, boolean hot, String research, Skill skill) {
+            int hammer, int anvi, boolean hot, String research, Skill skill) {
         super(wdth, heit, inputs, output, toolType, time, hammer, anvi, hot, research, skill);
     }
 

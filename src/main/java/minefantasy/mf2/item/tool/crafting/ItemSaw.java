@@ -1,19 +1,9 @@
 package minefantasy.mf2.item.tool.crafting;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.api.tool.IToolMF;
-import minefantasy.mf2.api.weapon.IDamageType;
-import minefantasy.mf2.api.weapon.IRackItem;
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -27,14 +17,27 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.ForgeHooks;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.tool.IToolMF;
+import minefantasy.mf2.api.weapon.IDamageType;
+import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemSaw extends ItemAxe implements IToolMaterial, IDamageType, IToolMF, IRackItem {
+
     protected int itemRarity;
     private float hitDamage;
     private float baseDamage;
@@ -70,14 +73,15 @@ public class ItemSaw extends ItemAxe implements IToolMaterial, IDamageType, IToo
     @Override
     public Multimap getItemAttributeModifiers() {
         Multimap multimap = super.getItemAttributeModifiers();
-        multimap.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        multimap.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Tool modifier", this.hitDamage, 0));
         return multimap;
     }
 
     @Override
     public float[] getDamageRatio(Object... implement) {
-        return new float[]{1, 0, 0};
+        return new float[] { 1, 0, 0 };
     }
 
     @Override
@@ -120,7 +124,8 @@ public class ItemSaw extends ItemAxe implements IToolMaterial, IDamageType, IToo
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;

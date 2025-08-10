@@ -3,6 +3,7 @@ package minefantasy.mf2.config;
 import minefantasy.mf2.entity.mob.EntityDragon;
 
 public class ConfigMobs extends ConfigurationBaseMF {
+
     public static final String BASIC = "1-1: Basic Entities";
     public static final String MOB_DRAGON = "2-4: DRAGON";
     public static final String MOB_MINOTAUR = "5-5: MINOTAUR";
@@ -55,28 +56,48 @@ public class ConfigMobs extends ConfigurationBaseMF {
         ancientdragonFD = Integer.parseInt(config.get(MOB_DRAGON, "2Eb: Fire dmg", 10).getString());
         ancientdragonFT = Integer.parseInt(config.get(MOB_DRAGON, "2Ec: Fire time", 100).getString());
 
-        dragonInterval = Integer.parseInt(config.get(MOB_DRAGON, "3A: Dragon Spawn Interval", 12000,
-                "How many ticks between visits (12000 means 4 times a day), there is a chance for a dragon each time")
-                .getString());
-        dragonChance = Float.parseFloat(config
-                .get(MOB_DRAGON, "3B: Spawn Chance", 5F, "A Percent (0-100) chance that a dragon spawns at set times")
-                .getString());
+        dragonInterval = Integer.parseInt(
+                config.get(
+                        MOB_DRAGON,
+                        "3A: Dragon Spawn Interval",
+                        12000,
+                        "How many ticks between visits (12000 means 4 times a day), there is a chance for a dragon each time")
+                        .getString());
+        dragonChance = Float.parseFloat(
+                config.get(
+                        MOB_DRAGON,
+                        "3B: Spawn Chance",
+                        5F,
+                        "A Percent (0-100) chance that a dragon spawns at set times").getString());
 
-        dragonKillNPC = Boolean.parseBoolean(config.get(MOB_DRAGON, "4A: Kill NPC Grief", true,
-                "Should dragons kill NPCs (including villages as well as animals/mobs)... Not as determined though")
-                .getString());
+        dragonKillNPC = Boolean.parseBoolean(
+                config.get(
+                        MOB_DRAGON,
+                        "4A: Kill NPC Grief",
+                        true,
+                        "Should dragons kill NPCs (including villages as well as animals/mobs)... Not as determined though")
+                        .getString());
         dragonGriefFire = Boolean.parseBoolean(
                 config.get(MOB_DRAGON, "4B: Fire Grief", true, "Should fire breath start fires").getString());
-        dragonGriefGeneral = Boolean.parseBoolean(config.get(MOB_DRAGON, "4C: General Block Grief", true,
-                "Should blocks be frozen by frost breath, melted by fire, or glass shatter with fire and stomping")
-                .getString());
+        dragonGriefGeneral = Boolean.parseBoolean(
+                config.get(
+                        MOB_DRAGON,
+                        "4C: General Block Grief",
+                        true,
+                        "Should blocks be frozen by frost breath, melted by fire, or glass shatter with fire and stomping")
+                        .getString());
         dragonMSG = Boolean.parseBoolean(
                 config.get(MOB_DRAGON, "4D: Spawn Message", true, "Will players get a message when dragons enter/leave")
                         .getString());
-        EntityDragon.interestTimeSeconds = Integer.parseInt(config.get(MOB_DRAGON, "4E: Dragon Interest Time", 90,
-                "How many seconds until a dragon leaves (2x as long if wounded) ").getString());
-        EntityDragon.heartChance = Float.parseFloat(config
-                .get(MOB_DRAGON, "4F: Heart Drop chance modifier", 1F, "Modify chance of getting a heart").getString());
+        EntityDragon.interestTimeSeconds = Integer.parseInt(
+                config.get(
+                        MOB_DRAGON,
+                        "4E: Dragon Interest Time",
+                        90,
+                        "How many seconds until a dragon leaves (2x as long if wounded) ").getString());
+        EntityDragon.heartChance = Float.parseFloat(
+                config.get(MOB_DRAGON, "4F: Heart Drop chance modifier", 1F, "Modify chance of getting a heart")
+                        .getString());
 
         minotaurSpawnrate = Integer.parseInt(config.get(MOB_MINOTAUR, "5Aa: Overworld Spawnrate", 5).getString());
         minotaurSpawnrateNether = Integer.parseInt(config.get(MOB_MINOTAUR, "5Ab: Nether Spawnrate", 25).getString());

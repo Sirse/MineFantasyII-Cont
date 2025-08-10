@@ -1,12 +1,14 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityRoad;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityRoad;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class RoadPacket extends PacketMF {
+
     public static final String packetName = "MF2_RoadPacket";
     private int[] coords = new int[3];
     private int[] surface;
@@ -14,13 +16,12 @@ public class RoadPacket extends PacketMF {
     private boolean isRequest = false;
 
     public RoadPacket(TileEntityRoad tile) {
-        this.coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        this.coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         this.surface = tile.surface;
         this.isLocked = tile.isLocked;
     }
 
-    public RoadPacket() {
-    }
+    public RoadPacket() {}
 
     public RoadPacket request() {
         isRequest = true;
@@ -47,7 +48,7 @@ public class RoadPacket extends PacketMF {
                 int s0 = packet.readInt();
                 int s1 = packet.readInt();
                 this.isLocked = packet.readBoolean();
-                tile.surface = new int[]{s0, s1};
+                tile.surface = new int[] { s0, s1 };
                 tile.isLocked = this.isLocked;
                 tile.refreshSurface();
             }

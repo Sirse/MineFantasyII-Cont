@@ -1,9 +1,9 @@
 package mods.battlegear2.api.heraldry;
 
-import net.minecraft.client.renderer.texture.DynamicTexture;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
+
+import net.minecraft.client.renderer.texture.DynamicTexture;
 
 public class RefreshableTexture extends DynamicTexture {
 
@@ -33,12 +33,23 @@ public class RefreshableTexture extends DynamicTexture {
     }
 
     public void refreshWith(int[][][][] pattern, HeraldryData data, boolean scale) {
-        BufferedImage image = new BufferedImage(pattern[data.getPattern()][0].length,
-                pattern[data.getPattern()][0][0].length, BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage image = new BufferedImage(
+                pattern[data.getPattern()][0].length,
+                pattern[data.getPattern()][0][0].length,
+                BufferedImage.TYPE_4BYTE_ABGR);
         for (int x = 0; x < image.getWidth(); x++) {
             for (int y = 0; y < image.getHeight(); y++) {
-                image.setRGB(x, y, PatternStore.getBlendedSmallPixel(pattern, data.getPattern(), x, y,
-                        data.getColour(0), data.getColour(1), data.getColour(2)));
+                image.setRGB(
+                        x,
+                        y,
+                        PatternStore.getBlendedSmallPixel(
+                                pattern,
+                                data.getPattern(),
+                                x,
+                                y,
+                                data.getColour(0),
+                                data.getColour(1),
+                                data.getColour(2)));
             }
         }
         if (scale && (image.getHeight() != height || image.getWidth() != width)) {

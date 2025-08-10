@@ -3,11 +3,11 @@ package mods.battlegear2.api;
 import net.minecraftforge.client.IItemRenderer;
 
 /**
- * Soon: Utility to use one of the default Battlegear2 renderer Implement in an
- * item to get its renderer automatically registered This is obviously
- * client-side only
+ * Soon: Utility to use one of the default Battlegear2 renderer Implement in an item to get its renderer automatically
+ * registered This is obviously client-side only
  */
 public interface IDefaultRender {
+
     /**
      * Called before anything else
      *
@@ -23,17 +23,20 @@ public interface IDefaultRender {
     public RenderType getRenderer();
 
     /**
-     * Called by Battlegear2 configuration GUI when the rendering option is toggled
-     * Use this to react, using another renderer when this one is disabled for
-     * example
+     * Called by Battlegear2 configuration GUI when the rendering option is toggled Use this to react, using another
+     * renderer when this one is disabled for example
      *
-     * @param isEnabled the new rendering state: on true, the renderer is going to be
-     *                  used, on false, it is disabled
+     * @param isEnabled the new rendering state: on true, the renderer is going to be used, on false, it is disabled
      */
     public void setRenderState(boolean isEnabled);
 
     public enum RenderType {
-        Bow, FlagPole, Quiver, Shield, Spear, HeraldryCrest, // Work in progress, not recommended for use
+        Bow,
+        FlagPole,
+        Quiver,
+        Shield,
+        Spear,
+        HeraldryCrest, // Work in progress, not recommended for use
         HeraldryItem// Work in progress, not recommended for use
     }
 }

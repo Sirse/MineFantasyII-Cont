@@ -1,5 +1,19 @@
 package minefantasy.mf2.item.custom;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -11,21 +25,9 @@ import minefantasy.mf2.block.decor.BlockComponent;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class ItemCustomComponent extends Item implements ITieredComponent {
+
     private final String materialType;
     @SideOnly(Side.CLIENT)
     public IIcon baseTex;
@@ -33,8 +35,7 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
     private float mass;
     private boolean canDamage = false;
     // STORAGE
-    private String blocktex;
-    ;
+    private String blocktex;;
     private String storageType;
 
     public ItemCustomComponent(String name, String type) {
@@ -96,8 +97,7 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
         if (this == ComponentListMF.cogwork_armour) {
             int AR = EntityCogwork.getArmourRating(getBase(tool));
             list.add(StatCollector.translateToLocal("attribute.armour.protection") + " " + AR);
-            if (mass > 0)
-                list.add(CustomMaterial.getWeightString(getWeightInKg(tool)));
+            if (mass > 0) list.add(CustomMaterial.getWeightString(getWeightInKg(tool)));
         }
     }
 
@@ -194,8 +194,7 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
             if (movingobjectposition == null) {
                 return item;
             } else {
-                int placed = BlockComponent.useComponent(item, storageType, blocktex, world, user,
-                        movingobjectposition);
+                int placed = BlockComponent.useComponent(item, storageType, blocktex, user, movingobjectposition);
                 if (placed > 0) {
                     item.stackSize -= placed;
                     return item;

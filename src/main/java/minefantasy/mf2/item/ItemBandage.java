@@ -1,11 +1,5 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.mechanics.EventManagerMF;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
@@ -14,7 +8,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.mechanics.EventManagerMF;
+
 public class ItemBandage extends Item {
+
     private static final String healingID = "MF_Bandage_progress";
     private String name;
     private float healPwr;
@@ -40,8 +42,7 @@ public class ItemBandage extends Item {
     }
 
     /**
-     * Called whenever this item is equipped and the right mouse button is pressed.
-     * Args: itemStack, world, entityPlayer
+     * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
@@ -56,8 +57,7 @@ public class ItemBandage extends Item {
     }
 
     /**
-     * returns the action that specifies what animation to play when the items is
-     * being used
+     * returns the action that specifies what animation to play when the items is being used
      */
     @Override
     public EnumAction getItemUseAction(ItemStack item) {

@@ -1,12 +1,7 @@
 package minefantasy.mf2.block.tileentity.blastfurnace;
 
-import minefantasy.mf2.api.crafting.MineFantasyFuels;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
-import minefantasy.mf2.api.refine.ISmokeCarrier;
-import minefantasy.mf2.api.refine.SmokeMechanics;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.util.MFLogUtil;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -16,9 +11,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
-import java.util.Random;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
+import minefantasy.mf2.api.refine.ISmokeCarrier;
+import minefantasy.mf2.api.refine.SmokeMechanics;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedInventory, ISmokeCarrier {
+
     public int ticksExisted;
     public boolean isBuilt = false;
     public int fireTime;
@@ -71,8 +73,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     }
 
     protected void interact(TileEntityBlastFC tile) {
-        if (!tile.isBuilt)
-            return;
+        if (!tile.isBuilt) return;
 
         for (int a = 0; a < getSizeInventory(); a++) {
             ItemStack mySlot = getStackInSlot(a);
@@ -96,8 +97,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     }
 
     private boolean canShare(ItemStack mySlot, int a) {
-        if (a == 1)
-            return isInput(mySlot);
+        if (a == 1) return isInput(mySlot);
         return isCarbon(mySlot);
     }
 
@@ -169,8 +169,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     }
 
     // INVENTORY
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     @Override
     public int getSizeInventory() {
@@ -238,12 +237,10 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -255,7 +252,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return side == 1 ? new int[]{0, 1} : new int[]{};
+        return side == 1 ? new int[] { 0, 1 } : new int[] {};
     }
 
     @Override

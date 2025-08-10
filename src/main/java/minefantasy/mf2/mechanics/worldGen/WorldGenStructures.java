@@ -1,16 +1,18 @@
 package minefantasy.mf2.mechanics.worldGen;
 
+import java.util.Random;
+
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
+
 import minefantasy.mf2.config.ConfigWorldGen;
 import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientAlter;
 import minefantasy.mf2.mechanics.worldGen.structure.WorldGenAncientForge;
 import minefantasy.mf2.mechanics.worldGen.structure.dwarven.WorldGenDwarvenStronghold;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class WorldGenStructures {
+
     private static int strongholdCount, chunkCount;
 
     public static void generate(Random seed, int chunkX, int chunkZ, World world, int dimension) {
@@ -75,8 +77,12 @@ public class WorldGenStructures {
                 if (stronghold.generate(world, seed, x + x1, 0, z + z1)) {
                     ++strongholdCount;
                     MFLogUtil.logDebug("Placed Dwarven Stronghold in wall at " + x + x1 + " " + z + z1);
-                    String s = "Gen: " + strongholdCount + " Strongholds in " + chunkCount + " Chunks = "
-                            + ((float) strongholdCount / (float) chunkCount * 100F) + "% cases";
+                    String s = "Gen: " + strongholdCount
+                            + " Strongholds in "
+                            + chunkCount
+                            + " Chunks = "
+                            + ((float) strongholdCount / (float) chunkCount * 100F)
+                            + "% cases";
                     System.out.println(s);
                     return;
                 }
@@ -88,8 +94,12 @@ public class WorldGenStructures {
         if (stronghold.generate(world, seed, x + x1, 0, z + z1)) {
             ++strongholdCount;
             MFLogUtil.logDebug("Placed Dwarven Stronghold on ground at " + x + x1 + " " + z + z1);
-            String s = "Gen: " + strongholdCount + " Strongholds in " + chunkCount + " Chunks = "
-                    + ((float) strongholdCount / (float) chunkCount * 100F) + "% cases";
+            String s = "Gen: " + strongholdCount
+                    + " Strongholds in "
+                    + chunkCount
+                    + " Chunks = "
+                    + ((float) strongholdCount / (float) chunkCount * 100F)
+                    + "% cases";
             System.out.println(s);
             return;
         }

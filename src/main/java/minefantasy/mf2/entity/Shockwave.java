@@ -1,5 +1,7 @@
 package minefantasy.mf2.entity;
 
+import java.util.*;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentProtection;
@@ -11,9 +13,8 @@ import net.minecraft.util.*;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 
-import java.util.*;
-
 public class Shockwave {// Explosion
+
     /**
      * whether or not the explosion sets fire to blocks around it
      */
@@ -64,7 +65,10 @@ public class Shockwave {// Explosion
         for (i = 0; i < this.maxRange; ++i) {
             for (j = 0; j < this.maxRange; ++j) {
                 for (k = 0; k < this.maxRange; ++k) {
-                    if (i == 0 || i == this.maxRange - 1 || j == 0 || j == this.maxRange - 1 || k == 0
+                    if (i == 0 || i == this.maxRange - 1
+                            || j == 0
+                            || j == this.maxRange - 1
+                            || k == 0
                             || k == this.maxRange - 1) {
                         double d0 = i / (this.maxRange - 1.0F) * 2.0F - 1.0F;
                         double d1 = j / (this.maxRange - 1.0F) * 2.0F - 1.0F;
@@ -105,8 +109,8 @@ public class Shockwave {// Explosion
         int i2 = MathHelper.floor_double(this.explosionY + this.explosionSize + 1.0D);
         int l = MathHelper.floor_double(this.explosionZ - this.explosionSize - 1.0D);
         int j2 = MathHelper.floor_double(this.explosionZ + this.explosionSize + 1.0D);
-        List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this.exploder,
-                AxisAlignedBB.getBoundingBox(i, k, l, j, i2, j2));
+        List list = this.worldObj
+                .getEntitiesWithinAABBExcludingEntity(this.exploder, AxisAlignedBB.getBoundingBox(i, k, l, j, i2, j2));
         Vec3 vec3 = Vec3.createVectorHelper(this.explosionX, this.explosionY, this.explosionZ);
 
         for (int i1 = 0; i1 < list.size(); ++i1) {
@@ -146,12 +150,17 @@ public class Shockwave {// Explosion
      * Does the second part of the explosion (sound, particles, drop spawn)
      */
     public void decorateWave(boolean flag) {
-        this.worldObj.playSoundEffect(this.explosionX, this.explosionY, this.explosionZ, "random.explode", 4.0F,
+        this.worldObj.playSoundEffect(
+                this.explosionX,
+                this.explosionY,
+                this.explosionZ,
+                "random.explode",
+                4.0F,
                 (1.0F + (this.worldObj.rand.nextFloat() - this.worldObj.rand.nextFloat()) * 0.2F) * 0.7F);
 
         if (this.explosionSize >= 2.0F && this.isSmoking) {
-            this.worldObj.spawnParticle("largesmoke", this.explosionX, this.explosionY, this.explosionZ, 1.0D, 0.0D,
-                    0.0D);
+            this.worldObj
+                    .spawnParticle("largesmoke", this.explosionX, this.explosionY, this.explosionZ, 1.0D, 0.0D, 0.0D);
         } else {
             this.worldObj.spawnParticle("smoke", this.explosionX, this.explosionY, this.explosionZ, 1.0D, 0.0D, 0.0D);
         }
@@ -189,15 +198,21 @@ public class Shockwave {// Explosion
                     d3 *= d7;
                     d4 *= d7;
                     d5 *= d7;
-                    this.worldObj.spawnParticle("explode", (d0 + this.explosionX * 1.0D) / 2.0D,
-                            (d1 + this.explosionY * 1.0D) / 2.0D, (d2 + this.explosionZ * 1.0D) / 2.0D, d3, d4, d5);
+                    this.worldObj.spawnParticle(
+                            "explode",
+                            (d0 + this.explosionX * 1.0D) / 2.0D,
+                            (d1 + this.explosionY * 1.0D) / 2.0D,
+                            (d2 + this.explosionZ * 1.0D) / 2.0D,
+                            d3,
+                            d4,
+                            d5);
                     this.worldObj.spawnParticle("smoke", d0, d1, d2, d3, d4, d5);
                 }
 
                 if (isGriefing && block.getMaterial() == Material.glass) {
                     this.worldObj.setBlockToAir(i, j, k);
-                    this.worldObj.playSoundEffect(i, j, k, "break.glass", 1.0F,
-                            0.75F + (explosionRNG.nextFloat() * 0.5F));
+                    this.worldObj
+                            .playSoundEffect(i, j, k, "break.glass", 1.0F, 0.75F + (explosionRNG.nextFloat() * 0.5F));
                 }
             }
         }

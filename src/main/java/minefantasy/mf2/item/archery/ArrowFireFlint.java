@@ -1,7 +1,5 @@
 package minefantasy.mf2.item.archery;
 
-import minefantasy.mf2.api.archery.IArrowHandler;
-import minefantasy.mf2.api.archery.ISpecialBow;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,6 +8,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.api.archery.IArrowHandler;
+import minefantasy.mf2.api.archery.ISpecialBow;
+
 /**
  * This class is an example used to fire custom arrows.
  */
@@ -17,7 +18,7 @@ public class ArrowFireFlint implements IArrowHandler {
 
     @Override
     public boolean onFireArrow(World world, ItemStack arrow, ItemStack bow, EntityPlayer user, float charge,
-                               boolean infinite) {
+            boolean infinite) {
         if (infinite || arrow.getItem() != Items.arrow) {
             return false;
         }

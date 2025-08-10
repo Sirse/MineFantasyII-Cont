@@ -1,15 +1,17 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.StatCollector;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
 
 public class LevelupPacket extends PacketMF {
+
     public static final String packetName = "MF2_levelup";
     private EntityPlayer user;
     private String username;
@@ -23,8 +25,7 @@ public class LevelupPacket extends PacketMF {
         this.level = level;
     }
 
-    public LevelupPacket() {
-    }
+    public LevelupPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
@@ -36,8 +37,12 @@ public class LevelupPacket extends PacketMF {
 
             if (skill != null) {
                 player.playSound("random.levelup", 1.0F, 0.5F);
-                player.addChatMessage(new ChatComponentText(StatCollector.translateToLocalFormatted("rpg.levelup",
-                        skill.getDisplayName().toLowerCase(), skillLvl)));
+                player.addChatMessage(
+                        new ChatComponentText(
+                                StatCollector.translateToLocalFormatted(
+                                        "rpg.levelup",
+                                        skill.getDisplayName().toLowerCase(),
+                                        skillLvl)));
             }
         }
     }

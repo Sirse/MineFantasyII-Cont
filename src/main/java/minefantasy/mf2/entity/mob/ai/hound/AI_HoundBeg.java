@@ -1,13 +1,15 @@
 package minefantasy.mf2.entity.mob.ai.hound;
 
-import minefantasy.mf2.entity.mob.EntityHound;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.entity.mob.EntityHound;
+
 public class AI_HoundBeg extends EntityAIBase {
+
     private EntityHound theWolf;
     private EntityPlayer thePlayer;
     private World worldObject;
@@ -35,8 +37,8 @@ public class AI_HoundBeg extends EntityAIBase {
     public boolean continueExecuting() {
         return !this.thePlayer.isEntityAlive() ? false
                 : (this.theWolf.getDistanceSqToEntity(this.thePlayer) > this.minPlayerDistance * this.minPlayerDistance
-                ? false
-                : this.field_75384_e > 0 && this.hasPlayerGotBoneInHand(this.thePlayer));
+                        ? false
+                        : this.field_75384_e > 0 && this.hasPlayerGotBoneInHand(this.thePlayer));
     }
 
     /**
@@ -59,8 +61,11 @@ public class AI_HoundBeg extends EntityAIBase {
      * Updates the task
      */
     public void updateTask() {
-        this.theWolf.getLookHelper().setLookPosition(this.thePlayer.posX,
-                this.thePlayer.posY + this.thePlayer.getEyeHeight(), this.thePlayer.posZ, 10.0F,
+        this.theWolf.getLookHelper().setLookPosition(
+                this.thePlayer.posX,
+                this.thePlayer.posY + this.thePlayer.getEyeHeight(),
+                this.thePlayer.posZ,
+                10.0F,
                 this.theWolf.getVerticalFaceSpeed());
         --this.field_75384_e;
     }
@@ -72,6 +77,6 @@ public class AI_HoundBeg extends EntityAIBase {
         ItemStack itemstack = p_75382_1_.inventory.getCurrentItem();
         return itemstack == null ? false
                 : (!this.theWolf.isTamed() && itemstack.getItem() == Items.bone ? true
-                : this.theWolf.isBreedingItem(itemstack));
+                        : this.theWolf.isBreedingItem(itemstack));
     }
 }

@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
+
 public class ContainerBigFurnace extends ContainerMF {
+
     private static final int HEATER_FUEL_SLOT = 0;
     private static final int HEATER_SLOT_COUNT = 1;
 
@@ -89,7 +91,11 @@ public class ContainerBigFurnace extends ContainerMF {
                 }
             } else {
                 if (smelter.isItemValidForSlot(SMELTER_INPUT_START_INDEX, stackInSlot)) {
-                    if (this.mergeItemStack(stackInSlot, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false)) {
+                    if (this.mergeItemStack(
+                            stackInSlot,
+                            SMELTER_INPUT_START_INDEX,
+                            SMELTER_OUTPUT_START_INDEX,
+                            false)) {
                         merged = true;
                     }
                 }

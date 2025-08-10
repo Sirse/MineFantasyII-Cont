@@ -1,37 +1,35 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.EntityDragonBreath;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.EntityDragonBreath;
+
 @SideOnly(Side.CLIENT)
 public class RenderDragonBreath extends Render {
-    public RenderDragonBreath() {
-    }
+
+    public RenderDragonBreath() {}
 
     /**
-     * Actually renders the given argument. This is a synthetic bridge method,
-     * always casting down its argument and then handing it off to a worker function
-     * which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity) and this method has signature public void
-     * func_76986_a(T entity, double d, double d1, double d2, float f, float f1).
-     * But JAD is pre 1.5 so doesn't do that.
+     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
+     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
+     * (Render<T extends Entity) and this method has signature public void func_76986_a(T entity, double d, double d1,
+     * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
     public void doRender(Entity entity, double x, double y, double z, float f, float f1) {
-        if (!(entity instanceof EntityDragonBreath))
-            return;
+        if (!(entity instanceof EntityDragonBreath)) return;
         EntityDragonBreath breath = (EntityDragonBreath) entity;
-        if (breath.isInvisible())
-            return;
+        if (breath.isInvisible()) return;
 
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y, (float) z);
@@ -54,8 +52,7 @@ public class RenderDragonBreath extends Render {
     }
 
     /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless
-     * you call Render.bindEntityTexture.
+     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
         return TextureMap.locationItemsTexture;

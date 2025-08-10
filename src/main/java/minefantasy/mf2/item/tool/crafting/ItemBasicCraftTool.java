@@ -1,6 +1,17 @@
 package minefantasy.mf2.item.tool.crafting;
 
+import java.util.List;
+
+import net.minecraft.block.Block;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+
 import com.google.common.collect.Sets;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -10,20 +21,12 @@ import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.api.weapon.IDamageType;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.block.Block;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-
-import java.util.List;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemBasicCraftTool extends ItemTool implements IToolMaterial, IToolMF, IDamageType {
+
     protected int itemRarity;
     private int tier;
     private String name;
@@ -34,7 +37,7 @@ public class ItemBasicCraftTool extends ItemTool implements IToolMaterial, ITool
     private float efficiencyMod = 1.0F;
 
     public ItemBasicCraftTool(String name, String type, int tier, int uses) {
-        super(1.0F, ToolMaterial.WOOD, Sets.newHashSet(new Block[]{}));
+        super(1.0F, ToolMaterial.WOOD, Sets.newHashSet(new Block[] {}));
         this.tier = tier;
         setCreativeTab(CreativeTabMF.tabCraftTool);
 
@@ -65,7 +68,7 @@ public class ItemBasicCraftTool extends ItemTool implements IToolMaterial, ITool
 
     @Override
     public float[] getDamageRatio(Object... implement) {
-        return new float[]{0, 1, 0};
+        return new float[] { 0, 1, 0 };
     }
 
     private void addSet(List list, Item[] items) {

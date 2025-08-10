@@ -1,15 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.archery.IAmmo;
-import minefantasy.mf2.api.crafting.ISpecialSalvage;
-import minefantasy.mf2.entity.EntityBomb;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.mechanics.BombDispenser;
+import java.util.List;
+
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -25,9 +17,19 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.archery.IAmmo;
+import minefantasy.mf2.api.crafting.ISpecialSalvage;
+import minefantasy.mf2.entity.EntityBomb;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.mechanics.BombDispenser;
 
 public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
+
     private static final String powderNBT = "MineFantasy_PowderType";
     private static final String fuseNBT = "MineFantasy_FuseType";
     private static final String fillingNBT = "MineFantasy_ExplosiveType";
@@ -108,13 +110,12 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
     }
 
     public static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
     public static ItemStack createExplosive(Item item, byte casing, byte filling, byte fuse, byte powder, int stackSize,
-                                            boolean sticky) {
+            boolean sticky) {
         ItemStack bomb = new ItemStack(item, stackSize);
         setFilling(bomb, filling);
         setCasing(bomb, casing);
@@ -127,7 +128,7 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
     }
 
     public static ItemStack createExplosive(Item item, byte casing, byte filling, byte fuse, byte powder,
-                                            int stackSize) {
+            int stackSize) {
         return createExplosive(item, casing, filling, fuse, powder, stackSize, false);
     }
 
@@ -139,7 +140,12 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
         if (!user.isSwingInProgress) {
-            world.playSoundEffect(user.posX, user.posY + 1.5D, user.posZ, "fire.ignite", 1.0F,
+            world.playSoundEffect(
+                    user.posX,
+                    user.posY + 1.5D,
+                    user.posZ,
+                    "fire.ignite",
+                    1.0F,
                     itemRand.nextFloat() * 0.4F + 0.8F);
             world.playSoundEffect(user.posX, user.posY + 1.5, user.posZ, "game.tnt.primed", 1.0F, 1.0F);
             user.setItemInUse(item, getMaxItemUseDuration(item));
@@ -160,8 +166,8 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
         }
 
         if (!world.isRemote) {
-            EntityBomb bomb = new EntityBomb(world, user).setType(getFilling(item), getCasing(item), getFuse(item),
-                    getPowder(item));
+            EntityBomb bomb = new EntityBomb(world, user)
+                    .setType(getFilling(item), getCasing(item), getFuse(item), getPowder(item));
             world.spawnEntityInWorld(bomb);
             if (item.hasTagCompound() && item.getTagCompound().hasKey("stickyBomb")) {
                 bomb.getEntityData().setBoolean("stickyBomb", true);
@@ -175,8 +181,9 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
         super.addInformation(item, user, list, fullInfo);
 
         if (item.hasTagCompound() && item.getTagCompound().hasKey("stickyBomb")) {
-            list.add(EnumChatFormatting.GREEN + StatCollector.translateToLocal("bomb.case.sticky")
-                    + EnumChatFormatting.GRAY);
+            list.add(
+                    EnumChatFormatting.GREEN + StatCollector.translateToLocal("bomb.case.sticky")
+                            + EnumChatFormatting.GRAY);
         }
         EnumExplosiveType fill = EnumExplosiveType.getType(getFilling(item));
         EnumCasingType casing = EnumCasingType.getType(getCasing(item));
@@ -291,10 +298,10 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{ItemBombComponent.getBombComponent("bombcase", getCasing(item)),
+        return new Object[] { ItemBombComponent.getBombComponent("bombcase", getCasing(item)),
                 ItemBombComponent.getBombComponent("fuse", getFuse(item)),
                 ItemBombComponent.getBombComponent("powder", getPowder(item)),
-                ItemBombComponent.getBombComponent("filling", getFilling(item)),};
+                ItemBombComponent.getBombComponent("filling", getFilling(item)), };
     }
 
     public byte getItemFuse(byte value) {

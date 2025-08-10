@@ -1,12 +1,14 @@
 package minefantasy.mf2.api.weapon;
 
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.HashMap;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 
-import java.util.HashMap;
+import minefantasy.mf2.api.rpg.Skill;
 
 public class WeaponClass {
+
     public static HashMap<String, WeaponClass> classes = new HashMap<String, WeaponClass>();
 
     public static WeaponClass FIST = new WeaponClass("fist", null, "blunt");
@@ -44,8 +46,7 @@ public class WeaponClass {
     }
 
     public static WeaponClass findClassForAny(ItemStack weapon) {
-        if (weapon == null)
-            return FIST;
+        if (weapon == null) return FIST;
         if (weapon.getItem() instanceof IWeaponClass || weapon.getItem() instanceof ItemSword) {
             return getWeaponClass(weapon);
         }

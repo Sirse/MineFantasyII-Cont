@@ -1,16 +1,19 @@
 package minefantasy.mf2.client.gui;
 
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.entity.player.InventoryPlayer;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.container.ContainerBlastChamber;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.InventoryPlayer;
-import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class GuiBlastChamber extends GuiContainer {
+
     private TileEntityBlastFC tile;
 
     public GuiBlastChamber(InventoryPlayer user, TileEntityBlastFC tile) {
@@ -20,12 +23,10 @@ public class GuiBlastChamber extends GuiContainer {
     }
 
     /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the
-     * items)
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
      */
     @Override
-    protected void drawGuiContainerForegroundLayer(int x, int y) {
-    }
+    protected void drawGuiContainerForegroundLayer(int x, int y) {}
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {

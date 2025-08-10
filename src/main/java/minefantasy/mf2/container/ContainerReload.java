@@ -1,8 +1,5 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.api.archery.AmmoMechanicsMF;
-import minefantasy.mf2.api.archery.IAmmo;
-import minefantasy.mf2.api.archery.IFirearm;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.IInventory;
@@ -10,7 +7,12 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.archery.AmmoMechanicsMF;
+import minefantasy.mf2.api.archery.IAmmo;
+import minefantasy.mf2.api.archery.IFirearm;
+
 public class ContainerReload extends ContainerMF {
+
     private final InventoryBasic weaponInv;
     private final ItemStack weapon;
 
@@ -28,7 +30,9 @@ public class ContainerReload extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         ItemStack held = player.getCurrentEquippedItem();
-        return held == weapon || (held != null && weapon != null && held.getItem() == weapon.getItem() && ItemStack.areItemStackTagsEqual(held, weapon));
+        return held == weapon || (held != null && weapon != null
+                && held.getItem() == weapon.getItem()
+                && ItemStack.areItemStackTagsEqual(held, weapon));
     }
 
     @Override
@@ -88,6 +92,7 @@ public class ContainerReload extends ContainerMF {
     }
 
     private static class SlotReload extends Slot {
+
         private final ContainerReload container;
 
         SlotReload(ContainerReload container, IInventory inventory, int id, int x, int y) {

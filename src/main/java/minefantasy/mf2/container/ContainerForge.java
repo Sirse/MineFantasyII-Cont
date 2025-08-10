@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityForge;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityForge;
+
 public class ContainerForge extends ContainerMF {
+
     private static final int FORGE_SLOT = 0;
     private static final int FORGE_SLOT_COUNT = 1;
     private final TileEntityForge tile;

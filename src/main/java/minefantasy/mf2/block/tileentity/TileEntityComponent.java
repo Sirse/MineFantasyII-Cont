@@ -1,17 +1,19 @@
 package minefantasy.mf2.block.tileentity;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.decor.BlockComponent;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.StorageBlockPacket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.StorageBlockPacket;
+
 public class TileEntityComponent extends TileEntity {
+
     public ItemStack item;
     public int stackSize, max;
     public String type = "bar";
@@ -121,10 +123,13 @@ public class TileEntityComponent extends TileEntity {
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new StorageBlockPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new StorageBlockPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 
     public boolean isFull() {
@@ -137,50 +142,33 @@ public class TileEntityComponent extends TileEntity {
         }
         if (type.equalsIgnoreCase("plank")) {
             float f = 0.125F;
-            if (stackSize > 42)
-                return 8F * f;
-            if (stackSize > 36)
-                return 7F * f;
-            if (stackSize > 30)
-                return 6F * f;
-            if (stackSize > 24)
-                return 5F * f;
-            if (stackSize > 18)
-                return 4F * f;
-            if (stackSize > 12)
-                return 3F * f;
-            if (stackSize > 6)
-                return 2F * f;
+            if (stackSize > 42) return 8F * f;
+            if (stackSize > 36) return 7F * f;
+            if (stackSize > 30) return 6F * f;
+            if (stackSize > 24) return 5F * f;
+            if (stackSize > 18) return 4F * f;
+            if (stackSize > 12) return 3F * f;
+            if (stackSize > 6) return 2F * f;
 
             return f;
         }
         if (type.equalsIgnoreCase("bar")) {
             float f = 0.125F;
-            if (stackSize > 50)
-                return 8F * f;
-            if (stackSize > 48)
-                return 7F * f;
-            if (stackSize > 34)
-                return 6F * f;
-            if (stackSize > 32)
-                return 5F * f;
-            if (stackSize > 18)
-                return 4F * f;
-            if (stackSize > 16)
-                return 3F * f;
-            if (stackSize > 2)
-                return 2F * f;
+            if (stackSize > 50) return 8F * f;
+            if (stackSize > 48) return 7F * f;
+            if (stackSize > 34) return 6F * f;
+            if (stackSize > 32) return 5F * f;
+            if (stackSize > 18) return 4F * f;
+            if (stackSize > 16) return 3F * f;
+            if (stackSize > 2) return 2F * f;
 
             return f;
         }
         if (type.equalsIgnoreCase("pot")) {
             float f = 0.25F;
-            if (stackSize > 48)
-                return 4F * f;
-            if (stackSize > 32)
-                return 3F * f;
-            if (stackSize > 16)
-                return 2F * f;
+            if (stackSize > 48) return 4F * f;
+            if (stackSize > 32) return 3F * f;
+            if (stackSize > 16) return 2F * f;
 
             return f;
         }

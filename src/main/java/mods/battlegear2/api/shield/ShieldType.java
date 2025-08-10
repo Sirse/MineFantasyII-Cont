@@ -26,7 +26,7 @@ public class ShieldType {
     private final int defaultRGB;
 
     public ShieldType(String name, float decayRate, float damageDecay, int maxDamage, int enchantability,
-                      int defaultColour) {
+            int defaultColour) {
         this.name = name;
         this.decayRate = decayRate;
         this.damageDecay = damageDecay;

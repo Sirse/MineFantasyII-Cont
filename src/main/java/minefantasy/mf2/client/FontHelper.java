@@ -19,10 +19,8 @@ public final class FontHelper {
             if (i < j - 1) {
                 char c0 = string.charAt(i + 1);
 
-                if (isFormatColour(c0))
-                    s1 = "\u00a7" + c0;
-                else if (isFormatSpecial(c0))
-                    s1 = s1 + "\u00a7" + c0;
+                if (isFormatColour(c0)) s1 = "\u00a7" + c0;
+                else if (isFormatSpecial(c0)) s1 = s1 + "\u00a7" + c0;
             }
         }
 

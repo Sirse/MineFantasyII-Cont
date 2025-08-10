@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EntityDamageSourceIndirect;
 
 public class EntityDamageSourceBomb extends EntityDamageSourceIndirect {
+
     private Entity thrower;
 
     public EntityDamageSourceBomb(Entity bomb, Entity user) {

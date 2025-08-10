@@ -1,13 +1,15 @@
 package minefantasy.mf2.recipe;
 
-import minefantasy.mf2.item.list.ToolListMF;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.item.list.ToolListMF;
+
 public class RecipeSyringe implements IRecipe {
+
     /**
      * Used to check if a recipe matches current crafting inventory
      */

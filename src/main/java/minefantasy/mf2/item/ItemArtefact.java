@@ -1,14 +1,7 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.knowledge.IArtefact;
-import minefantasy.mf2.api.knowledge.ResearchArtefacts;
-import minefantasy.mf2.block.decor.BlockSchematic;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,14 +14,23 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.IArtefact;
+import minefantasy.mf2.api.knowledge.ResearchArtefacts;
+import minefantasy.mf2.block.decor.BlockSchematic;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 public class ItemArtefact extends Item implements IArtefact {
+
     public static final String MYTHIC = "mythic_artefacts";
     public static final String DWARVEN = "dwarven_artefacts";
     public static final String GNOMISH = "gnomish_artefacts";
 
-    private static final Artefact[] types = new Artefact[]{
+    private static final Artefact[] types = new Artefact[] {
             new Artefact("ancient_jewel", "mithril_jewel", 20, 2, MYTHIC, 2, "smeltMithril", "smeltMaster"),
             new Artefact("ancient_jewel", "adamant_jewel", 20, 2, MYTHIC, 2, "smeltAdamantium", "smeltMaster"),
             new Artefact("ancient_jewel", "master_jewel", 30, 2, MYTHIC, 1, "smeltMaster"),
@@ -38,7 +40,7 @@ public class ItemArtefact extends Item implements IArtefact {
             new Artefact("schem_forge", "schem_forge", 50, 2, null, 1, "advforge", "advcrucible"),
             new Artefact("schem_gears", "schem_gears", 50, 2, null, 1, "cogArmour"),
             new Artefact("schem_cogwork", "schem_cogwork", 50, 2, null, 1, "cogArmour"),
-            new Artefact("schem_alloy", "schem_alloy", 50, 2, null, 1, "compPlate"),};
+            new Artefact("schem_alloy", "schem_alloy", 50, 2, null, 1, "compPlate"), };
 
     @SideOnly(Side.CLIENT)
     private static IIcon[] icons;
@@ -132,6 +134,7 @@ public class ItemArtefact extends Item implements IArtefact {
 }
 
 class Artefact {
+
     public final String name, tex;
     public final int rarity, time;
     public final String[] researches;
@@ -159,8 +162,8 @@ class Artefact {
             }
         }
         if (lootType != null) {
-            ChestGenHooks.addItem(lootType,
-                    new WeightedRandomChestContent(new ItemStack(item, 1, id), 1, 1, dropWeight));
+            ChestGenHooks
+                    .addItem(lootType, new WeightedRandomChestContent(new ItemStack(item, 1, id), 1, 1, dropWeight));
         }
     }
 }

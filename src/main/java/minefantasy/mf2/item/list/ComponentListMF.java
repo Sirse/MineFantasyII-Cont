@@ -1,5 +1,11 @@
 package minefantasy.mf2.item.list;
 
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
@@ -14,19 +20,15 @@ import minefantasy.mf2.item.gadget.ItemCrossbowPart;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.material.WoodMaterial;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 /**
  * @author Anonymous Productions
  */
 public class ComponentListMF {
-    public static final String[] ingotMats = new String[]{"copper", "tin", "bronze", "pigiron", "steel", "encrusted",
+
+    public static final String[] ingotMats = new String[] { "copper", "tin", "bronze", "pigiron", "steel", "encrusted",
             "blacksteelweak", "blacksteel", "silver", "redsteelweak", "redsteel", "bluesteelweak", "bluesteel",
-            "adamantium", "mithril", "ignotumite", "mithium", "ender", "tungsten", "obsidian"};
+            "adamantium", "mithril", "ignotumite", "mithium", "ender", "tungsten", "obsidian" };
 
     public static Item clay_pot = new ItemMFBowl("clay_pot").setStoragePlacement("pot", "pot");
     public static Item clay_pot_uncooked = new ItemComponentMF("clay_pot_uncooked", 0);
@@ -36,8 +38,8 @@ public class ComponentListMF {
 
     public static ItemComponentMF[] ingots = new ItemComponentMF[ingotMats.length];
 
-    public static ItemComponentMF plank = new ItemComponentMF("plank").setCustom(1, "wood").setStoragePlacement("plank",
-            "plank");
+    public static ItemComponentMF plank = new ItemComponentMF("plank").setCustom(1, "wood")
+            .setStoragePlacement("plank", "plank");
     public static Item vine = new ItemComponentMF("vine", -1);
     public static Item sharp_rock = new ItemComponentMF("sharp_rock", -1);
 
@@ -150,16 +152,18 @@ public class ComponentListMF {
             .setStoragePlacement("sheet", "scale");
     public static ItemCustomComponent splintmesh = new ItemCustomComponent("splintmesh", 1F, "metal")
             .setStoragePlacement("sheet", "splint");
-    public static ItemCustomComponent plate = new ItemCustomComponent("plate", 2F, "metal").setStoragePlacement("sheet",
-            "plate");
+    public static ItemCustomComponent plate = new ItemCustomComponent("plate", 2F, "metal")
+            .setStoragePlacement("sheet", "plate");
     public static ItemCustomComponent plate_huge = new ItemCustomComponent("plate_huge", 8F, "metal")
             .setStoragePlacement("bigplate", "bigplate");
     public static ItemCustomComponent metalHunk = new ItemCustomComponent("hunk", 0.25F, "metal");
     public static ItemCustomComponent arrowhead = new ItemCustomComponent("arrowhead", 1 / 4F, "metal");
     public static ItemCustomComponent bodkinhead = new ItemCustomComponent("bodkinhead", 1 / 4F, "metal");
     public static ItemCustomComponent broadhead = new ItemCustomComponent("broadhead", 1 / 4F, "metal");
-    public static ItemCustomComponent cogwork_armour = (ItemCustomComponent) new ItemCustomComponent("cogwork_armour",
-            30F, "metal").setCanDamage().setCreativeTab(CreativeTabMF.tabGadget).setMaxStackSize(1);
+    public static ItemCustomComponent cogwork_armour = (ItemCustomComponent) new ItemCustomComponent(
+            "cogwork_armour",
+            30F,
+            "metal").setCanDamage().setCreativeTab(CreativeTabMF.tabGadget).setMaxStackSize(1);
     public static ItemCustomComponent bar = (ItemCustomComponent) new ItemCustomComponent("bar", 1F, "metal")
             .setStoragePlacement("bar", "bar").setCreativeTab(CreativeTabMF.tabMaterialsMF);
 
@@ -171,10 +175,10 @@ public class ComponentListMF {
     public static Item gold_coin = new ItemComponentMF("gold_coin", 0);
 
     public static Item hinge = new ItemComponentMF("hinge", 0);
-    public static Item plank_cut = new ItemComponentMF("plank_cut").setCustom(1, "wood").setStoragePlacement("plank",
-            "plankcut");
-    public static Item plank_pane = new ItemComponentMF("plank_pane").setCustom(6, "wood").setStoragePlacement("sheet",
-            "woodpane");
+    public static Item plank_cut = new ItemComponentMF("plank_cut").setCustom(1, "wood")
+            .setStoragePlacement("plank", "plankcut");
+    public static Item plank_pane = new ItemComponentMF("plank_pane").setCustom(6, "wood")
+            .setStoragePlacement("sheet", "woodpane");
 
     public static Item cogwork_pulley = new ItemComponentMF("cogwork_pulley", 1)
             .setCreativeTab(CreativeTabMF.tabGadget);
@@ -273,17 +277,18 @@ public class ComponentListMF {
     public static ItemStack ingot(String material) {
         return ingot(material, 1);
     }
+
     public static ItemStack ingot(String material, int stackSize) {
         if (material.equals("iron")) {
             return new ItemStack(Items.iron_ingot);
         } else if (material.equals("gold")) {
             return new ItemStack(Items.gold_ingot);
         } else {
-          for (int i=0;i<ingotMats.length;i++) {
-              if (ingotMats[i].equals(material)) {
-                  return new ItemStack(ingots[i], 1);
-              }
-          }
+            for (int i = 0; i < ingotMats.length; i++) {
+                if (ingotMats[i].equals(material)) {
+                    return new ItemStack(ingots[i], 1);
+                }
+            }
         }
         return null;
     }

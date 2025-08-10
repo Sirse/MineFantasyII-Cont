@@ -1,12 +1,14 @@
 package minefantasy.mf2.client.render.mob;
 
-import minefantasy.mf2.entity.mob.EntityMinotaur;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 
+import minefantasy.mf2.entity.mob.EntityMinotaur;
+
 public class ModelMinotaur extends ModelBiped {
+
     ModelRenderer Nose;
     ModelRenderer Mane;
     ModelRenderer bipedLeftForearm;

@@ -1,11 +1,7 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.TileEntityRoad;
-import minefantasy.mf2.item.tool.advanced.ItemMattock;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
@@ -23,9 +19,15 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityRoad;
+import minefantasy.mf2.item.tool.advanced.ItemMattock;
 
 public class BlockRoad extends BlockContainer {
+
     public BlockRoad(String name, float f) {
         super(Material.ground);
         this.setStepSound(Block.soundTypeGravel);
@@ -63,17 +65,15 @@ public class BlockRoad extends BlockContainer {
     }
 
     /**
-     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or
-     * not to render the shared face of two adjacent blocks and also whether the
-     * player can attach torches, redstone wire, etc to this block.
+     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
      */
     public boolean isOpaqueCube() {
         return false;
     }
 
     /**
-     * If this block doesn't render as an ordinary block it will return False
-     * (examples: signs, buttons, stairs, etc)
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
     public boolean renderAsNormalBlock() {
         return false;
@@ -95,10 +95,9 @@ public class BlockRoad extends BlockContainer {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         TileEntityRoad tile = getTile(world, x, y, z);
-        if (tile == null)
-            return false;
+        if (tile == null) return false;
 
         boolean isLocked = tile.isLocked;
         ItemStack itemstack = player.getHeldItem();
@@ -229,6 +228,5 @@ public class BlockRoad extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister reg) {
-    }
+    public void registerBlockIcons(IIconRegister reg) {}
 }

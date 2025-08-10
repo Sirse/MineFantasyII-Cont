@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
 public interface IParryable {
+
     /**
      * Determines if the weapon can parry in the first place
      */

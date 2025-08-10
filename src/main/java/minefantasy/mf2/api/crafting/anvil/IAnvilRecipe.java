@@ -1,12 +1,14 @@
 package minefantasy.mf2.api.crafting.anvil;
 
-import minefantasy.mf2.api.rpg.Skill;
 import net.minecraft.item.ItemStack;
+
+import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
 public interface IAnvilRecipe {
+
     /**
      * Used to check if a recipe matches current crafting inventory
      */

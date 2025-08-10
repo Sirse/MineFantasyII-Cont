@@ -1,10 +1,7 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.api.weapon.WeaponClass;
-import minefantasy.mf2.config.ConfigWeapon;
-import mods.battlegear2.api.shield.IShield;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,16 +10,20 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import java.util.List;
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.weapon.WeaponClass;
+import minefantasy.mf2.config.ConfigWeapon;
+import mods.battlegear2.api.shield.IShield;
+import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemSpearMF extends ItemWeaponMF implements IExtendedReachWeapon {
+
     /**
-     * The spear is for the defensive player, it has a long reach, knockback and can
-     * be thrown. Spears are good for keeping enemies at a distance, Parrying is
-     * easier when sneaking
+     * The spear is for the defensive player, it has a long reach, knockback and can be thrown. Spears are good for
+     * keeping enemies at a distance, Parrying is easier when sneaking
      * <p>
      * These are for the defensive player
      */
@@ -60,15 +61,17 @@ public class ItemSpearMF extends ItemWeaponMF implements IExtendedReachWeapon {
         super.addInformation(item, user, list, extra);
 
         if (material != ToolMaterial.WOOD) {
-            list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                    "attribute.modifier.plus." + 0, decimal_format.format(getMountedDamage()),
-                    StatCollector.translateToLocal("attribute.weapon.mountedBonus")));
+            list.add(
+                    EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
+                            "attribute.modifier.plus." + 0,
+                            decimal_format.format(getMountedDamage()),
+                            StatCollector.translateToLocal("attribute.weapon.mountedBonus")));
         }
     }
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         float damage = super.modifyDamage(item, wielder, hit, initialDam, properHit);
 
         if (!(hit instanceof EntityLivingBase) || this instanceof ItemLance) {

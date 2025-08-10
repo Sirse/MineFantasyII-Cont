@@ -1,7 +1,7 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.stamina.StaminaBar;
-import mods.battlegear2.api.shield.IShield;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,12 +9,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import java.util.List;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import mods.battlegear2.api.shield.IShield;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemLance extends ItemSpearMF {
+
     /**
      */
     public ItemLance(String name, ToolMaterial material, int rarity, float weight) {
@@ -26,9 +28,11 @@ public class ItemLance extends ItemSpearMF {
     public void addInformation(ItemStack weapon, EntityPlayer user, List list, boolean extra) {
         super.addInformation(weapon, user, list, extra);
 
-        list.add(EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted("attribute.modifier.plus." + 0,
-                decimal_format.format(getJoustDamage(weapon)),
-                StatCollector.translateToLocal("attribute.weapon.joustDam")));
+        list.add(
+                EnumChatFormatting.BLUE + StatCollector.translateToLocalFormatted(
+                        "attribute.modifier.plus." + 0,
+                        decimal_format.format(getJoustDamage(weapon)),
+                        StatCollector.translateToLocal("attribute.weapon.joustDam")));
     }
 
     @Override
@@ -48,7 +52,7 @@ public class ItemLance extends ItemSpearMF {
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         float dam = super.modifyDamage(item, wielder, hit, initialDam, properHit);
         if (hit instanceof EntityLivingBase) {
             return joust((EntityLivingBase) hit, wielder, dam);
@@ -92,8 +96,7 @@ public class ItemLance extends ItemSpearMF {
         if (attacker.isRiding()) {
             Entity mount = attacker.ridingEntity;
             float speed = (float) Math.hypot(mount.motionX, mount.motionZ) * speedMod;
-            if (speed > speedCap)
-                speed = speedCap;
+            if (speed > speedCap) speed = speedCap;
 
             dam += getJoustDamage(target.getHeldItem()) / speedCap * speed;
 

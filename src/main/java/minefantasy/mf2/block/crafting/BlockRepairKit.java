@@ -1,10 +1,7 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -13,9 +10,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockRepairKit extends Block {
+
     protected float repairLevel;
     protected float successRate;
     protected float breakChance;
@@ -77,7 +79,7 @@ public class BlockRepairKit extends Block {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (world.isRemote) {
             return true;
         }
@@ -107,8 +109,7 @@ public class BlockRepairKit extends Block {
     }
 
     private boolean canRepair(ItemStack held) {
-        if (held == null)
-            return false;
+        if (held == null) return false;
         if (held.getItem().isDamageable() && CustomToolHelper.getCustomPrimaryMaterial(held) != null)// Custom Tool
         {
             return held.isItemDamaged();

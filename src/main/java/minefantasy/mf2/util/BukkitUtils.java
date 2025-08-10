@@ -1,10 +1,11 @@
 package minefantasy.mf2.util;
 
-import com.google.common.collect.Lists;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.config.ConfigIntegration;
+import java.lang.reflect.Method;
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -15,8 +16,10 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredListener;
 
-import java.lang.reflect.Method;
-import java.util.List;
+import com.google.common.collect.Lists;
+
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.config.ConfigIntegration;
 
 public final class BukkitUtils {
 
@@ -39,10 +42,14 @@ public final class BukkitUtils {
             callEvent(event);
             return event.isCancelled();
         } catch (Throwable throwable) {
-            MFLogUtil.logWarn(String.format("Failed call BlockBreakEvent: [Player: %s, X:%d, Y:%d, Z:%d]",
-                    String.valueOf(player), x, y, z));
-            if (MineFantasyII.isDebug())
-                throwable.printStackTrace();
+            MFLogUtil.logWarn(
+                    String.format(
+                            "Failed call BlockBreakEvent: [Player: %s, X:%d, Y:%d, Z:%d]",
+                            String.valueOf(player),
+                            x,
+                            y,
+                            z));
+            if (MineFantasyII.isDebug()) throwable.printStackTrace();
         }
         return true;
     }
@@ -50,15 +57,20 @@ public final class BukkitUtils {
     public static final boolean cantDamage(Entity damager, Entity damagee) {
         try {
             @SuppressWarnings("deprecation")
-            EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(toBukkitEntity(damager),
-                    toBukkitEntity(damagee), DamageCause.ENTITY_ATTACK, 0D);
+            EntityDamageByEntityEvent event = new EntityDamageByEntityEvent(
+                    toBukkitEntity(damager),
+                    toBukkitEntity(damagee),
+                    DamageCause.ENTITY_ATTACK,
+                    0D);
             callEvent(event);
             return event.isCancelled();
         } catch (Throwable throwable) {
-            MFLogUtil.logWarn(String.format("Failed call EntityDamageByEntityEvent: [Damager: %s, Damagee: %s]",
-                    String.valueOf(damager), String.valueOf(damagee)));
-            if (MineFantasyII.isDebug())
-                throwable.printStackTrace();
+            MFLogUtil.logWarn(
+                    String.format(
+                            "Failed call EntityDamageByEntityEvent: [Damager: %s, Damagee: %s]",
+                            String.valueOf(damager),
+                            String.valueOf(damagee)));
+            if (MineFantasyII.isDebug()) throwable.printStackTrace();
         }
         return true;
     }
@@ -78,12 +90,10 @@ public final class BukkitUtils {
     }
 
     private static final void callEvent(Event event) {
-        for (RegisteredListener listener : listeners)
-            try {
-                listener.callEvent(event);
-            } catch (Throwable throwable) {
-                if (MineFantasyII.isDebug())
-                    throwable.printStackTrace();
-            }
+        for (RegisteredListener listener : listeners) try {
+            listener.callEvent(event);
+        } catch (Throwable throwable) {
+            if (MineFantasyII.isDebug()) throwable.printStackTrace();
+        }
     }
 }

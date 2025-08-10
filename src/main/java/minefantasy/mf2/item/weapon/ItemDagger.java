@@ -1,18 +1,20 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.weapon.WeaponClass;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
-import java.util.Random;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.weapon.WeaponClass;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemDagger extends ItemWeaponMF {
+
     private Random rand = new Random();
 
     /**

@@ -1,5 +1,15 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
@@ -9,19 +19,11 @@ import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-import org.lwjgl.opengl.GL11;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
 
-    public int[][] stackorder = new int[][]{{0, 0}, {1, 0}, {0, 1}, {1, 1}, {0, 2}, {1, 2}, {2, 0},
-            {2, 1}, {2, 2}};
+    public int[][] stackorder = new int[][] { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 }, { 1, 2 }, { 2, 0 },
+            { 2, 1 }, { 2, 2 } };
 
     @Override
     public String getRecipeName() {
@@ -47,8 +49,7 @@ public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
                     && ResearchLogic.hasInfoUnlocked(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                 CachedCarpenterRecipe recipe = handleRecipe(irecipe);
 
-                if (recipe == null)
-                    continue;
+                if (recipe == null) continue;
 
                 recipe.computeVisuals();
                 arecipes.add(recipe);
@@ -68,8 +69,7 @@ public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
 
             CachedCarpenterRecipe recipe = handleRecipe(irecipe);
 
-            if (recipe == null || !recipe.contains(recipe.ingredients, ingredient.getItem()))
-                continue;
+            if (recipe == null || !recipe.contains(recipe.ingredients, ingredient.getItem())) continue;
 
             recipe.computeVisuals();
             if (recipe.contains(recipe.ingredients, ingredient)) {
@@ -119,10 +119,12 @@ public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
         public void setIngredients(int width, int height, Object[] items) {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
-                    if (items[y * width + x] == null)
-                        continue;
+                    if (items[y * width + x] == null) continue;
 
-                    MFPositionedStack stack = new MFPositionedStack(items[y * width + x], 41 + x * 23, 47 + y * 23,
+                    MFPositionedStack stack = new MFPositionedStack(
+                            items[y * width + x],
+                            41 + x * 23,
+                            47 + y * 23,
                             false);
                     stack.setMaxSize(1);
                     ingredients.add(stack);
@@ -144,7 +146,9 @@ public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
         public void setIngredients(List<PositionedStack> items) {
             ingredients.clear();
             for (int ingred = 0; ingred < items.size(); ingred++) {
-                MFPositionedStack stack = new MFPositionedStack(items.get(ingred), 41 + stackorder[ingred][0] * 23,
+                MFPositionedStack stack = new MFPositionedStack(
+                        items.get(ingred),
+                        41 + stackorder[ingred][0] * 23,
                         47 + stackorder[ingred][1] * 12);
                 stack.setMaxSize(1);
                 ingredients.add(stack);

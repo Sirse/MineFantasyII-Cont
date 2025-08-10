@@ -1,15 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.archery.IAmmo;
-import minefantasy.mf2.api.crafting.ISpecialSalvage;
-import minefantasy.mf2.entity.EntityMine;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.mechanics.BombDispenser;
+import java.util.List;
+
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -23,9 +15,19 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.archery.IAmmo;
+import minefantasy.mf2.api.crafting.ISpecialSalvage;
+import minefantasy.mf2.entity.EntityMine;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.mechanics.BombDispenser;
 
 public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
+
     private static final String powderNBT = "MineFantasy_PowderType";
     private static final String fuseNBT = "MineFantasy_FuseType";
     private static final String fillingNBT = "MineFantasy_ExplosiveType";
@@ -100,8 +102,7 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
     }
 
     public static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -113,7 +114,12 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
         if (!user.isSwingInProgress) {
-            world.playSoundEffect(user.posX, user.posY + 1.5D, user.posZ, "fire.ignite", 1.0F,
+            world.playSoundEffect(
+                    user.posX,
+                    user.posY + 1.5D,
+                    user.posZ,
+                    "fire.ignite",
+                    1.0F,
                     itemRand.nextFloat() * 0.4F + 0.8F);
             user.setItemInUse(item, getMaxItemUseDuration(item));
         }
@@ -134,8 +140,9 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
         }
 
         if (!world.isRemote) {
-            world.spawnEntityInWorld(new EntityMine(world, user).setType(getFilling(item), getCasing(item),
-                    getFuse(item), getPowder(item)));
+            world.spawnEntityInWorld(
+                    new EntityMine(world, user)
+                            .setType(getFilling(item), getCasing(item), getFuse(item), getPowder(item)));
         }
 
         return item;
@@ -242,10 +249,10 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{ItemBombComponent.getBombComponent("minecase", getCasing(item)),
+        return new Object[] { ItemBombComponent.getBombComponent("minecase", getCasing(item)),
                 ItemBombComponent.getBombComponent("fuse", getFuse(item)),
                 ItemBombComponent.getBombComponent("powder", getPowder(item)),
-                ItemBombComponent.getBombComponent("filling", getFilling(item)),};
+                ItemBombComponent.getBombComponent("filling", getFilling(item)), };
     }
 
     @Override

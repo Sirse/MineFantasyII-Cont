@@ -1,13 +1,15 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
 
 public class ResearchRequest extends PacketMF {
+
     public static final String packetName = "MF2_RequestResearch";
     private EntityPlayer user;
     private int researchID;
@@ -17,8 +19,7 @@ public class ResearchRequest extends PacketMF {
         this.user = user;
     }
 
-    public ResearchRequest() {
-    }
+    public ResearchRequest() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

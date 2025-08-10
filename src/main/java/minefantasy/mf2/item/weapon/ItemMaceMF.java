@@ -1,6 +1,5 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.weapon.WeaponClass;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -9,10 +8,13 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 
+import minefantasy.mf2.api.weapon.WeaponClass;
+
 /**
  * @author Anonymous Productions
  */
 public class ItemMaceMF extends ItemWeaponMF {
+
     private float stunChance = 0.20F;
 
     /**

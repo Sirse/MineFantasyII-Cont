@@ -26,7 +26,7 @@ public class Crest {
         try {
             input = new DataInputStream(new ByteArrayInputStream(crestData));
 
-            crestColours = new int[]{input.readInt(), input.readInt()};
+            crestColours = new int[] { input.readInt(), input.readInt() };
             imageIndex = input.readShort();
             size = input.readByte();
             x = input.readByte();

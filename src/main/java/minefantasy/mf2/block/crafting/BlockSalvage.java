@@ -1,15 +1,9 @@
 package minefantasy.mf2.block.crafting;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.archery.AmmoMechanicsMF;
-import minefantasy.mf2.api.crafting.Salvage;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.SkillList;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -20,11 +14,19 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.archery.AmmoMechanicsMF;
+import minefantasy.mf2.api.crafting.Salvage;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.SkillList;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockSalvage extends Block {
+
     protected float dropLevel;
     protected IIcon top, side, bottom;
     private String type;
@@ -78,7 +80,7 @@ public class BlockSalvage extends Block {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
-                                    float yOffset, float zOffset) {
+            float yOffset, float zOffset) {
         if (world.isRemote) {
             return true;
         }
@@ -86,9 +88,8 @@ public class BlockSalvage extends Block {
         String toolType = ToolHelper.getCrafterTool(held);
 
         /*
-         * Block above = world.getBlock(x, y+1, z); if(above != null) {
-         * if(salvageBlock(world, user, above, x, y, z)) { world.setBlockToAir(x, y+1,
-         * z); return true; } }
+         * Block above = world.getBlock(x, y+1, z); if(above != null) { if(salvageBlock(world, user, above, x, y, z)) {
+         * world.setBlockToAir(x, y+1, z); return true; } }
          */
 
         EntityItem drop = getDrop(world, x, y, z);
@@ -115,11 +116,8 @@ public class BlockSalvage extends Block {
         return false;
     }
     /*
-     * private boolean salvageBlock(World world, EntityPlayer user, Block junk, int
-     * x, int y, int z) { List<ItemStack> salvage = Salvage.salvageBlock(junk,
-     * dropLevel);
-     *
-     * if(salvage != null) { dropSalvage(world, x, y, z, salvage);
+     * private boolean salvageBlock(World world, EntityPlayer user, Block junk, int x, int y, int z) { List<ItemStack>
+     * salvage = Salvage.salvageBlock(junk, dropLevel); if(salvage != null) { dropSalvage(world, x, y, z, salvage);
      * world.playAuxSFX(1021, x, y, z, 0); return true; } return false; }
      */
 

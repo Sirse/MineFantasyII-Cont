@@ -1,11 +1,7 @@
 package minefantasy.mf2.item.gadget;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
-import minefantasy.mf2.item.ItemComponentMF;
-import minefantasy.mf2.item.list.ComponentListMF;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,9 +9,15 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
+import minefantasy.mf2.item.ItemComponentMF;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class ItemCrossbowPart extends ItemComponentMF implements ICrossbowPart {
+
     public IIcon modelIcon;
     private int tier;
     private String type, partname;
@@ -130,22 +132,14 @@ public class ItemCrossbowPart extends ItemComponentMF implements ICrossbowPart {
 
     @Override
     public float getModifier(String type) {
-        if (type.equalsIgnoreCase("power"))
-            return power;
-        if (type.equalsIgnoreCase("spread"))
-            return spread;
-        if (type.equalsIgnoreCase("recoil"))
-            return recoil;
-        if (type.equalsIgnoreCase("speed"))
-            return speed;
-        if (type.equalsIgnoreCase("capacity"))
-            return capacity;
-        if (type.equalsIgnoreCase("bash"))
-            return bash;
-        if (type.equalsIgnoreCase("zoom"))
-            return zoom;
-        if (type.equalsIgnoreCase("durability"))
-            return durability;
+        if (type.equalsIgnoreCase("power")) return power;
+        if (type.equalsIgnoreCase("spread")) return spread;
+        if (type.equalsIgnoreCase("recoil")) return recoil;
+        if (type.equalsIgnoreCase("speed")) return speed;
+        if (type.equalsIgnoreCase("capacity")) return capacity;
+        if (type.equalsIgnoreCase("bash")) return bash;
+        if (type.equalsIgnoreCase("zoom")) return zoom;
+        if (type.equalsIgnoreCase("durability")) return durability;
         return 0F;
     }
 

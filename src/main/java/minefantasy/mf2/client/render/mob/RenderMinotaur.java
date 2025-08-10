@@ -1,10 +1,7 @@
 package minefantasy.mf2.client.render.mob;
 
-import com.mojang.authlib.GameProfile;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.entity.mob.EntityMinotaur;
+import java.util.UUID;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -20,12 +17,19 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StringUtils;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.UUID;
+import com.mojang.authlib.GameProfile;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.entity.mob.EntityMinotaur;
 
 @SideOnly(Side.CLIENT)
 public class RenderMinotaur extends RenderBiped {
+
     public RenderMinotaur(ModelBiped model, float shadow) {
         super(model, shadow);
 
@@ -61,7 +65,8 @@ public class RenderMinotaur extends RenderBiped {
             net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient
                     .getItemRenderer(itemstack1, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(
-                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, itemstack1,
+                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED,
+                    itemstack1,
                     net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
             if (item instanceof ItemBlock) {
@@ -85,12 +90,12 @@ public class RenderMinotaur extends RenderBiped {
                         gameprofile = NBTUtil.func_152459_a(nbttagcompound.getCompoundTag("SkullOwner"));
                     } else if (nbttagcompound.hasKey("SkullOwner", 8)
                             && !StringUtils.isNullOrEmpty(nbttagcompound.getString("SkullOwner"))) {
-                        gameprofile = new GameProfile((UUID) null, nbttagcompound.getString("SkullOwner"));
-                    }
+                                gameprofile = new GameProfile((UUID) null, nbttagcompound.getString("SkullOwner"));
+                            }
                 }
 
-                TileEntitySkullRenderer.field_147536_b.func_152674_a(-0.5F, 0.0F, -0.5F, 1, 180.0F,
-                        itemstack1.getItemDamage(), gameprofile);
+                TileEntitySkullRenderer.field_147536_b
+                        .func_152674_a(-0.5F, 0.0F, -0.5F, 1, 180.0F, itemstack1.getItemDamage(), gameprofile);
             }
 
             GL11.glPopMatrix();
@@ -114,7 +119,8 @@ public class RenderMinotaur extends RenderBiped {
             net.minecraftforge.client.IItemRenderer customRenderer = net.minecraftforge.client.MinecraftForgeClient
                     .getItemRenderer(itemstack, net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED);
             boolean is3D = (customRenderer != null && customRenderer.shouldUseRenderHelper(
-                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED, itemstack,
+                    net.minecraftforge.client.IItemRenderer.ItemRenderType.EQUIPPED,
+                    itemstack,
                     net.minecraftforge.client.IItemRenderer.ItemRendererHelper.BLOCK_3D));
 
             if (item instanceof ItemBlock

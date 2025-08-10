@@ -1,10 +1,5 @@
 package minefantasy.mf2.mechanics;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import minefantasy.mf2.api.archery.AmmoMechanicsMF;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.config.ConfigStamina;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,7 +10,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import minefantasy.mf2.api.archery.AmmoMechanicsMF;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.config.ConfigStamina;
+
 public class ArrowHandlerMF {
+
     /**
      * This method adds arrows to the bow
      */
@@ -61,8 +63,7 @@ public class ArrowHandlerMF {
         }
 
         /*
-         * Checks over registered arrows and finds one to load The Quiver can be used to
-         * determine this
+         * Checks over registered arrows and finds one to load The Quiver can be used to determine this
          */
         ItemStack arrowToFire = AmmoMechanicsMF.reloadBow(bow);
         if (arrowToFire != null) {
@@ -78,19 +79,17 @@ public class ArrowHandlerMF {
             }
         }
         /*
-         * for(int a = 0; a < AmmoMechanicsMF.arrows.size(); a ++) { ItemStack arrow =
-         * AmmoMechanicsMF.arrows.get(a); if(user.inventory.hasItemStack(arrow)) {
-         * user.setItemInUse(bow, bow.getMaxItemUseDuration());//Starts pullback
-         * loadArrow(user, bow, arrow);//adds the arrow to NBT for rendering and later
-         * use event.setCanceled(true); return; } }
+         * for(int a = 0; a < AmmoMechanicsMF.arrows.size(); a ++) { ItemStack arrow = AmmoMechanicsMF.arrows.get(a);
+         * if(user.inventory.hasItemStack(arrow)) { user.setItemInUse(bow, bow.getMaxItemUseDuration());//Starts
+         * pullback loadArrow(user, bow, arrow);//adds the arrow to NBT for rendering and later use
+         * event.setCanceled(true); return; } }
          */
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void applyExhaustArrow(ArrowLooseEvent event) {
         if (StaminaBar.isSystemActive && !StaminaBar.isAnyStamina(event.entityPlayer, false)) {
-            if (ConfigStamina.weaponDrain < 1.0F)
-                event.charge *= ConfigStamina.weaponDrain;
+            if (ConfigStamina.weaponDrain < 1.0F) event.charge *= ConfigStamina.weaponDrain;
         }
     }
 
@@ -139,7 +138,10 @@ public class ArrowHandlerMF {
                     if (!user.capabilities.isCreativeMode) {
                         bow.damageItem(1, user);
                     }
-                    world.playSoundAtEntity(user, "minefantasy2:weapon.bowFire", 0.5F,
+                    world.playSoundAtEntity(
+                            user,
+                            "minefantasy2:weapon.bowFire",
+                            0.5F,
                             1.0F / (world.rand.nextFloat() * 0.4F + 1.2F) + charge * 0.5F);
                     loadArrow(user, bow, null);
                     event.setCanceled(true);

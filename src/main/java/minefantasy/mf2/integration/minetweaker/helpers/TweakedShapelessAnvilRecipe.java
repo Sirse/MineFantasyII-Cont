@@ -1,12 +1,13 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
 
 public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
 
@@ -19,7 +20,7 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
     private boolean hot;
 
     public TweakedShapelessAnvilRecipe(IIngredient[] input, IItemStack output, String tool, int time, int hammer,
-                                       int anvil, boolean hot, String research, Skill s) {
+            int anvil, boolean hot, String research, Skill s) {
         this.height = 4;
         this.width = 4;
         this.ingreds = input;
@@ -90,8 +91,7 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
                 for (int x = 0; x < 6; x++) {
                     for (int y = 0; y < 4; y++) {
                         ItemStack stack = inv.getStackInRowAndColumn(x, y);
-                        if (stack == null)
-                            continue;
+                        if (stack == null) continue;
                         if (stack.getItem() == ingred.getItem() && stack.getItemDamage() == ingred.getItemDamage()
                                 && !items[x][y]) {
                             matches[a] = true;
@@ -100,21 +100,16 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
                             break;
                         }
                     }
-                    if (found)
-                        break;
+                    if (found) break;
                 }
-                if (found)
-                    break;
+                if (found) break;
             }
         }
         boolean isMatch = true;
-        for (boolean b : matches)
-            if (!b)
-                isMatch = false;
+        for (boolean b : matches) if (!b) isMatch = false;
         for (int x = 0; x < 6; x++) {
             for (int y = 0; y < 4; y++) {
-                if (!items[x][y] && inv.getStackInRowAndColumn(x, y) != null)
-                    isMatch = false;
+                if (!items[x][y] && inv.getStackInRowAndColumn(x, y) != null) isMatch = false;
             }
         }
         return isMatch;

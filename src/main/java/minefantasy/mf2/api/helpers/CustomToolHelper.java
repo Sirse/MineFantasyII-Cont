@@ -1,13 +1,7 @@
 package minefantasy.mf2.api.helpers;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.api.crafting.ITieredComponent;
-import minefantasy.mf2.api.crafting.exotic.ISpecialDesign;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.item.heatable.ItemHeated;
+import java.util.List;
+
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,21 +10,28 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.List;
+import cpw.mods.fml.common.network.ByteBufUtils;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.crafting.ITieredComponent;
+import minefantasy.mf2.api.crafting.exotic.ISpecialDesign;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.item.heatable.ItemHeated;
 
 public class CustomToolHelper {
+
     public static final String slot_main = "main_metal";
     public static final String slot_haft = "haft_wood";
     public static EnumRarity poor = EnumHelper.addRarity("Poor", EnumChatFormatting.DARK_GRAY, "poor");
-    public static EnumRarity[] rarity = new EnumRarity[]{poor, EnumRarity.common, EnumRarity.uncommon,
-            EnumRarity.rare, EnumRarity.epic};
+    public static EnumRarity[] rarity = new EnumRarity[] { poor, EnumRarity.common, EnumRarity.uncommon,
+            EnumRarity.rare, EnumRarity.epic };
 
     /**
      * A bit of the new system, gets custom materials for the head
      */
     public static CustomMaterial getCustomPrimaryMaterial(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         CustomMaterial material = CustomMaterial.getMaterialFor(item, slot_main);
         if (material != null) {
@@ -40,8 +41,7 @@ public class CustomToolHelper {
     }
 
     public static CustomMaterial getCustomSecondaryMaterial(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         CustomMaterial material = CustomMaterial.getMaterialFor(item, slot_haft);
         if (material != null) {
@@ -223,10 +223,8 @@ public class CustomToolHelper {
 
         CustomMaterial custom = getCustomPrimaryMaterial(item);
         if (custom != null) {
-            if (custom.tier == 0)
-                return 1;
-            if (custom.tier <= 2)
-                return 2;
+            if (custom.tier == 0) return 1;
+            if (custom.tier <= 2) return 2;
             return Math.max(custom.tier, 2);
         }
         return value;
@@ -239,14 +237,15 @@ public class CustomToolHelper {
         if (materialOnTooltip()) {
             CustomMaterial main = getCustomPrimaryMaterial(item);
             if (main != null) {
-                String matName = StatCollector.translateToLocal(
-                        StatCollector.translateToLocal("material." + main.getName() + ".name"));
+                String matName = StatCollector
+                        .translateToLocal(StatCollector.translateToLocal("material." + main.getName() + ".name"));
                 list.add(EnumChatFormatting.GOLD + matName);
             }
         }
 
         if (haft != null) {
-            String matName = StatCollector.translateToLocalFormatted("item.mod_haft.name",
+            String matName = StatCollector.translateToLocalFormatted(
+                    "item.mod_haft.name",
                     StatCollector.translateToLocal("material." + haft.getName() + ".name"));
             list.add(EnumChatFormatting.GOLD + matName);
         }
@@ -268,7 +267,8 @@ public class CustomToolHelper {
 
         CustomMaterial metals = getCustomPrimaryMaterial(item);
         if (metals != null) {
-            String matName = StatCollector.translateToLocalFormatted("item.mod_joint.name",
+            String matName = StatCollector.translateToLocalFormatted(
+                    "item.mod_joint.name",
                     StatCollector.translateToLocal("material." + metals.getName() + ".name"));
             list.add(EnumChatFormatting.GOLD + matName);
         }
@@ -285,8 +285,8 @@ public class CustomToolHelper {
         if (base != null) {
             name = base.getName();
         }
-        return StatCollector.translateToLocalFormatted(unlocalName,
-                StatCollector.translateToLocal("material." + name + ".name"));
+        return StatCollector
+                .translateToLocalFormatted(unlocalName, StatCollector.translateToLocal("material." + name + ".name"));
     }
 
     public static String getLocalisedName(ItemStack item, String unlocalName) {
@@ -299,16 +299,15 @@ public class CustomToolHelper {
         if (base != null) {
             name = base.getName();
         }
-        return StatCollector.translateToLocalFormatted(unlocalName,
-                StatCollector.translateToLocal("material." + name + ".name"));
+        return StatCollector
+                .translateToLocalFormatted(unlocalName, StatCollector.translateToLocal("material." + name + ".name"));
     }
 
     public static boolean areEqual(ItemStack recipeItem, ItemStack inputItem) {
         if (recipeItem == null) {
             return inputItem == null;
         }
-        if (inputItem == null)
-            return false;
+        if (inputItem == null) return false;
 
         return recipeItem.isItemEqual(inputItem) && doesMainMatchForRecipe(recipeItem, inputItem)
                 && doesHaftMatchForRecipe(recipeItem, inputItem);
@@ -363,8 +362,7 @@ public class CustomToolHelper {
         if (base != null) {
             float mass = base.density * units;
             list.add(EnumChatFormatting.GOLD + base.getMaterialString());
-            if (mass > 0)
-                list.add(CustomMaterial.getWeightString(mass));
+            if (mass > 0) list.add(CustomMaterial.getWeightString(mass));
 
             if (base.isHeatable()) {
                 int maxTemp = base.getHeatableStats()[0];
@@ -431,15 +429,11 @@ public class CustomToolHelper {
         CustomMaterial main2 = getCustomSecondaryMaterial(item2);
         CustomMaterial haft1 = getCustomPrimaryMaterial(item1);
         CustomMaterial haft2 = getCustomSecondaryMaterial(item2);
-        if ((main1 == null && main2 != null) || (main2 == null && main1 != null))
-            return false;
-        if ((haft1 == null && haft2 != null) || (haft2 == null && haft1 != null))
-            return false;
+        if ((main1 == null && main2 != null) || (main2 == null && main1 != null)) return false;
+        if ((haft1 == null && haft2 != null) || (haft2 == null && haft1 != null)) return false;
 
-        if (main1 != null && main2 != null && main1 != main2)
-            return false;
-        if (haft1 != null && haft2 != null && haft1 != haft2)
-            return false;
+        if (main1 != null && main2 != null && main1 != main2) return false;
+        if (haft1 != null && haft2 != null && haft1 != haft2) return false;
 
         return true;
     }
@@ -493,8 +487,7 @@ public class CustomToolHelper {
     }
 
     public static String getComponentMaterial(ItemStack item, String type) {
-        if (item == null || type == null)
-            return null;
+        if (item == null || type == null) return null;
 
         if (item.getItem() instanceof ItemHeated) {
             return getComponentMaterial(ItemHeated.getItem(item), type);

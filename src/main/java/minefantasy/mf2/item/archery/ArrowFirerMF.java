@@ -1,13 +1,14 @@
 package minefantasy.mf2.item.archery;
 
-import minefantasy.mf2.api.archery.IArrowHandler;
-import minefantasy.mf2.api.archery.ISpecialBow;
-import minefantasy.mf2.entity.EntityArrowMF;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import minefantasy.mf2.api.archery.IArrowHandler;
+import minefantasy.mf2.api.archery.ISpecialBow;
+import minefantasy.mf2.entity.EntityArrowMF;
 
 /**
  * This class is an example used to fire custom arrows.
@@ -16,7 +17,7 @@ public class ArrowFirerMF implements IArrowHandler {
 
     @Override
     public boolean onFireArrow(World world, ItemStack arrow, ItemStack bow, EntityPlayer user, float charge,
-                               boolean infinite) {
+            boolean infinite) {
         if (arrow == null || !(arrow.getItem() instanceof ItemArrowMF)) {
             return false;
         }

@@ -1,5 +1,22 @@
 package minefantasy.mf2.item.archery;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import net.minecraft.block.BlockDispenser;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -14,27 +31,12 @@ import minefantasy.mf2.entity.EntityArrowMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.mechanics.MFArrowDispenser;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
+
     public static final DecimalFormat decimal_format = new DecimalFormat("#.##");
     public static final MFArrowDispenser dispenser = new MFArrowDispenser();
     protected float damage;
@@ -70,8 +72,9 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
         name = convertName(name);
         material = convertMaterial(material);
 
-        super.setUnlocalizedName((type == ArrowType.EXPLOSIVE || type == ArrowType.EXPLOSIVEBOLT) ? name
-                : type == ArrowType.BOLT ? (name + "_bolt") : (name + "_arrow"));
+        super.setUnlocalizedName(
+                (type == ArrowType.EXPLOSIVE || type == ArrowType.EXPLOSIVEBOLT) ? name
+                        : type == ArrowType.BOLT ? (name + "_bolt") : (name + "_arrow"));
         name = getName(name, type);
         design = type;
         arrowName = name;
@@ -86,7 +89,7 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
         GameRegistry.registerItem(this, "MF_Com_" + name, MineFantasyII.MODID);
 
         AmmoMechanicsMF.addArrow(new ItemStack(this));
-        if(Loader.isModLoaded("battlegear2")) {
+        if (Loader.isModLoaded("battlegear2")) {
             mods.battlegear2.api.quiver.QuiverArrowRegistry.addArrowToRegistry(new ItemStack(this), null);
         }
         BlockDispenser.dispenseBehaviorRegistry.putObject(this, dispenser);
@@ -216,8 +219,10 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
             CustomToolHelper.addInformation(item, list);
         }
         super.addInformation(item, user, list, extra);
-        list.add(EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.arrowPower.name") + ": "
-                + decimal_format.format(getDamageModifier(item)));
+        list.add(
+                EnumChatFormatting.BLUE + StatCollector.translateToLocal("attribute.arrowPower.name")
+                        + ": "
+                        + decimal_format.format(getDamageModifier(item)));
     }
 
     @Override
@@ -225,10 +230,10 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
         String name = ("" + StatCollector.translateToLocal(this.getUnlocalizedNameInefficiently(item) + ".name"))
                 .trim();
 
-        if (isCustom)
-            name = CustomToolHelper.getLocalisedName(item, name);
+        if (isCustom) name = CustomToolHelper.getLocalisedName(item, name);
 
-        if (design != ArrowType.NORMAL && design != ArrowType.EXPLOSIVE && design != ArrowType.BOLT
+        if (design != ArrowType.NORMAL && design != ArrowType.EXPLOSIVE
+                && design != ArrowType.BOLT
                 && design != ArrowType.EXPLOSIVEBOLT) {
             name += " (" + StatCollector.translateToLocal("arrow.head." + design.name.toLowerCase() + ".name") + ")";
         }

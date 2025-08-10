@@ -6,6 +6,7 @@ import net.minecraft.pathfinding.PathEntity;
 import net.minecraft.pathfinding.PathPoint;
 
 public class AI_CommonSprint extends EntityAIBase {
+
     public EntityLiving entity;
     public float range;
 

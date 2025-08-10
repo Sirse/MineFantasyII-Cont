@@ -1,14 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.cooking.CookRecipe;
-import minefantasy.mf2.api.crafting.IHeatSource;
-import minefantasy.mf2.api.crafting.IHeatUser;
-import minefantasy.mf2.block.crafting.BlockRoast;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TileInventoryPacket;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,9 +13,18 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.crafting.IHeatSource;
+import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.block.crafting.BlockRoast;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.TileInventoryPacket;
 
 public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser {
+
     /**
      * Enable high temperatures ruin cooking
      */
@@ -37,8 +39,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     private CookRecipe recipe;
     private boolean isOvenTemp;
 
-    public TileEntityRoast() {
-    }
+    public TileEntityRoast() {}
 
     @Override
     public void updateEntity() {
@@ -64,8 +65,14 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
             }
         }
         if (temp > 0 && worldObj.isRemote && rand.nextInt(20) == 0) {
-            worldObj.spawnParticle("flame", xCoord + 0.2F + (rand.nextFloat() * 0.6F), yCoord + 0.2F,
-                    zCoord + 0.2F + (rand.nextFloat() * 0.6F), 0F, 0F, 0F);
+            worldObj.spawnParticle(
+                    "flame",
+                    xCoord + 0.2F + (rand.nextFloat() * 0.6F),
+                    yCoord + 0.2F,
+                    zCoord + 0.2F + (rand.nextFloat() * 0.6F),
+                    0F,
+                    0F,
+                    0F);
         }
     }
 
@@ -84,8 +91,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     }
 
     public boolean isOven() {
-        if (worldObj == null)
-            return isOvenTemp;
+        if (worldObj == null) return isOvenTemp;
         Block base = worldObj.getBlock(xCoord, yCoord, zCoord);
         if (base instanceof BlockRoast) {
             return ((BlockRoast) base).isOven();
@@ -137,8 +143,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     }
 
     public int getProgressBar(int i) {
-        if (maxProgress <= 0)
-            return 0;
+        if (maxProgress <= 0) return 0;
         return (int) (i / maxProgress * progress);
     }
 
@@ -188,8 +193,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     }
 
     // INVENTORY
-    public void onInventoryChanged() {
-    }
+    public void onInventoryChanged() {}
 
     @Override
     public int getSizeInventory() {
@@ -257,12 +261,10 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -283,7 +285,11 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
                 }
 
                 itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(worldObj, xCoord + f, yCoord + f1, zCoord + f2,
+                EntityItem entityitem = new EntityItem(
+                        worldObj,
+                        xCoord + f,
+                        yCoord + f1,
+                        zCoord + f2,
                         new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
 
                 if (itemstack.hasTagCompound()) {
@@ -305,25 +311,24 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     }
 
     private void sendPacketToClients() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new TileInventoryPacket(this, this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new TileInventoryPacket(this, this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
 
-		/*
-        List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-		for (int i = 0; i < players.size(); i++) {
-			EntityPlayer player = players.get(i);
-			((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-					new TileInventoryPacket(this, this).generatePacket());
-		}
-		*/
+        /*
+         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+         * worldObj).getEntityTracker().func_151248_b(player, new TileInventoryPacket(this, this).generatePacket()); }
+         */
     }
 
     @SideOnly(Side.CLIENT)
     public String getTexName() {
-        if (worldObj == null)
-            return texname;
+        if (worldObj == null) return texname;
 
         Block base = worldObj.getBlock(xCoord, yCoord, zCoord);
         if (base instanceof BlockRoast) {
@@ -334,16 +339,14 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
 
     @Override
     public Block getBlockType() {
-        if (worldObj == null)
-            return BlockListMF.oven_stone;
+        if (worldObj == null) return BlockListMF.oven_stone;
 
         return super.getBlockType();
     }
 
     @Override
     public int getBlockMetadata() {
-        if (worldObj == null)
-            return 0;
+        if (worldObj == null) return 0;
         return super.getBlockMetadata();
     }
 }

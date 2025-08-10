@@ -1,10 +1,5 @@
 package minefantasy.mf2.mechanics.worldGen.structure.dwarven;
 
-import minefantasy.mf2.block.decor.BlockRack;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
-import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntityChest;
@@ -12,7 +7,14 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
+import minefantasy.mf2.block.decor.BlockRack;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.mechanics.worldGen.structure.LootTypes;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureGenAncientForge;
+import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
+
 public class StructureDSSurfaceAppendage extends StructureModuleMF {
+
     private String type;
 
     public StructureDSSurfaceAppendage(World world, StructureCoordinates position) {
@@ -82,15 +84,27 @@ public class StructureDSSurfaceAppendage extends StructureModuleMF {
                 if (blockarray != null) {
                     placeBlock((Block) blockarray[0], 0, x, 0, z);
                 }
-                placeBlock(BlockListMF.reinforced_stone_bricks, StructureGenAncientForge.getRandomMetadata(rand), x, -1,
+                placeBlock(
+                        BlockListMF.reinforced_stone_bricks,
+                        StructureGenAncientForge.getRandomMetadata(rand),
+                        x,
+                        -1,
                         z);
                 if (z < depth) {
-                    placeBlock(BlockListMF.reinforced_stone_bricks, StructureGenAncientForge.getRandomMetadata(rand), x,
-                            -2, z);
+                    placeBlock(
+                            BlockListMF.reinforced_stone_bricks,
+                            StructureGenAncientForge.getRandomMetadata(rand),
+                            x,
+                            -2,
+                            z);
                 }
                 if (z < depth - 1) {
-                    placeBlock(BlockListMF.reinforced_stone_bricks, StructureGenAncientForge.getRandomMetadata(rand), x,
-                            -3, z);
+                    placeBlock(
+                            BlockListMF.reinforced_stone_bricks,
+                            StructureGenAncientForge.getRandomMetadata(rand),
+                            x,
+                            -3,
+                            z);
                 }
                 // WALLS
                 for (int y = 0; y <= height; y++) {
@@ -140,26 +154,26 @@ public class StructureDSSurfaceAppendage extends StructureModuleMF {
 
     private Object[] getFloor(int width, int depth, int x, int z) {
         if (x <= -(width - 1) || x >= (width - 1) || z <= 1 || z >= depth - 1) {
-            return new Object[]{BlockListMF.reinforced_stone, 0};
+            return new Object[] { BlockListMF.reinforced_stone, 0 };
         }
-        return new Object[]{BlockListMF.cobble_pavement, 0};
+        return new Object[] { BlockListMF.cobble_pavement, 0 };
     }
 
     private Object[] getCeiling(int width, int depth, int x, int z) {
         if (x == -width || x == width || z == 0 || z == depth) {
-            return new Object[]{BlockListMF.reinforced_stone, false};
+            return new Object[] { BlockListMF.reinforced_stone, false };
         }
-        return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+        return new Object[] { BlockListMF.reinforced_stone_bricks, true };
     }
 
     private Object[] getRoofDecor(int width, int depth, int x, int z) {
         if (x == -width || x == width || z == 0 || z == depth) {
             if (x == 0 || x == -width || x == width) {
                 if (z == 0 || z == depth / 2 || z == depth) {
-                    return new Object[]{BlockListMF.reinforced_stone, false};
+                    return new Object[] { BlockListMF.reinforced_stone, false };
                 }
             }
-            return new Object[]{BlockListMF.bars[0], false};
+            return new Object[] { BlockListMF.bars[0], false };
         }
         return null;
     }
@@ -167,18 +181,18 @@ public class StructureDSSurfaceAppendage extends StructureModuleMF {
     private Object[] getWalls(int radius, int depth, int height, int x, int y, int z) {
         if (x == -radius || x == radius || z == depth || z == 0) {
             if ((x == -radius && (z == depth || z == 0)) || (x == radius && (z == depth || z == 0))) {
-                return new Object[]{BlockListMF.reinforced_stone, false};
+                return new Object[] { BlockListMF.reinforced_stone, false };
             }
 
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
         if (type == "Tower" && y == (height / 2)) {
-            return new Object[]{BlockListMF.reinforced_stone_bricks, true};
+            return new Object[] { BlockListMF.reinforced_stone_bricks, true };
         }
         if (y <= 0) {
             return null;
         }
-        return new Object[]{Blocks.air, false};
+        return new Object[] { Blocks.air, false };
     }
 
     private void decorateTower(int width, int depth, int height) {
@@ -222,8 +236,8 @@ public class StructureDSSurfaceAppendage extends StructureModuleMF {
         TileEntityChest tile = (TileEntityChest) getTileEntity(x, y, z, direction);
 
         if (tile != null) {
-            WeightedRandomChestContent.generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile,
-                    2 + rand.nextInt(3));
+            WeightedRandomChestContent
+                    .generateChestContents(rand, ChestGenHooks.getItems(loot, rand), tile, 2 + rand.nextInt(3));
         }
     }
 }

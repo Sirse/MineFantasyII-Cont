@@ -38,9 +38,10 @@ public class NEIConfig implements IConfigureNEI {
             API.registerRecipeHandler(handlerQuern);
             API.registerUsageHandler(handlerQuern);
 
-			/*RecipeHandlerTanning handlerTanning = new RecipeHandlerTanning();
-            API.registerRecipeHandler(handlerTanning);
-			API.registerUsageHandler(handlerTanning);*/
+            /*
+             * RecipeHandlerTanning handlerTanning = new RecipeHandlerTanning();
+             * API.registerRecipeHandler(handlerTanning); API.registerUsageHandler(handlerTanning);
+             */
 
             RecipeHandlerCrucible handlerCrucible = new RecipeHandlerCrucible();
             API.registerRecipeHandler(handlerCrucible);

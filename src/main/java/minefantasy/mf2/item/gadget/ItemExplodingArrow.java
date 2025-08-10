@@ -1,5 +1,14 @@
 package minefantasy.mf2.item.gadget;
 
+import java.util.List;
+
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
+
 import minefantasy.mf2.api.crafting.ISpecialSalvage;
 import minefantasy.mf2.entity.EntityArrowMF;
 import minefantasy.mf2.item.archery.ArrowType;
@@ -8,14 +17,6 @@ import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
-
-import java.util.List;
 
 public class ItemExplodingArrow extends ItemArrowMF implements ISpecialSalvage {
 
@@ -50,8 +51,9 @@ public class ItemExplodingArrow extends ItemArrowMF implements ISpecialSalvage {
         super.addInformation(item, user, list, fullInfo);
 
         if (item.hasTagCompound() && item.getTagCompound().hasKey("stickyBomb")) {
-            list.add(EnumChatFormatting.GREEN + StatCollector.translateToLocal("bomb.case.sticky")
-                    + EnumChatFormatting.GRAY);
+            list.add(
+                    EnumChatFormatting.GREEN + StatCollector.translateToLocal("bomb.case.sticky")
+                            + EnumChatFormatting.GRAY);
         }
         EnumExplosiveType fill = EnumExplosiveType.getType(ItemBomb.getFilling(item));
         EnumPowderType powder = EnumPowderType.getType(ItemBomb.getPowder(item));
@@ -77,8 +79,8 @@ public class ItemExplodingArrow extends ItemArrowMF implements ISpecialSalvage {
 
     @Override
     public Object[] getSalvage(ItemStack item) {
-        return new Object[]{ComponentListMF.bomb_casing_arrow,
+        return new Object[] { ComponentListMF.bomb_casing_arrow,
                 ItemBombComponent.getBombComponent("powder", ItemBomb.getPowder(item)),
-                ItemBombComponent.getBombComponent("filling", ItemBomb.getFilling(item)),};
+                ItemBombComponent.getBombComponent("filling", ItemBomb.getFilling(item)), };
     }
 }

@@ -1,9 +1,5 @@
 package minefantasy.mf2.item.tool;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.tool.ILighter;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -11,7 +7,13 @@ import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.tool.ILighter;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class ItemLighterMF extends Item implements ILighter {
+
     private float chance;
 
     public ItemLighterMF(String name, float chance, int uses) {
@@ -26,8 +28,7 @@ public class ItemLighterMF extends Item implements ILighter {
 
     // 0 for N/A -1 for fail, 1 for succeed
     public static int tryUse(ItemStack held, EntityPlayer user) {
-        if (held == null)
-            return 0;
+        if (held == null) return 0;
 
         if (held.getItem() instanceof ItemFlintAndSteel) {
             return 1;
@@ -50,7 +51,7 @@ public class ItemLighterMF extends Item implements ILighter {
     }
 
     public boolean onItemUse(ItemStack item, EntityPlayer user, World world, int x, int y, int z, int face, float xo,
-                             float yo, float zo) {
+            float yo, float zo) {
         if (face == 0) {
             --y;
         }
@@ -80,7 +81,12 @@ public class ItemLighterMF extends Item implements ILighter {
         } else {
             boolean success = user.getRNG().nextFloat() < chance;
             if (world.isAirBlock(x, y, z)) {
-                world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "fire.ignite", 1.0F,
+                world.playSoundEffect(
+                        x + 0.5D,
+                        y + 0.5D,
+                        z + 0.5D,
+                        "fire.ignite",
+                        1.0F,
                         itemRand.nextFloat() * 0.4F + 0.8F);
                 if (success) {
                     world.setBlock(x, y, z, Blocks.fire);

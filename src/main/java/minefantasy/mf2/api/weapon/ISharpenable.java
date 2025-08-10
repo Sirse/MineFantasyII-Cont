@@ -3,6 +3,7 @@ package minefantasy.mf2.api.weapon;
 import net.minecraft.item.ItemStack;
 
 public interface ISharpenable {
+
     /**
      * The max amount of uses of sharpness -1 means can't be sharpened
      */

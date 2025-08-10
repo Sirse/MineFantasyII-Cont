@@ -1,18 +1,20 @@
 package minefantasy.mf2.block.crafting;
 
-import minefantasy.mf2.api.helpers.PowerArmour;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.block.basic.BasicBlockMF;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.PowerArmour;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.block.basic.BasicBlockMF;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class BlockFrame extends BasicBlockMF {
+
     public static final float offset = 0.28125F;
     public boolean isCogworkHolder = false;
 
@@ -113,7 +115,7 @@ public class BlockFrame extends BasicBlockMF {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         if (ToolHelper.getCrafterTool(player.getHeldItem()).equalsIgnoreCase("spanner")) {
             return tryBuild(player, world, x, y, z);
         }

@@ -1,24 +1,27 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityBombPress;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityBombPress;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
- * <p>
- * Custom renderers based off render tutorial by MC_DucksAreBest
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
+ *         <p>
+ *         Custom renderers based off render tutorial by MC_DucksAreBest
  */
 public class TileEntityBombPressRenderer extends TileEntitySpecialRenderer {
+
     private ModelBombPress model;
     private Random random = new Random();
 
@@ -39,7 +42,7 @@ public class TileEntityBombPressRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderModelAt(String tex, int meta, double d, double d1, double d2, float f, int renderPass,
-                              float animation) {
+            float animation) {
         int i = meta;
 
         int j = 90 * i;

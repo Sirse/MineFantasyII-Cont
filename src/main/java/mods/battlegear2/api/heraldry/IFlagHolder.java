@@ -1,8 +1,8 @@
 package mods.battlegear2.api.heraldry;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.List;
+
+import net.minecraft.item.ItemStack;
 
 /**
  * Defines a {@link #TileEntity} holding flags {@link #ItemStack}

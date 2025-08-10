@@ -1,9 +1,7 @@
 package minefantasy.mf2.block.tileentity.decor;
 
-import minefantasy.mf2.api.helpers.BlockPositionHelper;
-import minefantasy.mf2.api.weapon.IRackItem;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TileInventoryPacket;
+import java.util.List;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -16,9 +14,13 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.List;
+import minefantasy.mf2.api.helpers.BlockPositionHelper;
+import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.TileInventoryPacket;
 
 public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
+
     private ItemStack inv[];
     private int ticksExisted;
 
@@ -118,16 +120,17 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
         if (!worldObj.isRemote) {
             List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
 
-            NetworkUtils.sendToWatchers(new TileInventoryPacket(this, this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+            NetworkUtils.sendToWatchers(
+                    new TileInventoryPacket(this, this).generatePacket(),
+                    (WorldServer) worldObj,
+                    this.xCoord,
+                    this.zCoord);
             super.sendPacketToClient();
             /*
-			for (int i = 0; i < players.size(); i++) {
-				EntityPlayer player = players.get(i);
-				((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-						new TileInventoryPacket(this, this).generatePacket());
-				super.sendPacketToClient(player);
-			}
-			*/
+             * for (int i = 0; i < players.size(); i++) { EntityPlayer player = players.get(i); ((WorldServer)
+             * worldObj).getEntityTracker().func_151248_b(player, new TileInventoryPacket(this, this).generatePacket());
+             * super.sendPacketToClient(player); }
+             */
         }
     }
 
@@ -146,11 +149,9 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
 
     private int getEnchantment(int i) {
         ItemStack is = this.getStackInSlot(i);
-        if (is == null)
-            return 0;
+        if (is == null) return 0;
 
-        if (is.isItemEnchanted())
-            return 1;
+        if (is.isItemEnchanted()) return 1;
 
         return 0;
     }
@@ -197,8 +198,7 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
         if (item.getItem() instanceof IRackItem) {
             return ((IRackItem) item.getItem()).canHang(this, item, slot);
         }
-        if (item.getItem() instanceof ItemArmor)
-            return false;
+        if (item.getItem() instanceof ItemArmor) return false;
         // if(item.getItem() instanceof ItemCrossbow || item.getItem() instanceof
         // ItemBomb || item.getItem() instanceof ItemMine)return false;
         return item.getItem().isItemTool(item);
@@ -220,8 +220,7 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     }
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     public boolean hasRackAbove(int slot) {
         TileEntity side = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);

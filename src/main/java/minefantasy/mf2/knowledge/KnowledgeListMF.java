@@ -1,5 +1,11 @@
 package minefantasy.mf2.knowledge;
 
+import java.util.ArrayList;
+
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
+
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.knowledge.InformationBase;
@@ -12,13 +18,9 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.*;
 import minefantasy.mf2.material.MetalMaterial;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-
-import java.util.ArrayList;
 
 public class KnowledgeListMF {
+
     public static final ArrayList<IRecipe> plankRecipe = new ArrayList<IRecipe>();
     public static final ArrayList<IRecipe> stoneBricksR = new ArrayList<IRecipe>();
     public static final ArrayList<IAnvilRecipe> barR = new ArrayList<IAnvilRecipe>();
@@ -165,12 +167,22 @@ public class KnowledgeListMF {
                 .registerStat().setUnlocked();
         dust = (new InformationBase("dust", -1, -3, 0, ComponentListMF.clay_pot, commodities)).registerStat()
                 .setUnlocked();
-        craftCrafters = (new InformationBase("craftCrafters", -1, 1, 0, CustomToolListMF.standard_hammer,
+        craftCrafters = (new InformationBase(
+                "craftCrafters",
+                -1,
+                1,
+                0,
+                CustomToolListMF.standard_hammer,
                 (InformationBase) null)).registerStat().setUnlocked();
         stamina = (new InformationBase("stamina", -3, 1, 0, Items.feather, craftCrafters)).registerStat().setUnlocked();
         combat = (new InformationBase("combat", -5, 2, 0, Items.iron_sword, stamina)).registerStat().setUnlocked();
-        craftArmourBasic = (new InformationBase("craftArmourBasic", -5, 0, 5,
-                ArmourListMF.armour(ArmourListMF.leather, 0, 1), combat)).registerStat().setUnlocked();
+        craftArmourBasic = (new InformationBase(
+                "craftArmourBasic",
+                -5,
+                0,
+                5,
+                ArmourListMF.armour(ArmourListMF.leather, 0, 1),
+                combat)).registerStat().setUnlocked();
         firemaker = (new InformationBase("firemaker", 5, 1, 0, Items.flint_and_steel, (InformationBase) null))
                 .registerStat().setUnlocked();
 
@@ -226,9 +238,14 @@ public class KnowledgeListMF {
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 75)
                 .setDescriptValues(getMetalTier("adamantium"));
 
-        smeltMaster = (new InformationBase("smeltMaster", 4, 13, 3, new ItemStack(ComponentListMF.artefacts, 1, 3),
-                (InformationBase) null)).registerStat().setPage(artisanry).setSpecial().addSkill(SkillList.artisanry,
-                100);
+        smeltMaster = (new InformationBase(
+                "smeltMaster",
+                4,
+                13,
+                3,
+                new ItemStack(ComponentListMF.artefacts, 1, 3),
+                (InformationBase) null)).registerStat().setPage(artisanry).setSpecial()
+                .addSkill(SkillList.artisanry, 100);
         smeltIgnotumite = (new InformationBase("smeltIgnotumite", 2, 15, 3, ComponentListMF.ingots[15], smeltMaster))
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 100)
                 .setDescriptValues(getMetalTier("ignotumite"));
@@ -259,19 +276,38 @@ public class KnowledgeListMF {
                 .registerStat().setPage(artisanry).setUnlocked();
         craftWeapons = (new InformationBase("craftWeapons", -3, 1, 5, CustomToolListMF.standard_sword, bar))
                 .registerStat().setPage(artisanry).setUnlocked();
-        craftAdvWeapons = (new InformationBase("craftAdvWeapons", -5, 1, 0, CustomToolListMF.standard_battleaxe,
+        craftAdvWeapons = (new InformationBase(
+                "craftAdvWeapons",
+                -5,
+                1,
+                0,
+                CustomToolListMF.standard_battleaxe,
                 craftWeapons)).registerStat().setPage(artisanry).setUnlocked();
         arrows = (new InformationBase("arrows", -3, 4, 0, CustomToolListMF.standard_arrow, bar)).registerStat()
                 .setPage(artisanry).setUnlocked();
 
         craftOrnate = (new InformationBase("craftOrnate", -3, -1, 1, ComponentListMF.ornate_items, null)).registerStat()
                 .setPage(artisanry).addSkill(SkillList.artisanry, 35);
-        craftArmourLight = (new InformationBase("craftArmourLight", -3, 3, 1,
-                ArmourListMF.armour(ArmourListMF.leather, 3, 1), anvil)).registerStat().setPage(artisanry)
-                .setUnlocked();
-        craftArmourMedium = (new InformationBase("craftArmourMedium", -4, 3, 1, CustomArmourListMF.standard_chain_chest,
+        craftArmourLight = (new InformationBase(
+                "craftArmourLight",
+                -3,
+                3,
+                1,
+                ArmourListMF.armour(ArmourListMF.leather, 3, 1),
+                anvil)).registerStat().setPage(artisanry).setUnlocked();
+        craftArmourMedium = (new InformationBase(
+                "craftArmourMedium",
+                -4,
+                3,
+                1,
+                CustomArmourListMF.standard_chain_chest,
                 craftArmourLight)).registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 0);
-        craftArmourHeavy = (new InformationBase("craftArmourHeavy", -5, 3, 3, CustomArmourListMF.standard_plate_chest,
+        craftArmourHeavy = (new InformationBase(
+                "craftArmourHeavy",
+                -5,
+                3,
+                3,
+                CustomArmourListMF.standard_plate_chest,
                 craftArmourMedium)).registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 10);
         arrowsBodkin = (new InformationBase("arrowsBodkin", -4, 5, 1, CustomToolListMF.standard_arrow_bodkin, arrows))
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 10);
@@ -304,7 +340,12 @@ public class KnowledgeListMF {
 
         blackpowder = (new InformationBase("blackpowder", 0, 0, 4, ComponentListMF.blackpowder, (InformationBase) null))
                 .registerStat().setPage(engineering).addSkill(SkillList.engineering, 0);
-        advblackpowder = (new InformationBase("advblackpowder", 2, -2, 2, ComponentListMF.blackpowder_advanced,
+        advblackpowder = (new InformationBase(
+                "advblackpowder",
+                2,
+                -2,
+                2,
+                ComponentListMF.blackpowder_advanced,
                 blackpowder)).registerStat().setPage(engineering).addSkill(SkillList.engineering, 50);
         bombs = (new InformationBase("bombs", 0, 2, 3, ToolListMF.bomb_custom, blackpowder)).registerStat()
                 .setPage(engineering).setSpecial().addSkill(SkillList.engineering, 10);
@@ -341,11 +382,21 @@ public class KnowledgeListMF {
                 .setPage(engineering).setSpecial().addSkill(SkillList.engineering, 0);
         crossShafts = (new InformationBase("crossShafts", -6, 2, 0, ComponentListMF.crossbow_stock_wood, crossbows))
                 .registerStat().setPage(engineering).setUnlocked();
-        crossShaftAdvanced = (new InformationBase("crossShaftAdvanced", -6, 4, 2, ComponentListMF.crossbow_stock_iron,
+        crossShaftAdvanced = (new InformationBase(
+                "crossShaftAdvanced",
+                -6,
+                4,
+                2,
+                ComponentListMF.crossbow_stock_iron,
                 crossShafts)).registerStat().setPage(engineering).addSkill(SkillList.engineering, 40);
         crossHeads = (new InformationBase("crossHeads", -2, -2, 0, ComponentListMF.cross_arms_basic, crossbows))
                 .registerStat().setPage(engineering).setUnlocked();
-        crossHeadAdvanced = (new InformationBase("crossHeadAdvanced", -3, -3, 2, ComponentListMF.cross_arms_advanced,
+        crossHeadAdvanced = (new InformationBase(
+                "crossHeadAdvanced",
+                -3,
+                -3,
+                2,
+                ComponentListMF.cross_arms_advanced,
                 crossHeads)).registerStat().setPage(engineering).addSkill(SkillList.engineering, 30);
         crossBayonet = (new InformationBase("crossBayonet", -1, -3, 1, ComponentListMF.cross_bayonet, crossHeads))
                 .registerStat().setPage(engineering).addSkill(SkillList.engineering, 10);
@@ -367,9 +418,19 @@ public class KnowledgeListMF {
         repair_ornate = (new InformationBase("repair_ornate", 12, 2, 3, BlockListMF.repair_ornate, repair_advanced))
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 50);
 
-        constructionPts = (new InformationBase("constructionPts", 0, 0, 0, ComponentListMF.plank_cut,
+        constructionPts = (new InformationBase(
+                "constructionPts",
+                0,
+                0,
+                0,
+                ComponentListMF.plank_cut,
                 (InformationBase) null)).registerStat().setPage(construction).setUnlocked();
-        reinforced_stone = (new InformationBase("reinforced_stone", 1, 0, 0, BlockListMF.reinforced_stone,
+        reinforced_stone = (new InformationBase(
+                "reinforced_stone",
+                1,
+                0,
+                0,
+                BlockListMF.reinforced_stone,
                 (InformationBase) null)).registerStat().setPage(construction).setUnlocked();
         glass = (new InformationBase("glass", 0, 1, 0, BlockListMF.framed_glass, (InformationBase) null)).registerStat()
                 .setPage(construction).setUnlocked();
@@ -379,13 +440,23 @@ public class KnowledgeListMF {
                 .setUnlocked();
         thatch = (new InformationBase("thatch", 0, -3, 0, BlockListMF.thatch, clay_wall)).registerStat()
                 .setPage(construction).setUnlocked();
-        refined_planks = (new InformationBase("refined_planks", -1, 0, 1, BlockListMF.refined_planks,
+        refined_planks = (new InformationBase(
+                "refined_planks",
+                -1,
+                0,
+                1,
+                BlockListMF.refined_planks,
                 (InformationBase) null)).registerStat().setPage(construction).addSkill(SkillList.construction, 0);
         clay_wall = (new InformationBase("clay_wall", 0, -1, 2, BlockListMF.clayWall, (InformationBase) null))
                 .registerStat().setPage(construction).addSkill(SkillList.construction, 5);
         paint_brush = (new InformationBase("paint_brush", -3, 0, 1, ToolListMF.paint_brush, refined_planks))
                 .registerStat().setPage(construction).addSkill(SkillList.construction, 10);
-        decorated_stone = (new InformationBase("decorated_stone", 5, 0, 2, BlockListMF.reinforced_stone_framed,
+        decorated_stone = (new InformationBase(
+                "decorated_stone",
+                5,
+                0,
+                2,
+                BlockListMF.reinforced_stone_framed,
                 brickworks)).registerStat().setPage(construction).addSkill(SkillList.construction, 15);
 
         bed_roll = (new InformationBase("bed_roll", 2, 3, 1, ToolListMF.bedroll, (InformationBase) null)).registerStat()
@@ -405,7 +476,12 @@ public class KnowledgeListMF {
         firepit = (new InformationBase("firepit", 0, 0, 0, BlockListMF.firepit, (InformationBase) null)).registerStat()
                 .setPage(provisioning).setUnlocked();
 
-        generic_meat = (new InformationBase("generic_meat", 0, -1, 0, FoodListMF.generic_meat_uncooked,
+        generic_meat = (new InformationBase(
+                "generic_meat",
+                0,
+                -1,
+                0,
+                FoodListMF.generic_meat_uncooked,
                 (InformationBase) null)).registerStat().setPage(provisioning).setUnlocked();
         stew = (new InformationBase("stew", 0, -3, 0, FoodListMF.stew, generic_meat)).registerStat()
                 .setPage(provisioning).setUnlocked();
@@ -462,7 +538,12 @@ public class KnowledgeListMF {
                 .setPage(provisioning).addSkill(SkillList.provisioning, 40);
 
         // MASTERY
-        toughness = (new InformationBase("toughness", -1, 0, 0, CustomArmourListMF.standard_plate_helmet,
+        toughness = (new InformationBase(
+                "toughness",
+                -1,
+                0,
+                0,
+                CustomArmourListMF.standard_plate_helmet,
                 (InformationBase) null)).registerStat().setPage(mastery).addSkill(SkillList.combat, 10).setPerk();
         fitness = (new InformationBase("fitness", 1, 0, 0, ComponentListMF.dragon_heart, (InformationBase) null))
                 .registerStat().setPage(mastery).addSkill(SkillList.combat, 20).setPerk();
@@ -485,8 +566,7 @@ public class KnowledgeListMF {
 
     private static Object getMetalTier(String string) {
         CustomMaterial mat = MetalMaterial.getMaterial(string);
-        if (mat != null)
-            return mat.crafterTier;
+        if (mat != null) return mat.crafterTier;
 
         return "?";
     }

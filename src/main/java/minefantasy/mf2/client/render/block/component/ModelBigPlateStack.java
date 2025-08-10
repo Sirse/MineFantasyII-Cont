@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelBigPlateStack extends ModelBase {
+
     private ModelRenderer[] sheet = new ModelRenderer[8];
 
     public ModelBigPlateStack() {

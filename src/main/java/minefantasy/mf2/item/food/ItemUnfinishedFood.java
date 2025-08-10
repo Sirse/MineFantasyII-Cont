@@ -1,18 +1,20 @@
 package minefantasy.mf2.item.food;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.item.list.ToolListMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.item.list.ToolListMF;
+
 /**
  * @author Anonymous Productions
  */
 public class ItemUnfinishedFood extends Item {
+
     private int itemRarity;
 
     public ItemUnfinishedFood(String name) {
@@ -45,6 +47,5 @@ public class ItemUnfinishedFood extends Item {
         return ToolListMF.rarity[lvl];
     }
 
-    public void onCrafted(EntityPlayer user, ItemStack item) {
-    }
+    public void onCrafted(EntityPlayer user, ItemStack item) {}
 }

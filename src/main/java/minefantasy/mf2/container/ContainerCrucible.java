@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityCrucible;
+
 public class ContainerCrucible extends ContainerMF {
+
     private static final int GRID_START_INDEX = 0;
     private static final int GRID_SLOT_COUNT = 9;
     private static final int GRID_END_INDEX = GRID_START_INDEX + GRID_SLOT_COUNT;

@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
+
 public class ContainerAnvilMF extends ContainerMF {
+
     private static final int ANVIL_GRID_WIDTH = 6;
     private static final int ANVIL_GRID_HEIGHT = 4;
     private static final int ANVIL_GRID_SLOT_COUNT = ANVIL_GRID_WIDTH * ANVIL_GRID_HEIGHT;

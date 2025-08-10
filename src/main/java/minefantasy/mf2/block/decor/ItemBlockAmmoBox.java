@@ -1,12 +1,9 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.api.tool.IStorageBlock;
-import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,11 +12,16 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.tool.IStorageBlock;
+import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
 
 public class ItemBlockAmmoBox extends ItemBlock implements IStorageBlock {
+
     public ItemBlockAmmoBox(Block base) {
         super(base);
     }
@@ -38,8 +40,10 @@ public class ItemBlockAmmoBox extends ItemBlock implements IStorageBlock {
         }
         CustomMaterial material = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
         if (material != null) {
-            list.add(StatCollector.translateToLocalFormatted("attribute.box.capacity.name",
-                    TileEntityAmmoBox.getCapacity(material.tier)));
+            list.add(
+                    StatCollector.translateToLocalFormatted(
+                            "attribute.box.capacity.name",
+                            TileEntityAmmoBox.getCapacity(material.tier)));
         }
     }
 

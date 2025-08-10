@@ -1,5 +1,19 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
+
 import minefantasy.mf2.api.crafting.IQualityBalance;
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
@@ -19,21 +33,9 @@ import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.AnvilPacket;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
-
-import java.util.Random;
 
 public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil, IQualityBalance {
+
     private final Random rand = new Random();
     public int tier;
     public float progressMax;
@@ -195,12 +197,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     @Override
-    public void openInventory() {
-    }
+    public void openInventory() {}
 
     @Override
-    public void closeInventory() {
-    }
+    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -237,8 +237,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     public boolean tryCraft(EntityPlayer user, boolean rightClick) {
-        if (user == null)
-            return false;
+        if (user == null) return false;
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
         int hammerTier = ToolHelper.getCrafterTier(user.getHeldItem());
@@ -246,14 +245,12 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             if (user.getHeldItem() != null) {
                 user.getHeldItem().damageItem(1, user);
                 if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
-                    if (worldObj.isRemote)
-                        user.renderBrokenItemStack(user.getHeldItem());
+                    if (worldObj.isRemote) user.renderBrokenItemStack(user.getHeldItem());
 
                     user.destroyCurrentEquippedItem();
                 }
             }
-            if (worldObj.isRemote)
-                return true;
+            if (worldObj.isRemote) return true;
 
             if (doesPlayerKnowCraft(user) && canCraft() && toolType.equalsIgnoreCase(toolTypeRequired)) {
                 float mod = 1.0F;
@@ -272,8 +269,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     ruinCraft();
                 }
 
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "minefantasy2:block.anvilsucceed",
-                        0.25F, rightClick ? 1.2F : 1.0F);
+                worldObj.playSoundEffect(
+                        xCoord + 0.5D,
+                        yCoord + 0.5D,
+                        zCoord + 0.5D,
+                        "minefantasy2:block.anvilsucceed",
+                        0.25F,
+                        rightClick ? 1.2F : 1.0F);
                 float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem()) * (rightClick ? 0.75F : 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
@@ -285,8 +287,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     craftItem(user);
                 }
             } else {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "minefantasy2:block.anvilfail",
-                        0.25F, 1.0F);
+                worldObj.playSoundEffect(
+                        xCoord + 0.5D,
+                        yCoord + 0.5D,
+                        zCoord + 0.5D,
+                        "minefantasy2:block.anvilfail",
+                        0.25F,
+                        1.0F);
             }
             lastPlayerHit = user.getCommandSenderName();
             updateCraftingData();
@@ -335,7 +342,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             if (inventory[outputSlot] == null || SpecialForging.getItemDesign(inventory[outputSlot]) != null) {
                 inventory[outputSlot] = result;
             } else {
-                if (inventory[outputSlot].isItemEqual(result) && ItemStack.areItemStackTagsEqual(inventory[outputSlot], result)) {
+                if (inventory[outputSlot].isItemEqual(result)
+                        && ItemStack.areItemStackTagsEqual(inventory[outputSlot], result)) {
                     if (inventory[outputSlot].stackSize + result.stackSize <= getStackSize(inventory[outputSlot])) {
                         inventory[outputSlot].stackSize += result.stackSize;
                     } else {
@@ -356,8 +364,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     private void addXP(EntityPlayer smith) {
-        if (skillUsed == null)
-            return;
+        if (skillUsed == null) return;
 
         float baseXP = this.progressMax / 10F;
         baseXP /= (1.0F + getAbsoluteBalance());
@@ -401,7 +408,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     for (int z = -4; z <= 4; z++) {
                         TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord + y, zCoord + z);
                         if (player != null && ResearchLogic.hasInfoUnlocked(player, KnowledgeListMF.smeltDragonforge)
-                                && tile != null && tile instanceof TileEntityForge) {
+                                && tile != null
+                                && tile instanceof TileEntityForge) {
                             if (((TileEntityForge) tile).dragonHeartPower > 0) {
                                 hasHeart = true;
                                 ((TileEntityForge) tile).dragonHeartPower = 0;
@@ -511,17 +519,21 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                 }
 
                 boolean delay = true;
-                double[] positions = new double[]{xCoord + f, yCoord + f1 + 1, zCoord + f2};
+                double[] positions = new double[] { xCoord + f, yCoord + f1 + 1, zCoord + f2 };
                 if (worldObj.getBlock(xCoord, yCoord + 1, zCoord).getMaterial().isSolid() && lastPlayerHit != null) {
                     EntityPlayer smith = worldObj.getPlayerEntityByName(lastPlayerHit);
                     if (smith != null) {
                         delay = false;
-                        positions = new double[]{smith.posX, smith.posY, smith.posZ};
+                        positions = new double[] { smith.posX, smith.posY, smith.posZ };
                     }
                 }
 
                 itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(worldObj, positions[0], positions[1], positions[2],
+                EntityItem entityitem = new EntityItem(
+                        worldObj,
+                        positions[0],
+                        positions[1],
+                        positions[2],
                         new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
                 if (itemstack.hasTagCompound()) {
                     entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
@@ -561,10 +573,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     public void syncData() {
 
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new AnvilPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new AnvilPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 
     public String getResultName() {
@@ -629,13 +644,11 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     private int getStackSize(ItemStack slot) {
-        if (slot == null)
-            return 0;
+        if (slot == null) return 0;
 
         if (slot.getItem() instanceof IHotItem) {
             ItemStack held = Heatable.getItem(slot);
-            if (held != null)
-                return held.getMaxStackSize();
+            if (held != null) return held.getMaxStackSize();
         }
         return slot.getMaxStackSize();
     }
@@ -646,8 +659,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             return null;
         }
 
-        if (ticksExisted <= 1)
-            return null;
+        if (ticksExisted <= 1) return null;
 
         for (int a = 0; a < getSizeInventory() - 1; a++) {
             craftMatrix.setInventorySlotContents(a, inventory[a]);
@@ -673,8 +685,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                 reassignHitValues();
                 qualityBalance = 0;
             }
-            if (progress > progressMax)
-                progress = progressMax - 1;
+            if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
     }
@@ -716,7 +727,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     public void setContainer(ContainerAnvilMF container) {
         syncAnvil = container;
-        craftMatrix = new AnvilCraftMatrix(this, syncAnvil, ShapelessAnvilRecipes.globalWidth,
+        craftMatrix = new AnvilCraftMatrix(
+                this,
+                syncAnvil,
+                ShapelessAnvilRecipes.globalWidth,
                 ShapelessAnvilRecipes.globalHeight);
     }
 
@@ -821,8 +835,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     private void setTrait(ItemStack item, String trait, boolean flag) {
-        if (item == null)
-            return;
+        if (item == null) return;
         if (item.getMaxStackSize() > 1 || !item.isItemStackDamageable()) {
             return;
         }
@@ -843,8 +856,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     public void upset(EntityPlayer user) {
         if (this.progress > 0 && this.progressMax > 0) {
-            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "minefantasy2:block.anvilsucceed",
-                    0.25F, 0.75F);
+            worldObj.playSoundEffect(
+                    xCoord + 0.5D,
+                    yCoord + 0.5D,
+                    zCoord + 0.5D,
+                    "minefantasy2:block.anvilsucceed",
+                    0.25F,
+                    0.75F);
             if (!worldObj.isRemote) {
                 progress -= (progressMax / 10F);
                 if (progress < 0) {

@@ -1,5 +1,10 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -7,20 +12,17 @@ import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import minetweaker.mc1710.item.MCItemStack;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @ZenClass("mods.minefantasy.TanningRack")
 public class TanningRack {
 
     @ZenMethod
-    public static void addTieredAndToolRecipe(IItemStack output, IIngredient input, float time, @Optional int tier, @Optional String tool) {
+    public static void addTieredAndToolRecipe(IItemStack output, IIngredient input, float time, @Optional int tier,
+            @Optional String tool) {
         MineTweakerAPI.apply(new TanningAction(output, input, time, tier, tool));
     }
 
@@ -30,7 +32,8 @@ public class TanningRack {
         List<TanningRecipe> recipesToRemove = new ArrayList<TanningRecipe>();
 
         for (TanningRecipe recipe : recipeList) {
-            if (output.matches(new MCItemStack(recipe.output)) && (input == null || input.matches(new MCItemStack(recipe.input)))) {
+            if (output.matches(new MCItemStack(recipe.output))
+                    && (input == null || input.matches(new MCItemStack(recipe.input)))) {
                 recipesToRemove.add(recipe);
             }
         }
@@ -44,6 +47,7 @@ public class TanningRack {
     }
 
     public static class TanningAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
         private final float time;
@@ -98,6 +102,7 @@ public class TanningRack {
     }
 
     public static class RemoveAction implements IUndoableAction {
+
         private final List<TanningRecipe> recipes;
 
         public RemoveAction(List<TanningRecipe> recipes) {

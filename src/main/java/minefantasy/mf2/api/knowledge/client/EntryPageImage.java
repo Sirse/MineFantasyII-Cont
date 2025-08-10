@@ -1,13 +1,15 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import minefantasy.mf2.api.helpers.RenderHelper;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
+import minefantasy.mf2.api.helpers.RenderHelper;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+
 public class EntryPageImage extends EntryPage {
+
     private Minecraft mc = Minecraft.getMinecraft();
     private String paragraph;
     /**
@@ -23,7 +25,7 @@ public class EntryPageImage extends EntryPage {
     public EntryPageImage(String tex, int width, int height, String paragraphs) {
         this.paragraph = paragraphs;
         this.image = tex;
-        this.sizes = new int[]{width, height};
+        this.sizes = new int[] { width, height };
     }
 
     @Override
@@ -72,7 +74,15 @@ public class EntryPageImage extends EntryPage {
     public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
         mc.renderEngine.bindTexture(TextureHelperMF.getResource(image));
         int xOffset = (universalBookImageWidth - sizes[0]) / 2;
-        RenderHelper.drawTexturedModalRect(posX + xOffset, posY + 15, 2, 0, 0, sizes[0], sizes[1], 1F / sizes[0],
+        RenderHelper.drawTexturedModalRect(
+                posX + xOffset,
+                posY + 15,
+                2,
+                0,
+                0,
+                sizes[0],
+                sizes[1],
+                1F / sizes[0],
                 1F / sizes[1]);
     }
 

@@ -1,5 +1,12 @@
 package minefantasy.mf2.block.list;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
+
 import minefantasy.mf2.block.basic.*;
 import minefantasy.mf2.block.crafting.*;
 import minefantasy.mf2.block.decor.*;
@@ -13,20 +20,15 @@ import minefantasy.mf2.block.tree.BlockSaplingMF;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 public class BlockListMF {
-    public static final String[] metalBlocks = new String[]{"copper", "tin", "silver", "bronze", "pigiron", "steel",
-            "blacksteel", "redsteel", "bluesteel", "adamantium", "mithril", "ignotumite", "mithium", "ender"};
-    public static final String[] specialMetalBlocks = new String[]{"bronze", "iron", "steel", "blacksteel",
-            "redsteel", "bluesteel"};
-    public static final String[] anvils = new String[]{"bronze", "iron", "steel", "blacksteel", "bluesteel",
-            "redsteel"};
+
+    public static final String[] metalBlocks = new String[] { "copper", "tin", "silver", "bronze", "pigiron", "steel",
+            "blacksteel", "redsteel", "bluesteel", "adamantium", "mithril", "ignotumite", "mithium", "ender" };
+    public static final String[] specialMetalBlocks = new String[] { "bronze", "iron", "steel", "blacksteel",
+            "redsteel", "bluesteel" };
+    public static final String[] anvils = new String[] { "bronze", "iron", "steel", "blacksteel", "bluesteel",
+            "redsteel" };
 
     public static Block oreCopper = new BlockOreMF("oreCopper", 0, -1).setHardness(2.0F).setResistance(3.0F);
     public static Block oreTin = new BlockOreMF("oreTin", 0).setHardness(2.5F).setResistance(4.0F);
@@ -61,9 +63,17 @@ public class BlockListMF {
             .setStepSound(Block.soundTypeGlass);
     public static Block framed_glass = new BasicBlockMF("framed_glass", Material.glass).setHardness(0.6F)
             .setResistance(0.2F).setStepSound(Block.soundTypeGlass);
-    public static Block framed_pane = new BlockPaneMF("framed_pane", "framed_glass", "framed_glass_pane",
-            Material.glass, true).setHardness(0.6F).setResistance(0.1F).setStepSound(Block.soundTypeGlass);
-    public static Block window_pane = new BlockPaneMF("window_pane", "window", "framed_glass_pane", Material.glass,
+    public static Block framed_pane = new BlockPaneMF(
+            "framed_pane",
+            "framed_glass",
+            "framed_glass_pane",
+            Material.glass,
+            true).setHardness(0.6F).setResistance(0.1F).setStepSound(Block.soundTypeGlass);
+    public static Block window_pane = new BlockPaneMF(
+            "window_pane",
+            "window",
+            "framed_glass_pane",
+            Material.glass,
             true).setHardness(0.9F).setResistance(0.2F).setStepSound(Block.soundTypeGlass);
 
     public static Block thatch = new BasicBlockMF("thatch", Material.leaves).setHardness(1.0F)
@@ -141,14 +151,24 @@ public class BlockListMF {
             .setResistance(10F).setStepSound(Block.soundTypeWood);
     public static Block nailed_planks = new BasicBlockMF("nailed_planks", Material.wood).setHardness(1.5F)
             .setResistance(7F).setStepSound(Block.soundTypeWood);
-    public static Block refined_planks_stair = new ConstructionBlockMF.StairsConstBlock("refined_planks_stair",
+    public static Block refined_planks_stair = new ConstructionBlockMF.StairsConstBlock(
+            "refined_planks_stair",
             refined_planks).register("refined_planks_stair");
-    public static Block nailed_planks_stair = new ConstructionBlockMF.StairsConstBlock("nailed_planks_stair",
+    public static Block nailed_planks_stair = new ConstructionBlockMF.StairsConstBlock(
+            "nailed_planks_stair",
             nailed_planks).register("nailed_planks_stair");
 
-    public static Block reinforced_stone = new BlockReinforcedStone("reinforced_stone", "base", "engraved", "dshall_0",
-            "dshall_1", "dshall_2").setHardness(2.0F).setResistance(15F).setStepSound(Block.soundTypeStone);
-    public static Block reinforced_stone_bricks = new BlockReinforcedStone("reinforced_stone_bricks", "base", "mossy",
+    public static Block reinforced_stone = new BlockReinforcedStone(
+            "reinforced_stone",
+            "base",
+            "engraved",
+            "dshall_0",
+            "dshall_1",
+            "dshall_2").setHardness(2.0F).setResistance(15F).setStepSound(Block.soundTypeStone);
+    public static Block reinforced_stone_bricks = new BlockReinforcedStone(
+            "reinforced_stone_bricks",
+            "base",
+            "mossy",
             "cracked").setHardness(2.0F).setResistance(15F).setStepSound(Block.soundTypeStone);
     public static Block reinforced_stone_framed = new BasicBlockMF("reinforced_stone_framed", Material.rock)
             .setHardness(2.5F).setResistance(20F).setStepSound(Block.soundTypeStone);
@@ -191,18 +211,23 @@ public class BlockListMF {
 
     public static Block mud_brick_stair = new ConstructionBlockMF.StairsConstBlock("mud_brick_stair", mud_brick)
             .register("mud_brick_stair");
-    public static Block mud_pavement_stair = new ConstructionBlockMF.StairsConstBlock("mud_pavement_stair",
+    public static Block mud_pavement_stair = new ConstructionBlockMF.StairsConstBlock(
+            "mud_pavement_stair",
             mud_pavement).register("mud_pavement_stair");
-    public static Block cobble_brick_stair = new ConstructionBlockMF.StairsConstBlock("cobble_brick_stair",
+    public static Block cobble_brick_stair = new ConstructionBlockMF.StairsConstBlock(
+            "cobble_brick_stair",
             cobble_brick).register("cobble_brick_stair");
-    public static Block cobble_pavement_stair = new ConstructionBlockMF.StairsConstBlock("cobble_pavement_stair",
+    public static Block cobble_pavement_stair = new ConstructionBlockMF.StairsConstBlock(
+            "cobble_pavement_stair",
             cobble_pavement).register("cobble_pavement_stair");
     public static Block firebrick_stair = new ConstructionBlockMF.StairsConstBlock("firebrick_stair", firebricks)
             .register("firebrick_stair");
-    public static Block reinforced_stone_stair = new ConstructionBlockMF.StairsConstBlock("reinforced_stone_stair",
+    public static Block reinforced_stone_stair = new ConstructionBlockMF.StairsConstBlock(
+            "reinforced_stone_stair",
             reinforced_stone).register("reinforced_stone_stair");
     public static Block reinforced_stone_brick_stair = new ConstructionBlockMF.StairsConstBlock(
-            "reinforced_stone_brick_stair", reinforced_stone_bricks).register("reinforced_stone_brick_stair");
+            "reinforced_stone_brick_stair",
+            reinforced_stone_bricks).register("reinforced_stone_brick_stair");
 
     public static Block yew_stair = new ConstructionBlockMF.StairsConstBlock("yew_stair", yew_planks)
             .register("yew_stair");

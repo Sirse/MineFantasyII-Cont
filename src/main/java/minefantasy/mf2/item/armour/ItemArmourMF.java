@@ -1,5 +1,21 @@
 package minefantasy.mf2.item.armour;
 
+import java.util.List;
+
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityEnderPearl;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.IIcon;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -16,23 +32,9 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.util.MFLogUtil;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityEnderPearl;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IIcon;
-
-import java.util.List;
 
 public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistance {
+
     @SideOnly(Side.CLIENT)
     private static Object fullplate;
     protected BaseMaterialMF baseMaterial;
@@ -53,7 +55,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     }
 
     public ItemArmourMF(String name, BaseMaterialMF material, ArmourDesign AD, int slot, String tex, int rarity,
-                        float customBulk) {
+            float customBulk) {
         this(name, material, AD, slot, tex, rarity);
         this.suitBulk = customBulk;
     }
@@ -167,7 +169,8 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     }
 
     public boolean canColour() {
-        return design == ArmourDesign.PADDING || design == ArmourDesign.LEATHER || design == ArmourDesign.CLOTH
+        return design == ArmourDesign.PADDING || design == ArmourDesign.LEATHER
+                || design == ArmourDesign.CLOTH
                 || isMetal();
     }
 
@@ -188,8 +191,8 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     public boolean hasColor(ItemStack item) {
         return !canColour() ? false
                 : (!item.hasTagCompound() ? false
-                : (!item.getTagCompound().hasKey("display", 10) ? false
-                : item.getTagCompound().getCompoundTag("display").hasKey("color", 3)));
+                        : (!item.getTagCompound().hasKey("display", 10) ? false
+                                : item.getTagCompound().getCompoundTag("display").hasKey("color", 3)));
     }
 
     /**
@@ -289,8 +292,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     }
 
     /**
-     * A bit of the new system, gets custom materials for armour Only used on
-     * cogwork armour though
+     * A bit of the new system, gets custom materials for armour Only used on cogwork armour though
      */
     public CustomMaterial getCustomMaterial(ItemStack item) {
         CustomMaterial material = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
@@ -305,8 +307,12 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
         float DR = getProtectionRatio(armour) * scalePiece();
 
         if (ArmourCalculator.advancedDamageTypes && !user.worldObj.isRemote) {
-            DR = ArmourCalculator.adjustACForDamage(src, DR, getProtectiveTrait(armour, 0),
-                    getProtectiveTrait(armour, 1), getProtectiveTrait(armour, 2));
+            DR = ArmourCalculator.adjustACForDamage(
+                    src,
+                    DR,
+                    getProtectiveTrait(armour, 0),
+                    getProtectiveTrait(armour, 1),
+                    getProtectiveTrait(armour, 2));
         }
         MFLogUtil.logDebug(">>>>DR<<<< = " + DR);
         return DR;
@@ -377,7 +383,8 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
 
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
-        if (entity instanceof EntityPlayer && armorType < 2 && design == ArmourDesign.FIELDPLATE
+        if (entity instanceof EntityPlayer && armorType < 2
+                && design == ArmourDesign.FIELDPLATE
                 && ConfigClient.customModel) {
             return getArmourTextureName(stack, entity, slot, type) + "_S.png";
         }
@@ -396,7 +403,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     @Override
     @SideOnly(Side.CLIENT)
     public net.minecraft.client.model.ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack,
-                                                               int armorSlot) {
+            int armorSlot) {
         if (!(entityLiving instanceof EntityPlayer) || armorType >= 2 || !ConfigClient.customModel) {
             return super.getArmorModel(entityLiving, itemStack, armorSlot);
         }

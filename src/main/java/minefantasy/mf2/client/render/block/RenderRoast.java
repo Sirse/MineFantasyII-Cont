@@ -1,19 +1,21 @@
 package minefantasy.mf2.client.render.block;
 
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
-import minefantasy.mf2.block.crafting.BlockRoast;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
+
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import minefantasy.mf2.block.crafting.BlockRoast;
+
 public class RenderRoast implements ISimpleBlockRenderingHandler {
+
     private static final TileEntityRoastRenderer invModel = new TileEntityRoastRenderer();
 
     @Override
     public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
-        if (!(block instanceof BlockRoast))
-            return;
+        if (!(block instanceof BlockRoast)) return;
         BlockRoast roast = (BlockRoast) block;
         if (roast.isOven()) {
             GL11.glPushMatrix();
@@ -25,7 +27,7 @@ public class RenderRoast implements ISimpleBlockRenderingHandler {
 
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId,
-                                    RenderBlocks renderer) {
+            RenderBlocks renderer) {
         return false;
     }
 

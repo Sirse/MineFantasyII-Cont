@@ -1,10 +1,11 @@
 package mods.battlegear2.api.quiver;
 
-import mods.battlegear2.api.PlayerEventChild;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import mods.battlegear2.api.PlayerEventChild;
 
 public interface IArrowContainer2 {
 
@@ -70,8 +71,7 @@ public interface IArrowContainer2 {
     public EntityArrow getArrowType(ItemStack container, World world, EntityPlayer player, float charge);
 
     /**
-     * Action to take after an arrow has been fired Usually equal to removing an
-     * arrow from the container
+     * Action to take after an arrow has been fired Usually equal to removing an arrow from the container
      *
      * @param player    The {@link EntityPlayer} using the bow
      * @param world
@@ -98,8 +98,7 @@ public interface IArrowContainer2 {
     public boolean isCraftableWithArrows(ItemStack container, ItemStack arrowStack);
 
     /**
-     * Crafts the item with the items from
-     * {@link #isCraftableWithArrows(ItemStack, ItemStack)}
+     * Crafts the item with the items from {@link #isCraftableWithArrows(ItemStack, ItemStack)}
      *
      * @param container The {@link ItemStack} representing this item
      * @param newStack  Another valid item on the crafting bench

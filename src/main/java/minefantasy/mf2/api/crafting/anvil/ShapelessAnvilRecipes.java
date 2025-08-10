@@ -1,21 +1,23 @@
 package minefantasy.mf2.api.crafting.anvil;
 
-import minefantasy.mf2.api.heating.Heatable;
-import minefantasy.mf2.api.heating.IHotItem;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.heating.IHotItem;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
 public class ShapelessAnvilRecipes implements IAnvilRecipe {
+
     public static final int globalWidth = 6;
     public static final int globalHeight = 4;
 
@@ -39,8 +41,8 @@ public class ShapelessAnvilRecipes implements IAnvilRecipe {
     public final Skill skillUsed;
     private final int recipeHammer;
 
-    public ShapelessAnvilRecipes(ItemStack output, String toolType, int hammer, int anvi, int time,
-                                 List components, boolean hot, String research, Skill skill) {
+    public ShapelessAnvilRecipes(ItemStack output, String toolType, int hammer, int anvi, int time, List components,
+            boolean hot, String research, Skill skill) {
         this.outputHot = hot;
         this.recipeOutput = output;
         this.anvil = anvi;
@@ -53,8 +55,7 @@ public class ShapelessAnvilRecipes implements IAnvilRecipe {
     }
 
     private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -98,7 +99,7 @@ public class ShapelessAnvilRecipes implements IAnvilRecipe {
                         }
                         if (inputItem.getItem() == recipeItem.getItem()
                                 && (recipeItem.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                                || inputItem.getItemDamage() == recipeItem.getItemDamage())) {
+                                        || inputItem.getItemDamage() == recipeItem.getItemDamage())) {
                             var6 = true;
                             var2.remove(recipeItem);
                             break;
@@ -116,8 +117,7 @@ public class ShapelessAnvilRecipes implements IAnvilRecipe {
     }
 
     protected ItemStack getHotItem(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
         if (!(item.getItem() instanceof IHotItem)) {
             return item;
         }

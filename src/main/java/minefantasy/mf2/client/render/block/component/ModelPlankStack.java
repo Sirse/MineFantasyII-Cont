@@ -4,6 +4,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 public class ModelPlankStack extends ModelBase {
+
     private ModelRenderer[] plank = new ModelRenderer[64];
 
     public ModelPlankStack() {

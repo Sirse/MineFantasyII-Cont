@@ -1,13 +1,15 @@
 package minefantasy.mf2.api.crafting;
 
-import minefantasy.mf2.api.heating.ForgeFuel;
-import minefantasy.mf2.api.heating.ForgeItemHandler;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
+import minefantasy.mf2.api.heating.ForgeFuel;
+import minefantasy.mf2.api.heating.ForgeItemHandler;
+
 public class MineFantasyFuels {
+
     public static void addForgeFuel(Object input, float time, int temperature) {
         addForgeFuel(input, time, temperature, false, false);
     }
@@ -44,8 +46,7 @@ public class MineFantasyFuels {
      * How many smelts (blast furn or bloomery) this can give as carbon
      */
     public static int getCarbon(ItemStack item) {
-        if (item == null)
-            return 0;
+        if (item == null) return 0;
 
         for (int i : OreDictionary.getOreIDs(item)) {
             String name = OreDictionary.getOreName(i);
@@ -67,8 +68,7 @@ public class MineFantasyFuels {
     }
 
     public static ItemStack convert(Object input) {
-        if (input == null)
-            return null;
+        if (input == null) return null;
 
         ItemStack itemstack = null;
         if (input instanceof ItemStack) {

@@ -1,12 +1,7 @@
 package minefantasy.mf2.item.tool.advanced;
 
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.stamina.StaminaBar;
-import minefantasy.mf2.api.weapon.IRackItem;
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
-import minefantasy.mf2.config.ConfigTools;
-import minefantasy.mf2.item.tool.ItemAxeMF;
-import minefantasy.mf2.util.BukkitUtils;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -17,9 +12,16 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+import minefantasy.mf2.config.ConfigTools;
+import minefantasy.mf2.item.tool.ItemAxeMF;
+import minefantasy.mf2.util.BukkitUtils;
 
 public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
+
     private Random rand = new Random();
 
     public ItemLumberAxe(String name, ToolMaterial material, int rarity) {
@@ -82,7 +84,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
 
     @Override
     public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-                                    EntityLivingBase user) {
+            EntityLivingBase user) {
         if (user instanceof EntityPlayer && canAcceptCost(user)) {
             breakChain(world, x, y, z, item, block, user, 32, block, world.getBlockMetadata(x, y, z));
         }
@@ -90,7 +92,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
     }
 
     private void breakChain(World world, int x, int y, int z, ItemStack item, Block block, EntityLivingBase user,
-                            int maxLogs, Block orient, int orientM) {
+            int maxLogs, Block orient, int orientM) {
         if (maxLogs > 0 && isLog(world, x, y, z, orient, orientM)) {
             if (MineFantasyII.isBukkitServer() && BukkitUtils.cantBreakBlock((EntityPlayer) user, x, y, z)) {
                 return;
@@ -99,7 +101,12 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
             Block newblock = world.getBlock(x, y, z);
             breakSurrounding(item, world, newblock, x, y, z, user);
             if (rand.nextFloat() * 100F < (100F - ConfigTools.hvyDropChance)) {
-                newblock.dropBlockAsItem(world, x, y, z, world.getBlockMetadata(x, y, z),
+                newblock.dropBlockAsItem(
+                        world,
+                        x,
+                        y,
+                        z,
+                        world.getBlockMetadata(x, y, z),
                         EnchantmentHelper.getFortuneModifier(user));
             }
             world.setBlockToAir(x, y, z);
@@ -137,7 +144,8 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
                         int blockZ = z + z1 + FD.offsetZ;
 
                         if (!(x1 + FD.offsetX == 0 && y1 + FD.offsetY == 0 && z1 + FD.offsetZ == 0)) {
-                            if (MineFantasyII.isBukkitServer() && BukkitUtils.cantBreakBlock((EntityPlayer) user, blockX, blockY, blockZ)) {
+                            if (MineFantasyII.isBukkitServer()
+                                    && BukkitUtils.cantBreakBlock((EntityPlayer) user, blockX, blockY, blockZ)) {
                                 break;
                             }
 
@@ -145,9 +153,15 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
                             int m = world.getBlockMetadata(blockX, blockY, blockZ);
 
                             if (item.getItemDamage() < item.getMaxDamage() && newblock != null
-                                    && user instanceof EntityPlayer && newblock.getMaterial() == Material.leaves) {
+                                    && user instanceof EntityPlayer
+                                    && newblock.getMaterial() == Material.leaves) {
                                 if (rand.nextFloat() * 100F < (100F - ConfigTools.hvyDropChance)) {
-                                    newblock.dropBlockAsItem(world, blockX, blockY, blockZ, m,
+                                    newblock.dropBlockAsItem(
+                                            world,
+                                            blockX,
+                                            blockY,
+                                            blockZ,
+                                            m,
                                             EnchantmentHelper.getFortuneModifier(user));
                                 }
                                 world.setBlockToAir(blockX, blockY, blockZ);

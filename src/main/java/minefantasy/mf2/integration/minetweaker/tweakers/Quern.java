@@ -1,5 +1,9 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -7,19 +11,17 @@ import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import minetweaker.mc1710.item.MCItemStack;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
-import java.util.ArrayList;
-
 @ZenClass("mods.minefantasy.Quern")
 public class Quern {
 
     @ZenMethod
-    public static void addRecipe(IItemStack output, IIngredient input, @Optional int tier, @Optional boolean consumePot) {
+    public static void addRecipe(IItemStack output, IIngredient input, @Optional int tier,
+            @Optional boolean consumePot) {
         MineTweakerAPI.apply(new AddRecipeAction(output, input, tier, consumePot));
     }
 
@@ -27,7 +29,8 @@ public class Quern {
     public static void remove(@NotNull IIngredient output, @Optional IIngredient input) {
         ArrayList<QuernRecipes> recipesToRemove = new ArrayList<QuernRecipes>();
         for (QuernRecipes recipes : QuernRecipes.recipeList) {
-            if (output.matches(new MCItemStack(recipes.result)) && (input == null || input.matches(new MCItemStack(recipes.input)))) {
+            if (output.matches(new MCItemStack(recipes.result))
+                    && (input == null || input.matches(new MCItemStack(recipes.input)))) {
                 recipesToRemove.add(recipes);
             }
         }
@@ -36,6 +39,7 @@ public class Quern {
     }
 
     private static class AddRecipeAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
         private final int tier;
@@ -53,7 +57,8 @@ public class Quern {
         public void apply() {
             for (IItemStack stack : input.getItems()) {
                 ItemStack s = MineTweakerMC.getItemStack(stack);
-                recipesToRemove.add(QuernRecipes.addRecipe(s, MineTweakerMC.getItemStack(output), this.tier, consumePot));
+                recipesToRemove
+                        .add(QuernRecipes.addRecipe(s, MineTweakerMC.getItemStack(output), this.tier, consumePot));
             }
         }
 
@@ -87,6 +92,7 @@ public class Quern {
     }
 
     private static class RemoveAction implements IUndoableAction {
+
         private final ArrayList<QuernRecipes> recipesToRemove;
 
         public RemoveAction(ArrayList<QuernRecipes> recipesToRemove) {

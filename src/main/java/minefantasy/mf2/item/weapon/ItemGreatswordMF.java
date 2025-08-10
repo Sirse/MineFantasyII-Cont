@@ -1,23 +1,24 @@
 package minefantasy.mf2.item.weapon;
 
-import minefantasy.mf2.api.weapon.WeaponClass;
+import java.util.Random;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
-import java.util.Random;
+import minefantasy.mf2.api.weapon.WeaponClass;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemGreatswordMF extends ItemHeavyWeaponMF {
+
     private Random rand = new Random();
 
     /**
-     * Greatswords are heavy counterparts to swords, with added damage, knockback
-     * and parrying arc
+     * Greatswords are heavy counterparts to swords, with added damage, knockback and parrying arc
      */
     public ItemGreatswordMF(String name, ToolMaterial material, int rarity, float weight) {
         super(material, name, rarity, weight);

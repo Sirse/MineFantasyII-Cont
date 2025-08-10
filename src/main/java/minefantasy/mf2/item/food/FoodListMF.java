@@ -1,22 +1,24 @@
 package minefantasy.mf2.item.food;
 
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.potion.Potion;
+
 import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.item.ItemBurntFood;
 import minefantasy.mf2.item.ItemComponentMF;
 import minefantasy.mf2.item.gadget.ItemJug;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.potion.Potion;
 
 public class FoodListMF {
+
     public static final float satModifier = 1.0F;
     // MORSELS
     public static Item wolf_raw = (new ItemFoodMF("wolf_raw", 2, 0.2F, true));
     public static Item wolf_cooked = (new ItemFoodMF("wolf_cooked", 6, 0.6F, true));
-    public static Item horse_raw = (new ItemFoodMF("horse_raw", 4, 0.4F, true)).setPotionEffect(Potion.hunger.id, 50, 0,
-            0.5F);
+    public static Item horse_raw = (new ItemFoodMF("horse_raw", 4, 0.4F, true))
+            .setPotionEffect(Potion.hunger.id, 50, 0, 0.5F);
     public static Item horse_cooked = (new ItemFoodMF("horse_cooked", 10, 1.0F, true));
     public static Item generic_meat_uncooked = (new ItemFoodMF("generic_meat_uncooked", 2, 0.2F, true));
     public static Item generic_meat_cooked = (new ItemFoodMF("generic_meat_cooked", 5, 0.5F, true));
@@ -37,8 +39,8 @@ public class FoodListMF {
     public static Item breadSlice = (new ItemFoodMF("breadslice", 2, 1.0F, false));
     public static Item curds = new ItemUnfinishedFood("curds");
     public static Item cheese_pot = new ItemUnfinishedFood("cheese_pot").setContainerItem(ComponentListMF.clay_pot);
-    public static Item cheese_slice = (new ItemFoodMF("cheese_slice", 4, 1.0F, false, 0).setFoodStats(1, 0.0F, 0.0F,
-            1.0F));
+    public static Item cheese_slice = (new ItemFoodMF("cheese_slice", 4, 1.0F, false, 0)
+            .setFoodStats(1, 0.0F, 0.0F, 1.0F));
     // T1 (basic mixing)
     // Util: Roast, Prep Block (Stone-Bronze Age)
     public static Item stew = (new ItemFoodMF("stew", 5, 1.0F, false, 0)).setFoodStats(1, 0.0F, 0.0F, 1.0F)
@@ -169,8 +171,7 @@ public class FoodListMF {
     /**
      * FOOD TYPES: Sugar: Stamina Regen Dairy: Saturation Grain: Stamina Max
      *
-     * Protien: Saturation / Stamina Max Fruit: Stamina Max / Stamina Time
-     * Vegetable: Stamina Time / Saturation
+     * Protien: Saturation / Stamina Max Fruit: Stamina Max / Stamina Time Vegetable: Stamina Time / Saturation
      */
 
 }

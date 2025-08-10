@@ -1,7 +1,35 @@
 package minefantasy.mf2.item.weapon;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.monster.EntityPigZombie;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemSword;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.*;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -32,36 +60,12 @@ import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 import mods.battlegear2.api.weapons.IHitTimeModifier;
 import mods.battlegear2.api.weapons.IPenetrateWeapon;
 import mods.battlegear2.api.weapons.WeaponRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.*;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-//Made this extend the sword class (allows them to be enchanted)
+// Made this extend the sword class (allows them to be enchanted)
 public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, IPowerAttack, IDamageType,
         IKnockbackWeapon, IWeaponSpeed, IHeldStaminaItem, IStaminaWeapon, IBattlegearWeapon, IToolMaterial,
         IWeightedWeapon, IParryable, ISpecialEffect, IDamageModifier, IWeaponClass, IRackItem {
+
     public static final DecimalFormat decimal_format = new DecimalFormat("#.#");
     public static float axeAPModifier = -0.1F;
     protected static int speedModHeavy = 5;
@@ -83,13 +87,13 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     protected float charge_cost = 10;
     protected float jump_cost = 2;
     protected float cleave_cost = 40;
-    protected float[] slashingDamage = new float[]{1F, 0F, 0F};
-    protected float[] crushingDamage = new float[]{0F, 1F, 0F};
-    protected float[] hackingDamage = new float[]{4F, 1F, 0F};
-    protected float[] hvyHackingDamage = new float[]{3F, 1F, 0F};
-    protected float[] piercingDamage = new float[]{0F, 0F, 1F};
-    protected float[] hvyPiercingDamage = new float[]{0F, 1F, 9F};
-    protected float[] hvySlashingDamage = new float[]{9F, 1F, 0F};
+    protected float[] slashingDamage = new float[] { 1F, 0F, 0F };
+    protected float[] crushingDamage = new float[] { 0F, 1F, 0F };
+    protected float[] hackingDamage = new float[] { 4F, 1F, 0F };
+    protected float[] hvyHackingDamage = new float[] { 3F, 1F, 0F };
+    protected float[] piercingDamage = new float[] { 0F, 0F, 1F };
+    protected float[] hvyPiercingDamage = new float[] { 0F, 1F, 9F };
+    protected float[] hvySlashingDamage = new float[] { 9F, 1F, 0F };
     protected int defParryTime = 15;
     protected int swordParryTime = 10;
     protected int axeParryTime = 15;
@@ -120,15 +124,12 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     /**
      * The base file for Weapons in MineFantasy
      * <p>
-     * Size Varients, (Normal and Heavy) Normal weapons are as is, regular damage
-     * and weight Heavy weapons do more damage, exhaust more and have balance offset
-     * (+50% dam)
+     * Size Varients, (Normal and Heavy) Normal weapons are as is, regular damage and weight Heavy weapons do more
+     * damage, exhaust more and have balance offset (+50% dam)
      * <p>
-     * Weapon Types: Blade: Parry Defensive, average damage and speed Axe: Brutal
-     * Offensive, slower than sword, more damage, Good against Armour Blunt: Simple
-     * Offensive, slower than axe, more damage, Good against Medium Armour Polearm:
-     * Ranged Defensive, Good against Heavy Armour Lightblade: Fast Offensive,
-     * Better against Unarmoured
+     * Weapon Types: Blade: Parry Defensive, average damage and speed Axe: Brutal Offensive, slower than sword, more
+     * damage, Good against Armour Blunt: Simple Offensive, slower than axe, more damage, Good against Medium Armour
+     * Polearm: Ranged Defensive, Good against Heavy Armour Lightblade: Fast Offensive, Better against Unarmoured
      */
     public ItemWeaponMF(ToolMaterial material, String named, int rarity, float weight) {
         super(material);
@@ -148,7 +149,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
         if (material == ToolMaterial.WOOD) {
             baseDamage = 0F;
         }
-        if(Loader.isModLoaded("battlegear2")) {
+        if (Loader.isModLoaded("battlegear2")) {
             if (isHeavyWeapon()) {
                 WeaponRegistry.addTwoHanded(new ItemStack(this));
             } else {
@@ -192,7 +193,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     }
 
     public static boolean tryPerformAbility(EntityLivingBase user, float points, boolean flash, boolean armour,
-                                            boolean weapon, boolean takePoints) {
+            boolean weapon, boolean takePoints) {
         if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(user)) {
             points *= StaminaBar.getBaseDecayModifier(user, armour, weapon);
             if (StaminaBar.isStaminaAvailable(user, points, flash)) {
@@ -294,35 +295,45 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
             list.add("");
 
             if (this instanceof IPenetrateWeapon) {
-                list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                        "attribute.modifier.plus." + 1, decimal_format.format(getAPDamText()),
-                        StatCollector.translateToLocal("attribute.weapon.penetrateArmor")));
+                list.add(
+                        EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
+                                "attribute.modifier.plus." + 1,
+                                decimal_format.format(getAPDamText()),
+                                StatCollector.translateToLocal("attribute.weapon.penetrateArmor")));
             }
 
             if (this instanceof IExtendedReachWeapon) {
                 float reach = ((IExtendedReachWeapon) this).getReachModifierInBlocks(weapon);
 
                 if (reach > 0) {
-                    list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                            "attribute.modifier.plus." + 0, decimal_format.format(reach),
-                            StatCollector.translateToLocal("attribute.weapon.extendedReach")));
+                    list.add(
+                            EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
+                                    "attribute.modifier.plus." + 0,
+                                    decimal_format.format(reach),
+                                    StatCollector.translateToLocal("attribute.weapon.extendedReach")));
                 } else {
-                    list.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
-                            "attribute.modifier.take." + 0, decimal_format.format(-1 * reach),
-                            StatCollector.translateToLocal("attribute.weapon.extendedReach")));
+                    list.add(
+                            EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
+                                    "attribute.modifier.take." + 0,
+                                    decimal_format.format(-1 * reach),
+                                    StatCollector.translateToLocal("attribute.weapon.extendedReach")));
                 }
             }
 
             if (this instanceof IHitTimeModifier) {
                 int hitMod = ((IHitTimeModifier) this).getHitTime(weapon, null);
                 if (hitMod > 0) {
-                    list.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
-                            "attribute.modifier.take." + 1, decimal_format.format(hitMod / 10F * 100),
-                            StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
+                    list.add(
+                            EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
+                                    "attribute.modifier.take." + 1,
+                                    decimal_format.format(hitMod / 10F * 100),
+                                    StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
                 } else {
-                    list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                            "attribute.modifier.plus." + 1, decimal_format.format(-(float) hitMod / 10F * 100),
-                            StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
+                    list.add(
+                            EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
+                                    "attribute.modifier.plus." + 1,
+                                    decimal_format.format(-(float) hitMod / 10F * 100),
+                                    StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
                 }
             }
 
@@ -353,7 +364,8 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
 
     @Override
     @Optional.Method(modid = "battlegear2")
-    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
+    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event,
+            ItemStack mainhandItem, ItemStack offhandItem) {
         return true;
     }
 
@@ -368,8 +380,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     }
 
     @Override
-    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {
-    }
+    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {}
 
     @Override
     public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
@@ -507,9 +518,14 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
                 }
                 if (hit instanceof EntityLivingBase) {
                     for (int a = 0; a < 4; a++) {
-                        hit.worldObj.spawnParticle("blockcrack_" + Block.getIdFromBlock(Blocks.redstone_block) + "_0",
-                                hit.posX, hit.posY + hit.getEyeHeight(), hit.posZ, rand.nextDouble() / 2D,
-                                rand.nextDouble() / 2D, rand.nextDouble() / 2D);
+                        hit.worldObj.spawnParticle(
+                                "blockcrack_" + Block.getIdFromBlock(Blocks.redstone_block) + "_0",
+                                hit.posX,
+                                hit.posY + hit.getEyeHeight(),
+                                hit.posZ,
+                                rand.nextDouble() / 2D,
+                                rand.nextDouble() / 2D,
+                                rand.nextDouble() / 2D);
                     }
                     ((EntityLivingBase) hit).addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 100, 0));
                 }
@@ -552,7 +568,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     }
 
     protected float[] getWeaponRatio(ItemStack implement) {
-        return new float[]{1F, 0F, 0F};
+        return new float[] { 1F, 0F, 0F };
     }
 
     protected float[] getWeaponRatio(ItemStack implement, EntityLivingBase user) {
@@ -602,7 +618,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
-                              boolean properHit) {
+            boolean properHit) {
         if (canCounter(wielder, item) == 1) {
             initialDam *= getCounterDamage();
         }
@@ -637,7 +653,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     }
 
     public float[] getCounterRatio() {
-        return new float[]{0, 0, 1};
+        return new float[] { 0, 0, 1 };
     }
 
     public float getCounterDamage() {
@@ -675,7 +691,8 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     @Override
     public Multimap getAttributeModifiers(ItemStack item) {
         Multimap map = HashMultimap.create();
-        map.put(SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
+        map.put(
+                SharedMonsterAttributes.attackDamage.getAttributeUnlocalizedName(),
                 new AttributeModifier(field_111210_e, "Weapon modifier", getMeleeDamage(item), 0));
 
         return map;

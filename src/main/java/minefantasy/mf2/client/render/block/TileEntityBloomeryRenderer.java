@@ -1,15 +1,18 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityBloomery;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityBloomery;
 
 public class TileEntityBloomeryRenderer extends TileEntitySpecialRenderer {
+
     private ModelBloomery model;
     private Random random = new Random();
 
@@ -26,7 +29,7 @@ public class TileEntityBloomeryRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderModelAt(TileEntityBloomery tile, String tex, int meta, double d, double d1, double d2, float f,
-                              boolean inv) {
+            boolean inv) {
         int i = meta;
 
         int j = 90 * i;

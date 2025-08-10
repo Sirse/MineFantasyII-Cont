@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
+
 import org.lwjgl.opengl.GL11;
 
 public class ModelCogwork extends ModelBiped {
@@ -117,7 +118,8 @@ public class ModelCogwork extends ModelBiped {
 
         if (isPlayer) {
             EntityPlayer player = (EntityPlayer) entity;
-            isFirstPerson = Minecraft.getMinecraft().thePlayer == player && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0;
+            isFirstPerson = Minecraft.getMinecraft().thePlayer == player
+                    && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0;
 
             // Set animation states for ModelBiped based on player actions
             ItemStack heldItem = player.getHeldItem();

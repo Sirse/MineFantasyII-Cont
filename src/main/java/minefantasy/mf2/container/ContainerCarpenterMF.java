@@ -1,12 +1,14 @@
 package minefantasy.mf2.container;
 
-import minefantasy.mf2.block.tileentity.TileEntityCarpenterMF;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.block.tileentity.TileEntityCarpenterMF;
+
 public class ContainerCarpenterMF extends ContainerMF {
+
     private final TileEntityCarpenterMF tile;
     private int playerInventoryStartIndex;
 

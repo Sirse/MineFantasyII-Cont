@@ -1,17 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.heating.ForgeItemHandler;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.BigFurnaceRecipes;
-import minefantasy.mf2.api.refine.IBellowsUseable;
-import minefantasy.mf2.api.refine.SmokeMechanics;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.refining.BlockBigFurnace;
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BigFurnacePacket;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,7 +20,18 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.heating.ForgeItemHandler;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.refine.BigFurnaceRecipes;
+import minefantasy.mf2.api.refine.IBellowsUseable;
+import minefantasy.mf2.api.refine.SmokeMechanics;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.refining.BlockBigFurnace;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.BigFurnacePacket;
 
 public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable, IInventory, ISidedInventory {
 
@@ -90,8 +91,14 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
                 }
 
                 for (int a = 0; a < 10; a++) {
-                    worldObj.spawnParticle("flame", xCoord + (rand.nextDouble() * 0.8D) + 0.1D, yCoord + 0.4D,
-                            zCoord + (rand.nextDouble() * 0.8D) + 0.1D, 0, 0.01, 0);
+                    worldObj.spawnParticle(
+                            "flame",
+                            xCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                            yCoord + 0.4D,
+                            zCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                            0,
+                            0.01,
+                            0);
                 }
             }
             pumpBellows(-1, 0, powerLevel * 0.9F);
@@ -104,13 +111,11 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private void pumpBellows(int x, int z, float pump) {
         int share = 2;
         TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null)
-            return;
+        if (tile == null) return;
 
         if (tile instanceof TileEntityBigFurnace) {
             TileEntityBigFurnace furn = (TileEntityBigFurnace) tile;
-            if (furn.isHeater())
-                furn.onUsedWithBellows(pump);
+            if (furn.isHeater()) furn.onUsedWithBellows(pump);
         }
     }
 
@@ -126,15 +131,12 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             if (numUsers <= 0 && doorAngle > 0) {
                 doorAngle--;
             }
-            if (doorAngle < 0)
-                doorAngle = 0;
-            if (doorAngle > 20)
-                doorAngle = 20;
+            if (doorAngle < 0) doorAngle = 0;
+            if (doorAngle > 20) doorAngle = 20;
         }
 
         ++ticksExisted;
-        if (justShared > 0)
-            justShared--;
+        if (justShared > 0) justShared--;
         if (ticksExisted % 10 == 0) {
             built = structureExists();
         }
@@ -156,8 +158,14 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private void updateFurnace() {
         if (isBurning()) {
             if (worldObj.isRemote && rand.nextInt(10) == 0) {
-                worldObj.spawnParticle("flame", xCoord + (rand.nextDouble() * 0.8D) + 0.1D, yCoord + 0.4D,
-                        zCoord + (rand.nextDouble() * 0.8D) + 0.1D, 0, 0.01, 0);
+                worldObj.spawnParticle(
+                        "flame",
+                        xCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                        yCoord + 0.4D,
+                        zCoord + (rand.nextDouble() * 0.8D) + 0.1D,
+                        0,
+                        0.01,
+                        0);
             }
         }
         if (worldObj.isRemote) {
@@ -187,17 +195,16 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
                     smelted = true;
                 }
             }
-        } else
-            for (int a = 0; a < 4; a++) {
-                if (canSmelt(inv[a], inv[a + 4])) {
-                    canSmelt = true;
+        } else for (int a = 0; a < 4; a++) {
+            if (canSmelt(inv[a], inv[a + 4])) {
+                canSmelt = true;
 
-                    if (progress >= getMaxTime()) {
-                        smeltItem(a, a + 4);
-                        smelted = true;
-                    }
+                if (progress >= getMaxTime()) {
+                    smeltItem(a, a + 4);
+                    smelted = true;
                 }
             }
+        }
 
         if (canSmelt) {
             progress += heat;
@@ -235,8 +242,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         ItemStack res = getSpecialResult().copy();
 
         for (int output = 4; output < 8; output++) {
-            if (res.stackSize <= 0)
-                break;
+            if (res.stackSize <= 0) break;
 
             if (inv[output] == null) {
                 setInventorySlotContents(output, res);
@@ -255,8 +261,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
                 }
             }
         }
-        for (int input = 0; input < 4; input++)
-            decrStackSize(input, 1);
+        for (int input = 0; input < 4; input++) decrStackSize(input, 1);
     }
 
     public void puffSmoke(Random rand, World world, int x, int y, int z) {
@@ -286,11 +291,9 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     }
 
     private boolean canSmelt(ItemStack in, ItemStack out) {
-        if (isHeater())
-            return false;
+        if (isHeater()) return false;
 
-        if (!built)
-            return false;
+        if (!built) return false;
 
         ItemStack res = getResult(in);
         if (res == null) {
@@ -314,8 +317,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private TileEntityBigFurnace getHeater() {
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
         if (tile != null && tile instanceof TileEntityBigFurnace) {
-            if (((TileEntityBigFurnace) tile).isHeater())
-                return (TileEntityBigFurnace) tile;
+            if (((TileEntityBigFurnace) tile).isHeater()) return (TileEntityBigFurnace) tile;
         }
         return null;
     }
@@ -323,15 +325,13 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private TileEntityBigFurnace getFurnace() {
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
         if (tile != null && tile instanceof TileEntityBigFurnace) {
-            if (!((TileEntityBigFurnace) tile).isHeater())
-                return (TileEntityBigFurnace) tile;
+            if (!((TileEntityBigFurnace) tile).isHeater()) return (TileEntityBigFurnace) tile;
         }
         return null;
     }
 
     private void updateHeater() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
         TileEntityBigFurnace furn = getFurnace();
         if (furn != null) {
@@ -362,8 +362,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
                 }
             }
             if (fuel <= 0) {
-                if (heat > 0)
-                    heat--;
+                if (heat > 0) heat--;
                 maxHeat = 0;
             }
         }
@@ -375,8 +374,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     }
 
     public ItemStack getResult(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         // SPECIAL SMELTING
         BigFurnaceRecipes recipe = BigFurnaceRecipes.getResult(item);
@@ -398,9 +396,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     public ItemStack getSpecialResult() {
         return null;
         /*
-         * ItemStack[] input = new ItemStack[4]; for(int a = 0; a < 4; a ++) { input[a]
-         * = inv[a]; } Alloy alloy = SpecialFurnaceRecipes.getResult(input); if(alloy !=
-         * null) { if(alloy.getLevel() <= getSmeltLevel()) { return
+         * ItemStack[] input = new ItemStack[4]; for(int a = 0; a < 4; a ++) { input[a] = inv[a]; } Alloy alloy =
+         * SpecialFurnaceRecipes.getResult(input); if(alloy != null) { if(alloy.getLevel() <= getSmeltLevel()) { return
          * SpecialFurnaceRecipes.getResult(input).getRecipeOutput(); } } return null;
          */
     }
@@ -441,8 +438,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     @SideOnly(Side.CLIENT)
     public int getHeatScaled(int height) {
-        if (heat <= 0)
-            return 0;
+        if (heat <= 0) return 0;
         int size = (int) (height / TileEntityForge.maxTemperature * this.heat);
 
         return Math.min(size, height);
@@ -450,8 +446,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     @SideOnly(Side.CLIENT)
     public int getItemHeatScaled(int height) {
-        if (maxHeat <= 0)
-            return 0;
+        if (maxHeat <= 0) return 0;
         int size = (int) (height / TileEntityForge.maxTemperature * this.maxHeat);
 
         return Math.min(size, height);
@@ -591,8 +586,13 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     public void openChest() {
         if (numUsers == 0) {
-            this.worldObj.playSoundEffect(xCoord + 0.5D, this.yCoord + 0.5D, zCoord + 0.5D,
-                    "minefantasy2:block.furnace_open", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            this.worldObj.playSoundEffect(
+                    xCoord + 0.5D,
+                    this.yCoord + 0.5D,
+                    zCoord + 0.5D,
+                    "minefantasy2:block.furnace_open",
+                    0.5F,
+                    this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
         ++numUsers;
     }
@@ -600,8 +600,13 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     public void closeChest() {
         --numUsers;
         if (numUsers == 0 && doorAngle >= 15) {
-            this.worldObj.playSoundEffect(xCoord + 0.5D, this.yCoord + 0.5D, zCoord + 0.5D,
-                    "minefantasy2:block.furnace_close", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            this.worldObj.playSoundEffect(
+                    xCoord + 0.5D,
+                    this.yCoord + 0.5D,
+                    zCoord + 0.5D,
+                    "minefantasy2:block.furnace_close",
+                    0.5F,
+                    this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
     }
 
@@ -612,28 +617,27 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     private void sendPacketToClients() {
         if (!worldObj.isRemote) {
-            NetworkUtils.sendToWatchers(new BigFurnacePacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
-			/*
-			List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-			for (int i = 0; i < players.size(); i++) {
-				EntityPlayer player = players.get(i);
-				((WorldServer) worldObj).getEntityTracker().func_151248_b(player,
-						new BigFurnacePacket(this).generatePacket());
-			}
-			*/
+            NetworkUtils.sendToWatchers(
+                    new BigFurnacePacket(this).generatePacket(),
+                    (WorldServer) worldObj,
+                    this.xCoord,
+                    this.zCoord);
+            /*
+             * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
+             * i++) { EntityPlayer player = players.get(i); ((WorldServer)
+             * worldObj).getEntityTracker().func_151248_b(player, new BigFurnacePacket(this).generatePacket()); }
+             */
         }
     }
 
     /*
-     * @Override public void recievePacket(ByteArrayDataInput data) { fuel =
-     * data.readInt(); progress = data.readInt(); direction = data.readInt(); heat =
-     * data.readInt(); int burn = data.readInt(); isBurningClient = burn == 1;
+     * @Override public void recievePacket(ByteArrayDataInput data) { fuel = data.readInt(); progress = data.readInt();
+     * direction = data.readInt(); heat = data.readInt(); int burn = data.readInt(); isBurningClient = burn == 1;
      * justShared = data.readInt(); doorAngle = data.readInt(); }
      */
 
     public int getBlockMetadata() {
-        if (worldObj == null)
-            return itemMeta * 2;
+        if (worldObj == null) return itemMeta * 2;
 
         if (this.blockMetadata == -1) {
             this.blockMetadata = this.worldObj.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord);
@@ -660,9 +664,9 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
         if (isHeater()) {
-            return new int[]{0};
+            return new int[] { 0 };
         }
-        return new int[]{0, 1, 2, 3, 4, 5, 6, 7};
+        return new int[] { 0, 1, 2, 3, 4, 5, 6, 7 };
     }
 
     @Override
@@ -714,8 +718,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     /**
      * Checks a valid block for sides. It must be the required block.
      * <p>
-     * HEATER: Requires any stone block for bronze, stone above hardness 2.0(like
-     * slate)for iron, and stone above hardness above 5.0(like granite) for steel
+     * HEATER: Requires any stone block for bronze, stone above hardness 2.0(like slate)for iron, and stone above
+     * hardness above 5.0(like granite) for steel
      * <p>
      * FURNACES require metal blocks of their material
      */
@@ -758,8 +762,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     }
 
     /**
-     * Determines if the furnace is built properly HEATER must have sides blocked by
-     * stone FURNACES must have walls built to specifications
+     * Determines if the furnace is built properly HEATER must have sides blocked by stone FURNACES must have walls
+     * built to specifications
      */
     private boolean structureExists() {
         if (worldObj == null) {

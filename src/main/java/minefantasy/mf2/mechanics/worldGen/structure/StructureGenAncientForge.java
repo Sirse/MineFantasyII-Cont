@@ -1,13 +1,15 @@
 package minefantasy.mf2.mechanics.worldGen.structure;
 
-import minefantasy.mf2.block.list.BlockListMF;
+import java.util.Random;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ChestGenHooks;
 
-import java.util.Random;
+import minefantasy.mf2.block.list.BlockListMF;
 
 public class StructureGenAncientForge extends StructureModuleMF {
+
     public StructureGenAncientForge(World world, int x, int y, int z, int d) {
         super(world, x, y, z, d);
     }
@@ -58,8 +60,7 @@ public class StructureGenAncientForge extends StructureModuleMF {
         for (int x = (-width / 2) + 1; x <= (width / 2) - 1; x++) {
             for (int z = 1; z <= depth - 1; z++) {
                 for (int y = 1; y <= 4; y++) {
-                    if (x % 4 != 0 || z % 4 != 0)
-                        placeBlock(Blocks.air, 0, x, y, z);
+                    if (x % 4 != 0 || z % 4 != 0) placeBlock(Blocks.air, 0, x, y, z);
                 }
             }
         }

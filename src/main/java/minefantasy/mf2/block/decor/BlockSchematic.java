@@ -1,10 +1,8 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -17,10 +15,14 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import java.util.List;
-import java.util.Random;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class BlockSchematic extends Block {
+
     public IIcon[] icons = new IIcon[6];
 
     public BlockSchematic(String name) {
@@ -33,7 +35,7 @@ public class BlockSchematic extends Block {
     }
 
     public static boolean useSchematic(ItemStack item, World world, EntityPlayer user,
-                                       MovingObjectPosition movingobjectposition) {
+            MovingObjectPosition movingobjectposition) {
         if (movingobjectposition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
             int i = movingobjectposition.blockX;
             int j = movingobjectposition.blockY;
@@ -71,7 +73,7 @@ public class BlockSchematic extends Block {
     }
 
     public static boolean placeSchematic(int meta, EntityPlayer user, ItemStack item, World world, int x, int y,
-                                         int z) {
+            int z) {
         if (world.isAirBlock(x, y, z) && canBuildOn(world, x, y - 1, z)) {
             world.setBlock(x, y, z, BlockListMF.schematic_general, Math.max(0, meta - 4), 2);
             return true;
@@ -85,8 +87,7 @@ public class BlockSchematic extends Block {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-    }
+    public void getSubBlocks(Item item, CreativeTabs tab, List list) {}
 
     @Override
     @SideOnly(Side.CLIENT)

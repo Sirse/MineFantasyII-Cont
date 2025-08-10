@@ -1,10 +1,5 @@
 package minefantasy.mf2.api.stamina;
 
-import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.helpers.PowerArmour;
-import minefantasy.mf2.api.helpers.TacticalManager;
-import minefantasy.mf2.api.knowledge.ResearchLogic;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,7 +7,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.PowerArmour;
+import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+
 public class StaminaBar {
+
     public static final String staminaRegenName = "MineFantasy_staminaRegen";
     public static final String staminaRegenTicksName = "MineFantasy_staminaRegenTicks";
     public static final String staminaBonusName = "MineFantasy_staminaMaxAddon";
@@ -22,8 +24,7 @@ public class StaminaBar {
     public static final String staminaIdleName = "MineFantasy_staminaIdle";
     public static final String staminaFlashName = "MineFantasy_staminaFlashing";
     /**
-     * Modifies the decay speed for armour, this scales to what a full suit of plate
-     * does
+     * Modifies the decay speed for armour, this scales to what a full suit of plate does
      */
     private static final float armourWeightModifier = 1.0F;
     private static final float armourWeightModifierClimbing = 5.0F;
@@ -143,8 +144,7 @@ public class StaminaBar {
     }
 
     private static float getStaminaLevelBoost(EntityLivingBase user) {
-        if (user.worldObj.isRemote)
-            return 0;
+        if (user.worldObj.isRemote) return 0;
 
         float amount = 0F;
         if (user instanceof EntityPlayer && levelUp && levelAmount > 0) {
@@ -179,8 +179,7 @@ public class StaminaBar {
     }
 
     public static void tickBonus(EntityLivingBase user) {
-        if (user.worldObj.isRemote)
-            return;
+        if (user.worldObj.isRemote) return;
 
         int currentTicks = getBonusStaminaTicks(user);
         currentTicks--;
@@ -197,8 +196,7 @@ public class StaminaBar {
     }
 
     public static void tickBonusRegen(EntityLivingBase user) {
-        if (user.worldObj.isRemote)
-            return;
+        if (user.worldObj.isRemote) return;
 
         int currentTicks = getBonusStaminaRegenTicks(user);
         currentTicks--;
@@ -211,8 +209,7 @@ public class StaminaBar {
     }
 
     /**
-     * Call this to buff stamina temporarily, it will not override more potent
-     * effects
+     * Call this to buff stamina temporarily, it will not override more potent effects
      *
      * @param user    the entity to buff
      * @param mod     the amount of stamina added
@@ -258,8 +255,7 @@ public class StaminaBar {
      *
      * @param user     the user
      * @param value    the amount to add to max stamina
-     * @param maxBonus the maximum this can achieve (not counting base stamina), <0 means
-     *                 no limit
+     * @param maxBonus the maximum this can achieve (not counting base stamina), <0 means no limit
      */
     public static boolean incrStaminaMax(EntityLivingBase user, float value, float maxBonus) {
         float current = getBaseMaxStamina(user);
@@ -470,8 +466,8 @@ public class StaminaBar {
         if (!TacticalManager.isImmuneToWeight(user)) {
             if (countHeld) {
                 if (user.getHeldItem() != null && user.getHeldItem().getItem() instanceof IHeldStaminaItem) {
-                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem()).getRegenModifier(user,
-                            user.getHeldItem());
+                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem())
+                            .getRegenModifier(user, user.getHeldItem());
                 }
             }
             if (countArmour) {
@@ -509,8 +505,8 @@ public class StaminaBar {
         if (!TacticalManager.isImmuneToWeight(user)) {
             if (countHeld) {
                 if (user.getHeldItem() != null && user.getHeldItem().getItem() instanceof IHeldStaminaItem) {
-                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem()).getIdleModifier(user,
-                            user.getHeldItem());
+                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem())
+                            .getIdleModifier(user, user.getHeldItem());
                 }
             }
             if (countArmour) {
@@ -528,9 +524,8 @@ public class StaminaBar {
     }
 
     /**
-     * This scales the decay modifier across all fields on difficulty It's base
-     * level is on normal with easy,peaceful being 25% - 50% slower. Hard is 25%
-     * faster
+     * This scales the decay modifier across all fields on difficulty It's base level is on normal with easy,peaceful
+     * being 25% - 50% slower. Hard is 25% faster
      */
     public static float getDecayModifier(World world) {
         if (!scaleDifficulty) {

@@ -1,16 +1,19 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
 
 public class TileEntityAmmoBoxRenderer extends TileEntitySpecialRenderer {
+
     private ModelAmmoBox modelbig, model, modelsml;
     private Random random = new Random();
 
@@ -29,7 +32,7 @@ public class TileEntityAmmoBoxRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderInvModel(String tex, byte type, CustomMaterial material, double d, double d1, double d2,
-                               float f) {
+            float f) {
         ModelAmmoBox baseMdl = type == 0 ? modelsml : type == 1 ? model : modelbig;
         int i = 2;
         int j = 450 - (90 * i);

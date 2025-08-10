@@ -1,5 +1,11 @@
 package minefantasy.mf2.mechanics;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.monster.*;
+import net.minecraft.init.Items;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.config.ConfigHardcore;
@@ -7,13 +13,9 @@ import minefantasy.mf2.item.list.CustomArmourListMF;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
 import minefantasy.mf2.util.XSTRandom;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.*;
-import net.minecraft.init.Items;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 
 public class MonsterUpgrader {
+
     public static final String zombieArmourNBT = "MF_ZombieArmour";
     private static final float zombieWepChance = 10F;
     private static final float zombieKnightChance = 200F;
@@ -93,8 +95,7 @@ public class MonsterUpgrader {
     }
 
     private void createZombieKnight(EntityZombie mob) {
-        if (mob.isChild())
-            return;
+        if (mob.isChild()) return;
         String tier = "steel";
         int lootId = 0;
         if (mob instanceof EntityPigZombie) {
@@ -124,8 +125,7 @@ public class MonsterUpgrader {
     }
 
     private void createZombieBrute(EntityZombie mob) {
-        if (mob.isChild())
-            return;
+        if (mob.isChild()) return;
         String tier = "iron";
         int lootId = 0;
         if (mob instanceof EntityPigZombie) {
@@ -143,8 +143,7 @@ public class MonsterUpgrader {
      * 1=Axe.....2=Mace.....3=dagger.....4=spear.....else sword
      */
     private void giveEntityWeapon(EntityLivingBase mob, String tier, int weaponType) {
-        if (CustomMaterial.getMaterial(tier) == null)
-            return;
+        if (CustomMaterial.getMaterial(tier) == null) return;
 
         ItemWeaponMF weapon = CustomToolListMF.standard_sword;
         if (weaponType == 1) {

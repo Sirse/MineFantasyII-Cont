@@ -1,5 +1,8 @@
 package minefantasy.mf2.item.list;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item.ToolMaterial;
+
 import minefantasy.mf2.item.archery.ArrowType;
 import minefantasy.mf2.item.archery.EnumBowType;
 import minefantasy.mf2.item.archery.ItemArrowMF;
@@ -10,10 +13,9 @@ import minefantasy.mf2.item.tool.*;
 import minefantasy.mf2.item.tool.advanced.*;
 import minefantasy.mf2.item.tool.crafting.*;
 import minefantasy.mf2.item.weapon.*;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item.ToolMaterial;
 
 public class CustomToolListMF {
+
     // STANDARD
     public static ItemWeaponMF standard_sword, standard_waraxe, standard_mace, standard_dagger, standard_spear;
     public static ItemWeaponMF standard_greatsword, standard_battleaxe, standard_warhammer, standard_katana,

@@ -1,6 +1,7 @@
 package minefantasy.mf2.entity;
 
-import minefantasy.mf2.entity.mob.DragonBreath;
+import java.util.Random;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,9 +10,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import minefantasy.mf2.entity.mob.DragonBreath;
 
 public class EntityDragonBreath extends EntityFireball {
+
     private static final float size = 0.75F;
     private final int typeId = 2;
     public Random rand = new Random();
@@ -23,7 +25,7 @@ public class EntityDragonBreath extends EntityFireball {
     }
 
     public EntityDragonBreath(World world, EntityLivingBase shooter, double xVelocity, double yVelocity,
-                              double zVelocity, float spread) {
+            double zVelocity, float spread) {
         this(world);
         this.shootingEntity = shooter;
         this.setSize(1.0F, 1.0F);
@@ -46,8 +48,7 @@ public class EntityDragonBreath extends EntityFireball {
     }
 
     @Override
-    public void setFire(int time) {
-    }
+    public void setFire(int time) {}
 
     public int getType() {
         return dataWatcher.getWatchableObjectInt(typeId);
@@ -130,8 +131,7 @@ public class EntityDragonBreath extends EntityFireball {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     public boolean canBeCollidedWith() {
         return false;

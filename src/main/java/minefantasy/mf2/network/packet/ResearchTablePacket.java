@@ -1,28 +1,29 @@
 package minefantasy.mf2.network.packet;
 
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.TileEntityResearch;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.TileEntityResearch;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class ResearchTablePacket extends PacketMF {
+
     public static final String packetName = "MF2_ResearchTblPkt";
     private int[] coords = new int[3];
     private int id;
     private float[] progress = new float[2];
 
     public ResearchTablePacket(TileEntityResearch tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         id = tile.researchID;
-        progress = new float[]{tile.progress, tile.maxProgress};
+        progress = new float[] { tile.progress, tile.maxProgress };
         if (progress[1] <= 0) {
             progress[1] = 0;
         }
     }
 
-    public ResearchTablePacket() {
-    }
+    public ResearchTablePacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

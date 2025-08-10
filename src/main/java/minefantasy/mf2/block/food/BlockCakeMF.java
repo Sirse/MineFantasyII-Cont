@@ -1,11 +1,5 @@
 package minefantasy.mf2.block.food;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.item.food.ItemFoodMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -18,7 +12,15 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.item.food.ItemFoodMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
+
 public class BlockCakeMF extends Block {
+
     protected int maxSlices = 8;
     protected float height = 0.5F;
     protected float width = 14F / 16F;
@@ -62,16 +64,16 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * Returns a bounding box from the pool of bounding boxes (this means this box
-     * can change after the pool has been cleared to be reused)
+     * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been
+     * cleared to be reused)
      */
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x, int y, int z) {
         int slices = world.getBlockMetadata(x, y, z);
         float border = (1F - width) / 2;
         float size = border + (slices / (float) maxSlices) * (1.0F - (border * 2));
-        return AxisAlignedBB.getBoundingBox(x + size, y, z + border, x + 1 - border, y + height - border,
-                z + 1 - border);
+        return AxisAlignedBB
+                .getBoundingBox(x + size, y, z + border, x + 1 - border, y + height - border, z + 1 - border);
     }
 
     /**
@@ -106,8 +108,7 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * If this block doesn't render as an ordinary block it will return False
-     * (examples: signs, buttons, stairs, etc)
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
     @Override
     public boolean renderAsNormalBlock() {
@@ -115,9 +116,8 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or
-     * not to render the shared face of two adjacent blocks and also whether the
-     * player can attach torches, redstone wire, etc to this block.
+     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
      */
     @Override
     public boolean isOpaqueCube() {
@@ -129,7 +129,7 @@ public class BlockCakeMF extends Block {
      */
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xoffset,
-                                    float yoffset, float zoffset) {
+            float yoffset, float zoffset) {
         if (ToolHelper.getCrafterTool(user.getHeldItem()).equalsIgnoreCase("knife")) {
             this.cutSlice(world, x, y, z, user);
             return true;
@@ -167,8 +167,7 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * Checks to see if its valid to put this block at the specified coordinates.
-     * Args: world, x, y, z
+     * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
      */
     @Override
     public boolean canPlaceBlockAt(World world, int x, int y, int z) {
@@ -176,9 +175,8 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which
-     * neighbor changed (coordinates passed are their own) Args: x, y, z, neighbor
-     * Block
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor Block
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
@@ -191,8 +189,7 @@ public class BlockCakeMF extends Block {
     }
 
     /**
-     * Can this block stay at this position. Similar to canPlaceBlockAt except gets
-     * checked often with plants.
+     * Can this block stay at this position. Similar to canPlaceBlockAt except gets checked often with plants.
      */
     @Override
     public boolean canBlockStay(World world, int x, int y, int z) {

@@ -1,7 +1,5 @@
 package minefantasy.mf2.client.render;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,14 +8,19 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import cpw.mods.fml.client.FMLClientHandler;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 /**
  * @author Anonymous Productions
  */
 
 public class RenderSaw implements IItemRenderer {
+
     RenderItem renderItem = new RenderItem();
     private float scale;
 
@@ -73,8 +76,15 @@ public class RenderSaw implements IItemRenderer {
 
             IIcon icon = item.getItem().getIcon(item, layer);
 
-            ItemRenderer.renderItemIn2D(tessellator, icon.getMaxU(), icon.getMinV(), icon.getMinU(), icon.getMaxV(),
-                    icon.getIconWidth(), icon.getIconHeight(), 1F / 16F);
+            ItemRenderer.renderItemIn2D(
+                    tessellator,
+                    icon.getMaxU(),
+                    icon.getMinV(),
+                    icon.getMinU(),
+                    icon.getMaxV(),
+                    icon.getIconWidth(),
+                    icon.getIconHeight(),
+                    1F / 16F);
         }
         if (item != null && item.hasEffect(0)) {
             TextureHelperMF.renderEnchantmentEffects(tessellator);

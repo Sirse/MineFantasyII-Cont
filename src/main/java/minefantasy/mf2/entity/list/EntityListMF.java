@@ -1,13 +1,15 @@
 package minefantasy.mf2.entity.list;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
+
 import cpw.mods.fml.common.registry.EntityRegistry;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.entity.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 
 public class EntityListMF {
+
     public static void register() {
         addEntity(EntityArrowMF.class, "arrowMF", 1, 16, ConfigExperiment.dynamicArrows ? 1 : 20);
         addEntity(EntityBomb.class, "bombMF", 2, 16, ConfigExperiment.dynamicArrows ? 1 : 20);
@@ -36,7 +38,7 @@ public class EntityListMF {
     }
 
     private static void addEntity(Class<? extends Entity> entityClass, String entityName, int id, int range,
-                                  int ticks) {
+            int ticks) {
         EntityRegistry.registerModEntity(entityClass, entityName, id, MineFantasyII.instance, range, ticks, true);
     }
 }

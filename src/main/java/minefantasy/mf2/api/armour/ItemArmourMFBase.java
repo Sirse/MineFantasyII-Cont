@@ -1,9 +1,8 @@
 package minefantasy.mf2.api.armour;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.helpers.ToolHelper;
+import java.text.DecimalFormat;
+import java.util.List;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
@@ -15,14 +14,17 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.common.util.EnumHelper;
 
-import java.text.DecimalFormat;
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.ToolHelper;
 
 public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmourMF, IArmourRating, ISpecialArmourMF {
+
     public static final DecimalFormat decimal_format = new DecimalFormat("#.#");
-    private static final float[] AC = new float[]{40F, 60F};
-    public static ArmorMaterial baseMaterial = EnumHelper.addArmorMaterial("MF Armour Base", 0,
-            new int[]{2, 6, 5, 2}, 0);
+    private static final float[] AC = new float[] { 40F, 60F };
+    public static ArmorMaterial baseMaterial = EnumHelper
+            .addArmorMaterial("MF Armour Base", 0, new int[] { 2, 6, 5, 2 }, 0);
     public float baseAR;
     public int enchantment;
     public String texture;
@@ -50,8 +52,8 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
         this.setUnlocalizedName(name);
         setDT(getBaseAC() * scalePiece());
 
-        baseRating = ArmourCalculator.translateToVanillaAR(getBaseAC() + 1F,
-                baseMaterial.getDamageReductionAmount(slot), 15);
+        baseRating = ArmourCalculator
+                .translateToVanillaAR(getBaseAC() + 1F, baseMaterial.getDamageReductionAmount(slot), 15);
     }
 
     public ItemArmourMFBase setDT(float DT) {
@@ -81,13 +83,17 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
 
     @Override
     public ArmorProperties getProperties(EntityLivingBase player, ItemStack armour, DamageSource source, double damage,
-                                         int slot) {
+            int slot) {
         float AC = getProtectionRatio(armour);
         AC = ArmourCalculator.getArmourValueMod(armour, AC);
 
         if (ArmourCalculator.advancedDamageTypes && !player.worldObj.isRemote) {
-            AC = ArmourCalculator.adjustACForDamage(source, AC, getProtectiveTrait(armour, 0),
-                    getProtectiveTrait(armour, 1), getProtectiveTrait(armour, 2));
+            AC = ArmourCalculator.adjustACForDamage(
+                    source,
+                    AC,
+                    getProtectiveTrait(armour, 0),
+                    getProtectiveTrait(armour, 1),
+                    getProtectiveTrait(armour, 2));
         }
 
         AC *= getACModifier(player, armour, source, damage);
@@ -105,8 +111,7 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
 
         if (player.getEntityData().hasKey("MF_ZombieArmour")) {
             AC -= 1.5F;
-            if (AC < 0)
-                AC = 0;
+            if (AC < 0) AC = 0;
         }
         AC++;// because 1.0AC = no armour so it adds ontop of this
 
@@ -161,14 +166,18 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
         if (getProtectionRatio(item) != ratio) {
             if (getProtectionRatio(item) > ratio) {
                 float percent = (ratio / getProtectionRatio(item)) - 1F;
-                list.add(EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
-                        "attribute.modifier.take." + 1, decimal_format.format(-percent * 100),
-                        StatCollector.translateToLocal("attribute.armour." + name)));
+                list.add(
+                        EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
+                                "attribute.modifier.take." + 1,
+                                decimal_format.format(-percent * 100),
+                                StatCollector.translateToLocal("attribute.armour." + name)));
             } else {
                 float percent = (ratio / getProtectionRatio(item)) - 1F;
-                list.add(EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                        "attribute.modifier.plus." + 1, decimal_format.format(percent * 100),
-                        StatCollector.translateToLocal("attribute.armour." + name)));
+                list.add(
+                        EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
+                                "attribute.modifier.plus." + 1,
+                                decimal_format.format(percent * 100),
+                                StatCollector.translateToLocal("attribute.armour." + name)));
             }
         }
     }
@@ -221,8 +230,12 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
         float DT2 = DT;
 
         if (ArmourCalculator.advancedDamageTypes && !user.worldObj.isRemote) {
-            DT2 = ArmourCalculator.adjustACForDamage(src, DT2, getProtectiveTrait(armour, 0),
-                    getProtectiveTrait(armour, 1), getProtectiveTrait(armour, 2));
+            DT2 = ArmourCalculator.adjustACForDamage(
+                    src,
+                    DT2,
+                    getProtectiveTrait(armour, 0),
+                    getProtectiveTrait(armour, 1),
+                    getProtectiveTrait(armour, 2));
         }
         return DT2;
     }
@@ -238,8 +251,12 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
         float DR = getProtectionRatio(armour) * scalePiece();
 
         if (ArmourCalculator.advancedDamageTypes && !user.worldObj.isRemote) {
-            DR = ArmourCalculator.adjustACForDamage(src, DR, getProtectiveTrait(armour, 0),
-                    getProtectiveTrait(armour, 1), getProtectiveTrait(armour, 2));
+            DR = ArmourCalculator.adjustACForDamage(
+                    src,
+                    DR,
+                    getProtectiveTrait(armour, 0),
+                    getProtectiveTrait(armour, 1),
+                    getProtectiveTrait(armour, 2));
         }
         return DR;
     }
@@ -250,8 +267,12 @@ public class ItemArmourMFBase extends ItemArmor implements ISpecialArmor, IArmou
         float DR = getProtectionRatio(armour) * scalePiece();
 
         if (ArmourCalculator.advancedDamageTypes) {
-            DR = ArmourCalculator.modifyACForType(damageType, DR, getProtectiveTrait(armour, 0),
-                    getProtectiveTrait(armour, 1), getProtectiveTrait(armour, 2));
+            DR = ArmourCalculator.modifyACForType(
+                    damageType,
+                    DR,
+                    getProtectiveTrait(armour, 0),
+                    getProtectiveTrait(armour, 1),
+                    getProtectiveTrait(armour, 2));
         }
         return DR;
     }

@@ -1,15 +1,16 @@
 package mods.battlegear2.api.heraldry;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.ResourceLocation;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 
 public class PatternStore {
 
@@ -25,7 +26,12 @@ public class PatternStore {
     }
 
     public static int getBlendedSmallPixel(int[][][][] rgbs, byte imageNo, int x, int y, int col1, int col2, int col3) {
-        return getBlendedSmallPixel(rgbs[imageNo][0][x][y], rgbs[imageNo][1][x][y], rgbs[imageNo][2][x][y], col1, col2,
+        return getBlendedSmallPixel(
+                rgbs[imageNo][0][x][y],
+                rgbs[imageNo][1][x][y],
+                rgbs[imageNo][2][x][y],
+                col1,
+                col2,
                 col3);
     }
 
@@ -113,66 +119,37 @@ public class PatternStore {
     }
 
     public int getBlendedSmallPixel(int index, byte imageNo, int x, int y, int col1, int col2, int col3) {
-        return getBlendedSmallPixel(patterns.get(index)[imageNo][0][x][y], patterns.get(index)[imageNo][1][x][y],
-                patterns.get(index)[imageNo][2][x][y], col1, col2, col3);
+        return getBlendedSmallPixel(
+                patterns.get(index)[imageNo][0][x][y],
+                patterns.get(index)[imageNo][1][x][y],
+                patterns.get(index)[imageNo][2][x][y],
+                col1,
+                col2,
+                col3);
     }
 
-	/*
-     * public static void initialise(ResourceManager rm){
-	 * 
-	 * try{ InputStream inputstream = rm.func_110536_a(small_image).func_110527_b();
-	 * BufferedImage image = ImageIO.read(inputstream);
-	 * 
-	 * if(image != null){
-	 * 
-	 * small_col1 = new byte[IMAGES_X * IMAGES_Y][(image.getWidth() /
-	 * IMAGES_X)][(image.getHeight() / IMAGES_Y)]; small_col2 = new byte[IMAGES_X *
-	 * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / IMAGES_Y)];
-	 * small_col3 = new byte[IMAGES_X * IMAGES_Y][(image.getWidth() /
-	 * IMAGES_X)][(image.getHeight() / IMAGES_Y)];
-	 * 
-	 * for(int x = 0; x < image.getWidth(); x++){ for(int y = 0; y <
-	 * image.getHeight() / 2; y++){
-	 * 
-	 * int imageNo = (x / IMAGES_X) + IMAGES_X * (y / IMAGES_Y);
-	 * 
-	 * int rgb = image.getRGB(x,y); small_col1[imageNo][x][y] = (byte) ((rgb >> 16)
-	 * & 0x000000FF); small_col2[imageNo][x][y] = (byte) ((rgb >>8 ) & 0x000000FF);
-	 * small_col3[imageNo][x][y] = (byte) ((rgb) & 0x000000FF);
-	 * 
-	 * if(small_col1[imageNo][x][y] == 0 && small_col2[imageNo][x][y] == 0 &&
-	 * small_col3[imageNo][x][y] == 0){ small_col1[imageNo][x][y] = (byte)255;
-	 * 
-	 * } } } } }catch (Exception e){ e.printStackTrace();; } /* try{ InputStream
-	 * inputstream = rm.func_110536_a(large_image).func_110527_b(); BufferedImage
-	 * image = ImageIO.read(inputstream);
-	 * 
-	 * if(image != null){
-	 * 
-	 * large_col1 = new float[IMAGES_X * IMAGES_Y][(image.getWidth() /
-	 * IMAGES_X)][(image.getHeight() / (IMAGES_Y * 2))]; large_col2 = new
-	 * float[IMAGES_X * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight()
-	 * / (IMAGES_Y * 2))]; large_col3 = new float[IMAGES_X *
-	 * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / (IMAGES_Y *
-	 * 2))];
-	 * 
-	 * 
-	 * for(int x = 0; x < image.getWidth(); x++){ for(int y = 0; y <
-	 * image.getHeight() / 2; y++){
-	 * 
-	 * int imageNo = (x / IMAGES_X) + IMAGES_X * (y / (2*IMAGES_Y));
-	 * 
-	 * int rgb = image.getRGB(x,y); int red = (rgb >> 16) & 0x000000FF; int green =
-	 * (rgb >>8 ) & 0x000000FF; int blue = (rgb) & 0x000000FF;
-	 * 
-	 * if(red == 0 && green == 0 && blue == 0){ large_col1[imageNo][x][y] = 0F;
-	 * }else{ large_col1[imageNo][x][y] = (float)red / (float)(red + green + blue);
-	 * large_col2[imageNo][x][y] = (float)red / (float)(red + green + blue);
-	 * large_col3[imageNo][x][y] = (float)red / (float)(red + green + blue); } } } }
-	 * }catch (Exception e){ e.printStackTrace();; }
-	 * 
-	 * 
-	 * }
-	 */
+    /*
+     * public static void initialise(ResourceManager rm){ try{ InputStream inputstream =
+     * rm.func_110536_a(small_image).func_110527_b(); BufferedImage image = ImageIO.read(inputstream); if(image !=
+     * null){ small_col1 = new byte[IMAGES_X * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / IMAGES_Y)];
+     * small_col2 = new byte[IMAGES_X * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / IMAGES_Y)];
+     * small_col3 = new byte[IMAGES_X * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / IMAGES_Y)];
+     * for(int x = 0; x < image.getWidth(); x++){ for(int y = 0; y < image.getHeight() / 2; y++){ int imageNo = (x /
+     * IMAGES_X) + IMAGES_X * (y / IMAGES_Y); int rgb = image.getRGB(x,y); small_col1[imageNo][x][y] = (byte) ((rgb >>
+     * 16) & 0x000000FF); small_col2[imageNo][x][y] = (byte) ((rgb >>8 ) & 0x000000FF); small_col3[imageNo][x][y] =
+     * (byte) ((rgb) & 0x000000FF); if(small_col1[imageNo][x][y] == 0 && small_col2[imageNo][x][y] == 0 &&
+     * small_col3[imageNo][x][y] == 0){ small_col1[imageNo][x][y] = (byte)255; } } } } }catch (Exception e){
+     * e.printStackTrace();; } /* try{ InputStream inputstream = rm.func_110536_a(large_image).func_110527_b();
+     * BufferedImage image = ImageIO.read(inputstream); if(image != null){ large_col1 = new float[IMAGES_X *
+     * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / (IMAGES_Y * 2))]; large_col2 = new float[IMAGES_X *
+     * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / (IMAGES_Y * 2))]; large_col3 = new float[IMAGES_X *
+     * IMAGES_Y][(image.getWidth() / IMAGES_X)][(image.getHeight() / (IMAGES_Y * 2))]; for(int x = 0; x <
+     * image.getWidth(); x++){ for(int y = 0; y < image.getHeight() / 2; y++){ int imageNo = (x / IMAGES_X) + IMAGES_X *
+     * (y / (2*IMAGES_Y)); int rgb = image.getRGB(x,y); int red = (rgb >> 16) & 0x000000FF; int green = (rgb >>8 ) &
+     * 0x000000FF; int blue = (rgb) & 0x000000FF; if(red == 0 && green == 0 && blue == 0){ large_col1[imageNo][x][y] =
+     * 0F; }else{ large_col1[imageNo][x][y] = (float)red / (float)(red + green + blue); large_col2[imageNo][x][y] =
+     * (float)red / (float)(red + green + blue); large_col3[imageNo][x][y] = (float)red / (float)(red + green + blue); }
+     * } } } }catch (Exception e){ e.printStackTrace();; } }
+     */
 
 }

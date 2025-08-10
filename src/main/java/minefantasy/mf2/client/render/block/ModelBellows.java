@@ -6,11 +6,12 @@ import net.minecraft.entity.Entity;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelBellows extends ModelBase {
+
     // fields
     ModelRenderer Flap4;
     ModelRenderer Handle;

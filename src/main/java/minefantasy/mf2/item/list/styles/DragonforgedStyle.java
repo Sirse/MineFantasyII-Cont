@@ -1,5 +1,9 @@
 package minefantasy.mf2.item.list.styles;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item.ToolMaterial;
+import net.minecraftforge.common.util.EnumHelper;
+
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.item.archery.EnumBowType;
@@ -12,11 +16,9 @@ import minefantasy.mf2.item.tool.*;
 import minefantasy.mf2.item.tool.advanced.*;
 import minefantasy.mf2.item.tool.crafting.*;
 import minefantasy.mf2.item.weapon.*;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraftforge.common.util.EnumHelper;
 
 public class DragonforgedStyle {
+
     public static ToolMaterial dragonforged = EnumHelper.addToolMaterial("dragonforged", 2, 250, 6.0F, 2.0F, 15);
 
     public static ItemWeaponMF dragonforged_sword, dragonforged_waraxe, dragonforged_mace, dragonforged_dagger,
@@ -123,41 +125,121 @@ public class DragonforgedStyle {
         dragonforged_spanner = (ItemSpanner) new ItemSpanner(design + "_spanner", 0, 0).setCustom(design)
                 .setCreativeTab(tab);
 
-        dragonforged_chain_helmet = (ItemCustomArmour) new ItemCustomArmour(design, "chain_helmet",
-                ArmourDesign.CHAINMAIL, 0, "chain_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_chain_chest = (ItemCustomArmour) new ItemCustomArmour(design, "chain_chest",
-                ArmourDesign.CHAINMAIL, 1, "chain_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_chain_legs = (ItemCustomArmour) new ItemCustomArmour(design, "chain_legs", ArmourDesign.CHAINMAIL,
-                2, "chain_layer_2", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_chain_boots = (ItemCustomArmour) new ItemCustomArmour(design, "chain_boots",
-                ArmourDesign.CHAINMAIL, 3, "chain_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_chain_helmet = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "chain_helmet",
+                ArmourDesign.CHAINMAIL,
+                0,
+                "chain_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_chain_chest = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "chain_chest",
+                ArmourDesign.CHAINMAIL,
+                1,
+                "chain_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_chain_legs = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "chain_legs",
+                ArmourDesign.CHAINMAIL,
+                2,
+                "chain_layer_2",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_chain_boots = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "chain_boots",
+                ArmourDesign.CHAINMAIL,
+                3,
+                "chain_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
 
-        dragonforged_scale_helmet = (ItemCustomArmour) new ItemCustomArmour(design, "scale_helmet",
-                ArmourDesign.SCALEMAIL, 0, "scale_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_scale_chest = (ItemCustomArmour) new ItemCustomArmour(design, "scale_chest",
-                ArmourDesign.SCALEMAIL, 1, "scale_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_scale_legs = (ItemCustomArmour) new ItemCustomArmour(design, "scale_legs", ArmourDesign.SCALEMAIL,
-                2, "scale_layer_2", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_scale_boots = (ItemCustomArmour) new ItemCustomArmour(design, "scale_boots",
-                ArmourDesign.SCALEMAIL, 3, "scale_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_scale_helmet = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "scale_helmet",
+                ArmourDesign.SCALEMAIL,
+                0,
+                "scale_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_scale_chest = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "scale_chest",
+                ArmourDesign.SCALEMAIL,
+                1,
+                "scale_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_scale_legs = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "scale_legs",
+                ArmourDesign.SCALEMAIL,
+                2,
+                "scale_layer_2",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_scale_boots = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "scale_boots",
+                ArmourDesign.SCALEMAIL,
+                3,
+                "scale_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
 
-        dragonforged_splint_helmet = (ItemCustomArmour) new ItemCustomArmour(design, "splint_helmet",
-                ArmourDesign.SPLINTMAIL, 0, "splint_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_splint_chest = (ItemCustomArmour) new ItemCustomArmour(design, "splint_chest",
-                ArmourDesign.SPLINTMAIL, 1, "splint_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_splint_legs = (ItemCustomArmour) new ItemCustomArmour(design, "splint_legs",
-                ArmourDesign.SPLINTMAIL, 2, "splint_layer_2", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_splint_boots = (ItemCustomArmour) new ItemCustomArmour(design, "splint_boots",
-                ArmourDesign.SPLINTMAIL, 3, "splint_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_splint_helmet = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "splint_helmet",
+                ArmourDesign.SPLINTMAIL,
+                0,
+                "splint_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_splint_chest = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "splint_chest",
+                ArmourDesign.SPLINTMAIL,
+                1,
+                "splint_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_splint_legs = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "splint_legs",
+                ArmourDesign.SPLINTMAIL,
+                2,
+                "splint_layer_2",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_splint_boots = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "splint_boots",
+                ArmourDesign.SPLINTMAIL,
+                3,
+                "splint_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
 
-        dragonforged_plate_helmet = (ItemCustomArmour) new ItemCustomArmour(design, "plate_helmet",
-                ArmourDesign.FIELDPLATE, 0, "plate_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_plate_chest = (ItemCustomArmour) new ItemCustomArmour(design, "plate_chest",
-                ArmourDesign.FIELDPLATE, 1, "plate_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_plate_legs = (ItemCustomArmour) new ItemCustomArmour(design, "plate_legs", ArmourDesign.FIELDPLATE,
-                2, "plate_layer_2", 0).modifyRating(ratingMod).setCreativeTab(tab);
-        dragonforged_plate_boots = (ItemCustomArmour) new ItemCustomArmour(design, "plate_boots",
-                ArmourDesign.FIELDPLATE, 3, "plate_layer_1", 0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_plate_helmet = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "plate_helmet",
+                ArmourDesign.FIELDPLATE,
+                0,
+                "plate_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_plate_chest = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "plate_chest",
+                ArmourDesign.FIELDPLATE,
+                1,
+                "plate_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_plate_legs = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "plate_legs",
+                ArmourDesign.FIELDPLATE,
+                2,
+                "plate_layer_2",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
+        dragonforged_plate_boots = (ItemCustomArmour) new ItemCustomArmour(
+                design,
+                "plate_boots",
+                ArmourDesign.FIELDPLATE,
+                3,
+                "plate_layer_1",
+                0).modifyRating(ratingMod).setCreativeTab(tab);
     }
 
     public static void loadCrafting() {

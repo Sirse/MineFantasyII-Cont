@@ -1,8 +1,5 @@
 package minefantasy.mf2.client.gui;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.knowledge.InformationBase;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -10,11 +7,17 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.knowledge.InformationBase;
+
 @SideOnly(Side.CLIENT)
 public class GuiDiscovery extends Gui {
+
     private static final ResourceLocation field_146261_a = new ResourceLocation(
             "textures/gui/achievement/achievement_background.png");
     private Minecraft field_146259_f;
@@ -56,7 +59,9 @@ public class GuiDiscovery extends Gui {
         GL11.glLoadIdentity();
         this.field_146260_g = this.field_146259_f.displayWidth;
         this.field_146267_h = this.field_146259_f.displayHeight;
-        ScaledResolution scaledresolution = new ScaledResolution(this.field_146259_f, this.field_146259_f.displayWidth,
+        ScaledResolution scaledresolution = new ScaledResolution(
+                this.field_146259_f,
+                this.field_146259_f.displayWidth,
                 this.field_146259_f.displayHeight);
         this.field_146260_g = scaledresolution.getScaledWidth();
         this.field_146267_h = scaledresolution.getScaledHeight();
@@ -120,8 +125,12 @@ public class GuiDiscovery extends Gui {
             GL11.glEnable(GL12.GL_RESCALE_NORMAL);
             GL11.glEnable(GL11.GL_COLOR_MATERIAL);
             GL11.glEnable(GL11.GL_LIGHTING);
-            this.field_146264_m.renderItemAndEffectIntoGUI(this.field_146259_f.fontRenderer,
-                    this.field_146259_f.getTextureManager(), this.field_146266_k.theItemStack, i + 8, j + 8);
+            this.field_146264_m.renderItemAndEffectIntoGUI(
+                    this.field_146259_f.fontRenderer,
+                    this.field_146259_f.getTextureManager(),
+                    this.field_146266_k.theItemStack,
+                    i + 8,
+                    j + 8);
             GL11.glDisable(GL11.GL_LIGHTING);
             GL11.glDepthMask(true);
             GL11.glEnable(GL11.GL_DEPTH_TEST);

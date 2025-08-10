@@ -1,15 +1,8 @@
 package minefantasy.mf2.item.heatable;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.heating.Heatable;
-import minefantasy.mf2.api.heating.IHotItem;
-import minefantasy.mf2.api.heating.TongsHelper;
-import minefantasy.mf2.api.helpers.GuiHelper;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.util.MFLogUtil;
+import java.awt.*;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -23,10 +16,19 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-import java.awt.*;
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.heating.IHotItem;
+import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.helpers.GuiHelper;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class ItemHeated extends Item implements IHotItem {
+
     public static boolean renderDynamicHotIngotRendering = true;
 
     public ItemHeated() {
@@ -125,13 +127,11 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     public static boolean showTemp(ItemStack stack) {
-        if (stack == null)
-            return false;
+        if (stack == null) return false;
 
         NBTTagCompound nbt = getNBT(stack);
 
-        if (nbt == null)
-            return false;
+        if (nbt == null) return false;
 
         if (nbt.hasKey(Heatable.NBT_ShouldDisplay)) {
             return nbt.getBoolean(Heatable.NBT_ShouldDisplay);
@@ -140,8 +140,7 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound())
-            item.setTagCompound(new NBTTagCompound());
+        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
         return item.getTagCompound();
     }
 
@@ -150,16 +149,14 @@ public class ItemHeated extends Item implements IHotItem {
         String name = "";
 
         ItemStack item = getItem(stack);
-        if (item != null)
-            name = item.getItem().getItemStackDisplayName(item);
+        if (item != null) name = item.getItem().getItemStackDisplayName(item);
         return StatCollector.translateToLocalFormatted("prefix.hotitem.name", name);
     }
 
     @Override
     public EnumRarity getRarity(ItemStack stack) {
         ItemStack item = getItem(stack);
-        if (item != null)
-            return item.getItem().getRarity(item);
+        if (item != null) return item.getItem().getRarity(item);
 
         return EnumRarity.common;
     }
@@ -170,15 +167,13 @@ public class ItemHeated extends Item implements IHotItem {
 
         if (item != null) {
             item.getItem().addInformation(item, player, list, b);
-        } else
-            super.addInformation(stack, player, list, b);
+        } else super.addInformation(stack, player, list, b);
 
         NBTTagCompound nbt = getNBT(stack);
         if (nbt.hasKey(Heatable.NBT_ShouldDisplay)) {
             if (nbt.getBoolean(Heatable.NBT_ShouldDisplay)) {
                 list.add(getHeatString(stack));
-                if (!getWorkString(item, stack).equals(""))
-                    list.add(getWorkString(item, stack));
+                if (!getWorkString(item, stack).equals("")) list.add(getWorkString(item, stack));
             }
         }
     }
@@ -246,8 +241,7 @@ public class ItemHeated extends Item implements IHotItem {
 
                     if (Heatable.HCCquenchRuin) {
                         float damageDone = 50F + (water > 0F ? water : 0F);
-                        if (damageDone > 99F)
-                            damageDone = 99F;
+                        if (damageDone > 99F) damageDone = 99F;
 
                         if (drop.isItemStackDamageable()) {
                             drop.setItemDamage((int) (drop.getMaxDamage() * damageDone / 100F));
@@ -307,18 +301,14 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     private int getRedOnHeat(double percent) {
-        if (percent <= 0)
-            return 255;
+        if (percent <= 0) return 255;
         return 255;
     }
 
     private int getGreenOnHeat(double percent) {
-        if (percent <= 0)
-            return 255;
-        if (percent > 100)
-            percent = 100;
-        if (percent < 0)
-            percent = 0;
+        if (percent <= 0) return 255;
+        if (percent > 100) percent = 100;
+        if (percent < 0) percent = 0;
 
         if (percent <= 55) {
             return (int) (255 - ((255 / 55) * percent));
@@ -328,13 +318,10 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     private int getBlueOnHeat(double percent) {
-        if (percent <= 0)
-            return 255;
+        if (percent <= 0) return 255;
 
-        if (percent > 100)
-            percent = 100;
-        if (percent < 0)
-            percent = 0;
+        if (percent > 100) percent = 100;
+        if (percent < 0) percent = 0;
 
         if (percent <= 55) {
             return (int) (255 - ((255 / 55) * percent));

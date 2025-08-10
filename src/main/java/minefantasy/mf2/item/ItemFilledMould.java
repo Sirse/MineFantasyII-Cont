@@ -1,9 +1,7 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.heating.TongsHelper;
-import minefantasy.mf2.item.list.ComponentListMF;
+import java.util.List;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -11,7 +9,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.List;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class ItemFilledMould extends ItemComponentMF {
 
@@ -112,8 +113,7 @@ public class ItemFilledMould extends ItemComponentMF {
 
     private void dropItem(World world, double i, double j, double k, ItemStack drop, boolean delay) {
         EntityItem entity = new EntityItem(world, i, j, k, drop);
-        if (delay)
-            entity.delayBeforeCanPickup = 20;
+        if (delay) entity.delayBeforeCanPickup = 20;
         entity.motionX = entity.motionY = entity.motionZ = 0F;
         world.spawnEntityInWorld(entity);
     }

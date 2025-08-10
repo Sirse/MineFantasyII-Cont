@@ -12,8 +12,14 @@ public class HeraldryData {
     public static final int BLUE = 3;
     public static final int MAX_CRESTS = 6;
     private static final int extraDataSize = 6;
-    public static final HeraldryData defaultData = new HeraldryData(0, (byte) 0, Color.YELLOW.getRGB(),
-            Color.BLUE.getRGB(), Color.BLACK.getRGB(), new ArrayList<Crest>(), new byte[extraDataSize]);
+    public static final HeraldryData defaultData = new HeraldryData(
+            0,
+            (byte) 0,
+            Color.YELLOW.getRGB(),
+            Color.BLUE.getRGB(),
+            Color.BLACK.getRGB(),
+            new ArrayList<Crest>(),
+            new byte[extraDataSize]);
     private int storageIndex;
     private byte pattern;
     private int[] patternColours;
@@ -22,10 +28,10 @@ public class HeraldryData {
     private List<Crest> crests;
 
     public HeraldryData(int patternStoreIndex, byte pattern, int pattern_col_1, int pattern_col_2, int pattern_col_3,
-                        List<Crest> crests, byte[] extraData) {
+            List<Crest> crests, byte[] extraData) {
         this.storageIndex = patternStoreIndex;
         this.pattern = pattern;
-        this.patternColours = new int[]{pattern_col_1, pattern_col_2, pattern_col_3};
+        this.patternColours = new int[] { pattern_col_1, pattern_col_2, pattern_col_3 };
         this.crests = crests;
         this.extraData = extraData;
     }
@@ -38,7 +44,7 @@ public class HeraldryData {
 
             storageIndex = input.readInt();
             pattern = input.readByte();
-            patternColours = new int[]{input.readInt(), input.readInt(), input.readInt()};
+            patternColours = new int[] { input.readInt(), input.readInt(), input.readInt() };
             byte crestCount = input.readByte();
             crests = new ArrayList<Crest>(crestCount);
             for (int i = 0; i < crestCount; i++) {
@@ -69,8 +75,7 @@ public class HeraldryData {
 
     public static String byteArrayToHex(byte[] a) {
         StringBuilder sb = new StringBuilder();
-        for (byte b : a)
-            sb.append(String.format("%02x", b & 0xff));
+        for (byte b : a) sb.append(String.format("%02x", b & 0xff));
         return sb.toString();
     }
 
@@ -151,7 +156,13 @@ public class HeraldryData {
 
     @Override
     public HeraldryData clone() {
-        return new HeraldryData(storageIndex, pattern, patternColours[0], patternColours[1], patternColours[2], crests,
+        return new HeraldryData(
+                storageIndex,
+                pattern,
+                patternColours[0],
+                patternColours[1],
+                patternColours[2],
+                crests,
                 extraData);
     }
 }

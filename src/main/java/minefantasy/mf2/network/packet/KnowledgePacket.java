@@ -1,16 +1,18 @@
 package minefantasy.mf2.network.packet;
 
+import java.util.ArrayList;
+
+import net.minecraft.entity.player.EntityPlayer;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-
-import java.util.ArrayList;
 
 public class KnowledgePacket extends PacketMF {
+
     public static final String packetName = "MF2_KnowledgeSync";
     private EntityPlayer user;
     private String username;
@@ -20,8 +22,7 @@ public class KnowledgePacket extends PacketMF {
         this.user = user;
     }
 
-    public KnowledgePacket() {
-    }
+    public KnowledgePacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
@@ -33,7 +34,7 @@ public class KnowledgePacket extends PacketMF {
 
             InformationBase base = InformationList.knowledgeList.get(a);
             if (base != null) {
-                completed.add(new Object[]{base, unlocked, artefactCount});
+                completed.add(new Object[] { base, unlocked, artefactCount });
             }
         }
         username = ByteBufUtils.readUTF8String(packet);

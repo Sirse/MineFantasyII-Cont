@@ -1,5 +1,12 @@
 package minefantasy.mf2.network;
 
+import java.util.Random;
+
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.IGuiHandler;
@@ -23,17 +30,12 @@ import minefantasy.mf2.integration.minetweaker.MTCompat;
 import minefantasy.mf2.item.archery.ArrowFireFlint;
 import minefantasy.mf2.item.archery.ArrowFirerMF;
 import minefantasy.mf2.mechanics.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-
-import java.util.Random;
 
 /**
  * @author Anonymous Productions
  */
 public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
+
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
         return null;
@@ -131,8 +133,7 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
         GameRegistry.registerTileEntity(TileEntityRoad.class, "MF_Road");
     }
 
-    public void preInit() {
-    }
+    public void preInit() {}
 
     public void registerTickHandlers() {
         FMLCommonHandler.instance().bus().register(new PlayerTickHandlerMF());

@@ -1,13 +1,14 @@
 package minefantasy.mf2.api.heating;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ForgeItemHandler {
+
     public static List<ForgeFuel> forgeFuel = new ArrayList();
     public static int forgeMaxTemp = 0;
 
@@ -16,8 +17,7 @@ public class ForgeItemHandler {
     }
 
     public static ForgeFuel getStats(ItemStack item) {
-        if (item == null)
-            return null;
+        if (item == null) return null;
 
         for (ForgeFuel fuel : forgeFuel) {
             if (fuel != null) {
@@ -39,8 +39,7 @@ public class ForgeItemHandler {
      * @return The amount of smelts it has(will not consume if its 0)
      */
     public static float getForgeFuel(ItemStack item) {
-        if (item == null)
-            return 0;
+        if (item == null) return 0;
 
         for (ForgeFuel fuel : forgeFuel) {
             if (fuel != null) {
@@ -97,8 +96,7 @@ public class ForgeItemHandler {
      * @return The amount of smelts it has(will not consume if its 0)
      */
     public static int getForgeHeat(ItemStack item) {
-        if (item == null)
-            return 0;
+        if (item == null) return 0;
 
         for (ForgeFuel fuel : forgeFuel) {
             if (fuel != null) {

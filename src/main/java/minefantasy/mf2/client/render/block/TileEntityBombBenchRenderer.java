@@ -1,23 +1,26 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
- * <p>
- * Custom renderers based off render tutorial by MC_DucksAreBest
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
+ *         <p>
+ *         Custom renderers based off render tutorial by MC_DucksAreBest
  */
 public class TileEntityBombBenchRenderer extends TileEntitySpecialRenderer {
+
     private ModelBombBench model;
     private Random random = new Random();
 

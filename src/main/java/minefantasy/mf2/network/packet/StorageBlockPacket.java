@@ -1,15 +1,17 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.tileentity.TileEntityComponent;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 
 public class StorageBlockPacket extends PacketMF {
+
     public static final String packetName = "MF2_StoragePkt";
     private int[] coords = new int[3];
     private ItemStack component;
@@ -17,7 +19,7 @@ public class StorageBlockPacket extends PacketMF {
     private int stackSize, max;
 
     public StorageBlockPacket(TileEntityComponent tile) {
-        this.coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        this.coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         this.type = tile.type;
         this.tex = tile.tex;
         this.materialName = tile.material != null ? tile.material.name : "steel";
@@ -26,8 +28,7 @@ public class StorageBlockPacket extends PacketMF {
         this.max = tile.max;
     }
 
-    public StorageBlockPacket() {
-    }
+    public StorageBlockPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

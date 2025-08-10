@@ -1,9 +1,7 @@
 package minefantasy.mf2.mechanics;
 
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -13,7 +11,10 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
-import java.util.List;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
+import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 public class ExtendedReachMF {
 
@@ -36,8 +37,8 @@ public class ExtendedReachMF {
                         Entity target = mouseOver.entityHit;
                         if (target instanceof EntityLiving && target != entityPlayer) {
                             if (target.hurtResistantTime != ((EntityLiving) target).maxHurtResistantTime) {
-                                FMLClientHandler.instance().getClient().playerController.attackEntity(entityPlayer,
-                                        target);
+                                FMLClientHandler.instance().getClient().playerController
+                                        .attackEntity(entityPlayer, target);
                             }
                         }
                     }
@@ -64,7 +65,8 @@ public class ExtendedReachMF {
                 Vec3 vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
                 Entity pointedEntity = null;
                 float f1 = 1.0F;
-                List list = mc.theWorld.getEntitiesWithinAABBExcludingEntity(mc.renderViewEntity,
+                List list = mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+                        mc.renderViewEntity,
                         mc.renderViewEntity.boundingBox
                                 .addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0).expand(f1, f1, f1));
                 double d2 = d1;

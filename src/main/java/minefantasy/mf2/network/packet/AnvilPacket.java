@@ -1,13 +1,15 @@
 package minefantasy.mf2.network.packet;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 import minefantasy.mf2.network.NetworkUtils;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 
 public class AnvilPacket extends PacketMF {
+
     public static final String packetName = "MF2_AnvilPacket";
     private int[] coords = new int[3];
     private String toolNeeded;
@@ -16,19 +18,18 @@ public class AnvilPacket extends PacketMF {
     private int[] tiers = new int[2];
 
     public AnvilPacket(TileEntityAnvilMF tile) {
-        coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         toolNeeded = tile.getToolNeeded();
         research = tile.getResearchNeeded();
-        floats = new float[]{tile.progress, tile.progressMax, tile.qualityBalance, tile.thresholdPosition,
-                tile.leftHit, tile.rightHit};
-        tiers = new int[]{tile.getToolTierNeeded(), tile.getAnvilTierNeeded()};
+        floats = new float[] { tile.progress, tile.progressMax, tile.qualityBalance, tile.thresholdPosition,
+                tile.leftHit, tile.rightHit };
+        tiers = new int[] { tile.getToolTierNeeded(), tile.getAnvilTierNeeded() };
         if (floats[1] <= 0) {
             floats[1] = 0;
         }
     }
 
-    public AnvilPacket() {
-    }
+    public AnvilPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

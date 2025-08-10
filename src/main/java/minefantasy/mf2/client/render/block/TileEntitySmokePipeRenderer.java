@@ -1,20 +1,22 @@
 package minefantasy.mf2.client.render.block;
 
-import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.tileentity.TileEntityChimney;
+import java.util.Random;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.tileentity.TileEntityChimney;
 
 public class TileEntitySmokePipeRenderer extends TileEntitySpecialRenderer {
+
     private static ModelSmokePipe model = new ModelSmokePipe();
     private Random random = new Random();
 
-    public TileEntitySmokePipeRenderer() {
-    }
+    public TileEntitySmokePipeRenderer() {}
 
     public void renderAModelAt(TileEntityChimney tile, double d, double d1, double d2, float f) {
         if (tile != null && !tile.isPipeChimney()) {

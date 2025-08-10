@@ -1,16 +1,18 @@
 package minefantasy.mf2.block.tileentity.decor;
 
-import minefantasy.mf2.api.heating.IQuenchBlock;
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TroughPacket;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.heating.IQuenchBlock;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.TroughPacket;
+
 public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBlock {
+
     public static int capacityScale = 8;
     public int fill;
     private int ticksExisted;
@@ -115,10 +117,13 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
     }
 
     public void syncData() {
-        if (worldObj.isRemote)
-            return;
+        if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(new TroughPacket(this).generatePacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(
+                new TroughPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
         super.sendPacketToClient();
     }
 

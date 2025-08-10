@@ -1,16 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.crafting.IBasicMetre;
-import minefantasy.mf2.api.crafting.IHeatSource;
-import minefantasy.mf2.api.crafting.IHeatUser;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.Functions;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.SkillList;
-import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.item.EntityItem;
@@ -28,9 +19,20 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 
-import java.util.Random;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.crafting.IHeatSource;
+import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Functions;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.SkillList;
+import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatSource {
+
     private final int maxFuel = 12000; // 10 minutes
     public int fuel = 0;
     private float charcoal = 0;
@@ -47,8 +49,7 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
             return 0;
         } else {
             Item i = input.getItem();
-            if (i == Items.stick)
-                return 600;// 30Sec
+            if (i == Items.stick) return 600;// 30Sec
             if (i == ComponentListMF.plank || i == ComponentListMF.plank_cut) {
                 return (int) (200 * CustomToolHelper.getBurnModifier(input));
             }
@@ -119,7 +120,10 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     }
 
     private void tryLight() {
-        if (isFire(-1, 0, 0) || isFire(1, 0, 0) || isFire(0, 0, -1) || isFire(0, 0, 1) || isFire(0, -1, 0)
+        if (isFire(-1, 0, 0) || isFire(1, 0, 0)
+                || isFire(0, 0, -1)
+                || isFire(0, 0, 1)
+                || isFire(0, -1, 0)
                 || isFire(0, 1, 0)) {
             setLit(true);
         }
@@ -215,11 +219,22 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     }
 
     public void extinguish(Block block, int meta) {
-        worldObj.playSoundEffect(xCoord + 0.5F, yCoord + 0.25F, zCoord + 0.5F, "random.fizz", 0.4F,
+        worldObj.playSoundEffect(
+                xCoord + 0.5F,
+                yCoord + 0.25F,
+                zCoord + 0.5F,
+                "random.fizz",
+                0.4F,
                 2.0F + this.rand.nextFloat() * 0.4F);
         worldObj.spawnParticle("largesmoke", xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 0.0D, 0.0D, 0.0D);
-        worldObj.spawnParticle("tilecrack_" + block + "_" + meta, xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 0.0D,
-                0.0D, 0.0D);
+        worldObj.spawnParticle(
+                "tilecrack_" + block + "_" + meta,
+                xCoord + 0.5D,
+                yCoord + 0.5D,
+                zCoord + 0.5D,
+                0.0D,
+                0.0D,
+                0.0D);
 
         setLit(false);
     }
@@ -258,8 +273,7 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     }
 
     public boolean hasBlockAbove() {
-        if (worldObj == null)
-            return false;
+        if (worldObj == null) return false;
 
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
         if (tile != null && tile instanceof IHeatUser) {

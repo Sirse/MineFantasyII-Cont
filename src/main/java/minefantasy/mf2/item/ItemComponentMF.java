@@ -1,15 +1,9 @@
 package minefantasy.mf2.item;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.crafting.ITieredComponent;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.decor.BlockComponent;
-import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.item.list.CreativeTabMF;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,14 +15,22 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.crafting.ITieredComponent;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemComponentMF extends Item implements ITieredComponent {
+
     protected String name;
     protected int itemRarity;
     // STORAGE
@@ -37,13 +39,9 @@ public class ItemComponentMF extends Item implements ITieredComponent {
 
     /*
      * private int itemRarity;
-     *
-     * @Override public EnumRarity getRarity(ItemStack item) { int lvl =
-     * itemRarity+1;
-     *
-     * if(item.isItemEnchanted()) { if(lvl == 0) { lvl++; } lvl ++; } if(lvl >=
-     * ToolListMF.rarity.length) { lvl = ToolListMF.rarity.length-1; } return
-     * ToolListMF.rarity[lvl]; }
+     * @Override public EnumRarity getRarity(ItemStack item) { int lvl = itemRarity+1; if(item.isItemEnchanted()) {
+     * if(lvl == 0) { lvl++; } lvl ++; } if(lvl >= ToolListMF.rarity.length) { lvl = ToolListMF.rarity.length-1; }
+     * return ToolListMF.rarity[lvl]; }
      */
     // ===================================================== CUSTOM START
     // =============================================================\\
@@ -211,8 +209,11 @@ public class ItemComponentMF extends Item implements ITieredComponent {
 
         super.addInformation(item, user, list, extra);
         if (isCustom) {
-            CustomToolHelper.addComponentString(item, list,
-                    CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main), this.unitCount);
+            CustomToolHelper.addComponentString(
+                    item,
+                    list,
+                    CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main),
+                    this.unitCount);
         }
     }
 
@@ -264,8 +265,7 @@ public class ItemComponentMF extends Item implements ITieredComponent {
         // super.getColorFromItemStack(item, layer));
         if (isCustom) {
             CustomMaterial mat = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
-            if (mat != null)
-                return mat.getColourInt();
+            if (mat != null) return mat.getColourInt();
         }
         return super.getColorFromItemStack(item, layer);
     }
@@ -314,8 +314,7 @@ public class ItemComponentMF extends Item implements ITieredComponent {
             if (movingobjectposition == null) {
                 return item;
             } else {
-                int placed = BlockComponent.useComponent(item, storageType, blocktex, world, user,
-                        movingobjectposition);
+                int placed = BlockComponent.useComponent(item, storageType, blocktex, user, movingobjectposition);
                 if (placed > 0) {
                     item.stackSize -= placed;
                     return item;

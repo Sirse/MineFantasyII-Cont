@@ -1,15 +1,17 @@
 package minefantasy.mf2.item.armour;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.ItemStack;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.config.ConfigClient;
 import minefantasy.mf2.material.BaseMaterialMF;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 
 public class ItemClothingMF extends ItemArmourMF {
+
     @SideOnly(Side.CLIENT)
     private Object model;
 
@@ -33,7 +35,7 @@ public class ItemClothingMF extends ItemArmourMF {
     @Override
     @SideOnly(Side.CLIENT)
     public net.minecraft.client.model.ModelBiped getArmorModel(EntityLivingBase entityLiving, ItemStack itemStack,
-                                                               int armorSlot) {
+            int armorSlot) {
 
         if (!ConfigClient.customModel) {
             return super.getArmorModel(entityLiving, itemStack, armorSlot);

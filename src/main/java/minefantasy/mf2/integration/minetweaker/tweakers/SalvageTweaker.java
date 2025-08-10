@@ -1,12 +1,13 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.Salvage;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -19,6 +20,7 @@ public class SalvageTweaker {
     }
 
     private static class AddSalvageAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
 

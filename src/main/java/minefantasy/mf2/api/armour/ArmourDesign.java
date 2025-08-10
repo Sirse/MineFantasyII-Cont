@@ -3,6 +3,7 @@ package minefantasy.mf2.api.armour;
 import java.util.HashMap;
 
 public class ArmourDesign {
+
     public static HashMap<String, ArmourDesign> designs = new HashMap<String, ArmourDesign>();
 
     public static final String light = "light";
@@ -57,8 +58,7 @@ public class ArmourDesign {
     /**
      * @param register The string that it is registered under (For config)
      * @param name     The name of the Design
-     * @param prot     The protection against basic damage (1.0F = normal protection for
-     *                 tier)
+     * @param prot     The protection against basic damage (1.0F = normal protection for tier)
      * @param dura     The durability modifier
      * @param weight   the weight in Kg of the suit
      * @param bulk     the bulk of the suit (1.0 = plate, 0.5 = splint, etc)
@@ -102,7 +102,7 @@ public class ArmourDesign {
     }
 
     public float[] getProtectiveTraits() {
-        return new float[]{cuttingModifier, bluntModifier, piercingModifier};
+        return new float[] { cuttingModifier, bluntModifier, piercingModifier };
     }
 
     public float getBulk() {

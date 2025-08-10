@@ -1,5 +1,20 @@
 package minefantasy.mf2.entity.mob;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockCrops;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.*;
+import net.minecraft.entity.ai.*;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.World;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.armour.IArmourPenetrationMob;
@@ -16,29 +31,16 @@ import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.list.styles.OrnateStyle;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockCrops;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.World;
 
 public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob, ISpecialCombatMob {
+
     private static final int dataID = 12;
     public int swing;
     private int grabCooldown;
     private int hitCooldownTime;
     private int specialAttackTime;
-    private float[] punch = new float[]{0F, 1F, 0F};
-    private float[] headbutt = new float[]{0F, 1F, 4F};
+    private float[] punch = new float[] { 0F, 1F, 0F };
+    private float[] headbutt = new float[] { 0F, 1F, 4F };
 
     public EntityMinotaur(World world) {
         super(world);
@@ -94,10 +96,10 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         if (getTier() == 3) {
             return OrnateStyle.ornate_greatsword;
         }
-        ItemWeaponMF[] list = new ItemWeaponMF[]{CustomToolListMF.standard_greatsword,
+        ItemWeaponMF[] list = new ItemWeaponMF[] { CustomToolListMF.standard_greatsword,
                 CustomToolListMF.standard_katana, CustomToolListMF.standard_battleaxe,
                 CustomToolListMF.standard_warhammer, CustomToolListMF.standard_spear,
-                CustomToolListMF.standard_halbeard};
+                CustomToolListMF.standard_halbeard };
         return list[rand.nextInt(list.length)];
     }
 
@@ -153,8 +155,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
                     }
                 }
             }
-            if (hitCooldownTime > 0)
-                --hitCooldownTime;
+            if (hitCooldownTime > 0) --hitCooldownTime;
             if (grabCooldown > 0) {
                 --grabCooldown;
             }
@@ -173,22 +174,31 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
 
                 if (intLvl > 0)// Smarter means more likely
                 {
-                    if (getAttack() != 2 && rand.nextInt(10) < intLvl && onGround && target instanceof EntityPlayer
-                            && ((EntityPlayer) target).isBlocking() && this.getDistanceToEntity(target) < 4F) {
+                    if (getAttack() != 2 && rand.nextInt(10) < intLvl
+                            && onGround
+                            && target instanceof EntityPlayer
+                            && ((EntityPlayer) target).isBlocking()
+                            && this.getDistanceToEntity(target) < 4F) {
                         this.jump();
                         this.initPowerAttack();
                     }
                 } else {
-                    if (getRageLevel() > 40 && getAttack() != 2 && rand.nextInt(50) == 0 && onGround
-                            && target instanceof EntityPlayer && ((EntityPlayer) target).isBlocking()
+                    if (getRageLevel() > 40 && getAttack() != 2
+                            && rand.nextInt(50) == 0
+                            && onGround
+                            && target instanceof EntityPlayer
+                            && ((EntityPlayer) target).isBlocking()
                             && this.getDistanceToEntity(target) < 4F) {
                         this.jump();
                         this.initPowerAttack();
                     }
                 }
                 double distance = this.getDistanceSqToEntity(target);
-                if (!TacticalManager.isFlankedBy(target, this, 270) && distance > 6 && distance < 12
-                        && rand.nextInt(50) == 0 && this.getAttack() == (byte) 0 && this.getMinotaur().throwsBombs) {
+                if (!TacticalManager.isFlankedBy(target, this, 270) && distance > 6
+                        && distance < 12
+                        && rand.nextInt(50) == 0
+                        && this.getAttack() == (byte) 0
+                        && this.getMinotaur().throwsBombs) {
                     this.throwBomb(target, 1.0F);
                 }
 
@@ -247,12 +257,12 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
             worldObj.setBlockMetadataWithNotify((int) posX, (int) posY, (int) posZ, 1, 2);
         } else if (worldObj.getBlock((int) posX, (int) posY, (int) posZ) instanceof BlockCrops
                 && worldObj.getBlockMetadata((int) posX, (int) posY, (int) posZ) > 0) {
-            worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "random.eat", 1.0F, 0.75F);
-            worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "dig.grass", 1.0F, 1.00F);
-            swingItem();
-            heal(5);
-            worldObj.setBlockToAir((int) posX, (int) posY, (int) posZ);
-        }
+                    worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "random.eat", 1.0F, 0.75F);
+                    worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "dig.grass", 1.0F, 1.00F);
+                    swingItem();
+                    heal(5);
+                    worldObj.setBlockToAir((int) posX, (int) posY, (int) posZ);
+                }
     }
 
     @Override
@@ -416,7 +426,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
      * Cutting, Blunt, Piercing
      */
     private float[] getValueResistences() {
-        return new float[]{0.75F, 1F, 0.5F};
+        return new float[] { 0.75F, 1F, 0.5F };
     }
 
     /**
@@ -525,8 +535,10 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
             grabCooldown = 60;
             TacticalManager.knockbackEntity(target, this, 4F, 1F);
         }
-        if (getAttack() == 3 && fallDistance > 0 && target instanceof EntityPlayer
-                && ((EntityPlayer) target).isBlocking() && rand.nextInt(100) < getDisarmChance()) {
+        if (getAttack() == 3 && fallDistance > 0
+                && target instanceof EntityPlayer
+                && ((EntityPlayer) target).isBlocking()
+                && rand.nextInt(100) < getDisarmChance()) {
             TacticalManager.tryDisarm(this, (EntityLivingBase) target, true);
         }
 
@@ -543,7 +555,9 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
             this.hitCooldownTime = getAttackSpeed();
             this.swingItem();
             if (i > 0) {
-                target.addVelocity(-MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F, 0.1D,
+                target.addVelocity(
+                        -MathHelper.sin(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F,
+                        0.1D,
                         MathHelper.cos(this.rotationYaw * (float) Math.PI / 180.0F) * i * 0.5F);
                 this.motionX *= 0.6D;
                 this.motionZ *= 0.6D;
@@ -581,8 +595,8 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     private int getAttackSpeed() {
         return 0;
         /*
-         * if(rage >= 100) { return 10; } if(rage > 80) { return 15; } if(rage > 50) {
-         * return 20; } if(rage > 25) { return 30; } return 35;
+         * if(rage >= 100) { return 10; } if(rage > 80) { return 15; } if(rage > 50) { return 20; } if(rage > 25) {
+         * return 30; } return 35;
          */
     }
 
@@ -675,8 +689,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     }
 
     public void setRage(int level) {
-        if (!worldObj.isRemote)
-            dataWatcher.updateObject(dataID + 3, Math.max(0, level));
+        if (!worldObj.isRemote) dataWatcher.updateObject(dataID + 3, Math.max(0, level));
     }
 
     public int getRageLevel() {

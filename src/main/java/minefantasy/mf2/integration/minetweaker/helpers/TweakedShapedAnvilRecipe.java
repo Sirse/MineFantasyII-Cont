@@ -1,14 +1,15 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
-
-import java.util.List;
 
 public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
 
@@ -21,7 +22,7 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
     private boolean hot;
 
     public TweakedShapedAnvilRecipe(IIngredient[][] input, IItemStack output, String tool, int time, int hammer,
-                                    int anvil, boolean hot, String research, Skill skill) {
+            int anvil, boolean hot, String research, Skill skill) {
         this.ingredients = input;
         this.result = output;
         this.tool = tool;
@@ -84,9 +85,9 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
         for (int x = 0; x <= this.recipeWidth; ++x) {
             for (int y = 0; y <= this.recipeHeight; ++y) {
                 ItemStack inputItem = matrix.getStackInRowAndColumn(x, y);
-                /*if(x >= this.recipeWidth || y >= this.recipeHeight) {
-                    return false;
-                }*/
+                /*
+                 * if(x >= this.recipeWidth || y >= this.recipeHeight) { return false; }
+                 */
 
                 if (inputItem == null && ingredients[x][y] != null || inputItem != null && ingredients[x][y] == null) {
                     return false;
@@ -106,10 +107,11 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
     private boolean isInList(ItemStack inputStack, List<IItemStack> items) {
         for (IItemStack i : items) {
             ItemStack recipeStack = MineTweakerMC.getItemStack(i);
-            if (inputStack.getItem() == recipeStack.getItem() && inputStack.getItemDamage() == recipeStack.getItemDamage()) {
-                /*if (!CustomToolHelper.doesMatchForRecipe(inputStack, recipeStack)) {
-                    return false;
-                }*/
+            if (inputStack.getItem() == recipeStack.getItem()
+                    && inputStack.getItemDamage() == recipeStack.getItemDamage()) {
+                /*
+                 * if (!CustomToolHelper.doesMatchForRecipe(inputStack, recipeStack)) { return false; }
+                 */
                 return true;
             }
         }

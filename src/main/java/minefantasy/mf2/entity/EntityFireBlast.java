@@ -1,7 +1,7 @@
 package minefantasy.mf2.entity;
 
-import minefantasy.mf2.config.ConfigMobs;
-import minefantasy.mf2.entity.mob.EntityDragon;
+import static net.minecraftforge.common.util.ForgeDirection.UP;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.projectile.EntityFireball;
@@ -10,9 +10,11 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import static net.minecraftforge.common.util.ForgeDirection.UP;
+import minefantasy.mf2.config.ConfigMobs;
+import minefantasy.mf2.entity.mob.EntityDragon;
 
 public class EntityFireBlast extends EntityFireball {
+
     private static final float size = 0.75F;
     public static DamageSource blastDamage = (new DamageSource("blastfurn")).setFireDamage();
     public static DamageSource basicDamage = (new DamageSource("fireblastBase")).setFireDamage();
@@ -54,7 +56,8 @@ public class EntityFireBlast extends EntityFireball {
                         int j = (int) posY + y;
                         int k = (int) posZ + z;
 
-                        if (!worldObj.isRemote && canBlockCatchFire(i, j - 1, k) && worldObj.isAirBlock(i, j, k)
+                        if (!worldObj.isRemote && canBlockCatchFire(i, j - 1, k)
+                                && worldObj.isAirBlock(i, j, k)
                                 && rand.nextFloat() < getPyro()) {
                             this.worldObj.setBlock(i, j, k, Blocks.fire);
                         }
@@ -63,8 +66,7 @@ public class EntityFireBlast extends EntityFireball {
             }
         }
         AxisAlignedBB bb = this.boundingBox.expand(1D, 1D, 1D);
-        if (!worldObj.isRemote)
-            this.destroyBlocksInAABB(bb);
+        if (!worldObj.isRemote) this.destroyBlocksInAABB(bb);
     }
 
     private int getLifeSpan() {
@@ -158,8 +160,7 @@ public class EntityFireBlast extends EntityFireball {
     }
 
     /**
-     * Returns true if other Entities should be prevented from moving through this
-     * Entity.
+     * Returns true if other Entities should be prevented from moving through this Entity.
      */
     public boolean canBeCollidedWith() {
         return false;
@@ -239,8 +240,7 @@ public class EntityFireBlast extends EntityFireball {
             double var17 = box.minY + (box.maxY - box.minY) * this.rand.nextFloat();
             double var14 = box.minZ + (box.maxZ - box.minZ) * this.rand.nextFloat();
             this.worldObj.spawnParticle("largeexplode", var16, var17, var14, 0.0D, 0.0D, 0.0D);
-            for (int a = 0; a < 1 + rand.nextInt(4); a++)
-                this.worldObj.playSoundAtEntity(this, "dig.glass", 1F, 1F);
+            for (int a = 0; a < 1 + rand.nextInt(4); a++) this.worldObj.playSoundAtEntity(this, "dig.glass", 1F, 1F);
         }
 
         return var8;

@@ -6,11 +6,12 @@ import net.minecraft.entity.Entity;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class ModelRoast extends ModelBase {
+
     ModelRenderer side2B;
     ModelRenderer side1B;
     ModelRenderer Top;
@@ -67,15 +68,11 @@ public class ModelRoast extends ModelBase {
 
     public void renderModel(boolean L, boolean R, float scale, boolean base) {
         Top.render(scale);
-        if (L)
-            side1.render(scale);
-        if (R)
-            side2.render(scale);
+        if (L) side1.render(scale);
+        if (R) side2.render(scale);
         if (base) {
-            if (L)
-                side1B.render(scale);
-            if (R)
-                side2B.render(scale);
+            if (L) side1B.render(scale);
+            if (R) side2B.render(scale);
         }
     }
 }

@@ -3,6 +3,7 @@ package minefantasy.mf2.api.heating;
 import net.minecraft.item.ItemStack;
 
 public class ForgeFuel {
+
     public ItemStack fuel;
     public float duration;
     public int baseHeat;

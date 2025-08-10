@@ -1,14 +1,15 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.Arrays;
+
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.StatCollector;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.StatCollector;
-
-import java.util.Arrays;
 
 public class RecipeHandlerTanning extends TemplateRecipeHandler {
 
@@ -45,8 +46,15 @@ public class RecipeHandlerTanning extends TemplateRecipeHandler {
     @Override
     public void drawExtras(int recipe) {
         TanningPair cachedRecipe = (TanningPair) this.arecipes.get(recipe);
-        GuiDraw.drawString(String.format("%s: %s", StatCollector.translateToLocal("nei.method.tanning.tool"),
-                cachedRecipe.toolType), 10, 85, -16777216, false);
+        GuiDraw.drawString(
+                String.format(
+                        "%s: %s",
+                        StatCollector.translateToLocal("nei.method.tanning.tool"),
+                        cachedRecipe.toolType),
+                10,
+                85,
+                -16777216,
+                false);
     }
 
     @Override

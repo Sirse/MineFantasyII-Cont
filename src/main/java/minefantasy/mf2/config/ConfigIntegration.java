@@ -1,9 +1,9 @@
 package minefantasy.mf2.config;
 
+import java.util.Arrays;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.relauncher.Side;
-
-import java.util.Arrays;
 
 public class ConfigIntegration extends ConfigurationBaseMF {
 
@@ -22,7 +22,10 @@ public class ConfigIntegration extends ConfigurationBaseMF {
                         .getString());
 
         if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
-            pluginsList = config.get(CATEGORY_BUKKIT, "Plugins List", new String[]{"WorldGuard"},
+            pluginsList = config.get(
+                    CATEGORY_BUKKIT,
+                    "Plugins List",
+                    new String[] { "WorldGuard" },
                     "This registers listeners of Bukkit plugins (if avaliable). Here you are should list all protection-related plugins (e.g WorldGuard). You are can find correct plugin name in its plugin.yml (inside plugin's .jar file)")
                     .getStringList();
             Arrays.sort(pluginsList);

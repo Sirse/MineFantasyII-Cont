@@ -1,19 +1,20 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import net.minecraft.item.ItemStack;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @ZenClass("mods.minefantasy.BigFurnace")
 public class BigFurnace {
@@ -24,6 +25,7 @@ public class BigFurnace {
     }
 
     private static class AddRecipeAction implements IUndoableAction {
+
         private final IItemStack output;
         private final IIngredient input;
         private final int tier;

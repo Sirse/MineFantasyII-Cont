@@ -1,6 +1,12 @@
 package minefantasy.mf2.item.tool.crafting;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.EnumRarity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+
 import com.google.common.collect.Sets;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.ToolHelper;
@@ -9,22 +15,19 @@ import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.api.weapon.IDamageType;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
-import net.minecraft.block.Block;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
 
 /**
  * @author Anonymous Productions
  */
 public class ItemEngineerTool extends ItemTool implements IToolMaterial, IToolMF, IDamageType {
+
     private ToolMaterial material;
     private int tier;
     private String toolType;
     private int itemRarity;
 
     public ItemEngineerTool(String name, ToolMaterial material, int tier, String toolType, int rarity) {
-        super(1.0F, material, Sets.newHashSet(new Block[]{}));
+        super(1.0F, material, Sets.newHashSet(new Block[] {}));
         this.toolType = toolType;
         this.material = material;
         this.tier = tier;
@@ -79,7 +82,7 @@ public class ItemEngineerTool extends ItemTool implements IToolMaterial, IToolMF
 
     @Override
     public float[] getDamageRatio(Object... implement) {
-        return new float[]{0, 1, 0};
+        return new float[] { 0, 1, 0 };
     }
 
     @Override

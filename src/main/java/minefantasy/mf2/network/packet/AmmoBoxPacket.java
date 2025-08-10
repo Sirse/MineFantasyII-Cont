@@ -1,14 +1,16 @@
 package minefantasy.mf2.network.packet;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
-import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
-import minefantasy.mf2.network.NetworkUtils;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
+import cpw.mods.fml.common.network.ByteBufUtils;
+import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
+import minefantasy.mf2.network.NetworkUtils;
+
 public class AmmoBoxPacket extends PacketMF {
+
     public static final String packetName = "MF2_AmmoBoxPkt";
     private int[] coords = new int[3];
     private int stock;
@@ -16,14 +18,13 @@ public class AmmoBoxPacket extends PacketMF {
     private int angle;
 
     public AmmoBoxPacket(TileEntityAmmoBox tile) {
-        this.coords = new int[]{tile.xCoord, tile.yCoord, tile.zCoord};
+        this.coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         this.ammo = tile.ammo;
         this.stock = tile.stock;
         this.angle = tile.angle;
     }
 
-    public AmmoBoxPacket() {
-    }
+    public AmmoBoxPacket() {}
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {

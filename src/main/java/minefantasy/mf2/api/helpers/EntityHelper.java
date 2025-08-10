@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class EntityHelper {
+
     public static final String MFNBT = "MineFantasy_KeptNBT";
 
     public static NBTTagCompound getMFNBT(EntityPlayer player) {

@@ -1,31 +1,32 @@
 package mods.battlegear2.api.weapons;
 
-import cpw.mods.fml.common.event.FMLInterModComms;
-import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.HashSet;
 import java.util.Set;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import cpw.mods.fml.common.event.FMLInterModComms;
+import cpw.mods.fml.common.event.FMLInterModComms.IMCMessage;
+
 /**
- * Registry for stacks which will be allowed in battle inventory, accessible
- * through {@link FMLInterModComms} messages. Use only if your item is not
- * recognized by default. Use of {@link IBattlegearWeapon} is preferred over
- * this method. {@link NBTTagCompound} are supported.
+ * Registry for stacks which will be allowed in battle inventory, accessible through {@link FMLInterModComms} messages.
+ * Use only if your item is not recognized by default. Use of {@link IBattlegearWeapon} is preferred over this method.
+ * {@link NBTTagCompound} are supported.
  *
  * @author GotoLink
  */
 public class WeaponRegistry {
+
     private static Set<StackHolder> weapons = new HashSet<StackHolder>();
     private static Set<StackHolder> mainHand = new HashSet<StackHolder>();
     private static Set<StackHolder> offHand = new HashSet<StackHolder>();
 
     /**
-     * Called by a {@link IMCMessage} with "Dual" as key, and the {@link ItemStack}
-     * as value
+     * Called by a {@link IMCMessage} with "Dual" as key, and the {@link ItemStack} as value
      *
      * @param stack registered as dual wieldable
      */
@@ -36,8 +37,7 @@ public class WeaponRegistry {
     }
 
     /**
-     * Called by a {@link IMCMessage} with "MainHand" as key, and the
-     * {@link ItemStack} as value
+     * Called by a {@link IMCMessage} with "MainHand" as key, and the {@link ItemStack} as value
      *
      * @param stack registered as wieldable only in main hand
      */
@@ -47,8 +47,7 @@ public class WeaponRegistry {
     }
 
     /**
-     * Called by a {@link IMCMessage} with "OffHand" as key, and the
-     * {@link ItemStack} as value
+     * Called by a {@link IMCMessage} with "OffHand" as key, and the {@link ItemStack} as value
      *
      * @param stack registered as wieldable only in offhand
      */
@@ -70,6 +69,7 @@ public class WeaponRegistry {
     }
 
     static class StackHolder {
+
         private final ItemStack stack;
         private int hash;
 
@@ -81,11 +81,9 @@ public class WeaponRegistry {
         public int hashCode() {
             int init = 17, mult = 37;
             if (hash == 0) {
-                if (stack == null)
-                    hash = new HashCodeBuilder(init, mult).toHashCode();
-                else
-                    hash = new HashCodeBuilder(init, mult).append(Item.getIdFromItem(stack.getItem()))
-                            .append(stack.getItemDamage()).append(stack.getTagCompound()).toHashCode();
+                if (stack == null) hash = new HashCodeBuilder(init, mult).toHashCode();
+                else hash = new HashCodeBuilder(init, mult).append(Item.getIdFromItem(stack.getItem()))
+                        .append(stack.getItemDamage()).append(stack.getTagCompound()).toHashCode();
             }
             return hash;
         }

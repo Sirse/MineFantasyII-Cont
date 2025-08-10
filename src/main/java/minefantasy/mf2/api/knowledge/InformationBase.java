@@ -1,10 +1,7 @@
 package minefantasy.mf2.api.knowledge;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.knowledge.client.EntryPage;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.Skill;
+import java.util.ArrayList;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,9 +10,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.IStatStringFormat;
 import net.minecraft.util.StatCollector;
 
-import java.util.ArrayList;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.knowledge.client.EntryPage;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.Skill;
 
 public class InformationBase {
+
     public static boolean easyResearch;
     public static boolean unlockAll;
     private static int nextID;
@@ -28,8 +30,7 @@ public class InformationBase {
     public int ID;
     public String[] requirements;
     /**
-     * Returns the fully description of the achievement - ready to be displayed on
-     * screen.
+     * Returns the fully description of the achievement - ready to be displayed on screen.
      */
     public Object[] descriptValues;
     private boolean startedUnlocked = false;
@@ -93,19 +94,15 @@ public class InformationBase {
     }
 
     /*
-     * public IChatComponent func_150951_e() { IChatComponent ichatcomponent =
-     * super.func_150951_e();
-     * ichatcomponent.getChatStyle().setColor(this.getSpecial() ?
-     * EnumChatFormatting.DARK_PURPLE : EnumChatFormatting.GREEN); return
-     * ichatcomponent; }
-     *
-     * public InformationBase func_150953_b(Class p_150953_1_) { return
-     * (InformationBase)super.func_150953_b(p_150953_1_); }
+     * public IChatComponent func_150951_e() { IChatComponent ichatcomponent = super.func_150951_e();
+     * ichatcomponent.getChatStyle().setColor(this.getSpecial() ? EnumChatFormatting.DARK_PURPLE :
+     * EnumChatFormatting.GREEN); return ichatcomponent; } public InformationBase func_150953_b(Class p_150953_1_) {
+     * return (InformationBase)super.func_150953_b(p_150953_1_); }
      */
 
     /**
-     * Special achievements have a 'spiked' (on normal texture pack) frame, special
-     * achievements are the hardest ones to achieve.
+     * Special achievements have a 'spiked' (on normal texture pack) frame, special achievements are the hardest ones to
+     * achieve.
      */
     public InformationBase setSpecial() {
         this.isSpecial = true;
@@ -172,8 +169,8 @@ public class InformationBase {
     }
 
     /**
-     * Special achievements have a 'spiked' (on normal texture pack) frame, special
-     * achievements are the hardest ones to achieve.
+     * Special achievements have a 'spiked' (on normal texture pack) frame, special achievements are the hardest ones to
+     * achieve.
      */
     public boolean getSpecial() {
         return this.isSpecial;
@@ -198,14 +195,12 @@ public class InformationBase {
 
         if (isEasy()) {
             ResearchLogic.tryUnlock(user, this);
-        } else {
-        }
+        } else {}
         return true;
     }
 
     public boolean hasSkillsUnlocked(EntityPlayer player) {
-        if (skills == null)
-            return true;
+        if (skills == null) return true;
         for (int id = 0; id < skills.size(); id++) {
             SkillRequirement requirement = skills.get(id);
             if (!requirement.isAvailable(player)) {
@@ -241,7 +236,9 @@ public class InformationBase {
             requirements = new String[skills.size()];
             for (int id = 0; id < skills.size(); id++) {
                 SkillRequirement requirement = skills.get(id);
-                requirements[id] = StatCollector.translateToLocalFormatted("rpg.required", requirement.level,
+                requirements[id] = StatCollector.translateToLocalFormatted(
+                        "rpg.required",
+                        requirement.level,
                         requirement.skill.getDisplayName());
             }
         }
@@ -262,6 +259,7 @@ public class InformationBase {
 }
 
 class SkillRequirement {
+
     protected Skill skill;
     protected int level;
 

@@ -174,6 +174,8 @@ tasks.withType<JavaCompile>().configureEach {
 
 spotless {
   encoding("UTF-8")
+  // Enforce LF line endings across all Spotless formats to avoid CRLF noise and hook shebang issues
+  lineEndings = com.diffplug.spotless.LineEnding.UNIX
 
   java {
     target("src/**/*.java")
@@ -190,9 +192,8 @@ spotless {
     endWithNewline()
   }
   format("gradle") {
-    // Only format Gradle scripts in repo root and gradle/ folder
     target("*.gradle", "*.gradle.kts", "gradle/**/*.gradle", "gradle/**/*.gradle.kts")
-    // Never touch outputs or Gradle working dirs
+
     targetExclude("build/**", "run/**", ".gradle/**")
     trimTrailingWhitespace()
     endWithNewline()
@@ -203,42 +204,7 @@ tasks.named("check").configure {
   dependsOn("spotlessCheck")
 }
 
-tasks.named("spotlessGradle").configure { mustRunAfter("extractNatives", "extractNatives2") }
-tasks.named("spotlessGradleCheck").configure { mustRunAfter("extractNatives", "extractNatives2") }
-
-tasks.register("installGitHook") {
-  group = "formatting"
-  description = "Installs a pre-commit git hook that runs spotlessApply"
-  doLast {
-    val hooksDir = file(".git/hooks")
-    if (!hooksDir.exists()) hooksDir.mkdirs()
-    val hookFile = file(".git/hooks/pre-commit")
-    val isWindows = System.getProperty("os.name").lowercase().contains("win")
-    val script = if (isWindows) {
-      """
-      |@echo off
-      |REM Run Gradle Spotless before commit
-      |call gradlew.bat spotlessApply
-      |if errorlevel 1 (
-      |  echo Spotless formatting failed. Aborting commit.
-      |  exit /b 1
-      |)
-      |exit /b 0
-      |""".trimMargin().replace("\n", "\r\n")
-    } else {
-      """
-      |#!/bin/sh
-      |# Run Gradle Spotless before commit
-      |./gradlew spotlessApply
-      |if [ $? -ne 0 ]; then
-      |  echo "Spotless formatting failed. Aborting commit."
-      |  exit 1
-      |fi
-      |exit 0
-      |""".trimMargin()
-    }
-    hookFile.writeText(script)
-    if (!isWindows) hookFile.setExecutable(true)
-    println("Pre-commit hook installed: ${hookFile}")
-  }
+tasks.findByName("extractNatives2")?.let { extractTask ->
+  tasks.named("spotlessGradle").configure { mustRunAfter(extractTask) }
+  tasks.named("spotlessGradleCheck").configure { mustRunAfter(extractTask) }
 }

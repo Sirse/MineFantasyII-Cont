@@ -1,9 +1,5 @@
 package minefantasy.mf2.entity.mob;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.config.ConfigMobs;
-import minefantasy.mf2.entity.EntityDragonBreath;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -13,6 +9,11 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.config.ConfigMobs;
+import minefantasy.mf2.entity.EntityDragonBreath;
 
 public class FireBreath extends DragonBreath {
 
@@ -53,8 +54,7 @@ public class FireBreath extends DragonBreath {
                         && hit.isFlammable(world, x, y + 1, z, ForgeDirection.UP)) {
                     world.setBlock(x, y + 1, z, Blocks.fire);
                 }
-                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing"))
-                    return;
+                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
 
                 if (ConfigMobs.dragonGriefGeneral && hit == Blocks.ice) {
                     world.setBlock(x, y, z, Blocks.water);

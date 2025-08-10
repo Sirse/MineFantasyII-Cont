@@ -1,12 +1,9 @@
 package minefantasy.mf2.block.decor;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
-import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.network.packet.RackCommand;
+import static net.minecraftforge.common.util.ForgeDirection.*;
+
+import java.util.Random;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -21,17 +18,22 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
-import static net.minecraftforge.common.util.ForgeDirection.*;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.network.packet.RackCommand;
 
 /**
  * @author Anonymous Productions
- * <p>
- * Sources are provided for educational reasons. though small bits of
- * code, or methods can be used in your own creations.
+ *         <p>
+ *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
+ *         creations.
  */
 public class BlockRack extends BlockWoodDecor {
+
     public static int rack_RI = 115;
 
     public BlockRack(String name) {
@@ -45,11 +47,10 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Convert standard South, West, North, East to rack's (North, South, East,
-     * West)
+     * Convert standard South, West, North, East to rack's (North, South, East, West)
      */
     public static int getDirection(int dir) {
-        int[] directions = new int[]{3, 4, 2, 5};
+        int[] directions = new int[] { 3, 4, 2, 5 };
         return directions[Math.min(3, dir)];
     }
 
@@ -109,12 +110,12 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Returns a bounding box from the pool of bounding boxes (this means this box
-     * can change after the pool has been cleared to be reused)
+     * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been
+     * cleared to be reused)
      */
     @Override
     public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_,
-                                                         int p_149668_4_) {
+            int p_149668_4_) {
         this.setBlockBoundsBasedOnState(p_149668_1_, p_149668_2_, p_149668_3_, p_149668_4_);
         return super.getCollisionBoundingBoxFromPool(p_149668_1_, p_149668_2_, p_149668_3_, p_149668_4_);
     }
@@ -124,7 +125,7 @@ public class BlockRack extends BlockWoodDecor {
      */
     @Override
     public void setBlockBoundsBasedOnState(IBlockAccess p_149719_1_, int p_149719_2_, int p_149719_3_,
-                                           int p_149719_4_) {
+            int p_149719_4_) {
         this.modifyBoundingbox(p_149719_1_.getBlockMetadata(p_149719_2_, p_149719_3_, p_149719_4_));
     }
 
@@ -134,7 +135,7 @@ public class BlockRack extends BlockWoodDecor {
     @SideOnly(Side.CLIENT)
     @Override
     public AxisAlignedBB getSelectedBoundingBoxFromPool(World p_149633_1_, int p_149633_2_, int p_149633_3_,
-                                                        int p_149633_4_) {
+            int p_149633_4_) {
         this.setBlockBoundsBasedOnState(p_149633_1_, p_149633_2_, p_149633_3_, p_149633_4_);
         return super.getSelectedBoundingBoxFromPool(p_149633_1_, p_149633_2_, p_149633_3_, p_149633_4_);
     }
@@ -160,9 +161,8 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or
-     * not to render the shared face of two adjacent blocks and also whether the
-     * player can attach torches, redstone wire, etc to this block.
+     * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two
+     * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
      */
     @Override
     public boolean isOpaqueCube() {
@@ -170,8 +170,7 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * If this block doesn't render as an ordinary block it will return False
-     * (examples: signs, buttons, stairs, etc)
+     * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
      */
     @Override
     public boolean renderAsNormalBlock() {
@@ -179,8 +178,7 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Called when a block is placed using its ItemBlock. Args: World, X, Y, Z,
-     * side, hitX, hitY, hitZ, block metadata
+     * Called when a block is placed using its ItemBlock. Args: World, X, Y, Z, side, hitX, hitY, hitZ, block metadata
      */
 
     /**
@@ -192,8 +190,7 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Checks to see if its valid to put this block at the specified coordinates.
-     * Args: world, x, y, z
+     * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
      */
     @Override
     public boolean canPlaceBlockAt(World p_149742_1_, int p_149742_2_, int p_149742_3_, int p_149742_4_) {
@@ -205,7 +202,7 @@ public class BlockRack extends BlockWoodDecor {
 
     @Override
     public int onBlockPlaced(World p_149660_1_, int p_149660_2_, int p_149660_3_, int p_149660_4_, int p_149660_5_,
-                             float p_149660_6_, float p_149660_7_, float p_149660_8_, int p_149660_9_) {
+            float p_149660_6_, float p_149660_7_, float p_149660_8_, int p_149660_9_) {
         int j1 = p_149660_9_;
 
         if ((p_149660_9_ == 0 || p_149660_5_ == 2)
@@ -230,9 +227,8 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     /**
-     * Lets the block know when one of its neighbor changes. Doesn't know which
-     * neighbor changed (coordinates passed are their own) Args: x, y, z, neighbor
-     * Block
+     * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
+     * their own) Args: x, y, z, neighbor Block
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
@@ -309,7 +305,11 @@ public class BlockRack extends BlockWoodDecor {
                         }
 
                         var7.stackSize -= var11;
-                        EntityItem var12 = new EntityItem(world, x + var8, y + var9, z + var10,
+                        EntityItem var12 = new EntityItem(
+                                world,
+                                x + var8,
+                                y + var9,
+                                z + var10,
                                 new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
 
                         if (var7.hasTagCompound()) {
@@ -331,7 +331,7 @@ public class BlockRack extends BlockWoodDecor {
 
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int i, float f, float f1,
-                                    float f2) {
+            float f2) {
         TileEntityRack tile = (TileEntityRack) world.getTileEntity(x, y, z);
         if (world.isRemote) {
             int slot = tile.getSlotFor(f, f2);
@@ -345,11 +345,9 @@ public class BlockRack extends BlockWoodDecor {
     }
 
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister reg) {
-    }
+    public void registerIcons(IIconRegister reg) {}
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister reg) {
-    }
+    public void registerBlockIcons(IIconRegister reg) {}
 }

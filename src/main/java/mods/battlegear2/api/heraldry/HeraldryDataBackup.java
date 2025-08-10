@@ -21,10 +21,10 @@ public class HeraldryDataBackup {
     private byte[] byteArray = null;
 
     public HeraldryDataBackup(int pattern, int pattern_col_1, int pattern_col_2, int pattern_col_3, int crest,
-                              int crest_col_1, int crest_col_2, int crest_position, int helm, int banner) {
+            int crest_col_1, int crest_col_2, int crest_position, int helm, int banner) {
         this.pattern = (byte) pattern;
         this.crest = (short) crest;
-        colours = new int[]{pattern_col_1, pattern_col_2, pattern_col_3, crest_col_1, crest_col_2};
+        colours = new int[] { pattern_col_1, pattern_col_2, pattern_col_3, crest_col_1, crest_col_2 };
         this.crestPosition = (byte) crest_position;
         this.helm = (byte) helm;
         this.banner = (byte) banner;
@@ -72,8 +72,7 @@ public class HeraldryDataBackup {
 
     public static String byteArrayToHex(byte[] a) {
         StringBuilder sb = new StringBuilder();
-        for (byte b : a)
-            sb.append(String.format("%02x", b & 0xff));
+        for (byte b : a) sb.append(String.format("%02x", b & 0xff));
         return sb.toString();
     }
 
