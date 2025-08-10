@@ -20,7 +20,7 @@ import minefantasy.mf2.item.weapon.ItemWeaponMF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiContainerCreative;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
@@ -106,7 +106,7 @@ public class MineFantasyHUD extends Gui {
         int width = resolution.getScaledWidth();
         int height = resolution.getScaledHeight();
 
-        boolean inContainer = mc.currentScreen instanceof GuiInventory || mc.currentScreen instanceof GuiContainerCreative;
+        boolean inContainer = mc.currentScreen instanceof GuiContainer;
 
         if (inContainer) {
             renderArmourRating(player, width, height);
@@ -123,7 +123,9 @@ public class MineFantasyHUD extends Gui {
             if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY && mop.entityHit instanceof EntityCogwork) {
                 lookAtCogwork((EntityCogwork) mop.entityHit, width, height);
             } else if (mop.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-                renderBlockHUD(player, mop.blockX, mop.blockY, mop.blockZ, width, height);
+                if (!inContainer) {
+                    renderBlockHUD(player, mop.blockX, mop.blockY, mop.blockZ, width, height);
+                }
             }
         }
     }
@@ -146,7 +148,6 @@ public class MineFantasyHUD extends Gui {
         if (tile instanceof IBasicMetre) {
             renderGenericMetre((IBasicMetre) tile, screenWidth, screenHeight);
         }
-
         if (tile instanceof IQualityBalance) {
             renderQualityBalance((IQualityBalance) tile, screenWidth, screenHeight);
         }
