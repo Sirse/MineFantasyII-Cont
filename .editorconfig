@@ -1,0 +1,40 @@
+# This is the root EditorConfig file, stop searching for other configs in parent folders
+root = true
+
+# Global settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Windows-specific scripts and configs
+[*.{bat,cmd,ini}]
+end_of_line = crlf
+
+# Java
+[*.java]
+indent_size = 4
+continuation_indent_size = 8
+
+# Gradle
+[*.{gradle,gradle.kts}]
+indent_size = 2
+
+# Kotlin
+[*.{kt,kts}]
+indent_size = 2
+
+# JSON, MCMeta, YAML, XML and etc config/resource files
+[*.{json,mcmeta,info,yaml,yml,xml,dtd,xsd,xsl,svg,sh,md}]
+indent_size = 2
+
+# MC lang files - keep trailing spaces for formatting
+[*.lang]
+trim_trailing_whitespace = false
+
+# MD files - keep trailing spaces for hard line breaks
+[*.md]
+trim_trailing_whitespace = false

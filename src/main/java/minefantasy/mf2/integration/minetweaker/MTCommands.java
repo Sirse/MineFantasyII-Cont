@@ -7,8 +7,8 @@ import minetweaker.MineTweakerAPI;
 import minetweaker.MineTweakerImplementationAPI;
 import minetweaker.api.player.IPlayer;
 import minetweaker.api.server.ICommandFunction;
-import scala.actors.threadpool.Arrays;
 
+import java.util.Arrays;
 import java.util.Map;
 
 public class MTCommands implements ICommandFunction {

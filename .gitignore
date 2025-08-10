@@ -1,81 +1,39 @@
-### Windows ###
-
-thumbs.db
-*.db
-
-### Java ###
-
-*.class
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.war
-*.ear
-*.txt
-
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-### Eclipse ###
-
-*.pydevproject
-.metadata
-.gradle
+# Gradle & build system
+.gradle/
+build/
+out/
 bin/
 tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-/eclipse
-/run
-
-# Eclipse Core
-.project
-
-# External tool builders
-.externalToolBuilders/
-
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-# CDT-specific
-.cproject
-
-# JDT-specific (Eclipse Java Development Tools)
+eclipse/
 .classpath
-
-# Java annotation processor (APT)
+.project
 .factorypath
 
-# PDT-specific
-.buildpath
-
-# sbteclipse plugin
-.target
-
-# TeXlipse plugin
-.texlipse
-
-### Intellij IDEA ###
-
+# IDE settings
+.settings/
+.idea/
 *.iml
 *.ipr
 *.iws
+.vscode/
+.vs/
 
-.idea/
-.idea_modules/
-classes/
+# OS files
+.DS_Store
+Thumbs.db
 
-/out/
-gradle/wrapper/gradle-wrapper.properties
-gradlew
-gradlew.bat
+# Minecraft runtime files
+run/
 
-# Linux
-*~
+# Scripts & local gradle addons
+!gradlew.bat
+addon.local.gradle
+addon.local.gradle.kts
+addon.late.local.gradle
+addon.late.local.gradle.kts
+
+# General logs and crash dumps
+*.log
+hs_err_pid*
+.run/
+*.class

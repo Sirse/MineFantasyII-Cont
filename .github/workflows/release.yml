@@ -15,11 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK 8
+      - name: Setup JDK 17 (for Gradle)
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '8'
+          java-version: '17'
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -34,10 +34,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Setup CI workspace
-        run: ./gradlew setupCIWorkspace -S
+        run: ./gradlew setupCIWorkspace --stacktrace -S
 
       - name: Build
-        run: ./gradlew build -S
+        run: ./gradlew build --stacktrace -S
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
