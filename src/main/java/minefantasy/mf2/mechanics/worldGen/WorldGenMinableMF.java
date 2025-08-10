@@ -9,7 +9,6 @@ import net.minecraft.world.gen.feature.WorldGenerator;
 import java.util.Random;
 
 public class WorldGenMinableMF extends WorldGenerator {
-    private static final String __OBFID = "CL_00000426";
     private Block oreBlock;
     /**
      * The number of blocks to generate.
