@@ -66,13 +66,14 @@ listOf(configurations.runtimeClasspath, configurations.testRuntimeClasspath).for
 }
 
 repositories {
-  maven {
-    name = "OvermindDL1 Maven"
-    url = uri("https://gregtech.overminddl1.com/")
-  }
+  mavenCentral()
   maven {
     name = "GTNH Maven"
     url = uri("https://nexus.gtnewhorizons.com/repository/public/")
+  }
+  maven {
+    name = "OvermindDL1 Maven"
+    url = uri("https://gregtech.overminddl1.com/")
   }
   maven {
     name = "JitPack"
