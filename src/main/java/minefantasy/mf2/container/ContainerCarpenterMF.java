@@ -29,7 +29,7 @@ public class ContainerCarpenterMF extends ContainerMF {
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int slot = y * width + x;
-                this.addSlotToContainer(new Slot(tile, slot, 44 + x * 18, 54 + y * 18));
+                this.addSlotToContainer(new SlotFiltered(tile, slot, 44 + x * 18, 54 + y * 18));
             }
         }
 
@@ -38,7 +38,7 @@ public class ContainerCarpenterMF extends ContainerMF {
 
         for (int y = 0; y < 4; y++) {
             int slot = tile.getSizeInventory() - 4 + y;
-            this.addSlotToContainer(new Slot(tile, slot, 3, 54 + y * 18));
+            this.addSlotToContainer(new SlotFiltered(tile, slot, 3, 54 + y * 18));
         }
 
         if (user != null) {

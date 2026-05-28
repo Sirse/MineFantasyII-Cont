@@ -280,8 +280,20 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                     getNBT(result).setString("MF_CraftedByName", lastPlayerHit);
                 }
                 this.inventory[output] = result;
-            } else if (this.inventory[output].getItem() == result.getItem()) {
-                this.inventory[output].stackSize += result.stackSize; // Forge BugFix: Results may have multiple items
+            } else if (this.inventory[output].getItem() == result.getItem()
+                    && ItemStack.areItemStackTagsEqual(this.inventory[output], result)) {
+                int max = this.inventory[output].getMaxStackSize();
+                int toAdd = Math.min(result.stackSize, max - this.inventory[output].stackSize);
+                if (toAdd > 0) {
+                    this.inventory[output].stackSize += toAdd;
+                }
+                if (result.stackSize > toAdd) {
+                    ItemStack overflow = result.copy();
+                    overflow.stackSize = result.stackSize - toAdd;
+                    this.dropItem(overflow);
+                }
+            } else {
+                this.dropItem(result);
             }
             consumeResources();
         }
@@ -453,7 +465,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     private boolean canFitResult(ItemStack result) {
         ItemStack resSlot = inventory[getOutputSlotNum()];
         if (resSlot != null && result != null) {
-            if (!resSlot.isItemEqual(result)) {
+            if (!resSlot.isItemEqual(result) || !ItemStack.areItemStackTagsEqual(resSlot, result)) {
                 return false;
             }
             if (resSlot.stackSize + result.stackSize > resSlot.getMaxStackSize()) {

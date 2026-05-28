@@ -164,7 +164,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
             return true;
         } else {
             if (areItemsEqual(result, inv[4]) && (inv[4].stackSize + result.stackSize) <= inv[4].getMaxStackSize()) {
-                inv[4].stackSize++;
+                inv[4].stackSize += result.stackSize;
                 return true;
             } else {
                 return false;

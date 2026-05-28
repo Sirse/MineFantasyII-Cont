@@ -33,12 +33,19 @@ public class CogworkControlPacket extends PacketMF {
         forward = packet.readFloat();
         strafe = packet.readFloat();
         isJumping = packet.readBoolean();
+        if (Float.isNaN(forward) || Float.isInfinite(forward) || Float.isNaN(strafe) || Float.isInfinite(strafe)) {
+            return;
+        }
+        forward = Math.max(-1.0F, Math.min(1.0F, forward));
+        strafe = Math.max(-1.0F, Math.min(1.0F, strafe));
         Entity entity = player.worldObj.getEntityByID(id);
 
         if (entity instanceof EntityCogwork) {
             suit = (EntityCogwork) entity;
 
-            if (suit.riddenByEntity == player && player.getDistanceSqToEntity(suit) <= 64D) {
+            if (!suit.isDead && suit.riddenByEntity == player
+                    && player.ridingEntity == suit
+                    && player.getDistanceSqToEntity(suit) <= 64D) {
                 suit.setMoveForward(forward);
                 suit.setMoveStrafe(strafe);
                 suit.setJumpControl(isJumping);
