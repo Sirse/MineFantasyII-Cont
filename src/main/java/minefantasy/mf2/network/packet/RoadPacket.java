@@ -41,6 +41,9 @@ public class RoadPacket extends PacketMF {
 
         if (isRequest) {
             if (NetworkUtils.isServer(player)) {
+                if (!NetworkUtils.isWithinDistanceSq(player, coords, 64D)) {
+                    return;
+                }
                 tile.sendPacketToClients();
             }
         } else {

@@ -37,6 +37,9 @@ public class ContainerReload extends ContainerMF {
 
     @Override
     public ItemStack slotClick(int slotId, int mouseButton, int modifier, EntityPlayer player) {
+        if (!canInteractWith(player)) {
+            return null;
+        }
         ItemStack result = super.slotClick(slotId, mouseButton, modifier, player);
         if (weapon != null) {
             ItemStack ammo = weaponInv.getStackInSlot(0);
@@ -47,6 +50,9 @@ public class ContainerReload extends ContainerMF {
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        if (!canInteractWith(player)) {
+            return null;
+        }
         if (index < 0 || index >= inventorySlots.size()) {
             return null; // Invalid index
         }

@@ -315,7 +315,12 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return inventory[slot];
+        if (this.inventory[slot] != null) {
+            ItemStack itemstack = this.inventory[slot];
+            this.inventory[slot] = null;
+            return itemstack;
+        }
+        return null;
     }
 
     @Override

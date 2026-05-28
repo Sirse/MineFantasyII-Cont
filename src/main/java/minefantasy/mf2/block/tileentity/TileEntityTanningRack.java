@@ -295,7 +295,12 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return items[slot];
+        if (this.items[slot] != null) {
+            ItemStack itemstack = this.items[slot];
+            this.items[slot] = null;
+            return itemstack;
+        }
+        return null;
     }
 
     @Override

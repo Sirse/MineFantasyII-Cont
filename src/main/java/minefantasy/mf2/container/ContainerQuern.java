@@ -23,7 +23,7 @@ public class ContainerQuern extends ContainerMF {
 
         this.addSlotToContainer(new SlotFiltered(tile, INPUT_SLOT, 81, 9));
         this.addSlotToContainer(new SlotFiltered(tile, POT_SLOT, 81, 32));
-        this.addSlotToContainer(new SlotFiltered(tile, OUTPUT_SLOT, 81, 55));
+        this.addSlotToContainer(new SlotOutput(tile, OUTPUT_SLOT, 81, 55));
 
         this.playerInventoryStartIndex = QUERN_SLOT_COUNT;
         this.addPlayerInventory(user, 0, 93);

@@ -38,7 +38,7 @@ public class CogworkControlPacket extends PacketMF {
         if (entity instanceof EntityCogwork) {
             suit = (EntityCogwork) entity;
 
-            if (suit.riddenByEntity == player) {
+            if (suit.riddenByEntity == player && player.getDistanceSqToEntity(suit) <= 64D) {
                 suit.setMoveForward(forward);
                 suit.setMoveStrafe(strafe);
                 suit.setJumpControl(isJumping);

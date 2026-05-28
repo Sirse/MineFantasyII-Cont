@@ -27,6 +27,8 @@ public class TileInventoryPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        // Strictly clientbound visual sync packet.
+        // Never accept or apply this packet as authoritative state on server.
         if (NetworkUtils.isServer(player)) {
             return;
         }

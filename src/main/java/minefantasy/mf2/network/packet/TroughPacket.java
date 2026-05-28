@@ -32,7 +32,7 @@ public class TroughPacket extends PacketMF {
         TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
         if (entity instanceof TileEntityTrough) {
             TileEntityTrough tile = (TileEntityTrough) entity;
-            tile.fill = newFill;
+            tile.fill = Math.max(0, Math.min(newFill, tile.getCapacity()));
         }
     }
 

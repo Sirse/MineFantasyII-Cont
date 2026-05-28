@@ -45,7 +45,7 @@ public class AmmoBoxPacket extends PacketMF {
         TileEntityAmmoBox tile = (TileEntityAmmoBox) entity;
         boolean changed = tile.setContentsValidated(newAmmo, newStock);
 
-        tile.angle = newAngle;
+        tile.angle = ((newAngle % 360) + 360) % 360;
         if (changed && player.worldObj != null) {
             player.worldObj.markBlockForUpdate(coords[0], coords[1], coords[2]);
         }

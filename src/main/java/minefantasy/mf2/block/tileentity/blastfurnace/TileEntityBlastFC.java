@@ -207,7 +207,12 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return items[slot];
+        if (this.items[slot] != null) {
+            ItemStack itemstack = this.items[slot];
+            this.items[slot] = null;
+            return itemstack;
+        }
+        return null;
     }
 
     @Override

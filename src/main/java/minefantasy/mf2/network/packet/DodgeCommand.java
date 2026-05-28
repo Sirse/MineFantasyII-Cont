@@ -20,9 +20,13 @@ public class DodgeCommand extends PacketMF {
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
         ID = packet.readInt();
-        if (NetworkUtils.isServer(player)) {
-            CombatMechanics.initDodge(player, ID);
+        if (!NetworkUtils.isServer(player)) {
+            return;
         }
+        if (ID != -1 && ID != 0 && ID != 1) {
+            return;
+        }
+        CombatMechanics.initDodge(player, ID);
     }
 
     @Override

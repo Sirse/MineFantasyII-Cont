@@ -2,8 +2,10 @@ package minefantasy.mf2.network.packet;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
 
@@ -13,8 +15,11 @@ import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class PacketHandlerMF {
+    private static final long ERROR_LOG_INTERVAL_MS = 5000L;
+    private static final Map<String, Long> LAST_ERROR_LOG = new ConcurrentHashMap<String, Long>();
 
     public Map<String, PacketMF> packetList = new Hashtable<String, PacketMF>();
     public Map<String, FMLEventChannel> channels = new Hashtable<String, FMLEventChannel>();
@@ -57,7 +62,7 @@ public class PacketHandlerMF {
         try {
             handler.process(event.packet.payload(), ((NetHandlerPlayServer) event.handler).playerEntity);
         } catch (Throwable t) {
-            // Supressed
+            logPacketError(event.packet.channel(), "SERVERBOUND", ((NetHandlerPlayServer) event.handler).playerEntity, t);
         }
     }
 
@@ -70,7 +75,26 @@ public class PacketHandlerMF {
         try {
             handler.process(event.packet.payload(), MineFantasyII.proxy.getClientPlayer());
         } catch (Throwable t) {
-            // Supressed
+            logPacketError(event.packet.channel(), "CLIENTBOUND", MineFantasyII.proxy.getClientPlayer(), t);
+        }
+    }
+
+    private void logPacketError(String channel, String side, EntityPlayer player, Throwable t) {
+        String playerInfo = "null";
+        if (player != null) {
+            playerInfo = player.getCommandSenderName() + "[" + player.getEntityId() + "]";
+        }
+        String key = side + "|" + channel + "|" + t.getClass().getName();
+        long now = System.currentTimeMillis();
+        Long last = LAST_ERROR_LOG.get(key);
+        if (last == null || now - last.longValue() >= ERROR_LOG_INTERVAL_MS) {
+            LAST_ERROR_LOG.put(key, Long.valueOf(now));
+            MFLogUtil.MF_LOGGER.error(
+                    MFLogUtil.PREFIX + "Packet handling failed: channel={}, side={}, player={}",
+                    channel,
+                    side,
+                    playerInfo,
+                    t);
         }
     }
 

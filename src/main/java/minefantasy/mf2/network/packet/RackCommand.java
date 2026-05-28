@@ -33,6 +33,9 @@ public class RackCommand extends PacketMF {
         int y = packet.readInt();
         int z = packet.readInt();
         slot = packet.readInt();
+        if (slot < 0 || slot >= 4) {
+            return;
+        }
 
         TileEntity tile = player.worldObj.getTileEntity(x, y, z);
         if (!(tile instanceof TileEntityRack)) {
@@ -43,6 +46,9 @@ public class RackCommand extends PacketMF {
             return;
         }
         rack = (TileEntityRack) tile;
+        if (!rack.isUseableByPlayer(player)) {
+            return;
+        }
         BlockRack.interact(slot, player.worldObj, rack, player);
     }
 

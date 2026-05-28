@@ -19,7 +19,7 @@ public class ContainerResearch extends ContainerMF {
     public ContainerResearch(InventoryPlayer playerInventory, TileEntityResearch tile) {
         this.tile = tile;
 
-        addSlotToContainer(new Slot(tile, INPUT_SLOT, 83, 40));
+        addSlotToContainer(new SlotFiltered(tile, INPUT_SLOT, 83, 40));
 
         this.playerInventoryStartIndex = RESEARCH_SLOT_COUNT;
         addPlayerMainInventory(playerInventory, 2, 76);

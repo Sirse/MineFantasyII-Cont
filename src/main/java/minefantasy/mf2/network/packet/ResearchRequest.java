@@ -27,6 +27,9 @@ public class ResearchRequest extends PacketMF {
         if (!NetworkUtils.isServer(player)) {
             return;
         }
+        if (researchID < 0 || researchID >= InformationList.knowledgeList.size()) {
+            return;
+        }
 
         InformationBase research = InformationList.knowledgeList.get(researchID);
         if (research != null && research.isEasy()) {

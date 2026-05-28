@@ -153,7 +153,12 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return inv[slot];
+        if (this.inv[slot] != null) {
+            ItemStack itemstack = this.inv[slot];
+            this.inv[slot] = null;
+            return itemstack;
+        }
+        return null;
     }
 
     @Override

@@ -142,7 +142,12 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        return inventory[slot];
+        if (this.inventory[slot] != null) {
+            ItemStack itemstack = this.inventory[slot];
+            this.inventory[slot] = null;
+            return itemstack;
+        }
+        return null;
     }
 
     @Override
