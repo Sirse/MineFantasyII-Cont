@@ -4,45 +4,52 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
+import net.minecraftforge.client.event.MouseEvent;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.network.packet.ExtendedReachPacket;
 import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 public class ExtendedReachMF {
 
     @SubscribeEvent
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            tickEnd(event.player);
+    public void onMouse(MouseEvent event) {
+        if (event.button == 0 && event.buttonstate) {
+            attackExtendedTarget();
         }
     }
 
-    public void tickEnd(EntityPlayer entityPlayer) {
-        // If we JUST swung an Item
-        if (entityPlayer.swingProgressInt == 1) {
-            ItemStack mainhand = entityPlayer.getCurrentEquippedItem();
-            if (mainhand != null && mainhand.getItem() instanceof IExtendedReachWeapon) {
-                float extendedReach = ((IExtendedReachWeapon) mainhand.getItem()).getReachModifierInBlocks(mainhand);
-                if (extendedReach > 0) {
-                    MovingObjectPosition mouseOver = getMouseOver(0, extendedReach + 4);
-                    if (mouseOver != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
-                        Entity target = mouseOver.entityHit;
-                        if (target instanceof EntityLiving && target != entityPlayer) {
-                            if (target.hurtResistantTime != ((EntityLiving) target).maxHurtResistantTime) {
-                                FMLClientHandler.instance().getClient().playerController
-                                        .attackEntity(entityPlayer, target);
-                            }
-                        }
-                    }
-                }
+    public void attackExtendedTarget() {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+        EntityPlayer entityPlayer = mc.thePlayer;
+        if (entityPlayer == null) {
+            return;
+        }
+        if (mc.objectMouseOver != null
+                && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY) {
+            return;
+        }
+
+        ItemStack mainhand = entityPlayer.getCurrentEquippedItem();
+        if (mainhand != null && mainhand.getItem() instanceof IExtendedReachWeapon) {
+            float extendedReach = ((IExtendedReachWeapon) mainhand.getItem()).getReachModifierInBlocks(mainhand);
+            if (extendedReach <= 0F) {
+                return;
+            }
+            MovingObjectPosition mouseOver = getMouseOver(1.0F, extendedReach + 4.0F);
+            if (mouseOver != null && mouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.ENTITY
+                    && mouseOver.entityHit instanceof EntityLivingBase
+                    && mouseOver.entityHit != entityPlayer) {
+                MineFantasyII.packetHandler.sendPacketToServer(
+                        new ExtendedReachPacket(mouseOver.entityHit.getEntityId()).generatePacket());
             }
         }
     }
@@ -51,7 +58,6 @@ public class ExtendedReachMF {
         Minecraft mc = FMLClientHandler.instance().getClient();
         if (mc.renderViewEntity != null) {
             if (mc.theWorld != null) {
-                mc.pointedEntity = null;
                 double d0 = maxDist;
                 MovingObjectPosition objectMouseOver = mc.renderViewEntity.rayTrace(d0, tickPart);
                 double d1 = d0;
@@ -65,14 +71,14 @@ public class ExtendedReachMF {
                 Vec3 vec32 = vec3.addVector(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0);
                 Entity pointedEntity = null;
                 float f1 = 1.0F;
-                List list = mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+                List<Entity> list = mc.theWorld.getEntitiesWithinAABBExcludingEntity(
                         mc.renderViewEntity,
                         mc.renderViewEntity.boundingBox
                                 .addCoord(vec31.xCoord * d0, vec31.yCoord * d0, vec31.zCoord * d0).expand(f1, f1, f1));
                 double d2 = d1;
 
                 for (int i = 0; i < list.size(); ++i) {
-                    Entity entity = (Entity) list.get(i);
+                    Entity entity = list.get(i);
 
                     if (entity.canBeCollidedWith()) {
                         float f2 = entity.getCollisionBorderSize();

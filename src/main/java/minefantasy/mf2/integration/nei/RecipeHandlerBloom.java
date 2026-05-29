@@ -116,6 +116,9 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
 
         @Override
         public PositionedStack getOtherStack() {
+            if (afuels == null || afuels.isEmpty()) {
+                return null;
+            }
             return afuels.get((cycleticks / 48) % afuels.size()).stack;
         }
     }

@@ -61,6 +61,9 @@ public class RecipeHandlerBigFurnace extends TemplateRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
+        if (recipeList == null) {
+            fillRecipeList();
+        }
         for (RecipePair recipePair : recipeList) {
             if (CustomToolHelper.areEqual(recipePair.outputStack, result)) {
                 BigFurnaceRecipe cachedRecipe = new BigFurnaceRecipe(recipePair.inputStack, recipePair.outputStack);

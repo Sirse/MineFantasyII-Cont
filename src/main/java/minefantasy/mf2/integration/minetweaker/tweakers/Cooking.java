@@ -71,10 +71,13 @@ public class Cooking {
 
         @Override
         public void undo() {
-            for (Map.Entry<String, CookRecipe> recipeEntry : CookRecipe.recipeList.entrySet()) {
+            java.util.Iterator<Map.Entry<String, CookRecipe>> it = CookRecipe.recipeList.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, CookRecipe> recipeEntry = it.next();
                 for (CookRecipe recipe : addedRecipes) {
-                    if (recipe.equals(recipe)) {
-                        CookRecipe.recipeList.remove(recipeEntry);
+                    if (recipeEntry.getValue().equals(recipe)) {
+                        it.remove();
+                        break;
                     }
                 }
             }

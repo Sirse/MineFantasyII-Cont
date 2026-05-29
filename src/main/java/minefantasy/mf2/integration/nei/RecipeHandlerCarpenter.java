@@ -63,7 +63,7 @@ public class RecipeHandlerCarpenter extends TemplateRecipeHandler {
         for (ICarpenterRecipe irecipe : (List<ICarpenterRecipe>) CraftingManagerCarpenter.getInstance()
                 .getRecipeList()) {
 
-            if (ResearchLogic.hasInfoUnlocked(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
+            if (!ResearchLogic.hasInfoUnlocked(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                 continue;
             }
 

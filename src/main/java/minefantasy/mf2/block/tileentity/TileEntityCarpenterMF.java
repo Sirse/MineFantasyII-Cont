@@ -282,19 +282,20 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 this.inventory[output] = result;
             } else if (this.inventory[output].getItem() == result.getItem()
                     && ItemStack.areItemStackTagsEqual(this.inventory[output], result)) {
-                int max = this.inventory[output].getMaxStackSize();
-                int toAdd = Math.min(result.stackSize, max - this.inventory[output].stackSize);
-                if (toAdd > 0) {
-                    this.inventory[output].stackSize += toAdd;
-                }
-                if (result.stackSize > toAdd) {
-                    ItemStack overflow = result.copy();
-                    overflow.stackSize = result.stackSize - toAdd;
-                    this.dropItem(overflow);
-                }
-            } else {
-                this.dropItem(result);
-            }
+                        ItemStack outputStack = this.inventory[output];
+                        int max = outputStack.getMaxStackSize();
+                        int toAdd = Math.min(result.stackSize, max - outputStack.stackSize);
+                        if (toAdd > 0) {
+                            outputStack.stackSize += toAdd;
+                        }
+                        if (result.stackSize > toAdd) {
+                            ItemStack overflow = result.copy();
+                            overflow.stackSize = result.stackSize - toAdd;
+                            this.dropItem(overflow);
+                        }
+                    } else {
+                        this.dropItem(result);
+                    }
             consumeResources();
         }
         onInventoryChanged();

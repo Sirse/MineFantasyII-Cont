@@ -52,10 +52,14 @@ public class BigFurnace {
 
         @Override
         public void undo() {
-            for (Map.Entry<String, BigFurnaceRecipes> entry : BigFurnaceRecipes.recipeList.entrySet()) {
+            java.util.Iterator<Map.Entry<String, BigFurnaceRecipes>> it = BigFurnaceRecipes.recipeList.entrySet()
+                    .iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, BigFurnaceRecipes> entry = it.next();
                 for (BigFurnaceRecipes recipeToRemove : addedRecipes) {
                     if (entry.getValue().equals(recipeToRemove)) {
-                        BigFurnaceRecipes.recipeList.remove(entry);
+                        it.remove();
+                        break;
                     }
                 }
             }

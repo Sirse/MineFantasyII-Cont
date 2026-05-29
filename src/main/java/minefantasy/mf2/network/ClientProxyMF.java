@@ -38,7 +38,6 @@ import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.list.styles.DragonforgedStyle;
 import minefantasy.mf2.item.list.styles.OrnateStyle;
 import minefantasy.mf2.mechanics.ExtendedReachMF;
-import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
 
 /**
  * @author Anonymous Productions
@@ -77,8 +76,7 @@ public class ClientProxyMF extends CommonProxyMF {
     @Override
     public void registerTickHandlers() {
         super.registerTickHandlers();
-        FMLCommonHandler.instance().bus().register(new PlayerTickHandlerMF());
-        FMLCommonHandler.instance().bus().register(new ExtendedReachMF());
+        MinecraftForge.EVENT_BUS.register(new ExtendedReachMF());
         MinecraftForge.EVENT_BUS.register(new HudHandlerMF());
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
 

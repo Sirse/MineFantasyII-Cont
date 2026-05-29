@@ -642,7 +642,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     resSlot = heated;
                 }
             }
-            return resSlot.isItemEqual(result)
+            return (resSlot.isItemEqual(result) && ItemStack.areItemStackTagsEqual(resSlot, result))
                     || (SpecialForging.getItemDesign(resSlot) != null && resSlot.stackSize <= 1);
         }
         return true;

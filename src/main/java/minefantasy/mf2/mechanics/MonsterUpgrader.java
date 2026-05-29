@@ -70,7 +70,8 @@ public class MonsterUpgrader {
                     mob.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3F);
                 }
             }
-        } else if (mob instanceof EntitySpider) {
+        }
+        if (ConfigHardcore.upgradeZombieWep && mob instanceof EntitySpider) {
             if (mob.riddenByEntity == null) {
                 if (random.nextFloat() * (witchRiderChance) < diff) {
                     EntityWitch rider = new EntityWitch(mob.worldObj);
@@ -84,7 +85,7 @@ public class MonsterUpgrader {
                     rider.mountEntity(mob);
                 }
             }
-        } else {
+        } else if (!ConfigHardcore.upgradeZombieWep) {
             if (mob.getHeldItem() != null && mob.getHeldItem().getItem() == Items.iron_sword) {
                 giveEntityWeapon(mob, "iron", 0);
             }

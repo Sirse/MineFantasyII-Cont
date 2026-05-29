@@ -3,6 +3,7 @@ package minefantasy.mf2.mechanics;
 import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
@@ -34,10 +35,12 @@ import minefantasy.mf2.util.XSTRandom;
 
 public class PlayerTickHandlerMF {
 
-    private static ItemStack lastStack;
     private static String stepNBT = "MF_LastStep";
     private static String chunkCoords = "MF_BedPos";
     private static String resetBed = "MF_Resetbed";
+    private static final String lastHeldSlotNBT = "MF_LastHeldSlot";
+    private static final String lastHeldItemNBT = "MF_LastHeldItem";
+    private static final String lastHeldDamageNBT = "MF_LastHeldDamage";
 
     private static XSTRandom random = new XSTRandom();
     // Dragon tiers
@@ -237,8 +240,13 @@ public class PlayerTickHandlerMF {
         }
 
         if (event.phase == TickEvent.Phase.START) {
-            applyBalance(event.player);
-            ItemFoodMF.onTick(event.player);
+            if (!event.player.worldObj.isRemote) {
+                applyBalance(event.player);
+                ItemFoodMF.onTick(event.player);
+            } else if (ConfigWeapon.useBalance) {
+                // Keep client camera smoothing in sync with authoritative balance values.
+                applyBalance(event.player);
+            }
 
             if (!event.player.worldObj.isRemote
                     && !(!ConfigHardcore.HCChotBurn && ItemApron.isUserProtected(event.player))
@@ -254,25 +262,27 @@ public class PlayerTickHandlerMF {
             }
             if (event.player.worldObj.isRemote) {
                 ItemStack item = event.player.getHeldItem();
-                if (lastStack == null && item != null) {
-                    if (item.getItem() instanceof IFirearm) {
-                        NBTTagCompound nbt = AmmoMechanicsMF.getNBT(item);
-                        if (nbt.hasKey(ItemCrossbow.useTypeNBT)
-                                && nbt.getString(ItemCrossbow.useTypeNBT).equalsIgnoreCase("fire")) {
-                            nbt.setString(ItemCrossbow.useTypeNBT, "null");
-                        }
+                NBTTagCompound data = event.player.getEntityData();
+                int currentSlot = event.player.inventory.currentItem;
+
+                boolean hasLastHeld = data.hasKey(lastHeldSlotNBT);
+                int lastSlot = data.getInteger(lastHeldSlotNBT);
+                int lastItem = data.getInteger(lastHeldItemNBT);
+                int lastDamage = data.getInteger(lastHeldDamageNBT);
+                if (!hasLastHeld) {
+                    resetFirearmUse(item);
+                } else if (currentSlot != lastSlot) {
+                    ItemStack previous = event.player.inventory.getStackInSlot(lastSlot);
+                    if (previous != null && previous.getItem() instanceof IFirearm
+                            && Item.getIdFromItem(previous.getItem()) == lastItem
+                            && previous.getItemDamage() == lastDamage) {
+                        resetFirearmUse(previous);
                     }
                 }
-                if (lastStack != null && (item == null || item != lastStack)) {
-                    if (lastStack.getItem() instanceof IFirearm) {
-                        NBTTagCompound nbt = AmmoMechanicsMF.getNBT(lastStack);
-                        if (nbt.hasKey(ItemCrossbow.useTypeNBT)
-                                && nbt.getString(ItemCrossbow.useTypeNBT).equalsIgnoreCase("fire")) {
-                            nbt.setString(ItemCrossbow.useTypeNBT, "null");
-                        }
-                    }
-                }
-                lastStack = item;
+
+                data.setInteger(lastHeldSlotNBT, currentSlot);
+                data.setInteger(lastHeldItemNBT, item != null ? Item.getIdFromItem(item.getItem()) : 0);
+                data.setInteger(lastHeldDamageNBT, item != null ? item.getItemDamage() : 0);
             }
 
             float weight = ArmourCalculator.getTotalWeightOfWorn(event.player, false);
@@ -281,6 +291,16 @@ public class PlayerTickHandlerMF {
                     event.player.motionY -= (weight / 20000F);
                 }
             }
+        }
+    }
+
+    private void resetFirearmUse(ItemStack item) {
+        if (item == null || !(item.getItem() instanceof IFirearm)) {
+            return;
+        }
+        NBTTagCompound nbt = AmmoMechanicsMF.getNBT(item);
+        if (nbt.hasKey(ItemCrossbow.useTypeNBT) && nbt.getString(ItemCrossbow.useTypeNBT).equalsIgnoreCase("fire")) {
+            nbt.setString(ItemCrossbow.useTypeNBT, "null");
         }
     }
 
@@ -325,7 +345,6 @@ public class PlayerTickHandlerMF {
     }
 
     private void applyBalance(EntityPlayer entityPlayer) {
-        float weight = 2.0F;
         float pitchBalance = entityPlayer.getEntityData().hasKey("MF_Balance_Pitch")
                 ? entityPlayer.getEntityData().getFloat("MF_Balance_Pitch")
                 : 0F;
@@ -333,25 +352,27 @@ public class PlayerTickHandlerMF {
                 ? entityPlayer.getEntityData().getFloat("MF_Balance_Yaw")
                 : 0F;
 
-        if (pitchBalance > 0) {
-            if (pitchBalance < 1.0F && pitchBalance > -1.0F) weight = pitchBalance;
-            pitchBalance -= weight;
+        if (pitchBalance != 0F) {
+            float pitchStep = Math.min(2.0F, Math.abs(pitchBalance));
 
             if (ConfigWeapon.useBalance) {
-                entityPlayer.rotationPitch += pitchBalance > 0 ? weight : -weight;
+                entityPlayer.rotationPitch += pitchBalance > 0 ? pitchStep : -pitchStep;
             }
-
-            if (pitchBalance < 0) pitchBalance = 0;
+            pitchBalance += pitchBalance > 0 ? -pitchStep : pitchStep;
+            if (Math.abs(pitchBalance) < 0.001F) {
+                pitchBalance = 0F;
+            }
         }
-        if (yawBalance > 0) {
-            if (yawBalance < 1.0F && yawBalance > -1.0F) weight = yawBalance;
-            yawBalance -= weight;
+        if (yawBalance != 0F) {
+            float yawStep = Math.min(2.0F, Math.abs(yawBalance));
 
             if (ConfigWeapon.useBalance) {
-                entityPlayer.rotationYaw += yawBalance > 0 ? weight : -weight;
+                entityPlayer.rotationYaw += yawBalance > 0 ? yawStep : -yawStep;
             }
-
-            if (yawBalance < 0) yawBalance = 0;
+            yawBalance += yawBalance > 0 ? -yawStep : yawStep;
+            if (Math.abs(yawBalance) < 0.001F) {
+                yawBalance = 0F;
+            }
         }
         entityPlayer.getEntityData().setFloat("MF_Balance_Pitch", pitchBalance);
         entityPlayer.getEntityData().setFloat("MF_Balance_Yaw", yawBalance);
@@ -380,10 +401,14 @@ public class PlayerTickHandlerMF {
         ResearchLogic.syncData(player);
 
         if (!persist.hasKey("MF_HasBook")) {
-            persist.setBoolean("MF_HasBook", true);
             if (player.capabilities.isCreativeMode) return;
-
-            player.inventory.addItemStackToInventory(new ItemStack(ToolListMF.researchBook));
+            ItemStack book = new ItemStack(ToolListMF.researchBook);
+            if (player.inventory.addItemStackToInventory(book)) {
+                persist.setBoolean("MF_HasBook", true);
+            } else {
+                player.entityDropItem(book, 0F);
+                persist.setBoolean("MF_HasBook", true);
+            }
         }
         if (RPGElements.isSystemActive) {
             RPGElements.initSkills(player);

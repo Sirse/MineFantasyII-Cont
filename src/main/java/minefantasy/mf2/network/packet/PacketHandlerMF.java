@@ -18,6 +18,7 @@ import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class PacketHandlerMF {
+
     private static final long ERROR_LOG_INTERVAL_MS = 5000L;
     private static final Map<String, Long> LAST_ERROR_LOG = new ConcurrentHashMap<String, Long>();
 
@@ -51,6 +52,7 @@ public class PacketHandlerMF {
         packetList.put(WoodDecorPacket.packetName, new WoodDecorPacket());
         packetList.put(CogworkControlPacket.packetName, new CogworkControlPacket());
         packetList.put(StorageBlockPacket.packetName, new StorageBlockPacket());
+        packetList.put(ExtendedReachPacket.packetName, new ExtendedReachPacket());
     }
 
     @SubscribeEvent
@@ -62,7 +64,11 @@ public class PacketHandlerMF {
         try {
             handler.process(event.packet.payload(), ((NetHandlerPlayServer) event.handler).playerEntity);
         } catch (Throwable t) {
-            logPacketError(event.packet.channel(), "SERVERBOUND", ((NetHandlerPlayServer) event.handler).playerEntity, t);
+            logPacketError(
+                    event.packet.channel(),
+                    "SERVERBOUND",
+                    ((NetHandlerPlayServer) event.handler).playerEntity,
+                    t);
         }
     }
 

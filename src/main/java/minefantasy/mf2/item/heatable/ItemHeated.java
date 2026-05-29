@@ -47,7 +47,7 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     public static int getUnstableTemp(ItemStack item) {
-        return Heatable.getWorkTemp(item);
+        return Heatable.getUnstableTemp(item);
     }
 
     public static ItemStack getItem(ItemStack item) {
@@ -237,7 +237,11 @@ public class ItemHeated extends Item implements IHotItem {
                         world.spawnParticle("largesmoke", i + 0.5F, j + 1, k + 0.5F, 0, 0.065F, 0);
                     }
 
-                    ItemStack drop = getItem(item).copy();
+                    ItemStack originalItem = getItem(item);
+                    if (originalItem == null) {
+                        return item;
+                    }
+                    ItemStack drop = originalItem.copy();
 
                     if (Heatable.HCCquenchRuin) {
                         float damageDone = 50F + (water > 0F ? water : 0F);
@@ -248,13 +252,8 @@ public class ItemHeated extends Item implements IHotItem {
                         }
                     }
                     drop.stackSize = item.stackSize;
-                    if (drop != null) {
-                        item.stackSize = 0;
-
-                        if (item.stackSize <= 0) {
-                            return drop.copy();
-                        }
-                    }
+                    item.stackSize = 0;
+                    return drop;
                 }
             }
 
@@ -266,10 +265,9 @@ public class ItemHeated extends Item implements IHotItem {
         if (renderPass > 1 || !renderDynamicHotIngotRendering) {
             return Color.WHITE.getRGB();
         }
-        NBTTagCompound nbt = getNBT(item);
         int heat = getTemp(item);
         int maxHeat = Heatable.forgeMaximumMetalHeat;
-        double heatPer = (double) heat / (double) maxHeat * 100D;
+        double heatPer = maxHeat > 0 ? (double) heat / (double) maxHeat * 100D : 0D;
 
         int red = getRedOnHeat(heatPer);
         int green = getGreenOnHeat(heatPer);
@@ -311,9 +309,9 @@ public class ItemHeated extends Item implements IHotItem {
         if (percent < 0) percent = 0;
 
         if (percent <= 55) {
-            return (int) (255 - ((255 / 55) * percent));
+            return (int) (255 - ((255D / 55D) * percent));
         } else {
-            return (int) ((255 / 55) * (percent - 55));
+            return (int) ((255D / 55D) * (percent - 55));
         }
     }
 
@@ -324,7 +322,7 @@ public class ItemHeated extends Item implements IHotItem {
         if (percent < 0) percent = 0;
 
         if (percent <= 55) {
-            return (int) (255 - ((255 / 55) * percent));
+            return (int) (255 - ((255D / 55D) * percent));
         }
         return 0;
     }

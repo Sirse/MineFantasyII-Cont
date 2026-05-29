@@ -101,7 +101,7 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
                 if (stack != null && this.ingreds[y][x] != null) {
                     for (IItemStack i : this.ingreds[y][x].getItems()) {
                         ItemStack ingred = MineTweakerMC.getItemStack(i);
-                        if (stack.getItem() == ingred.getItem() && stack.getItemDamage() == stack.getItemDamage()) {
+                        if (stack.getItem() == ingred.getItem() && stack.getItemDamage() == ingred.getItemDamage()) {
                             hasMatch = true;
                         }
                     }

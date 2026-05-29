@@ -82,20 +82,17 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
 
     @Override
     public boolean matches(AnvilCraftMatrix matrix) {
-        for (int x = 0; x <= this.recipeWidth; ++x) {
-            for (int y = 0; y <= this.recipeHeight; ++y) {
+        for (int y = 0; y < this.recipeHeight; ++y) {
+            for (int x = 0; x < this.recipeWidth; ++x) {
                 ItemStack inputItem = matrix.getStackInRowAndColumn(x, y);
-                /*
-                 * if(x >= this.recipeWidth || y >= this.recipeHeight) { return false; }
-                 */
-
-                if (inputItem == null && ingredients[x][y] != null || inputItem != null && ingredients[x][y] == null) {
+                IIngredient ingredient = ingredients[y] != null && x < ingredients[y].length ? ingredients[y][x] : null;
+                if ((inputItem == null && ingredient != null) || (inputItem != null && ingredient == null)) {
                     return false;
                 }
-
-                IIngredient recipeStack = ingredients[x][y];
-
-                if (!isInList(inputItem, ingredients[x][y].getItems())) {
+                if (inputItem == null) {
+                    continue;
+                }
+                if (!isInList(inputItem, ingredient.getItems())) {
                     return false;
                 }
             }
