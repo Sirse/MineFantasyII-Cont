@@ -29,21 +29,23 @@ public class LevelupPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
         String name = ByteBufUtils.readUTF8String(packet);
         int skillLvl = packet.readInt();
 
-        if (!NetworkUtils.isServer(player)) {
-            Skill skill = RPGElements.getSkillByName(name);
+        Skill skill = RPGElements.getSkillByName(name);
 
-            if (skill != null) {
-                player.playSound("random.levelup", 1.0F, 0.5F);
-                player.addChatMessage(
-                        new ChatComponentText(
-                                StatCollector.translateToLocalFormatted(
-                                        "rpg.levelup",
-                                        skill.getDisplayName().toLowerCase(),
-                                        skillLvl)));
-            }
+        if (skill != null) {
+            player.playSound("random.levelup", 1.0F, 0.5F);
+            player.addChatMessage(
+                    new ChatComponentText(
+                            StatCollector.translateToLocalFormatted(
+                                    "rpg.levelup",
+                                    skill.getDisplayName().toLowerCase(),
+                                    skillLvl)));
         }
     }
 

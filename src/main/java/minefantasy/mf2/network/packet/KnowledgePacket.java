@@ -26,6 +26,10 @@ public class KnowledgePacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
         int size = InformationList.knowledgeList.size();
         ArrayList<Object[]> completed = new ArrayList<>();
         for (int a = 0; a < size; a++) {
@@ -38,13 +42,11 @@ public class KnowledgePacket extends PacketMF {
             }
         }
         username = ByteBufUtils.readUTF8String(packet);
-        if (!NetworkUtils.isServer(player)) {
-            for (Object[] entry : completed) {
-                InformationBase base = (InformationBase) entry[0];
-                ResearchLogic.setArtefactCount(base.getUnlocalisedName(), player, (Integer) entry[2]);
-                if ((Boolean) entry[1]) {
-                    ResearchLogic.forceUnlock(player, base);
-                }
+        for (Object[] entry : completed) {
+            InformationBase base = (InformationBase) entry[0];
+            ResearchLogic.setArtefactCount(base.getUnlocalisedName(), player, (Integer) entry[2]);
+            if ((Boolean) entry[1]) {
+                ResearchLogic.forceUnlock(player, base);
             }
         }
     }

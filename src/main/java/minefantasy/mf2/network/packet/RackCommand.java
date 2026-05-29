@@ -11,6 +11,8 @@ import minefantasy.mf2.network.NetworkUtils;
 public class RackCommand extends PacketMF {
 
     public static final String packetName = "MF2_Command_Rack";
+    private static final String LAST_RACK_CMD_TICK_NBT = "MF2_LastRackCmd";
+    private static final long RACK_COOLDOWN_TICKS = 2L;
     private EntityPlayer user;
     private TileEntityRack rack;
     private int slot;
@@ -49,6 +51,12 @@ public class RackCommand extends PacketMF {
         if (!rack.isUseableByPlayer(player)) {
             return;
         }
+        long now = player.worldObj.getTotalWorldTime();
+        long last = player.getEntityData().getLong(LAST_RACK_CMD_TICK_NBT);
+        if (now - last < RACK_COOLDOWN_TICKS) {
+            return;
+        }
+        player.getEntityData().setLong(LAST_RACK_CMD_TICK_NBT, now);
         BlockRack.interact(slot, player.worldObj, rack, player);
     }
 

@@ -15,6 +15,9 @@ import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 public class ExtendedReachPacket extends PacketMF {
 
     public static final String packetName = "MF2_ExtReach";
+    private static final String LAST_ATTACK_TICK_NBT = "MF2_LastExtReachAtk";
+    private static final long ATTACK_COOLDOWN_TICKS = 2L;
+    private static final double MAX_ALLOWED_REACH_BLOCKS = 10.0D;
 
     private int targetId;
 
@@ -46,6 +49,13 @@ public class ExtendedReachPacket extends PacketMF {
             return;
         }
 
+        long now = user.worldObj.getTotalWorldTime();
+        long last = user.getEntityData().getLong(LAST_ATTACK_TICK_NBT);
+        if (now - last < ATTACK_COOLDOWN_TICKS) {
+            return;
+        }
+        user.getEntityData().setLong(LAST_ATTACK_TICK_NBT, now);
+
         user.attackTargetEntityWithCurrentItem(target);
     }
 
@@ -62,7 +72,7 @@ public class ExtendedReachPacket extends PacketMF {
             return false;
         }
 
-        double maxDist = extendedReach + 4.0D;
+        double maxDist = Math.min(extendedReach + 4.0D, MAX_ALLOWED_REACH_BLOCKS);
         Vec3 start = player.getPosition(1.0F);
         Vec3 look = player.getLook(1.0F);
         Vec3 end = start.addVector(look.xCoord * maxDist, look.yCoord * maxDist, look.zCoord * maxDist);

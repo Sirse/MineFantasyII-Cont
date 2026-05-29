@@ -26,6 +26,7 @@ public class ConfigHardcore extends ConfigurationBaseMF {
     public static boolean preventCook;
     public static boolean upgradeZombieWep;
     public static float zombieWepChance;
+    public static boolean spiderRiders;
     public static boolean fastZombies;
     public static boolean critLimp;
 
@@ -144,14 +145,18 @@ public class ConfigHardcore extends ConfigurationBaseMF {
                         CATEGORY_MOB,
                         "Give Zombie Weapon",
                         true,
-                        "Zombies have a chance on spawning with forged iron weapons, It also controls some zombies having MF armour")
+                        "Zombies have a chance of spawning with forged weapons. It also affects MF-armoured zombie variants.")
                         .getString());
         zombieWepChance = Float.parseFloat(
                 config.get(
                         CATEGORY_MOB,
                         "Zombie Weapon Spawn Chance Modifier",
                         1.0F,
-                        "Chance for Zombies to have forged weapons, increased with difficulty").getString());
+                        "Multiplier for zombie forged-weapon chance and MF-armoured zombie variants. Difficulty still modifies the final chance.")
+                        .getString());
+        spiderRiders = Boolean.parseBoolean(
+                config.get(CATEGORY_MOB, "Enable Spider Riders", true, "Allow witches/creepers to spawn riding spiders")
+                        .getString());
         fastZombies = Boolean.parseBoolean(
                 config.get(
                         CATEGORY_MOB,

@@ -23,15 +23,17 @@ public class HitSoundPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
+        if (NetworkUtils.isServer(player)) {
+            return;
+        }
+
         entId = packet.readInt();
         sound = ByteBufUtils.readUTF8String(packet);
 
-        if (!NetworkUtils.isServer(player)) {
-            Entity entity = player.worldObj.getEntityByID(entId);
-            if (entity != null) {
-                if (ConfigClient.playHitsound) {
-                    entity.worldObj.playSound(entity.posX, entity.posY, entity.posZ, sound, 1.0F, 1.0F, false);
-                }
+        Entity entity = player.worldObj.getEntityByID(entId);
+        if (entity != null) {
+            if (ConfigClient.playHitsound) {
+                entity.worldObj.playSound(entity.posX, entity.posY, entity.posZ, sound, 1.0F, 1.0F, false);
             }
         }
     }

@@ -3,7 +3,6 @@ package minefantasy.mf2.mechanics;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.*;
-import net.minecraft.init.Items;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -51,10 +50,11 @@ public class MonsterUpgrader {
                             mob.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(1.0F);
                         }
                     } else {
-                        float mod = diff >= 2 ? ConfigHardcore.zombieWepChance * 2
-                                : diff < 1 ? ConfigHardcore.zombieWepChance / 2 : ConfigHardcore.zombieWepChance;
-                        float chance = random.nextFloat() * 100F * mod;
-                        if (chance >= (100F - zombieWepChance)) {
+                        float difficultyMod = diff >= 2 ? 2F : diff < 1 ? 0.5F : 1F;
+                        float chance = Math.min(
+                                100F,
+                                Math.max(0F, zombieWepChance * ConfigHardcore.zombieWepChance * difficultyMod));
+                        if (random.nextFloat() * 100F < chance) {
                             giveEntityWeapon(mob, tier, random.nextInt(5));
                             if (mob.getEntityAttribute(SharedMonsterAttributes.attackDamage) != null) {
                                 mob.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(1.0F);
@@ -62,16 +62,18 @@ public class MonsterUpgrader {
                         }
                     }
                 }
-                if (random.nextFloat() * (zombieKnightChance) < diff) {
+                float difficultyMod = diff >= 2 ? 2F : diff < 1 ? 0.5F : 1F;
+                float armourMod = Math.max(0F, ConfigHardcore.zombieWepChance) * difficultyMod;
+                if (armourMod > 0F && random.nextFloat() * (zombieKnightChance / armourMod) < diff) {
                     createZombieKnight((EntityZombie) mob);
-                } else if (random.nextFloat() * (zombieBruteChance) < diff) {
+                } else if (armourMod > 0F && random.nextFloat() * (zombieBruteChance / armourMod) < diff) {
                     createZombieBrute((EntityZombie) mob);
                 } else if (ConfigHardcore.fastZombies) {
                     mob.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3F);
                 }
             }
         }
-        if (ConfigHardcore.upgradeZombieWep && mob instanceof EntitySpider) {
+        if (ConfigHardcore.spiderRiders && mob instanceof EntitySpider) {
             if (mob.riddenByEntity == null) {
                 if (random.nextFloat() * (witchRiderChance) < diff) {
                     EntityWitch rider = new EntityWitch(mob.worldObj);
@@ -84,10 +86,6 @@ public class MonsterUpgrader {
                     mob.worldObj.spawnEntityInWorld(rider);
                     rider.mountEntity(mob);
                 }
-            }
-        } else if (!ConfigHardcore.upgradeZombieWep) {
-            if (mob.getHeldItem() != null && mob.getHeldItem().getItem() == Items.iron_sword) {
-                giveEntityWeapon(mob, "iron", 0);
             }
         }
         if (mob instanceof EntityPigZombie) {
@@ -109,6 +107,7 @@ public class MonsterUpgrader {
         setArmour(mob, 1, tier);
         mob.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.2F);
         mob.getEntityData().setInteger("MF_LootDrop", lootId);
+        mob.getEntityData().setBoolean(zombieArmourNBT, true);
     }
 
     private void setArmour(EntityLivingBase mob, int id, String tier) {
@@ -138,6 +137,7 @@ public class MonsterUpgrader {
         setArmour(mob, 0, tier);
         mob.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.35F);
         mob.getEntityData().setInteger("MF_LootDrop", lootId);
+        mob.getEntityData().setBoolean(zombieArmourNBT, true);
     }
 
     /**

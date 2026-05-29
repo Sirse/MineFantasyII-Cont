@@ -11,6 +11,8 @@ import minefantasy.mf2.network.NetworkUtils;
 public class ResearchRequest extends PacketMF {
 
     public static final String packetName = "MF2_RequestResearch";
+    private static final String LAST_REQUEST_TICK_NBT = "MF2_LastResearchReq";
+    private static final long REQUEST_COOLDOWN_TICKS = 2L;
     private EntityPlayer user;
     private int researchID;
 
@@ -23,13 +25,19 @@ public class ResearchRequest extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        researchID = packet.readInt();
         if (!NetworkUtils.isServer(player)) {
             return;
         }
+        researchID = packet.readInt();
         if (researchID < 0 || researchID >= InformationList.knowledgeList.size()) {
             return;
         }
+        long now = player.worldObj.getTotalWorldTime();
+        long last = player.getEntityData().getLong(LAST_REQUEST_TICK_NBT);
+        if (now - last < REQUEST_COOLDOWN_TICKS) {
+            return;
+        }
+        player.getEntityData().setLong(LAST_REQUEST_TICK_NBT, now);
 
         InformationBase research = InformationList.knowledgeList.get(researchID);
         if (research != null && research.isEasy()) {

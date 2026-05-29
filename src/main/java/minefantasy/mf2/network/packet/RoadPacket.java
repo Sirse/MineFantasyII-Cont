@@ -1,7 +1,6 @@
 package minefantasy.mf2.network.packet;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.tileentity.TileEntityRoad;
@@ -33,14 +32,12 @@ public class RoadPacket extends PacketMF {
         this.coords = NetworkUtils.readCoords(packet);
         isRequest = packet.readBoolean();
 
-        TileEntity entity = player.worldObj.getTileEntity(coords[0], coords[1], coords[2]);
-        if (!(entity instanceof TileEntityRoad)) {
-            return;
-        }
-        TileEntityRoad tile = (TileEntityRoad) entity;
-
         if (isRequest) {
             if (NetworkUtils.isServer(player)) {
+                TileEntityRoad tile = NetworkUtils.getTile(player.worldObj, coords, TileEntityRoad.class);
+                if (tile == null) {
+                    return;
+                }
                 if (!NetworkUtils.isWithinDistanceSq(player, coords, 64D)) {
                     return;
                 }
@@ -48,6 +45,10 @@ public class RoadPacket extends PacketMF {
             }
         } else {
             if (!NetworkUtils.isServer(player)) {
+                TileEntityRoad tile = NetworkUtils.getTile(player.worldObj, coords, TileEntityRoad.class);
+                if (tile == null) {
+                    return;
+                }
                 int s0 = packet.readInt();
                 int s1 = packet.readInt();
                 this.isLocked = packet.readBoolean();
