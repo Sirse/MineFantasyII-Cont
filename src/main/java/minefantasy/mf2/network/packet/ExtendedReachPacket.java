@@ -76,7 +76,7 @@ public class ExtendedReachPacket extends PacketMF {
         Vec3 start = player.getPosition(1.0F);
         Vec3 look = player.getLook(1.0F);
         Vec3 end = start.addVector(look.xCoord * maxDist, look.yCoord * maxDist, look.zCoord * maxDist);
-        MovingObjectPosition blockHit = player.worldObj.rayTraceBlocks(start, end, false, true, false);
+        MovingObjectPosition blockHit = player.worldObj.rayTraceBlocks(start, end, false);
         float border = target.getCollisionBorderSize();
         MovingObjectPosition hit = target.boundingBox.expand(border, border, border).calculateIntercept(start, end);
         if (hit == null || start.squareDistanceTo(hit.hitVec) > maxDist * maxDist) {

@@ -3,6 +3,7 @@ package minefantasy.mf2.mechanics;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.monster.*;
+import net.minecraft.init.Items;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
