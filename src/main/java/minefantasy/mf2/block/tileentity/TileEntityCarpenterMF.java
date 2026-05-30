@@ -448,7 +448,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 setInventorySlotContents(s, item);
                 return null;// All Placed
             } else {
-                if (slot.isItemEqual(item) && slot.stackSize < slot.getMaxStackSize()) {
+                if (slot.isItemEqual(item) && ItemStack.areItemStackTagsEqual(slot, item)
+                        && slot.stackSize < slot.getMaxStackSize()) {
                     if (slot.stackSize + item.stackSize <= slot.getMaxStackSize()) {
                         slot.stackSize += item.stackSize;
                         return null;// All Shared

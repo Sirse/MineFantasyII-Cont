@@ -245,8 +245,12 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             if (res.stackSize <= 0) break;
 
             if (inv[output] == null) {
-                setInventorySlotContents(output, res);
-                break;
+                int placed = Math.min(res.stackSize, res.getMaxStackSize());
+                setInventorySlotContents(output, new ItemStack(res.getItem(), placed, res.getItemDamage()));
+                if (res.hasTagCompound()) {
+                    inv[output].setTagCompound((NBTTagCompound) res.getTagCompound().copy());
+                }
+                res.stackSize -= placed;
             } else {
                 if (CustomToolHelper.areEqual(inv[output], res)) {
                     int spaceLeft = inv[output].getMaxStackSize() - inv[output].stackSize;
@@ -283,7 +287,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             setInventorySlotContents(output, res);
         } else {
             if (CustomToolHelper.areEqual(inv[output], res)) {
-                inv[output].stackSize += res.stackSize;
+                int max = inv[output].getMaxStackSize();
+                inv[output].stackSize = Math.min(max, inv[output].stackSize + res.stackSize);
             }
         }
 
@@ -612,6 +617,11 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     @Override
     public ItemStack getStackInSlotOnClosing(int var1) {
+        if (inv[var1] != null) {
+            ItemStack itemstack = inv[var1];
+            inv[var1] = null;
+            return itemstack;
+        }
         return null;
     }
 
@@ -691,7 +701,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         if (!isHeater()) {
             return slot >= 4;
         }
-        return item.getItem() == Items.bucket;
+        return item != null && item.getItem() == Items.bucket;
     }
 
     public int getCookProgressScaled(int i) {

@@ -114,7 +114,7 @@ public class ContainerAnvilMF extends ContainerMF {
             return null;
         }
 
-        slot.onPickupFromSlot(player, stackInSlot);
+        slot.onPickupFromSlot(player, originalStack);
         onPostTransfer(player, slot, originalStack);
         return originalStack;
     }

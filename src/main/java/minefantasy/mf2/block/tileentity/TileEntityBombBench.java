@@ -116,7 +116,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
                             if (spare == null) {
                                 setInventorySlotContents(5, cont);
                                 cont = null;
-                            } else if (spare.isItemEqual(cont)) {
+                            } else if (spare.isItemEqual(cont) && ItemStack.areItemStackTagsEqual(spare, cont)) {
                                 if (spare.stackSize + cont.stackSize <= spare.getMaxStackSize()) {
                                     spare.stackSize += cont.stackSize;
                                     cont = null;

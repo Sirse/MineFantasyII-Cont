@@ -58,17 +58,18 @@ public class BlockFirepit extends BlockContainer {
             if (held != null) {
                 if (firepit.addFuel(held) && !player.capabilities.isCreativeMode) {
                     if (!world.isRemote) {
+                        ItemStack container = held.getItem().getContainerItem(held);
                         if (held.stackSize == 1) {
-                            if (held.getItem().getContainerItem(held) != null) {
-                                player.setCurrentItemOrArmor(0, held.getItem().getContainerItem(held));
+                            if (container != null) {
+                                player.setCurrentItemOrArmor(0, container);
                             } else {
                                 player.setCurrentItemOrArmor(0, null);
                             }
                         } else {
                             held.stackSize--;
-                            if (held.getItem().getContainerItem(held) != null) {
-                                if (!player.inventory.addItemStackToInventory(held.getItem().getContainerItem(held))) {
-                                    player.entityDropItem(held.getItem().getContainerItem(held), 0F);
+                            if (container != null) {
+                                if (!player.inventory.addItemStackToInventory(container)) {
+                                    player.entityDropItem(container, 0F);
                                 }
                             }
                         }

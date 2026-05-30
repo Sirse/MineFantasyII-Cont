@@ -204,14 +204,14 @@ public class BlockForge extends BlockContainer {
                     if (user.capabilities.isCreativeMode) {
                         return true;
                     }
-                    if (user.getHeldItem().getItem().getContainerItem() != null) {
-                        ItemStack cont = new ItemStack(user.getHeldItem().getItem().getContainerItem());
+                    ItemStack container = held.getItem().getContainerItem(held);
+                    if (container != null) {
                         if (user.getHeldItem().stackSize == 1) {
-                            user.setCurrentItemOrArmor(0, cont);
+                            user.setCurrentItemOrArmor(0, container);
                             return true;
                         } else {
-                            if (!user.inventory.addItemStackToInventory(cont)) {
-                                user.entityDropItem(cont, 0.0F);
+                            if (!user.inventory.addItemStackToInventory(container)) {
+                                user.entityDropItem(container, 0.0F);
                             }
                         }
                     }

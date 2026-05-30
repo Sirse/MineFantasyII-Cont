@@ -127,7 +127,7 @@ public class ContainerBigFurnace extends ContainerMF {
             return null;
         }
 
-        slot.onPickupFromSlot(player, stackInSlot);
+        slot.onPickupFromSlot(player, originalStack);
         return originalStack;
     }
 }

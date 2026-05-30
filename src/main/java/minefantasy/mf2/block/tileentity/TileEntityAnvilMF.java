@@ -614,11 +614,12 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         resetRecipe = true;
         for (int slot = 0; slot < getSizeInventory() - 1; slot++) {
             ItemStack item = getStackInSlot(slot);
-            if (item != null && item.getItem() != null && item.getItem().getContainerItem(item) != null) {
+            ItemStack container = getContainerItem(item);
+            if (container != null) {
                 if (item.stackSize == 1) {
-                    setInventorySlotContents(slot, item.getItem().getContainerItem(item));
+                    setInventorySlotContents(slot, container.copy());
                 } else {
-                    this.dropItem(item.getItem().getContainerItem(item));
+                    this.dropItem(container.copy());
                     this.decrStackSize(slot, 1);
                 }
             } else {
@@ -627,6 +628,14 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         }
         resetRecipe = false;
         this.onInventoryChanged();
+    }
+
+    private ItemStack getContainerItem(ItemStack item) {
+        if (item == null || item.getItem() == null) {
+            return null;
+        }
+        ItemStack container = item.getItem().getContainerItem(item);
+        return container == null ? null : container.copy();
     }
 
     private boolean canFitResult(ItemStack result) {

@@ -20,6 +20,7 @@ import minefantasy.mf2.item.gadget.ItemCrossbowPart;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.material.WoodMaterial;
+import minefantasy.mf2.util.MFLogUtil;
 
 /**
  * @author Anonymous Productions
@@ -197,6 +198,10 @@ public class ComponentListMF {
         Blocks.iron_bars.setBlockTextureName("minefantasy2:metal/iron_bars");
         for (int a = 0; a < ingotMats.length; a++) {
             BaseMaterialMF mat = BaseMaterialMF.getMaterial(ingotMats[a]);
+            if (mat == null) {
+                MFLogUtil.logWarn("Missing BaseMaterialMF for ingot material key: " + ingotMats[a]);
+                continue;
+            }
             String name = mat.name;
             int rarity = mat.rarity;
 

@@ -22,6 +22,13 @@ public class ExtendedReachMF {
 
     @SubscribeEvent
     public void onMouse(MouseEvent event) {
+        Minecraft mc = FMLClientHandler.instance().getClient();
+        if (mc == null || event == null || event.isCanceled()) {
+            return;
+        }
+        if (mc.currentScreen != null || !mc.inGameHasFocus) {
+            return;
+        }
         if (event.button == 0 && event.buttonstate) {
             attackExtendedTarget();
         }

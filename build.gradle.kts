@@ -22,7 +22,6 @@ val unimixinsVersion = "0.1.22"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
-    vendor.set(JvmVendorSpec.AZUL)
   }
   sourceCompatibility = JavaVersion.VERSION_1_8
   targetCompatibility = JavaVersion.VERSION_1_8
