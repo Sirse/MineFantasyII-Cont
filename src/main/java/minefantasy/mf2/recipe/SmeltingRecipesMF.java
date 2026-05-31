@@ -25,7 +25,6 @@ public class SmeltingRecipesMF {
         ItemStack iron = ComponentListMF.bar("Iron");
         ItemStack pigiron = ComponentListMF.bar("PigIron");
         ItemStack steel = ComponentListMF.bar("Steel");
-        ItemStack diamond = ComponentListMF.bar("Encrusted");
         ItemStack tungsten = ComponentListMF.bar("Tungsten");
         ItemStack obsidian = ComponentListMF.bar("Obsidian");
         ItemStack black = ComponentListMF.bar("BlackSteel");
@@ -134,6 +133,7 @@ public class SmeltingRecipesMF {
         KnowledgeListMF.mithril = MineFantasyAPI.addRatioAlloy(
                 2,
                 ComponentListMF.bar("mithril", 2),
+                2,
                 new Object[] { BlockListMF.oreMythic, silver, silver });
 
         KnowledgeListMF.ignotumite = MineFantasyAPI

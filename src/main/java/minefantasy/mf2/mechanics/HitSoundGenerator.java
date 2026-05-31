@@ -13,11 +13,13 @@ import minefantasy.mf2.network.packet.HitSoundPacket;
 public class HitSoundGenerator {
 
     public static void makeHitSound(ItemStack weapon, Entity target) {
+        if (target == null || target.worldObj == null) {
+            return;
+        }
         WeaponClass WC = WeaponClass.findClassForAny(weapon);
-        String material = "metal";
         String type = "blunt";
 
-        material = getMaterial(material, weapon);
+        String material = getMaterial(weapon);
         if (WC != null) {
             type = WC.getSound();
             String sndString = "minefantasy2:weapon.hit." + type + "." + material;
@@ -29,29 +31,34 @@ public class HitSoundGenerator {
         }
     }
 
-    public static String getMaterial(String material, ItemStack itemstack) {
+    public static String getMaterial(ItemStack itemstack) {
         if (itemstack == null) {
             return "metal";
         }
         Item item = itemstack.getItem();
+        String material = "metal";
+
         if (item instanceof ItemTool) {
-            if (((ItemTool) item).getToolMaterialName().equalsIgnoreCase("WOOD")) {
-                material = "wood";
-            }
-            if (((ItemTool) item).getToolMaterialName().equalsIgnoreCase("STONE")) {
-                material = "stone";
-            }
+            material = getMaterialFromName(((ItemTool) item).getToolMaterialName(), material);
         }
 
         if (item instanceof ItemSword) {
-            if (((ItemSword) item).getToolMaterialName().equalsIgnoreCase("WOOD")) {
-                material = "wood";
-            }
-            if (((ItemSword) item).getToolMaterialName().equalsIgnoreCase("STONE")) {
-                material = "stone";
-            }
+            material = getMaterialFromName(((ItemSword) item).getToolMaterialName(), material);
         }
 
         return material;
+    }
+
+    private static String getMaterialFromName(String toolMaterialName, String fallback) {
+        if (toolMaterialName == null) {
+            return fallback;
+        }
+        if ("WOOD".equalsIgnoreCase(toolMaterialName)) {
+            return "wood";
+        }
+        if ("STONE".equalsIgnoreCase(toolMaterialName)) {
+            return "stone";
+        }
+        return fallback;
     }
 }

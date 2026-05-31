@@ -207,7 +207,7 @@ public class PlayerTickHandlerMF {
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             ItemStack held = event.player.getHeldItem();
-            if (held != null) {
+            if (!event.player.worldObj.isRemote && held != null) {
                 int parry = ItemWeaponMF.getParry(held);
                 if (parry > 0) {
                     ItemWeaponMF.setParry(held, parry - 1);
@@ -260,7 +260,7 @@ public class PlayerTickHandlerMF {
                     }
                 }
             }
-            if (event.player.worldObj.isRemote) {
+            if (!event.player.worldObj.isRemote) {
                 ItemStack item = event.player.getHeldItem();
                 NBTTagCompound data = event.player.getEntityData();
                 int currentSlot = event.player.inventory.currentItem;
@@ -345,6 +345,7 @@ public class PlayerTickHandlerMF {
     }
 
     private void applyBalance(EntityPlayer entityPlayer) {
+        boolean clientSide = entityPlayer.worldObj.isRemote;
         float pitchBalance = entityPlayer.getEntityData().hasKey("MF_Balance_Pitch")
                 ? entityPlayer.getEntityData().getFloat("MF_Balance_Pitch")
                 : 0F;
@@ -355,7 +356,7 @@ public class PlayerTickHandlerMF {
         if (pitchBalance != 0F) {
             float pitchStep = Math.min(2.0F, Math.abs(pitchBalance));
 
-            if (ConfigWeapon.useBalance) {
+            if (ConfigWeapon.useBalance && clientSide) {
                 entityPlayer.rotationPitch += pitchBalance > 0 ? pitchStep : -pitchStep;
             }
             pitchBalance += pitchBalance > 0 ? -pitchStep : pitchStep;
@@ -366,7 +367,7 @@ public class PlayerTickHandlerMF {
         if (yawBalance != 0F) {
             float yawStep = Math.min(2.0F, Math.abs(yawBalance));
 
-            if (ConfigWeapon.useBalance) {
+            if (ConfigWeapon.useBalance && clientSide) {
                 entityPlayer.rotationYaw += yawBalance > 0 ? yawStep : -yawStep;
             }
             yawBalance += yawBalance > 0 ? -yawStep : yawStep;

@@ -144,8 +144,17 @@ public class CookingRecipes {
         if (!ConfigHardcore.preventCook) {
             GameRegistry.addSmelting(clay, new ItemStack(ceramic), 0F);
         }
-        return MineFantasyAPI
-                .addCookingRecipe(new ItemStack(clay), new ItemStack(ceramic), null, temp, 1000, time, 0, true, false);
+        int maxTemp = Math.max(temp, 1000);
+        return MineFantasyAPI.addCookingRecipe(
+                new ItemStack(clay),
+                new ItemStack(ceramic),
+                null,
+                temp,
+                maxTemp,
+                time,
+                0,
+                true,
+                false);
 
     }
 }

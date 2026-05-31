@@ -10,6 +10,7 @@ import minefantasy.mf2.api.refine.IBellowsUseable;
 public class TileEntityBellows extends TileEntity {
 
     public int direction;
+    public int prevPress = 0;
     public int press = 0;
 
     public TileEntityBellows() {
@@ -38,6 +39,7 @@ public class TileEntityBellows extends TileEntity {
     @Override
     public void updateEntity() {
         super.updateEntity();
+        prevPress = press;
         if (press > 0) press -= 2;
         if (press < 0) press = 0;
         sendPacketToClients();
@@ -52,6 +54,7 @@ public class TileEntityBellows extends TileEntity {
         super.readFromNBT(nbt);
         direction = nbt.getInteger("direction");
         press = nbt.getInteger("press");
+        prevPress = press;
     }
 
     public void writeToNBT(NBTTagCompound nbt) {

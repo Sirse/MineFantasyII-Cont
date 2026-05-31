@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityBellows;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 public class TileEntityBellowsRenderer extends TileEntitySpecialRenderer {
 
@@ -45,7 +46,7 @@ public class TileEntityBellowsRenderer extends TileEntitySpecialRenderer {
         model.renderModel(0, 0.0625F);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }
@@ -73,7 +74,8 @@ public class TileEntityBellowsRenderer extends TileEntitySpecialRenderer {
         if (i == 0) {
             j = 90;
         }
-        model.rotate(tile.press);
+        int press = Math.round(tile.prevPress + (tile.press - tile.prevPress) * f);
+        model.rotate(press);
         bindTextureByName("textures/models/tileentity/bellows.png"); // texture
 
         GL11.glPushMatrix(); // start
@@ -84,10 +86,10 @@ public class TileEntityBellowsRenderer extends TileEntitySpecialRenderer {
         GL11.glScalef(scale, -scale, -scale); // if you read this comment out this line and you can see what happens
         GL11.glPushMatrix();
         float level = 0F;
-        model.renderModel(tile.press, 0.0625F);
+        model.renderModel(press, 0.0625F);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }

@@ -29,6 +29,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     public String tex = "";
     public int tier = 0;
     public String toolType = "knife";
+    public float prevAcTime;
     public float acTime;
     private int tempTicksExisted = 0;
     private Random rand = new Random();
@@ -46,6 +47,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     @Override
     public void updateEntity() {
         super.updateEntity();
+        prevAcTime = acTime;
         ++tempTicksExisted;
         if (tempTicksExisted == 10) {
             blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
@@ -214,6 +216,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         acTime = nbt.getFloat("acTime");
+        prevAcTime = acTime;
         tex = nbt.getString("tex");
         tier = nbt.getInteger("tier");
         progress = nbt.getFloat("Progress");

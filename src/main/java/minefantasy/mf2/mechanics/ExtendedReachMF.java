@@ -14,10 +14,13 @@ import net.minecraftforge.client.event.MouseEvent;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.network.packet.ExtendedReachPacket;
 import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
+@SideOnly(Side.CLIENT)
 public class ExtendedReachMF {
 
     @SubscribeEvent
@@ -88,6 +91,9 @@ public class ExtendedReachMF {
                     Entity entity = list.get(i);
 
                     if (entity.canBeCollidedWith()) {
+                        if (entity.boundingBox == null) {
+                            continue;
+                        }
                         float f2 = entity.getCollisionBorderSize();
                         AxisAlignedBB axisalignedbb = entity.boundingBox.expand(f2, f2, f2);
                         MovingObjectPosition movingobjectposition = axisalignedbb.calculateIntercept(vec3, vec32);

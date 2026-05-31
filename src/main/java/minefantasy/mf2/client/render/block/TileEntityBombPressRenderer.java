@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityBombPress;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 /**
  * @author Anonymous Productions
@@ -36,7 +37,9 @@ public class TileEntityBombPressRenderer extends TileEntitySpecialRenderer {
         }
         for (int a = 0; a < 2; a++) {
             if (shouldRender(tile, a)) {
-                this.renderModelAt("bombPress", i, d, d1, d2, f, a, ((TileEntityBombPress) tile).animation);
+                float anim = ((TileEntityBombPress) tile).prevAnimation
+                        + ((((TileEntityBombPress) tile).animation - ((TileEntityBombPress) tile).prevAnimation) * f);
+                this.renderModelAt("bombPress", i, d, d1, d2, f, a, anim);
             }
         }
     }
@@ -75,7 +78,7 @@ public class TileEntityBombPressRenderer extends TileEntitySpecialRenderer {
         model.renderModel(0.0625F, animation);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }

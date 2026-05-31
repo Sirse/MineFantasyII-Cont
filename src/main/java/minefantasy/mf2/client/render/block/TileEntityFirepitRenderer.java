@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityFirepit;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 public class TileEntityFirepitRenderer extends TileEntitySpecialRenderer {
 
@@ -36,6 +37,7 @@ public class TileEntityFirepitRenderer extends TileEntitySpecialRenderer {
             bindTextureByName("textures/models/tileentity/forge_top.png"); // texture
             topModel.render(0.0625F);
         }
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix();
 
     }
@@ -50,6 +52,7 @@ public class TileEntityFirepitRenderer extends TileEntitySpecialRenderer {
 
         model.renderModel(null, 0.0625F);
 
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix();
 
     }

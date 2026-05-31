@@ -1,8 +1,5 @@
 package minefantasy.mf2.recipe;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.MineFantasyAPI;
@@ -26,10 +23,7 @@ public class CustomWoodRecipes {
     private static final Skill construction = SkillList.construction;
 
     public static void init() {
-        ArrayList<CustomMaterial> wood = CustomMaterial.getList("wood");
-        Iterator iterator = wood.iterator();
-        while (iterator.hasNext()) {
-            CustomMaterial customMat = (CustomMaterial) iterator.next();
+        for (CustomMaterial customMat : CustomMaterial.getList("wood")) {
             addRecipes(customMat);
         }
     }
@@ -67,12 +61,8 @@ public class CustomWoodRecipes {
                         new Object[] { "NNN", "CTC", "CTC", 'T', timber, 'C', cutPlank, 'N', ComponentListMF.nail, }));
         Salvage.addSalvage(
                 woodpane,
-                cutPlank,
-                cutPlank,
-                cutPlank,
-                cutPlank,
-                timber,
-                timber,
+                new ItemStack(cutPlank.getItem(), 4, cutPlank.getItemDamage()),
+                new ItemStack(timber.getItem(), 2, timber.getItemDamage()),
                 new ItemStack(ComponentListMF.nail, 3));
 
         time = 10;
@@ -90,13 +80,8 @@ public class CustomWoodRecipes {
                                 cutPlank, }));
         Salvage.addSalvage(
                 result,
-                cutPlank,
-                cutPlank,
-                cutPlank,
-                timber,
-                timber,
-                timber,
-                timber,
+                new ItemStack(cutPlank.getItem(), 3, cutPlank.getItemDamage()),
+                new ItemStack(timber.getItem(), 4, timber.getItemDamage()),
                 new ItemStack(ComponentListMF.nail, 2));
 
         time = 20;
@@ -114,10 +99,7 @@ public class CustomWoodRecipes {
                                 cutPlank, }));
         Salvage.addSalvage(
                 result,
-                cutPlank,
-                cutPlank,
-                cutPlank,
-                cutPlank,
+                new ItemStack(cutPlank.getItem(), 4, cutPlank.getItemDamage()),
                 new ItemStack(ComponentListMF.nail, 2),
                 ComponentListMF.hinge);
 
@@ -136,10 +118,8 @@ public class CustomWoodRecipes {
                                 woodpane, 'C', cutPlank, }));
         Salvage.addSalvage(
                 result,
-                cutPlank,
-                cutPlank,
-                woodpane,
-                woodpane,
+                new ItemStack(cutPlank.getItem(), 2, cutPlank.getItemDamage()),
+                new ItemStack(woodpane.getItem(), 2, woodpane.getItemDamage()),
                 new ItemStack(ComponentListMF.nail, 2),
                 new ItemStack(ComponentListMF.hinge, 2));
 
@@ -155,15 +135,10 @@ public class CustomWoodRecipes {
                         material.tier,
                         (int) (material.durability * time),
                         new Object[] { "NNNN", "HPPH", "P  P", " PP ", 'N', ComponentListMF.nail, 'H',
-                                ComponentListMF.hinge, 'P', woodpane, 'C', cutPlank, }));
+                                ComponentListMF.hinge, 'P', woodpane, }));
         Salvage.addSalvage(
                 result,
-                woodpane,
-                woodpane,
-                woodpane,
-                woodpane,
-                woodpane,
-                woodpane,
+                new ItemStack(woodpane.getItem(), 6, woodpane.getItemDamage()),
                 new ItemStack(ComponentListMF.nail, 4),
                 new ItemStack(ComponentListMF.hinge, 2));
 
@@ -179,7 +154,10 @@ public class CustomWoodRecipes {
                         material.tier,
                         (int) (material.durability * time),
                         new Object[] { "P P", "PPP", "NNN", 'N', ComponentListMF.nail, 'P', timber, }));
-        Salvage.addSalvage(result, timber, timber, timber, timber, timber, new ItemStack(ComponentListMF.nail, 3));
+        Salvage.addSalvage(
+                result,
+                new ItemStack(timber.getItem(), 5, timber.getItemDamage()),
+                new ItemStack(ComponentListMF.nail, 3));
 
     }
 

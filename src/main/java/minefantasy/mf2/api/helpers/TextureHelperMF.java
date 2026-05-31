@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.helpers;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -9,30 +10,29 @@ import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.collect.Maps;
-
 import cpw.mods.fml.client.FMLClientHandler;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class TextureHelperMF {
 
     public static final ResourceLocation ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-    private static final Map resourceList = Maps.newHashMap();
+    private static final Map<String, ResourceLocation> resourceList = new ConcurrentHashMap<String, ResourceLocation>();
 
     /**
      * This gets the resource location from just a simple directory(Beats the shit you have to do nower days!)
      */
     public static ResourceLocation getResource(String directory) {
-        ResourceLocation resourcelocation = (ResourceLocation) resourceList.get(directory);
-
-        if (resourcelocation == null) {
-            MFLogUtil.logDebug("MineFantasy: Added Resource: " + directory);
-
-            resourcelocation = new ResourceLocation("minefantasy2", directory);
-            resourceList.put(directory, resourcelocation);
+        ResourceLocation resourcelocation = resourceList.get(directory);
+        if (resourcelocation != null) {
+            return resourcelocation;
         }
-
-        return resourcelocation;
+        ResourceLocation created = new ResourceLocation("minefantasy2", directory);
+        ResourceLocation existing = resourceList.putIfAbsent(directory, created);
+        if (existing == null) {
+            MFLogUtil.logDebug("MineFantasy: Added Resource: " + directory);
+            return created;
+        }
+        return existing;
     }
 
     public static void renderEnchantmentEffects(Tessellator tessellator) {

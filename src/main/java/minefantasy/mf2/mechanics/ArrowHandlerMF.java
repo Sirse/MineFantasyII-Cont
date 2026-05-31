@@ -53,6 +53,9 @@ public class ArrowHandlerMF {
     public void readyBow(ArrowNockEvent event) {
         EntityPlayer user = event.entityPlayer;
         ItemStack bow = event.result;
+        if (user == null || bow == null) {
+            return;
+        }
 
         if (AmmoMechanicsMF.arrows == null || AmmoMechanicsMF.arrows.size() <= 0) {
             if (getIsInfinite(event.entityPlayer, event.result)) {
@@ -104,11 +107,10 @@ public class ArrowHandlerMF {
         EntityPlayer user = event.entityPlayer;
 
         ItemStack bow = event.bow;
-        World world = event.entity.worldObj;
-
-        if (world.isRemote) {
+        if (user == null || bow == null) {
             return;
         }
+        World world = event.entity.worldObj;
         boolean creative = user.capabilities.isCreativeMode;
 
         float charge = power / 20.0F;
@@ -127,6 +129,11 @@ public class ArrowHandlerMF {
         boolean infinite = getIsInfinite(user, bow);
         if (loaded == null && !infinite) {
             // No loaded arrow and not infinite: do not allow firing (prevents ammo bypass)
+            event.setCanceled(true);
+            return;
+        }
+        event.setCanceled(true);
+        if (world.isRemote) {
             return;
         }
         // Use loaded arrow if present; otherwise fall back to a default when infinite
@@ -156,6 +163,9 @@ public class ArrowHandlerMF {
     }
 
     private boolean getIsInfinite(EntityPlayer user, ItemStack bow) {
+        if (user == null || bow == null) {
+            return false;
+        }
         return user.capabilities.isCreativeMode
                 || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, bow) > 0;
     }

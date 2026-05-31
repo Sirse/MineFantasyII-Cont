@@ -3,7 +3,10 @@ package minefantasy.mf2.mechanics;
 public class TierHelper {
 
     /**
-     * This gets the "points" on how powerful food is (This is used to help balance cost)
+     * Legacy helper for estimating food "points" for balance discussions.
+     * <p>
+     * Currently unused by runtime logic and kept for reference/compatibility. The {@code hunger} argument is
+     * intentionally not applied in this legacy formula.
      */
     public static int getPointsWorthForFood(int hunger, float saturation, float staminaMax, float staminaMaxTime,
             float staminaSpeed, float staminaSpeedTime) {

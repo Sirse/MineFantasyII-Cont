@@ -73,7 +73,6 @@ public class CombatMechanics {
     private static final float power_attack_base = 25F;
     private static final float parryFatigue = 5F;
     public static boolean swordSkeleton = true;
-    private static boolean debugParry = true;
     private static XSTRandom random = new XSTRandom();
     protected float jumpEvade_cost = 30;
     protected float evade_cost = 10;
@@ -304,7 +303,7 @@ public class CombatMechanics {
         float damage = modifyDamage(src, world, hit, event.ammount, false);
 
         if (hitter instanceof EntityPlayer) {
-            applyHeavyBalance(hitter);
+            applyHeavyBalance((EntityPlayer) hitter);
         }
 
         if (event.source.isProjectile() && !event.source.isFireDamage()) {
@@ -339,12 +338,12 @@ public class CombatMechanics {
         }
     }
 
-    private void applyHeavyBalance(EntityLivingBase hitter) {
+    private void applyHeavyBalance(EntityPlayer hitter) {
         if (!ConfigWeapon.useBalance) return;
         if (hitter.getHeldItem() != null && hitter.getHeldItem().getItem() instanceof ItemWeaponMF) {
             ItemWeaponMF hitterWeapon = ((ItemWeaponMF) hitter.getHeldItem().getItem());
             if (hitterWeapon.isHeavyWeapon()) {
-                TacticalManager.throwPlayerOffBalance((EntityPlayer) hitter, hitterWeapon.getBalance(), true);
+                TacticalManager.throwPlayerOffBalance(hitter, hitterWeapon.getBalance(), true);
             }
         }
     }
@@ -378,7 +377,6 @@ public class CombatMechanics {
         // TODO: Zombie armour
         if (event.entityLiving.getEntityData().hasKey(MonsterUpgrader.zombieArmourNBT)
                 && event.entityLiving instanceof EntityZombie) {
-            float percent = 1.0F;
             ItemStack[] armours = new ItemStack[4];
             for (int a = 1; a < 5; a++) {
                 armours[a - 1] = event.entityLiving.getEquipmentInSlot(a);
@@ -631,7 +629,7 @@ public class CombatMechanics {
                 threshold = ArmourCalculator.adjustACForDamage(source, threshold, 1.0F, 0.75F, 0.5F);
             }
 
-            if (debugParry && !user.worldObj.isRemote) {
+            if (ConfigExperiment.debugParry && !user.worldObj.isRemote) {
                 MFLogUtil.logDebug("Init Parry: Damage = " + dam + " Threshold = " + threshold);
             }
 
@@ -718,7 +716,7 @@ public class CombatMechanics {
                             armour.setItemDamage(armour.getMaxDamage());
                         }
                     }
-                    if (armour.getItemDamage() >= armour.getMaxDamage()) {
+                    if (!user.worldObj.isRemote && armour.getItemDamage() >= armour.getMaxDamage()) {
                         user.setCurrentItemOrArmor(a + 1, null);
                         user.worldObj.playSoundEffect(
                                 user.posX,
@@ -866,7 +864,7 @@ public class CombatMechanics {
                 if (tar != null && tar instanceof EntityPlayer && ((EntityPlayer) tar).isBlocking()) {
                     double dist = mob.getDistanceSqToEntity(tar);
 
-                    if (tar instanceof EntityZombie && mob.onGround
+                    if (mob instanceof EntityZombie && mob.onGround
                             && mob.getRNG().nextInt(10) == 0
                             && dist > 1D
                             && dist < 4D) {

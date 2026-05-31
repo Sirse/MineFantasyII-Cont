@@ -20,7 +20,7 @@ public class RecipeArmourDyeMF implements IRecipe {
     @Override
     public boolean matches(InventoryCrafting matrix, World world) {
         ItemStack itemstack = null;
-        ArrayList arraylist = new ArrayList();
+        ArrayList<ItemStack> arraylist = new ArrayList<ItemStack>();
 
         for (int i = 0; i < matrix.getSizeInventory(); ++i) {
             ItemStack itemstack1 = matrix.getStackInSlot(i);
@@ -110,6 +110,9 @@ public class RecipeArmourDyeMF implements IRecipe {
         if (itemarmor == null) {
             return null;
         } else {
+            if (j == 0) {
+                return null;
+            }
             k = aint[0] / j;
             int i1 = aint[1] / j;
             l = aint[2] / j;

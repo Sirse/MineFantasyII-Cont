@@ -95,47 +95,23 @@ public class ForgedArmourRecipes {
         Salvage.addSalvage(
                 CustomArmourListMF.standard_chain_helmet,
                 helm,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail, 4),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_chain_chest,
                 chest,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail, // 6 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 6 Rivet
+                new ItemStack(mail, 6),
+                new ItemStack(rivet, 6));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_chain_legs,
                 legs,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail, 4),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_chain_boots,
                 boots,
-                mail,
-                mail, // 2 Mail
-                rivet,
-                rivet);// 2 Rivet
+                new ItemStack(mail, 2),
+                new ItemStack(rivet, 2));
     }
 
     private static void assembleScalemail() {
@@ -206,47 +182,23 @@ public class ForgedArmourRecipes {
         Salvage.addSalvage(
                 CustomArmourListMF.standard_scale_helmet,
                 helm,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail.getItem(), 4, mail.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_scale_chest,
                 chest,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail, // 6 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 6 Rivet
+                new ItemStack(mail.getItem(), 6, mail.getItemDamage()),
+                new ItemStack(rivet, 6));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_scale_legs,
                 legs,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail.getItem(), 4, mail.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_scale_boots,
                 boots,
-                mail,
-                mail, // 2 Mail
-                rivet,
-                rivet);// 2 Rivet
+                new ItemStack(mail.getItem(), 2, mail.getItemDamage()),
+                new ItemStack(rivet, 2));
     }
 
     private static void assembleSplintmail() {
@@ -317,48 +269,23 @@ public class ForgedArmourRecipes {
         Salvage.addSalvage(
                 CustomArmourListMF.standard_splint_helmet,
                 helm,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail.getItem(), 4, mail.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_splint_chest,
                 chest,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail,
-                mail, // 6
-                // Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 6 Rivet
+                new ItemStack(mail.getItem(), 6, mail.getItemDamage()),
+                new ItemStack(rivet, 6));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_splint_legs,
                 legs,
-                mail,
-                mail,
-                mail,
-                mail, // 4 Mail
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(mail.getItem(), 4, mail.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_splint_boots,
                 boots,
-                mail,
-                mail, // 2 Mail
-                rivet,
-                rivet);// 2 Rivet
+                new ItemStack(mail.getItem(), 2, mail.getItemDamage()),
+                new ItemStack(rivet, 2));
     }
 
     private static void assembleFieldplate() {
@@ -430,39 +357,23 @@ public class ForgedArmourRecipes {
         Salvage.addSalvage(
                 CustomArmourListMF.standard_plate_helmet,
                 helm,
-                plate,
-                plate, // 2 Plate
-                rivet,
-                rivet);// Rivet
+                new ItemStack(plate.getItem(), 2, plate.getItemDamage()),
+                new ItemStack(rivet, 2));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_plate_chest,
                 chest,
-                plate,
-                plate,
-                plate,
-                plate, // 4 Plate
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(plate.getItem(), 4, plate.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_plate_legs,
                 legs,
-                plate,
-                plate,
-                plate,
-                plate, // 4 Plate
-                rivet,
-                rivet,
-                rivet,
-                rivet);// 4 Rivet
+                new ItemStack(plate.getItem(), 4, plate.getItemDamage()),
+                new ItemStack(rivet, 4));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_plate_boots,
                 boots,
-                plate,
-                plate, // 2 Plate
-                rivet,
-                rivet);// 2 Rivet
+                new ItemStack(plate.getItem(), 2, plate.getItemDamage()),
+                new ItemStack(rivet, 2));
 
     }
 
@@ -484,7 +395,10 @@ public class ForgedArmourRecipes {
                         time,
                         new Object[] { " RR ", "RIIR", 'R', ComponentListMF.rivet, 'I', minorPiece }));
 
-        Salvage.addSalvage(majorPiece, minorPiece, minorPiece, new ItemStack(ComponentListMF.rivet, 4));
+        Salvage.addSalvage(
+                majorPiece,
+                new ItemStack(minorPiece.getItem(), 2, minorPiece.getItemDamage()),
+                new ItemStack(ComponentListMF.rivet, 4));
 
         time = 25;
         KnowledgeListMF.cogPlateR.add(
@@ -503,18 +417,8 @@ public class ForgedArmourRecipes {
 
         Salvage.addSalvage(
                 ComponentListMF.cogwork_armour,
-                minorPiece,
-                minorPiece,
-                minorPiece,
-                minorPiece,
-                minorPiece,
-                minorPiece,
-                majorPiece,
-                majorPiece,
-                majorPiece,
-                majorPiece,
-                majorPiece,
-                majorPiece);
+                new ItemStack(minorPiece.getItem(), 6, minorPiece.getItemDamage()),
+                new ItemStack(majorPiece.getItem(), 6, majorPiece.getItemDamage()));
     }
 
     private static void addMetalComponents() {
@@ -578,7 +482,7 @@ public class ForgedArmourRecipes {
 
         Salvage.addSalvage(ComponentListMF.chainmesh, hunk);
         Salvage.addSalvage(ComponentListMF.scalemesh, hunk);
-        Salvage.addSalvage(ComponentListMF.splintmesh, hunk, ComponentListMF.rivet, ComponentListMF.rivet);
-        Salvage.addSalvage(ComponentListMF.plate, bar, bar);
+        Salvage.addSalvage(ComponentListMF.splintmesh, hunk, new ItemStack(ComponentListMF.rivet, 2));
+        Salvage.addSalvage(ComponentListMF.plate, new ItemStack(bar, 2));
     }
 }

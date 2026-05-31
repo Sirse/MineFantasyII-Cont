@@ -2,7 +2,6 @@ package minefantasy.mf2.network.packet;
 
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,8 +18,7 @@ import minefantasy.mf2.util.MFLogUtil;
 
 public class PacketHandlerMF {
 
-    private static final long ERROR_LOG_INTERVAL_MS = 5000L;
-    private static final Map<String, Long> LAST_ERROR_LOG = new ConcurrentHashMap<String, Long>();
+    private static final long PACKET_ERROR_LOG_INTERVAL_MS = 5000L;
 
     public Map<String, PacketMF> packetList = new Hashtable<String, PacketMF>();
     public Map<String, FMLEventChannel> channels = new Hashtable<String, FMLEventChannel>();
@@ -91,17 +89,14 @@ public class PacketHandlerMF {
             playerInfo = player.getCommandSenderName() + "[" + player.getEntityId() + "]";
         }
         String key = side + "|" + channel + "|" + t.getClass().getName();
-        long now = System.currentTimeMillis();
-        Long last = LAST_ERROR_LOG.get(key);
-        if (last == null || now - last.longValue() >= ERROR_LOG_INTERVAL_MS) {
-            LAST_ERROR_LOG.put(key, Long.valueOf(now));
-            MFLogUtil.MF_LOGGER.error(
-                    MFLogUtil.PREFIX + "Packet handling failed: channel={}, side={}, player={}",
-                    channel,
-                    side,
-                    playerInfo,
-                    t);
-        }
+        MFLogUtil.errorThrottled(
+                "packet|" + key,
+                PACKET_ERROR_LOG_INTERVAL_MS,
+                t,
+                "Packet handling failed: channel={}, side={}, player={}",
+                channel,
+                side,
+                playerInfo);
     }
 
     public void sendPacketToPlayer(FMLProxyPacket packet, EntityPlayerMP player) {

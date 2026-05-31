@@ -424,7 +424,7 @@ public class ForgingRecipes {
                                 (int) (time * material.craftTimeModifier),
                                 new Object[] { "I I", "I I", 'I', hunk, }));
                 if (hunk.getItem() instanceof ItemComponentMF) {
-                    Salvage.addSalvage(BlockListMF.bars[id], hunk, hunk, hunk, hunk);
+                    Salvage.addSalvage(BlockListMF.bars[id], new ItemStack(hunk.getItem(), 4, hunk.getItemDamage()));
                 }
             }
         }
@@ -784,7 +784,10 @@ public class ForgingRecipes {
                 new ItemStack(ComponentListMF.rivet, 2),
                 new ItemStack(ComponentListMF.leather_strip, 2));
 
-        Salvage.addSalvage(ComponentListMF.bronze_gears, bronzeHunk, bronzeHunk, bronzeHunk, bronzeHunk, iron);
+        Salvage.addSalvage(
+                ComponentListMF.bronze_gears,
+                new ItemStack(bronzeHunk.getItem(), 4, bronzeHunk.getItemDamage()),
+                iron);
 
         Salvage.addSalvage(
                 ComponentListMF.tungsten_gears,
@@ -807,8 +810,14 @@ public class ForgingRecipes {
                 tungstenHunk,
                 new ItemStack(ComponentListMF.rivet, 2));
 
-        Salvage.addSalvage(ComponentListMF.bomb_casing_iron, ironHunk, ironHunk);
-        Salvage.addSalvage(ComponentListMF.mine_casing_iron, ironHunk, ironHunk, ComponentListMF.rivet, iron);
+        Salvage.addSalvage(
+                ComponentListMF.bomb_casing_iron,
+                new ItemStack(ironHunk.getItem(), 2, ironHunk.getItemDamage()));
+        Salvage.addSalvage(
+                ComponentListMF.mine_casing_iron,
+                new ItemStack(ironHunk.getItem(), 2, ironHunk.getItemDamage()),
+                ComponentListMF.rivet,
+                iron);
         Salvage.addSalvage(
                 ComponentListMF.bomb_casing_arrow,
                 ironHunk,

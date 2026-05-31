@@ -14,6 +14,7 @@ import org.lwjgl.opengl.GL12;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 /**
  * @author Anonymous Productions
@@ -91,6 +92,7 @@ public class TileEntityBigFurnaceRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
         GL11.glPopMatrix();
 
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }
@@ -129,6 +131,7 @@ public class TileEntityBigFurnaceRenderer extends TileEntitySpecialRenderer {
         GL11.glPopMatrix();
         GL11.glPopMatrix();
 
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }
@@ -162,6 +165,7 @@ public class TileEntityBigFurnaceRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
         GL11.glTranslatef(-1F, -1F, 0.0F);
         ItemRenderer.renderItemIn2D(image, x2, y1, x1, y2, tw, th, 0.0625F);
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 
     }
 
@@ -195,6 +199,7 @@ public class TileEntityBigFurnaceRenderer extends TileEntitySpecialRenderer {
         GL11.glRotatef(180.0F, 0.0F, 0.0F, 1.0F);
         GL11.glTranslatef(-1F, -1F, 0.0F);
         ItemRenderer.renderItemIn2D(image, x2, y1, x1, y2, tw, th, 0.0625F);
+        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 
     }
 

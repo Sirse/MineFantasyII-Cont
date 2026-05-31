@@ -107,7 +107,7 @@ public class SalvageRecipes {
                 new ItemStack(Blocks.stone, 3),
                 new ItemStack(Blocks.redstone_torch, 2),
                 Items.redstone);
-        Salvage.addSalvage(Items.saddle, Items.leather, 5);
+        Salvage.addSalvage(Items.saddle, new ItemStack(Items.leather, 5));
         Salvage.addSalvage(Items.sign, new ItemStack(Blocks.planks, 2));
         Salvage.addSalvage(Items.speckled_melon, new ItemStack(Items.gold_nugget, 8), Items.melon);
         Salvage.addSalvage(Blocks.activator_rail, Items.iron_ingot, Items.redstone);
@@ -149,13 +149,15 @@ public class SalvageRecipes {
         Salvage.addSalvage(Blocks.stonebrick, Blocks.stone);
         Salvage.addSalvage(Blocks.stone_button, Blocks.stone);
         Salvage.addSalvage(Blocks.stone_pressure_plate, new ItemStack(Blocks.stone, 2));
-        Salvage.addSalvage(Blocks.tnt, new ItemStack(Blocks.sand, 4), Items.gunpowder, 5);
+        Salvage.addSalvage(Blocks.tnt, new ItemStack(Blocks.sand, 4), new ItemStack(Items.gunpowder, 5));
         Salvage.addSalvage(Blocks.trapped_chest, Blocks.chest, Blocks.tripwire_hook);
-        Salvage.addSalvage(Blocks.tripwire_hook, ironHunk, ironHunk);
+        ItemStack doubleIronHunk = ironHunk.copy();
+        doubleIronHunk.stackSize = 2;
+        Salvage.addSalvage(Blocks.tripwire_hook, doubleIronHunk);
         Salvage.addSalvage(Blocks.wooden_button, Blocks.planks);
         Salvage.addSalvage(Blocks.wooden_pressure_plate, new ItemStack(Blocks.planks, 2));
         Salvage.addSalvage(Blocks.cobblestone_wall, Blocks.cobblestone);
-        Salvage.addSalvage(Blocks.iron_bars, ironHunk, ironHunk);
+        Salvage.addSalvage(Blocks.iron_bars, doubleIronHunk.copy());
         Salvage.addSalvage(Items.item_frame, new ItemStack(Items.stick, 8), Items.leather);
     }
 }

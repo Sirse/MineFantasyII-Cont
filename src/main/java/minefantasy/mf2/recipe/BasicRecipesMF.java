@@ -98,9 +98,7 @@ public class BasicRecipesMF {
                 GameRegistry.addRecipe(
                         new ItemStack(BlockListMF.storage[id]),
                         new Object[] { "III", "III", "III", 'I', ingot });
-                GameRegistry.addShapelessRecipe(
-                        new ItemStack(ingot.getItem(), 9),
-                        new Object[] { BlockListMF.storage[id] });
+                GameRegistry.addShapelessRecipe(copyWithSize(ingot, 9), new Object[] { BlockListMF.storage[id] });
             }
         }
 
@@ -215,13 +213,13 @@ public class BasicRecipesMF {
 
     private static void assembleWoodVariations(CustomMaterial material) {
         // TODO
-        if (material.name != "RefinedWood") {
+        if (!"RefinedWood".equals(material.name)) {
             ArrayList<ItemStack> list = OreDictionary.getOres("planks" + material.name);
             if (list.isEmpty()) {
                 for (ItemStack planks : OreDictionary.getOres("plankWood")) {
                     if (planks.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-                        ItemStack item = planks.copy();
                         for (int i = 0; i < 16; i++) {
+                            ItemStack item = planks.copy();
                             item.setItemDamage(i);
                             tryAddWoodPlanks(item, material);
                             CarpenterRecipes.tryAddSawPlanks(item, material);
@@ -242,6 +240,9 @@ public class BasicRecipesMF {
     }
 
     private static void tryAddWoodPlanks(ItemStack planks, CustomMaterial material) {
+        if (material == null || material.name == null || material.name.length() < 4) {
+            return;
+        }
         String sub = material.name.substring(0, material.name.length() - 4).toLowerCase();
 
         if (planks.getUnlocalizedName().toLowerCase().contains(sub)) {
@@ -271,5 +272,11 @@ public class BasicRecipesMF {
         KnowledgeListMF.pumpPieOut = GameRegistry.addShapedRecipe(
                 new ItemStack(Items.pumpkin_pie),
                 new Object[] { "F", 'F', FoodListMF.pie_pumpkin_cooked });
+    }
+
+    private static ItemStack copyWithSize(ItemStack stack, int size) {
+        ItemStack out = stack.copy();
+        out.stackSize = size;
+        return out;
     }
 }

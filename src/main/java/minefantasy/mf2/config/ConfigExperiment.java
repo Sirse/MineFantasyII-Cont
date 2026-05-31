@@ -10,6 +10,7 @@ public class ConfigExperiment extends ConfigurationBaseMF {
     public static final String CATEGORY_FOOD = "Experimental: Hunger Modification";
     public static boolean stickArrows;
     public static boolean dynamicArrows;
+    public static boolean debugParry;
     public static String debug = "";
 
     @Override
@@ -31,6 +32,12 @@ public class ConfigExperiment extends ConfigurationBaseMF {
                         true,
                         "This is for whatever hosts the world (singleplayer, or servers); it increases the rate arrows sync their data for smoother rendering for players. This however increases packet traffic. If you have a lot of players on a server or a lot of arrows, disable this to help clean it up")
                         .getString());
+        debugParry = Boolean.parseBoolean(
+                config.get(
+                        CATEGORY_EARLY,
+                        "Debug Parry Logs",
+                        false,
+                        "Enable verbose parry debug output to log combat threshold calculations").getString());
 
         String AADesc = "This feature Sets supported armours to calculate weapons differently: \n"
                 + "Damage is divided into cutting and blunt, and MF armours will alter their ratings depending \n"

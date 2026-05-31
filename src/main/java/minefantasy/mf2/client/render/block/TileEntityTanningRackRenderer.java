@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL12;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
 
@@ -30,8 +31,11 @@ public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderAModelAt(TileEntityTanningRack tile, double d, double d1, double d2, float f) {
-        if (tile != null);
+        if (tile == null) {
+            return;
+        }
         int i = 0;
+        float acAnim = tile.prevAcTime + (tile.acTime - tile.prevAcTime) * f;
         if (tile.getWorldObj() != null) {
             i = tile.blockMetadata;
         }
@@ -64,15 +68,16 @@ public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
         if (tile.isAutomated()) {
             engmodel.renderModel(0.0625F);
             GL11.glPushMatrix();
-            GL11.glTranslatef(0F, tile.acTime, 0F);
+            GL11.glTranslatef(0F, acAnim, 0F);
             engmodel.renderBlade(0.0625F);
             GL11.glPopMatrix();
-            engmodel.rotateLever(tile.acTime);
+            engmodel.rotateLever(acAnim);
             engmodel.renderLever(0.0625F);
         } else {
             model.renderModel(0.0625F);
         }
         renderHungItem(tile, d, d1, d2, f);
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix();
 
     }
@@ -93,6 +98,7 @@ public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
         } else {
             model.renderModel(0.0625F);
         }
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix();
 
     }

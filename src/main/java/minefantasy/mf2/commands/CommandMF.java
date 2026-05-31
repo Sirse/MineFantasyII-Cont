@@ -17,25 +17,18 @@ import minefantasy.mf2.api.material.CustomMaterial;
 
 public class CommandMF implements ICommand {
 
-    private final List materials;
-
-    private final List aliases = new ArrayList<String>() {
-
-        {
-            add("mf");
-            add("minefantasy");
-        }
-    };
+    private final List<String> materials;
+    private final List<String> aliases = Arrays.asList("mf", "minefantasy");
 
     public CommandMF() {
         materials = setupMaterialsList();
     }
 
-    private List setupMaterialsList() {
-        List materials = new ArrayList<String>();
+    private List<String> setupMaterialsList() {
+        List<String> materials = new ArrayList<String>();
         for (CustomMaterial material : CustomMaterial.materialList.values()) {
             if (material.type.equalsIgnoreCase("wood") || material.type.equalsIgnoreCase("metal")) {
-                materials.add(material);
+                materials.add(material.getName());
             }
         }
         return materials;
@@ -52,7 +45,7 @@ public class CommandMF implements ICommand {
     }
 
     @Override
-    public List getCommandAliases() {
+    public List<String> getCommandAliases() {
         return this.aliases;
     }
 
@@ -62,8 +55,7 @@ public class CommandMF implements ICommand {
             return;
         }
         EntityPlayer player = (EntityPlayer) iCommandSender;
-        boolean hasPerms = player.capabilities.isCreativeMode
-                || iCommandSender.canCommandSenderUseCommand(2, getCommandName());
+        boolean hasPerms = iCommandSender.canCommandSenderUseCommand(2, getCommandName());
         if (!hasPerms) {
             player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.mf.no_permission")));
             return;
@@ -119,7 +111,7 @@ public class CommandMF implements ICommand {
                 return;
             }
             ItemStack updated = ToolHelper.setQuality(equippedItem, qualityLvl);
-            if (updated.stackTagCompound != null) {
+            if (updated != null && updated.stackTagCompound != null) {
                 if (qualityLvl <= 50) {
                     updated.stackTagCompound.setBoolean("MF_Inferior", true);
                 }
@@ -134,7 +126,13 @@ public class CommandMF implements ICommand {
     }
 
     private void processUnbreakableCommand(String[] strings, EntityPlayer player, ItemStack equippedItem) {
-        boolean isUnbreakable = Boolean.parseBoolean(strings[2]);
+        String value = strings[2].toLowerCase();
+        if (!"true".equals(value) && !"false".equals(value)) {
+            player.addChatMessage(
+                    new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.boolean")));
+            return;
+        }
+        boolean isUnbreakable = Boolean.parseBoolean(value);
         ToolHelper.setUnbreakable(equippedItem, isUnbreakable);
         onSuccess(player);
     }
@@ -149,18 +147,26 @@ public class CommandMF implements ICommand {
     }
 
     @Override
-    public List addTabCompletionOptions(ICommandSender iCommandSender, String[] strings) {
+    public List<String> addTabCompletionOptions(ICommandSender iCommandSender, String[] strings) {
+        if (strings.length == 0) {
+            return Arrays.asList("edit");
+        }
+
+        if (strings.length == 1) {
+            return Arrays.asList("edit");
+        }
+
         if (strings[0].equalsIgnoreCase("edit")) {
             if (strings.length == 2) {
                 return Arrays.asList("material", "quality", "unbreakable");
             }
 
             if (strings.length == 3) {
-                if (strings[2].equalsIgnoreCase("material")) {
+                if (strings[1].equalsIgnoreCase("material")) {
                     return materials;
                 }
 
-                if (strings[2].equalsIgnoreCase("unbreakable")) {
+                if (strings[1].equalsIgnoreCase("unbreakable")) {
                     return Arrays.asList("true", "false");
                 }
             }

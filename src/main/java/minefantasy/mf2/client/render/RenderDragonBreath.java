@@ -32,23 +32,24 @@ public class RenderDragonBreath extends Render {
         if (breath.isInvisible()) return;
 
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) x, (float) y, (float) z);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        float baseSize = 1.0F;
-        GL11.glScalef(baseSize + entity.width, baseSize + entity.height, baseSize + entity.width);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glColor3f(1, 1, 1);
-        Minecraft.getMinecraft().getTextureManager()
-                .bindTexture(TextureHelperMF.getResource(breath.getTextureName() + ".png"));
-        GL11.glDepthMask(false);
-        Tessellator tessellator = Tessellator.instance;
-        this.renderImg(breath, tessellator);
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glColor3f(1, 1, 1);
-        GL11.glPopMatrix();
+        try {
+            GL11.glTranslatef((float) x, (float) y, (float) z);
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            float baseSize = 1.0F;
+            GL11.glScalef(baseSize + entity.width, baseSize + entity.height, baseSize + entity.width);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glColor3f(1, 1, 1);
+            Minecraft.getMinecraft().getTextureManager()
+                    .bindTexture(TextureHelperMF.getResource(breath.getTextureName() + ".png"));
+            GL11.glDepthMask(false);
+            Tessellator tessellator = Tessellator.instance;
+            this.renderImg(breath, tessellator, f1);
+        } finally {
+            RenderStateMF.restoreDefaults();
+            GL11.glPopMatrix();
+        }
     }
 
     /**
@@ -58,7 +59,7 @@ public class RenderDragonBreath extends Render {
         return TextureMap.locationItemsTexture;
     }
 
-    private void renderImg(EntityDragonBreath breath, Tessellator tessellator) {
+    private void renderImg(EntityDragonBreath breath, Tessellator tessellator, float partialTicks) {
         float x1 = 0;
         float x2 = 1;
         float y1 = 0;
@@ -68,7 +69,7 @@ public class RenderDragonBreath extends Render {
         float f6 = 0.25F;
         GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        GL11.glRotatef(breath.ticksExisted * 36, 0.0F, 0.0F, 0.1F);
+        GL11.glRotatef((breath.ticksExisted + partialTicks) * 36F, 0.0F, 0.0F, 0.1F);
         tessellator.startDrawingQuads();
         tessellator.setNormal(0.0F, 1.0F, 0.0F);
         tessellator.addVertexWithUV(0.0F - f5, 0.0F - f6, 0.0D, x1, y2);

@@ -17,12 +17,17 @@ public class RecipeSyringe implements IRecipe {
     public boolean matches(InventoryCrafting matrix, World world) {
         ItemStack syringe = null;
         ItemStack filler = null;
+        int itemCount = 0;
 
         for (int i = 0; i < matrix.getSizeInventory(); ++i) {
             ItemStack itemstack1 = matrix.getStackInSlot(i);
 
             if (itemstack1 != null) {
+                itemCount++;
                 if (itemstack1.getItem() == ToolListMF.syringe_empty) {
+                    if (syringe != null) {
+                        return false;
+                    }
                     syringe = itemstack1;
                 } else if (itemstack1.getItem() instanceof ItemPotion) {
                     ItemPotion potion = (ItemPotion) itemstack1.getItem();
@@ -30,13 +35,17 @@ public class RecipeSyringe implements IRecipe {
                     if (potion.isSplash(itemstack1.getItemDamage())) {
                         return false;
                     }
-
+                    if (filler != null) {
+                        return false;
+                    }
                     filler = itemstack1;
+                } else {
+                    return false;
                 }
             }
         }
 
-        return syringe != null && filler != null;
+        return itemCount == 2 && syringe != null && filler != null;
     }
 
     /**
@@ -46,12 +55,17 @@ public class RecipeSyringe implements IRecipe {
     public ItemStack getCraftingResult(InventoryCrafting matrix) {
         ItemStack syringe = null;
         ItemStack filler = null;
+        int itemCount = 0;
 
         for (int i = 0; i < matrix.getSizeInventory(); ++i) {
             ItemStack itemstack1 = matrix.getStackInSlot(i);
 
             if (itemstack1 != null) {
+                itemCount++;
                 if (itemstack1.getItem() == ToolListMF.syringe_empty) {
+                    if (syringe != null) {
+                        return null;
+                    }
                     syringe = itemstack1;
                 } else if (itemstack1.getItem() instanceof ItemPotion) {
                     ItemPotion potion = (ItemPotion) itemstack1.getItem();
@@ -60,11 +74,16 @@ public class RecipeSyringe implements IRecipe {
                         return null;
                     }
 
+                    if (filler != null) {
+                        return null;
+                    }
                     filler = itemstack1;
+                } else {
+                    return null;
                 }
             }
         }
-        if (syringe != null && filler != null) {
+        if (itemCount == 2 && syringe != null && filler != null) {
             return new ItemStack(ToolListMF.syringe, 1, filler.getItemDamage());
         }
         return null;

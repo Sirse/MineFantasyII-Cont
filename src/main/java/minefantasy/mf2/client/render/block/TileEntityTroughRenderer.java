@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 public class TileEntityTroughRenderer extends TileEntitySpecialRenderer {
 
@@ -51,35 +52,35 @@ public class TileEntityTroughRenderer extends TileEntitySpecialRenderer {
         }
 
         GL11.glPushMatrix(); // start
-        float scale = 1.0F;
-        float yOffset = 1 / 16F;
-        GL11.glTranslatef((float) d + 0.5F, (float) d1 + yOffset, (float) d2 + 0.5F); // size
-        GL11.glRotatef(j, 0.0F, 1.0F, 0.0F); // rotate based on metadata
-        GL11.glScalef(scale, -scale, -scale); // if you read this comment out this line and you can see what happens
-        GL11.glPushMatrix();
-        float level = 0F;
+        try {
+            float scale = 1.0F;
+            float yOffset = 1 / 16F;
+            GL11.glTranslatef((float) d + 0.5F, (float) d1 + yOffset, (float) d2 + 0.5F); // size
+            GL11.glRotatef(j, 0.0F, 1.0F, 0.0F); // rotate based on metadata
+            GL11.glScalef(scale, -scale, -scale);
+            GL11.glPushMatrix();
 
-        CustomMaterial material = tile.getMaterial();
-        GL11.glColor3f(material.colourRGB[0] / 255F, material.colourRGB[1] / 255F, material.colourRGB[2] / 255F);
+            CustomMaterial material = tile.getMaterial();
+            GL11.glColor3f(material.colourRGB[0] / 255F, material.colourRGB[1] / 255F, material.colourRGB[2] / 255F);
+            bindTextureByName("textures/models/tileentity/" + tile.getTexName() + "_base.png");
+            model.renderModel(0.0625F);
+            GL11.glColor3f(1F, 1F, 1F);
 
-        bindTextureByName("textures/models/tileentity/" + tile.getTexName() + "_base.png"); // texture
-        model.renderModel(0.0625F);
-
-        GL11.glColor3f(1F, 1F, 1F);
-
-        float height = (float) tile.fill / (float) tile.getCapacity();
-        if (tile.fill > 0) {
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
-            bindTextureByName("textures/models/tileentity/" + tile.getTexName() + "_water.png"); // texture
-            GL11.glColor4f(1F, 1F, 1F, 0.5F);
-            GL11.glTranslatef(0F, -height * 0.35F, 0F);
-            model.renderWater(0.0625F);
+            int capacity = tile.getCapacity();
+            float height = capacity > 0 ? (float) tile.fill / (float) capacity : 0F;
+            if (tile.fill > 0) {
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                bindTextureByName("textures/models/tileentity/" + tile.getTexName() + "_water.png");
+                GL11.glColor4f(1F, 1F, 1F, 0.5F);
+                GL11.glTranslatef(0F, -height * 0.35F, 0F);
+                model.renderWater(0.0625F);
+            }
+            GL11.glPopMatrix();
+        } finally {
+            RenderStateMF.restoreDefaults();
+            GL11.glPopMatrix(); // end
         }
-        GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
-        GL11.glPopMatrix(); // end
 
     }
 
@@ -87,23 +88,22 @@ public class TileEntityTroughRenderer extends TileEntitySpecialRenderer {
         int j = 90;
 
         GL11.glPushMatrix(); // start
-        float scale = 1.0F;
-        float yOffset = 1 / 16F;
-        GL11.glTranslatef((float) d + 0.5F, (float) d1 + yOffset, (float) d2 + 0.5F); // size
-        GL11.glRotatef(j, 0.0F, 1.0F, 0.0F); // rotate based on metadata
-        GL11.glScalef(scale, -scale, -scale); // if you read this comment out this line and you can see what happens
-        GL11.glPushMatrix();
+        try {
+            float scale = 1.0F;
+            float yOffset = 1 / 16F;
+            GL11.glTranslatef((float) d + 0.5F, (float) d1 + yOffset, (float) d2 + 0.5F); // size
+            GL11.glRotatef(j, 0.0F, 1.0F, 0.0F);
+            GL11.glScalef(scale, -scale, -scale);
+            GL11.glPushMatrix();
 
-        GL11.glColor3f(material.colourRGB[0] / 255F, material.colourRGB[1] / 255F, material.colourRGB[2] / 255F);
-
-        bindTextureByName("textures/models/tileentity/" + tex + "_base.png"); // texture
-        model.renderModel(0.0625F);
-
-        GL11.glColor3f(1F, 1F, 1F);
-
-        GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
-        GL11.glPopMatrix(); // end
+            GL11.glColor3f(material.colourRGB[0] / 255F, material.colourRGB[1] / 255F, material.colourRGB[2] / 255F);
+            bindTextureByName("textures/models/tileentity/" + tex + "_base.png");
+            model.renderModel(0.0625F);
+            GL11.glPopMatrix();
+        } finally {
+            RenderStateMF.restoreDefaults();
+            GL11.glPopMatrix(); // end
+        }
 
     }
 

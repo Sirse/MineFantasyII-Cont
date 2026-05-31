@@ -65,7 +65,7 @@ public class TileEntityBloomeryRenderer extends TileEntitySpecialRenderer {
         model.renderModel(tile, 0.0625F);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        GL11.glColor3f(1F, 1F, 1F);
         GL11.glPopMatrix(); // end
 
     }
@@ -84,7 +84,7 @@ public class TileEntityBloomeryRenderer extends TileEntitySpecialRenderer {
         model.renderModel(null, 0.0625F);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        GL11.glColor3f(1F, 1F, 1F);
         GL11.glPopMatrix(); // end
 
     }

@@ -647,7 +647,7 @@ public class GuiKnowledge extends GuiScreen {
                         x + 20,
                         y + 32,
                         red);
-            } else {
+            } else if (requirements != null) {
                 for (int a = 0; a < requirements.length; a++) {
                     boolean isUnlocked = selected.isUnlocked(a, mc.thePlayer);
                     String text = requirements[a];

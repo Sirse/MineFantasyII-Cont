@@ -5,11 +5,13 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityBombPress extends TileEntity {
 
+    public float prevAnimation = 0F;
     public float animation = 0F;
 
     @Override
     public void updateEntity() {
         super.updateEntity();
+        prevAnimation = animation;
         if (worldObj.isBlockIndirectlyGettingPowered(xCoord, yCoord, zCoord)) {
             if (animation <= 0) {
                 use(null);

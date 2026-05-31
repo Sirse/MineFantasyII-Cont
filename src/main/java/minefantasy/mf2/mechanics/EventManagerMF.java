@@ -604,7 +604,7 @@ public class EventManagerMF {
         Block broken = event.block;
 
         if (broken != null && ConfigHardcore.HCCallowRocks) {
-            if (held == null && CustomStone.isStone(broken)) {
+            if (held == null && CustomStone.isStone(broken, event.blockMetadata)) {
                 entityDropItem(
                         event.world,
                         event.x,

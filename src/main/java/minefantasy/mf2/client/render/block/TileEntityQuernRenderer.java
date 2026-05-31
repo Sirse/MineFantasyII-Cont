@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityQuern;
+import minefantasy.mf2.client.render.RenderStateMF;
 
 public class TileEntityQuernRenderer extends TileEntitySpecialRenderer {
 
@@ -36,7 +37,7 @@ public class TileEntityQuernRenderer extends TileEntitySpecialRenderer {
         model.renderModel(tile, 0.0625F);
 
         GL11.glPopMatrix();
-        GL11.glColor3f(255, 255, 255);
+        RenderStateMF.restoreDefaults();
         GL11.glPopMatrix(); // end
 
     }

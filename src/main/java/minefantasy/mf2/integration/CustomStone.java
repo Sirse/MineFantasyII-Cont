@@ -1,40 +1,47 @@
 package minefantasy.mf2.integration;
 
-import java.util.ArrayList;
-
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeVersion;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class CustomStone {
 
-    private static final ArrayList<ItemStack> customStones = new ArrayList<>();
+    private static int stoneOreId = -1;
+    private static int stoneSmoothOreId = -1;
+    private static boolean initialized;
 
     public static void init() {
-        String stoneEntry = ForgeVersion.getBuildVersion() < 934 ? "stoneSmooth" : "stone";
-        if (!OreDictionary.doesOreNameExist(stoneEntry)) {
-            customStones.clear();
-            return;
-        }
-
-        customStones.clear();
-        customStones.addAll(OreDictionary.getOres(stoneEntry));
+        initialized = true;
+        stoneOreId = OreDictionary.getOreID("stone");
+        stoneSmoothOreId = OreDictionary.getOreID("stoneSmooth");
     }
 
     public static boolean isStone(Block block) {
+        return isStone(block, 0);
+    }
+
+    public static boolean isStone(Block block, int metadata) {
         if (block == null) return false;
-        return block == Blocks.stone || isStone(new ItemStack(block));
+        if (block == Blocks.stone) return true;
+        return isStone(new ItemStack(block, 1, metadata));
     }
 
     public static boolean isStone(ItemStack stack) {
+        ensureInitialized();
         if (stack == null || stack.getItem() == null) return false;
-        for (ItemStack stoneStack : customStones) {
-            if (stoneStack != null && OreDictionary.itemMatches(stoneStack, stack, false)) {
+        int[] oreIds = OreDictionary.getOreIDs(stack);
+        for (int oreId : oreIds) {
+            if (oreId == stoneOreId || oreId == stoneSmoothOreId) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static void ensureInitialized() {
+        if (!initialized) {
+            init();
+        }
     }
 }

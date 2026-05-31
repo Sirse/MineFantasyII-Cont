@@ -32,10 +32,9 @@ public class MFPositionedStack extends PositionedStack {
 
             if (item.getItemDamage() == Short.MAX_VALUE) {
                 List<ItemStack> permutations = ItemList.itemMap.get(item.getItem());
-                if (!permutations.isEmpty()) {
+                if (permutations != null && !permutations.isEmpty()) {
                     for (ItemStack stack : permutations) {
-                        if (item.getItem().equals(stack.getItem())
-                                && CustomToolHelper.doesMatchForRecipe(item, stack)) { // TODO:
+                        if (CustomToolHelper.doesMatchForRecipe(item, stack)) { // TODO:
                             // Rework
                             stacks.add(stack.copy());
                         }

@@ -2,9 +2,10 @@ package minefantasy.mf2.mechanics;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.*;
 import net.minecraft.init.Items;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.material.CustomMaterial;
@@ -17,6 +18,8 @@ import minefantasy.mf2.util.XSTRandom;
 public class MonsterUpgrader {
 
     public static final String zombieArmourNBT = "MF_ZombieArmour";
+    private static final String upgradedNbt = "MF_Upgraded";
+    private static final String legacyUpgradedNbt = "giveMFWeapon";
     private static final float zombieWepChance = 10F;
     private static final float zombieKnightChance = 200F;
     private static final float zombieBruteChance = 200F;
@@ -90,7 +93,10 @@ public class MonsterUpgrader {
             }
         }
         if (mob instanceof EntityPigZombie) {
-            mob.getEntityAttribute(SharedMonsterAttributes.attackDamage).setBaseValue(1.0F);
+            IAttributeInstance attackDamage = mob.getEntityAttribute(SharedMonsterAttributes.attackDamage);
+            if (attackDamage != null) {
+                attackDamage.setBaseValue(1.0F);
+            }
         }
     }
 
@@ -167,16 +173,15 @@ public class MonsterUpgrader {
     }
 
     @SubscribeEvent
-    public void updateLiving(LivingUpdateEvent event) {
-        EntityLivingBase living = event.entityLiving;
-
-        if (isEnabled() && !living.worldObj.isRemote && !living.getEntityData().hasKey("giveMFWeapon")) {
-            living.getEntityData().setBoolean("giveMFWeapon", true);
-            upgradeMob(event.entityLiving);
+    public void onEntityJoinWorld(EntityJoinWorldEvent event) {
+        if (!(event.entity instanceof EntityLivingBase) || event.world.isRemote) {
+            return;
         }
-    }
+        EntityLivingBase living = (EntityLivingBase) event.entity;
 
-    private boolean isEnabled() {
-        return true;
+        if (!living.getEntityData().getBoolean(upgradedNbt) && !living.getEntityData().getBoolean(legacyUpgradedNbt)) {
+            living.getEntityData().setBoolean(upgradedNbt, true);
+            upgradeMob(living);
+        }
     }
 }

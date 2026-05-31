@@ -183,7 +183,7 @@ public class CarpenterRecipes {
                 scrapWood,
                 scrapWood);
         Salvage.addSalvage(
-                ToolListMF.waraxeTraining,
+                ToolListMF.spearTraining,
                 Blocks.planks,
                 new ItemStack(ComponentListMF.nail, 2),
                 scrapWood,
@@ -1837,10 +1837,7 @@ public class CarpenterRecipes {
                 new ItemStack(ComponentListMF.bolt, 3),
                 ComponentListMF.tungsten_gears,
                 BlockListMF.crucibleadv,
-                steelPlate,
-                steelPlate,
-                steelPlate,
-                steelPlate);
+                new ItemStack(steelPlate.getItem(), 4, steelPlate.getItemDamage()));
         Salvage.addSalvage(
                 BlockListMF.bombBench,
                 new ItemStack(ComponentListMF.bolt, 4),
@@ -1870,10 +1867,7 @@ public class CarpenterRecipes {
         Salvage.addSalvage(
                 BlockListMF.forge_metal,
                 new ItemStack(ComponentListMF.bolt, 4),
-                blackPlate,
-                blackPlate,
-                blackPlate,
-                blackPlate,
+                new ItemStack(blackPlate.getItem(), 4, blackPlate.getItemDamage()),
                 new ItemStack(ComponentListMF.iron_frame, 2),
                 new ItemStack(Blocks.redstone_block, 2));
         Salvage.addSalvage(
@@ -2149,7 +2143,7 @@ public class CarpenterRecipes {
                 -1,
                 1 + (int) (2 * time),
                 new Object[] { "WW", " S", 'W', plank, 'S', Items.stick });
-        Salvage.addSalvage(CustomToolListMF.standard_mallet, plank, plank, Items.stick);
+        Salvage.addSalvage(CustomToolListMF.standard_mallet, new ItemStack(plank, 2), Items.stick);
         Salvage.addSalvage(CustomToolListMF.standard_spoon, plank, Items.stick);
 
         KnowledgeListMF.refinedPlankR.add(
@@ -2175,6 +2169,9 @@ public class CarpenterRecipes {
     }
 
     static void tryAddSawPlanks(ItemStack planks, CustomMaterial material) {
+        if (material == null || material.name == null || material.name.length() < 4) {
+            return;
+        }
         String sub = material.name.substring(0, material.name.length() - 4).toLowerCase();
 
         if (planks.getUnlocalizedName().toLowerCase().contains(sub)) {

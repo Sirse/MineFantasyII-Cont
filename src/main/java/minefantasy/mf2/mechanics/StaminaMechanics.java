@@ -4,14 +4,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.stamina.IStaminaWeapon;
@@ -39,7 +40,7 @@ public class StaminaMechanics {
                 if (entity.ticksExisted % 20 == 0) {
                     entity.playSound("mob.blaze.breathe", 0.1F, 1.8F);
                 }
-                if (entity.ticksExisted + 5 % 20 == 0) {
+                if ((entity.ticksExisted + 5) % 20 == 0) {
                     entity.playSound("mob.blaze.breathe", 0.15F, 1.5F);
                 }
             }
@@ -75,9 +76,15 @@ public class StaminaMechanics {
         // out of stamina
         if (values[0] <= 0) {
             if (ConfigStamina.affectSpeed) {
-                entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 2));
+                PotionEffect slow = entity.getActivePotionEffect(Potion.moveSlowdown);
+                if (slow == null || slow.getDuration() <= 10) {
+                    entity.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 40));
+                }
             }
-            entity.addPotionEffect(new PotionEffect(Potion.hunger.id, 2));
+            PotionEffect hunger = entity.getActivePotionEffect(Potion.hunger);
+            if (hunger == null || hunger.getDuration() <= 10) {
+                entity.addPotionEffect(new PotionEffect(Potion.hunger.id, 40));
+            }
             // Drain air when exhausted, you will drown faster
             if (isInWater(entity) && entity.getAir() > -20 && entity.ticksExisted % 20 == 0) {
                 entity.setAir(entity.getAir() - 1);
@@ -113,9 +120,9 @@ public class StaminaMechanics {
     }
 
     private static void syncStamina(EntityPlayer player, float[] stam) {
-        if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new StaminaPacket(stam, player).generatePacket());
+        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
+            StaminaPacket packet = new StaminaPacket(stam, player);
+            MineFantasyII.packetHandler.sendPacketToPlayer(packet.generatePacket(), (EntityPlayerMP) player);
         }
     }
 
@@ -129,7 +136,7 @@ public class StaminaMechanics {
         if (user.isSprinting() && ConfigStamina.sprintModifier > 0 && user.ridingEntity == null) {
             float sprintingSeconds = 60F;
             countArmour = true;// Armour gets factored in with sprinting
-            value += value += (5F / sprintingSeconds) * ConfigStamina.sprintModifier;
+            value += (5F / sprintingSeconds) * ConfigStamina.sprintModifier;
         }
         if (user instanceof EntityPlayer) {
             if (user.getHeldItem() != null && ((EntityPlayer) user).isUsingItem() && ConfigStamina.bowModifier > 0) {

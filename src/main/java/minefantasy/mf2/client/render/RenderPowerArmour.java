@@ -27,12 +27,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.util.MFLogUtil;
 
 @SideOnly(Side.CLIENT)
 public class RenderPowerArmour extends RendererLivingEntity {
 
     private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation(
             "textures/misc/enchanted_item_glint.png");
+    private static final long RENDER_ERROR_LOG_COOLDOWN_MS = 5000L;
     protected ModelBiped cogworkSuit;
 
     public RenderPowerArmour() {
@@ -81,6 +83,9 @@ public class RenderPowerArmour extends RendererLivingEntity {
      */
     @Override
     public void doRender(Entity entity, double x, double y, double z, float f, float f1) {
+        if (!(entity instanceof EntityLivingBase)) {
+            return;
+        }
         EntityLivingBase user = (EntityLivingBase) entity;
 
         if (entity.riddenByEntity != null && entity.riddenByEntity instanceof EntityLivingBase) {
@@ -294,13 +299,24 @@ public class RenderPowerArmour extends RendererLivingEntity {
             }
 
             GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        } catch (Exception exception) {}
-
-        OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        GL11.glPopMatrix();
+        } catch (Exception exception) {
+            MFLogUtil.errorThrottled(
+                    "render|RenderPowerArmour|" + entity.getClass().getName(),
+                    RENDER_ERROR_LOG_COOLDOWN_MS,
+                    exception,
+                    "RenderPowerArmour error for entity {}[{}]",
+                    entity.getClass().getSimpleName(),
+                    Integer.valueOf(entity.getEntityId()));
+        } finally {
+            OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            GL11.glDepthMask(true);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glPopMatrix();
+        }
         this.passSpecialRender(entity, x, y, z);
         MinecraftForge.EVENT_BUS.post(new RenderLivingEvent.Post(entity, this, x, y, z));
     }
