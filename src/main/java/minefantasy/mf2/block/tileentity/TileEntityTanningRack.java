@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
 import minefantasy.mf2.api.helpers.ToolHelper;
@@ -19,6 +20,8 @@ import minefantasy.mf2.block.crafting.BlockEngineerTanner;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.container.ContainerTanner;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.TannerPacket;
 
 public class TileEntityTanningRack extends TileEntity implements IInventory {
 
@@ -56,7 +59,6 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
             if (acTime > 0) {
                 acTime -= (1F / 20);
             }
-            // syncAnimations();
         }
     }
 
@@ -85,6 +87,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                             0.75F,
                             0.85F);
                     acTime = 1.0F;
+                    syncAnimation();
                 }
 
                 float efficiency = leverPull ? 100F : ToolHelper.getCrafterEfficiency(held);
@@ -166,6 +169,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
             }
         }
         return false;
+    }
+
+    private void syncAnimation() {
+        if (worldObj.isRemote) return;
+        NetworkUtils.sendToWatchers(new TannerPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
     }
 
     public boolean isAutomated() {

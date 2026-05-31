@@ -1,12 +1,13 @@
 package minefantasy.mf2.api.knowledge;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.PlayerTagData;
 import minefantasy.mf2.network.packet.KnowledgePacket;
 
@@ -115,9 +116,9 @@ public class ResearchLogic {
     }
 
     public static void syncData(EntityPlayer player) {
-        if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new KnowledgePacket(player).generatePacket());
+        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
+            MineFantasyII.packetHandler
+                    .sendPacketToPlayer(new KnowledgePacket(player).generatePacket(), (EntityPlayerMP) player);
         }
     }
 

@@ -3,9 +3,12 @@ package minefantasy.mf2.block.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.refine.IBellowsUseable;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.BellowsPacket;
 
 public class TileEntityBellows extends TileEntity {
 
@@ -42,12 +45,11 @@ public class TileEntityBellows extends TileEntity {
         prevPress = press;
         if (press > 0) press -= 2;
         if (press < 0) press = 0;
-        sendPacketToClients();
     }
 
     private void sendPacketToClients() {
-        // TODO Auto-generated method stub
-
+        if (worldObj.isRemote) return;
+        NetworkUtils.sendToWatchers(new BellowsPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
     }
 
     public void readFromNBT(NBTTagCompound nbt) {

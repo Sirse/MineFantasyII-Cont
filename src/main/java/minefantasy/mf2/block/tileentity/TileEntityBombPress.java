@@ -2,6 +2,10 @@ package minefantasy.mf2.block.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
+
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.BombPressPacket;
 
 public class TileEntityBombPress extends TileEntity {
 
@@ -30,6 +34,12 @@ public class TileEntityBombPress extends TileEntity {
             ((TileEntityBombBench) under).tryCraft(user, true);
             animation = 1.0F;
             worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "tile.piston.out", 1.0F, 0.75F);
+            syncAnimation();
         }
+    }
+
+    private void syncAnimation() {
+        if (worldObj.isRemote) return;
+        NetworkUtils.sendToWatchers(new BombPressPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
     }
 }

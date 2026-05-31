@@ -39,6 +39,9 @@ public class PacketHandlerMF {
         packetList.put(TroughPacket.packetName, new TroughPacket());
         packetList.put(BombBenchPacket.packetName, new BombBenchPacket());
         packetList.put(TannerPacket.packetName, new TannerPacket());
+        packetList.put(BellowsPacket.packetName, new BellowsPacket());
+        packetList.put(QuernPacket.packetName, new QuernPacket());
+        packetList.put(BombPressPacket.packetName, new BombPressPacket());
         packetList.put(RoadPacket.packetName, new RoadPacket());
         packetList.put(BloomeryPacket.packetName, new BloomeryPacket());
         packetList.put(CrossbowBenchPacket.packetName, new CrossbowBenchPacket());

@@ -7,11 +7,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.QuernPacket;
 
 public class TileEntityQuern extends TileEntity implements IInventory, ISidedInventory {
 
@@ -63,7 +66,21 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
             worldObj.playSoundEffect(xCoord, yCoord, zCoord, "minefantasy2:block.quern", 1.0F, 1.0F);
         }
         this.postUseTicks = 10;
+        syncAnimation();
         return true;
+    }
+
+    public int getPostUseTicks() {
+        return postUseTicks;
+    }
+
+    public void setPostUseTicks(int postUseTicks) {
+        this.postUseTicks = postUseTicks;
+    }
+
+    private void syncAnimation() {
+        if (worldObj.isRemote) return;
+        NetworkUtils.sendToWatchers(new QuernPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
     }
 
     public boolean onRevolutionComplete() {

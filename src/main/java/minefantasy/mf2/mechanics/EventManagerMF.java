@@ -19,6 +19,7 @@ import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
@@ -28,7 +29,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.util.FakePlayer;
@@ -836,20 +836,23 @@ public class EventManagerMF {
     @SubscribeEvent
     public void levelup(LevelupEvent event) {
         EntityPlayer player = event.thePlayer;
-        if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new LevelupPacket(player, event.theSkill, event.theLevel).generatePacket());
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new SkillPacket(player, event.theSkill).generatePacket());
+        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
+            EntityPlayerMP serverPlayer = (EntityPlayerMP) player;
+            MineFantasyII.packetHandler.sendPacketToPlayer(
+                    new LevelupPacket(player, event.theSkill, event.theLevel).generatePacket(),
+                    serverPlayer);
+            MineFantasyII.packetHandler
+                    .sendPacketToPlayer(new SkillPacket(player, event.theSkill).generatePacket(), serverPlayer);
         }
     }
 
     @SubscribeEvent
     public void syncSkill(SyncSkillEvent event) {
         EntityPlayer player = event.thePlayer;
-        if (!player.worldObj.isRemote) {
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new SkillPacket(player, event.theSkill).generatePacket());
+        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
+            MineFantasyII.packetHandler.sendPacketToPlayer(
+                    new SkillPacket(player, event.theSkill).generatePacket(),
+                    (EntityPlayerMP) player);
         }
     }
 

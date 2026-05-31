@@ -11,6 +11,7 @@ import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -20,7 +21,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
@@ -28,6 +28,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.armour.IElementalResistance;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -138,10 +139,9 @@ public class CombatMechanics {
     public static void setParryCooldown(EntityLivingBase user, int ticks) {
         user.getEntityData().setInteger(parryCooldownNBT, ticks);
 
-        if (!user.worldObj.isRemote && user instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) user;
-            ((WorldServer) player.worldObj).getEntityTracker()
-                    .func_151248_b(player, new ParryPacket(ticks, player).generatePacket());
+        if (!user.worldObj.isRemote && user instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) user;
+            MineFantasyII.packetHandler.sendPacketToPlayer(new ParryPacket(ticks, player).generatePacket(), player);
         }
     }
 
