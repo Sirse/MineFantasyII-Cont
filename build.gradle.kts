@@ -17,8 +17,6 @@ val versionNEI = "2.7.72-GTNH"
 val versionNotEnoughIds = "2.1.10"
 val versionWaila = "1.8.12"
 val versionCraftTweaker = "3.4.2"
-val unimixinsVersion = "0.1.22"
-
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
@@ -95,18 +93,18 @@ dependencies {
     isTransitive = false
   }
 
-  implementation("com.github.LegacyModdingMC.UniMixins:unimixins-mixin-1.7.10:$unimixinsVersion")
-  //annotationProcessor("com.github.LegacyModdingMC.UniMixins:unimixins-mixin-1.7.10:$unimixinsVersion")
-
   constraints {
+    implementation("org.apache.logging.log4j:log4j-api") {
+      version {
+        strictly("2.0-beta9-fixed")
+      }
+      because("Forge 1.7.10/FML cannot scan modern multi-release Log4j jars during mod discovery")
+    }
     implementation("org.apache.logging.log4j:log4j-core") {
       version {
-        strictly("[2.17, 3[")
-        prefer("2.19.0")
+        strictly("2.0-beta9-fixed")
       }
-      because(
-        "CVE-2021-44228, CVE-2021-45046, CVE-2021-45105: Log4j vulnerable to remote code execution and other critical security vulnerabilities"
-      )
+      because("Forge 1.7.10/FML cannot scan modern multi-release Log4j jars during mod discovery")
     }
   }
 }
