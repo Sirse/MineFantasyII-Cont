@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.heating.ForgeFuel;
@@ -21,13 +20,20 @@ import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 
-public class RecipeHandlerBloom extends TemplateRecipeHandler {
+public class RecipeHandlerBloom extends MFNEIRecipeHandler {
+
+    public RecipeHandlerBloom() {
+        super("minefantasy2.bloomery");
+    }
 
     private static ArrayList<FuelPair> afuels;
 
     private static void findFuels() {
         afuels = new ArrayList<FuelPair>();
         for (ForgeFuel fuel : ForgeItemHandler.forgeFuel) {
+            if (fuel == null || !NEIHelper.isValidStack(fuel.fuel)) {
+                continue;
+            }
             ItemStack item = fuel.fuel;
             if (TileEntityBlastFC.isCarbon(item) && MineFantasyFuels.getCarbon(item) > 0) {
                 afuels.add(new FuelPair(item.copy()));
@@ -36,7 +42,7 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
     }
 
     @Override
-    public TemplateRecipeHandler newInstance() {
+    public codechicken.nei.recipe.TemplateRecipeHandler newInstance() {
         if (afuels == null || afuels.isEmpty()) {
             findFuels();
         }
@@ -63,13 +69,25 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
         GL11.glColor4f(1, 1, 1, 1);
         GuiDraw.changeTexture(getGuiTexture());
         GuiDraw.drawTexturedModalRect(0, 0, 0, 11, 176, 89);
+        drawSlotFrame(120, 27);
+    }
+
+    private void drawSlotFrame(int x, int y) {
+        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GuiDraw.changeTexture("minefantasy2:textures/gui/icons.png");
+        GuiDraw.drawTexturedModalRect(x - 2, y - 2, 20, 0, 20, 20);
     }
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
+        if (!NEIHelper.isValidStack(result)) {
+            return;
+        }
         Map<ItemStack, ItemStack> recipes = BloomRecipe.recipeList;
         for (Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
-            if (CustomToolHelper.areEqual(recipe.getValue(), result)) {
+            if (recipe != null && NEIHelper.isValidStack(recipe.getKey())
+                    && NEIHelper.isValidStack(recipe.getValue())
+                    && CustomToolHelper.areEqual(recipe.getValue(), result)) {
                 arecipes.add(new SmeltingPair(recipe.getKey(), recipe.getValue()));
             }
         }
@@ -77,8 +95,11 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
 
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
+        if (!NEIHelper.isValidStack(ingredient)) {
+            return;
+        }
         ItemStack result = BloomRecipe.getSmeltingResult(ingredient);
-        if (result != null) {
+        if (NEIHelper.isValidStack(result)) {
             SmeltingPair arecipe = new SmeltingPair(ingredient, result);
             arecipe.setIngredientPermutation(Arrays.asList(arecipe.ingred), ingredient);
             arecipes.add(arecipe);
@@ -90,7 +111,7 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
         private PositionedStack stack;
 
         private FuelPair(ItemStack fuel) {
-            this.stack = new PositionedStack(fuel, 75, 57, false);
+            this.stack = NEIHelper.positionedStack(fuel, 75, 46, false);
         }
     }
 
@@ -100,8 +121,8 @@ public class RecipeHandlerBloom extends TemplateRecipeHandler {
         private PositionedStack result;
 
         private SmeltingPair(ItemStack ingred, ItemStack result) {
-            this.ingred = new PositionedStack(ingred, 75, 19);
-            this.result = new PositionedStack(result, 120, 29);
+            this.ingred = NEIHelper.positionedStack(ingred, 75, 8);
+            this.result = NEIHelper.positionedStack(result, 120, 27);
         }
 
         @Override

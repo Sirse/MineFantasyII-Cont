@@ -10,12 +10,15 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 
-public class RecipeHandlerCrucible extends TemplateRecipeHandler {
+public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
+
+    public RecipeHandlerCrucible() {
+        super("minefantasy2.crucible");
+    }
 
     private String recipeName = "method.crucible";
 
@@ -36,8 +39,12 @@ public class RecipeHandlerCrucible extends TemplateRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
+        if (!NEIHelper.isValidStack(result)) {
+            return;
+        }
         for (Alloy alloy : AlloyRecipes.alloys) {
-            if (CustomToolHelper.areEqual(alloy.recipeOutput, result)) {
+            if (alloy != null && NEIHelper.isValidStack(alloy.recipeOutput)
+                    && CustomToolHelper.areEqual(alloy.recipeOutput, result)) {
                 CachedAlloyRecipe recipe = new CachedAlloyRecipe(alloy);
                 arecipes.add(recipe);
             }
@@ -46,12 +53,23 @@ public class RecipeHandlerCrucible extends TemplateRecipeHandler {
 
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
+        if (!NEIHelper.isValidStack(ingredient)) {
+            return;
+        }
         for (Alloy alloy : AlloyRecipes.alloys) {
+            if (alloy == null || !NEIHelper.isValidStack(alloy.recipeOutput)) {
+                continue;
+            }
             for (Object object : alloy.recipeItems) {
+                if (!(object instanceof ItemStack)) {
+                    continue;
+                }
                 ItemStack recipeIngredient = (ItemStack) object;
-                if (CustomToolHelper.areEqual(recipeIngredient, ingredient)) {
+                if (NEIHelper.isValidStack(recipeIngredient)
+                        && CustomToolHelper.areEqual(recipeIngredient, ingredient)) {
                     CachedAlloyRecipe recipe = new CachedAlloyRecipe(alloy);
                     arecipes.add(recipe);
+                    break;
                 }
             }
         }
@@ -84,7 +102,7 @@ public class RecipeHandlerCrucible extends TemplateRecipeHandler {
         @SuppressWarnings("unchecked")
         private CachedAlloyRecipe(Alloy alloy) {
             setIngridients(alloy.recipeItems);
-            output = new PositionedStack(alloy.recipeOutput, 124, 32);
+            output = NEIHelper.positionedStack(alloy.recipeOutput, 124, 32);
             tier = alloy.level;
         }
 
@@ -93,12 +111,18 @@ public class RecipeHandlerCrucible extends TemplateRecipeHandler {
                 for (int y = 0; y < 3; y++) {
                     int index = y * 3 + x;
                     if (recipeItems.size() > index) {
+                        if (!(recipeItems.get(index) instanceof ItemStack)) {
+                            continue;
+                        }
                         ItemStack currentStack = (ItemStack) recipeItems.get(index);
-                        if (currentStack == null) {
+                        if (!NEIHelper.isValidStack(currentStack)) {
                             continue;
                         }
 
-                        PositionedStack stack = new PositionedStack(currentStack, 57 + x * 18, 14 + y * 18);
+                        PositionedStack stack = NEIHelper.positionedStack(currentStack, 57 + x * 18, 14 + y * 18);
+                        if (stack == null) {
+                            continue;
+                        }
                         ingredients.add(stack);
                     }
                 }

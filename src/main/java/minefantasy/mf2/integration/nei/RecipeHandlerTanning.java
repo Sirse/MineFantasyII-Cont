@@ -8,10 +8,13 @@ import net.minecraft.util.StatCollector;
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
-import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
 
-public class RecipeHandlerTanning extends TemplateRecipeHandler {
+public class RecipeHandlerTanning extends MFNEIRecipeHandler {
+
+    public RecipeHandlerTanning() {
+        super("minefantasy2.tanning");
+    }
 
     @Override
     public String getRecipeName() {
@@ -25,8 +28,11 @@ public class RecipeHandlerTanning extends TemplateRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
+        if (!NEIHelper.isValidStack(result)) {
+            return;
+        }
         for (TanningRecipe recipe : TanningRecipe.recipeList) {
-            if (NEIServerUtils.areStacksSameTypeCrafting(result, recipe.output)) {
+            if (isValidRecipe(recipe) && NEIServerUtils.areStacksSameTypeCrafting(result, recipe.output)) {
                 TanningPair cachedRecipe = new TanningPair(recipe);
                 arecipes.add(cachedRecipe);
             }
@@ -35,11 +41,15 @@ public class RecipeHandlerTanning extends TemplateRecipeHandler {
 
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
-        TanningRecipe recipe = TanningRecipe.getRecipe(ingredient);
-        if (recipe != null) {
-            TanningPair cachedRecipe = new TanningPair(recipe);
-            cachedRecipe.setIngredientPermutation(Arrays.asList(cachedRecipe.input), ingredient);
-            arecipes.add(cachedRecipe);
+        if (!NEIHelper.isValidStack(ingredient)) {
+            return;
+        }
+        for (TanningRecipe recipe : TanningRecipe.recipeList) {
+            if (isValidRecipe(recipe) && NEIHelper.matchesItemDamage(recipe.input, ingredient)) {
+                TanningPair cachedRecipe = new TanningPair(recipe);
+                cachedRecipe.setIngredientPermutation(Arrays.asList(cachedRecipe.input), ingredient);
+                arecipes.add(cachedRecipe);
+            }
         }
     }
 
@@ -62,6 +72,10 @@ public class RecipeHandlerTanning extends TemplateRecipeHandler {
         return 1;
     }
 
+    private boolean isValidRecipe(TanningRecipe recipe) {
+        return recipe != null && NEIHelper.isValidStack(recipe.input) && NEIHelper.isValidStack(recipe.output);
+    }
+
     private class TanningPair extends CachedRecipe {
 
         private PositionedStack input;
@@ -69,8 +83,8 @@ public class RecipeHandlerTanning extends TemplateRecipeHandler {
         private String toolType;
 
         private TanningPair(TanningRecipe recipe) {
-            input = new PositionedStack(recipe.input, 50, 20);
-            output = new PositionedStack(recipe.output, 100, 20);
+            input = NEIHelper.positionedStack(recipe.input, 50, 20);
+            output = NEIHelper.positionedStack(recipe.output, 100, 20);
             toolType = recipe.toolType;
         }
 

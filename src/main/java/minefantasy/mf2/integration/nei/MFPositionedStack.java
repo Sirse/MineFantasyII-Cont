@@ -28,7 +28,7 @@ public class MFPositionedStack extends PositionedStack {
 
         ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
         for (ItemStack item : items) {
-            if (item == null || item.getItem() == null) continue;
+            if (!NEIHelper.isValidStack(item)) continue;
 
             if (item.getItemDamage() == Short.MAX_VALUE) {
                 List<ItemStack> permutations = ItemList.itemMap.get(item.getItem());
