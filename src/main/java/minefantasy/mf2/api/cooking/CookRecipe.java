@@ -76,7 +76,7 @@ public class CookRecipe {
             return result;
         }
 
-        if (canCookBasics) {
+        if (canCookBasics && !oven) {
             ItemStack recipe = FurnaceRecipes.smelting().getSmeltingResult(item);
             if (recipe != null && recipe.getItem() instanceof ItemFood) {
                 return new CookRecipe(recipe, new ItemStack(burnt_food), 100, 300, 20, false, true);

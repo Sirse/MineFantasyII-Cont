@@ -25,7 +25,6 @@ public class CraftingManagerAnvil {
     public List recipes = new ArrayList();
 
     private CraftingManagerAnvil() {
-        Collections.sort(this.recipes, new RecipeSorterAnvil(this));
         System.out.println("MineFantasy: Anvil recipes initiating");
     }
 
@@ -113,6 +112,7 @@ public class CraftingManagerAnvil {
             recipe = new ShapedAnvilRecipes(var5, var6, var15, result, tool, time, hammer, anvil, hot, research, skill);
         }
         this.recipes.add(recipe);
+        Collections.sort(this.recipes, new RecipeSorterAnvil(this));
         return recipe;
     }
 
@@ -140,6 +140,7 @@ public class CraftingManagerAnvil {
 
         IAnvilRecipe recipe = new ShapelessAnvilRecipes(output, tool, hammer, anvil, time, var3, hot, research, skill);
         this.recipes.add(recipe);
+        Collections.sort(this.recipes, new RecipeSorterAnvil(this));
         return recipe;
     }
 
@@ -257,6 +258,7 @@ public class CraftingManagerAnvil {
 
                 if (rec.matches(matrix)) {
                     var13 = rec;
+                    break;
                 }
             }
 

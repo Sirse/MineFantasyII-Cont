@@ -34,7 +34,11 @@ public class TanningRecipe {
     }
 
     public static TanningRecipe addRecipe(Object input, float time, int tier, String toolType, ItemStack output) {
-        TanningRecipe recipe = new TanningRecipe(convertItem(input), time, tier, toolType, output);
+        ItemStack inputStack = convertItem(input);
+        if (inputStack == null || output == null) {
+            return null;
+        }
+        TanningRecipe recipe = new TanningRecipe(inputStack, time, tier, toolType, output);
         recipeList.add(recipe);
         return recipe;
     }
@@ -58,6 +62,9 @@ public class TanningRecipe {
 
         for (int a = 0; a < recipeList.size(); a++) {
             TanningRecipe recipe = recipeList.get(a);
+            if (recipe == null || recipe.input == null) {
+                continue;
+            }
             if (recipe.input.getItem() == item.getItem()) {
                 if (recipe.input.getItemDamage() == OreDictionary.WILDCARD_VALUE
                         || recipe.input.getItemDamage() == item.getItemDamage()) {

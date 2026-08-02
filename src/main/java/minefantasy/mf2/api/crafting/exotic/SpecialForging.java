@@ -23,6 +23,10 @@ public class SpecialForging {
         Salvage.shareSalvage(dragon, base);
     }
 
+    public static void removeDragonforgeCraft(Item base) {
+        dragonforgeCrafts.remove(base);
+    }
+
     public static Item getDragonCraft(ItemStack blacksteel) {
         if (dragonforgeCrafts.containsKey(blacksteel.getItem())) {
             return dragonforgeCrafts.get(blacksteel.getItem());
@@ -33,6 +37,10 @@ public class SpecialForging {
     public static void addSpecialCraft(String special, Item base, Item output) {
         specialCrafts.put(getIdentifier(base, special), output);
         Salvage.shareSalvage(output, base);
+    }
+
+    public static void removeSpecialCraft(String special, Item base) {
+        specialCrafts.remove(getIdentifier(base, special));
     }
 
     public static Item getSpecialCraft(String special, ItemStack input) {

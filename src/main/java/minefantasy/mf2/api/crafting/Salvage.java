@@ -17,6 +17,7 @@ import minefantasy.mf2.util.XSTRandom;
 public class Salvage {
 
     public static HashMap<String, Object[]> salvageList = new HashMap<String, Object[]>();
+    public static List<SalvageRecipe> displayList = new ArrayList<SalvageRecipe>();
     public static HashMap<String, Item> sharedSalvage = new HashMap<String, Item>();
     private static XSTRandom random = new XSTRandom();
 
@@ -29,14 +30,61 @@ public class Salvage {
     }
 
     public static void addSalvage(Item input, Object... components) {
-        salvageList.put(CustomToolHelper.getSimpleReferenceName(input), components);
+        addSalvage(new ItemStack(input, 1, OreDictionary.WILDCARD_VALUE), components);
     }
 
     public static void addSalvage(ItemStack item, Object... components) {
-        if (item.isItemStackDamageable()) {
-            item.setItemDamage(OreDictionary.WILDCARD_VALUE);
+        if (item == null || item.getItem() == null) {
+            return;
         }
-        salvageList.put(CustomToolHelper.getReferenceName(item), components);
+        ItemStack normalized = normalizeInput(item);
+        salvageList.put(CustomToolHelper.getReferenceName(normalized), components);
+        addDisplayRecipe(normalized, components);
+    }
+
+    public static void removeSalvage(ItemStack item) {
+        if (item == null || item.getItem() == null) {
+            return;
+        }
+        ItemStack normalized = normalizeInput(item);
+        salvageList.remove(CustomToolHelper.getReferenceName(normalized));
+        salvageList.remove(CustomToolHelper.getSimpleReferenceName(normalized.getItem()));
+        removeDisplayRecipe(normalized);
+    }
+
+    public static ItemStack normalizeInput(ItemStack item) {
+        if (item == null) {
+            return null;
+        }
+        ItemStack normalized = item.copy();
+        if (normalized.isItemStackDamageable()) {
+            normalized.setItemDamage(OreDictionary.WILDCARD_VALUE);
+        }
+        return normalized;
+    }
+
+    public static Object[] getRegisteredSalvage(ItemStack item) {
+        if (item == null || item.getItem() == null) {
+            return null;
+        }
+        return salvageList.get(CustomToolHelper.getReferenceName(normalizeInput(item)));
+    }
+
+    private static void addDisplayRecipe(ItemStack input, Object[] components) {
+        if (input == null || input.getItem() == null || components == null) {
+            return;
+        }
+        removeDisplayRecipe(input);
+        displayList.add(new SalvageRecipe(input.copy(), components));
+    }
+
+    private static void removeDisplayRecipe(ItemStack input) {
+        for (int i = displayList.size() - 1; i >= 0; i--) {
+            SalvageRecipe recipe = displayList.get(i);
+            if (recipe != null && isSameDisplayInput(input, recipe.input)) {
+                displayList.remove(i);
+            }
+        }
     }
 
     /**
@@ -136,5 +184,24 @@ public class Salvage {
         }
         return item2.getItem() == item1.getItem() && (item2.getItemDamage() == OreDictionary.WILDCARD_VALUE
                 || item2.getItemDamage() == item1.getItemDamage());
+    }
+
+    private static boolean isSameDisplayInput(ItemStack item1, ItemStack item2) {
+        if (item1 == null || item2 == null || item1.getItem() != item2.getItem()) {
+            return false;
+        }
+        return item1.getItemDamage() == item2.getItemDamage() && CustomToolHelper.doesMatchForRecipe(item1, item2)
+                && CustomToolHelper.doesMatchForRecipe(item2, item1);
+    }
+
+    public static class SalvageRecipe {
+
+        public final ItemStack input;
+        public final Object[] outputs;
+
+        private SalvageRecipe(ItemStack input, Object[] outputs) {
+            this.input = input;
+            this.outputs = outputs;
+        }
     }
 }

@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
@@ -57,16 +56,7 @@ public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
     }
 
     public static int getTemp(ItemStack item) {
-        NBTTagCompound tag = getNBT(item);
-
-        if (tag.hasKey("MFtemp")) return tag.getInteger("MFtemp");
-
-        return 0;
-    }
-
-    private static NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
-        return item.getTagCompound();
+        return item != null && item.hasTagCompound() ? item.getTagCompound().getInteger("MFtemp") : 0;
     }
 
     @Override

@@ -55,6 +55,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private boolean outputHot = false;
     private Skill skillUsed;
     private boolean resetRecipe = false;
+    private boolean craftingDataDirty = true;
     private boolean isFakeAnvil = false;
     private ItemStack recipe;
     private int hammerTierRequired;
@@ -143,13 +144,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
         if (this.inventory[slot] != null) {
             ItemStack itemstack;
 
             if (this.inventory[slot].stackSize <= num) {
                 itemstack = this.inventory[slot];
                 this.inventory[slot] = null;
+                onInventoryChanged();
                 return itemstack;
             } else {
                 itemstack = this.inventory[slot].splitStack(num);
@@ -157,7 +158,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                 if (this.inventory[slot].stackSize == 0) {
                     this.inventory[slot] = null;
                 }
-
+                onInventoryChanged();
                 return itemstack;
             }
         } else {
@@ -177,8 +178,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
         inventory[slot] = item;
+        onInventoryChanged();
     }
 
     @Override
@@ -220,8 +221,9 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         }
         super.updateEntity();
         if (!worldObj.isRemote) {
-            if (!isFakeAnvil && ticksExisted % 20 == 0) {
+            if (!isFakeAnvil && craftingDataDirty && ticksExisted % 20 == 0) {
                 updateCraftingData();
+                craftingDataDirty = false;
             }
             if (!canCraft() && ticksExisted > 1) {
                 progress = progressMax = 0;
@@ -237,7 +239,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     public void onInventoryChanged() {
         if (!resetRecipe) {
             updateCraftingData();
+            craftingDataDirty = false;
             resetRecipe = true;
+        } else {
+            craftingDataDirty = true;
         }
     }
 

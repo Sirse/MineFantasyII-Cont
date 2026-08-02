@@ -63,11 +63,12 @@ public class GuiHelper {
             return new int[] { width * 11, height * 0 };
         }
 
+        // Station icons live on the row that renderToolIcon samples at icon[1] + 20 (i.e. y = 40).
         if (s.equalsIgnoreCase("anvil")) {
-            return new int[] { 0, height * 2 };
+            return new int[] { 0, height * 1 };
         }
         if (s.equalsIgnoreCase("carpenter")) {
-            return new int[] { width * 1, height * 2 };
+            return new int[] { width * 1, height * 1 };
         }
         return new int[] { 0, 0 };
     }
