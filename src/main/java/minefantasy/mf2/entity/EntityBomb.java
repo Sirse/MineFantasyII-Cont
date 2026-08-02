@@ -229,17 +229,12 @@ public class EntityBomb extends Entity {
         return isStuckInBlock() ? 0F : getCase().weightModifier;
     }
 
-    private void explode2() {
-        float power = 3.5F;
-        this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, power, false);
-    }
-
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
     @Override
     protected void writeEntityToNBT(NBTTagCompound nbt) {
-        nbt.setByte("Fuse", (byte) this.fuse);
+        nbt.setInteger("Fuse", this.fuse);
     }
 
     /**
@@ -247,7 +242,7 @@ public class EntityBomb extends Entity {
      */
     @Override
     protected void readEntityFromNBT(NBTTagCompound nbt) {
-        this.fuse = nbt.getByte("Fuse");
+        this.fuse = nbt.getInteger("Fuse");
     }
 
     @Override
@@ -275,6 +270,7 @@ public class EntityBomb extends Entity {
         worldObj.playSoundAtEntity(this, "random.explode", 0.3F, 10F - 5F);
         worldObj.createExplosion(this, posX, posY, posZ, 0, false);
         if (!this.worldObj.isRemote) {
+            Vec3 blastPos = Vec3.createVectorHelper(posX, posY + 0.5D, posZ);
             double area = getRangeOfBlast() * 2D;
             AxisAlignedBB var3 = this.boundingBox.expand(area, area / 2, area);
             List var4 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, var3);
@@ -299,7 +295,11 @@ public class EntityBomb extends Entity {
                             double sc = distanceToEntity - (radius / 2);
                             if (sc < 0) sc = 0;
                             if (sc > (radius / 2)) sc = (radius / 2);
-                            dam *= (sc / (radius / 2));
+                            dam *= 1F - (float) (sc / (radius / 2));
+                        }
+                        dam *= worldObj.getBlockDensity(blastPos, entityHit.boundingBox);
+                        if (dam <= 0F) {
+                            continue;
                         }
                         if (!(entityHit instanceof EntityItem)) {
 
@@ -346,9 +346,6 @@ public class EntityBomb extends Entity {
         if (getFilling() == 2) {
             hit.setFire(5);
         }
-        if (hit instanceof EntityLivingBase) {
-            EntityLivingBase live = (EntityLivingBase) hit;
-        }
     }
 
     private double getRangeOfBlast() {
@@ -357,12 +354,6 @@ public class EntityBomb extends Entity {
 
     private int getDamage() {
         return (int) (getBlast().damage * getCase().damageModifier * getPowderType().damageModifier);
-    }
-
-    public boolean canEntityBeSeen(Entity entity) {
-        return this.worldObj.rayTraceBlocks(
-                Vec3.createVectorHelper(this.posX, this.posY + this.getEyeHeight(), this.posZ),
-                Vec3.createVectorHelper(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ)) == null;
     }
 
     public byte getFilling() {

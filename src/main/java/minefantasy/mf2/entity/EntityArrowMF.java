@@ -898,6 +898,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         worldObj.playSoundAtEntity(this, "random.explode", 0.3F, 10F - 5F);
         worldObj.createExplosion(this, posX, posY, posZ, 0, false);
         if (!this.worldObj.isRemote) {
+            Vec3 blastPos = Vec3.createVectorHelper(posX, posY + 0.5D, posZ);
             double area = getRangeOfBlast() * 2D;
             AxisAlignedBB var3 = this.boundingBox.expand(area, area / 2, area);
             List var4 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, var3);
@@ -917,7 +918,11 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                             double sc = distanceToEntity - (radius / 2);
                             if (sc < 0) sc = 0;
                             if (sc > (radius / 2)) sc = (radius / 2);
-                            dam *= (sc / (radius / 2));
+                            dam *= 1F - (float) (sc / (radius / 2));
+                        }
+                        dam *= worldObj.getBlockDensity(blastPos, entityHit.boundingBox);
+                        if (dam <= 0F) {
+                            continue;
                         }
                         if (!(entityHit instanceof EntityItem)) {
                             DamageSource source = causeBombDamage(this, shootingEntity != null ? shootingEntity : this);
