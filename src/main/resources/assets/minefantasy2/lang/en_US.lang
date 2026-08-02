@@ -687,6 +687,9 @@ tile.tanner.name=Shabby Tanning Rack
 tile.tannerStrong.name=Tanning Rack
 tile.tannerMetal.name=Advanced Tanning Rack
 tile.bombBench.name=Bomb Crafting Table
+method.bomb_bench=Bomb Bench
+method.crossbow_bench=Crossbow Bench
+method.bomb_press=Bomb Press
 tile.crossbowBench.name=Crossbow Assembly Table
 tile.bombPress.name=Bomb Press
 tile.carpenterBench.name=Carpenter Bench
@@ -1219,6 +1222,7 @@ item.skillbook_provisioning2.name=History of Trade
 item.skillbook_provisioning2.desc=Max Provisioning
 item.skillbook_engineering2.name=Engineers' Lexicon
 item.skillbook_engineering2.desc=Max Engineering
+item.engin_anvil_tools.name=Engineering Tools
 item.skillbook_combat2.name=Great War Journal
 item.skillbook_combat2.desc=Max Weaponry
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1235,6 +1239,10 @@ method.crucibleT2=Firebrick Crucible
 method.crucibleT3=Mythic Crucible
 method.crucibleT4=Masterwork Crucible
 method.quern=Quern
+method.cooking=Cooking
+method.oven=Oven
+method.salvage=Salvage
+method.paintOil=Paint Oil
 info.hasKnowledge=Can Research
 
 gui.purchase=Purchase
@@ -1836,6 +1844,7 @@ knowledge.engTanner=Advanced Tanner
 knowledge.engTanner.desc=Easy Tanning
 
 knowledge.engTanner.1=Tanning is probably one of the most tiring methods of production. Now with some proper mechanical methods you can make it easier!^This tanning rack is able to slice and dice clean hide for you. Just place the item as usual than right-click the top.
+nei.method.tanning.tool=Tool
 
 knowledge.advcrucible=Auto Crucible
 knowledge.advcrucible.desc=Easy Alloys
@@ -2246,3 +2255,9 @@ knowledge.doctor=Doctor
 knowledge.doctor.desc=Duty to benefit
 knowledge.doctor.1=Your constant use of aiding your fellow humans has yielded you experience in medicine.^Bandages heal 50% more damage.
 
+nei.minefantasy2.special_output=Requires %s in output slot
+nei.minefantasy2.tool=Tool: %s
+nei.minefantasy2.station=Station: %s
+nei.minefantasy2.tier=Tier: %s
+nei.method.big_furnace=Big Furnace
+nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn items yield less

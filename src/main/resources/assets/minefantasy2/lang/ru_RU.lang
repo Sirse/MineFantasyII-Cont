@@ -16,7 +16,7 @@ attribute.kit.salvage.name=Эффективность разбора
 
 attribute.kit.repairRate.name=Шанс починки
 attribute.kit.repairRate_enchant.name=Шанс починки (Зачарованные вещи) 
-attribute.kit.repairRate_normal.name=Шанс починки (Не зачарованные вещи) 
+attribute.kit.repairRate_normal.name=Шанс починки (Незачарованные вещи)
 
 attribute.kit.repairChance.name=Шанс успешной починки
 attribute.kit.breakChance.name=Шанс поломки набора
@@ -54,7 +54,7 @@ knowledge.unlocked=Исследование завершено
 vehicle.noArmour=Вы не можете использовать этот костюм, когда носите что-либо.
 vehicle.tooBigArmour=Ваша броня слишком объёмна и вы не влезаете в костюм.
 
-research.noskill=Вы сможете изучить что-то из этого, пока не достигнете более высокого уровня.
+research.noskill=Вы не сможете изучить ничего из этого, пока не достигнете более высокого уровня.
 research.null=Больше нечего изучать
 
 research.addArtefact=Добавлено знание: %1$s (%2$s/%3$s)
@@ -148,10 +148,10 @@ item.mod_head.name=%1$s Голова
 item.mod_haft.name=Рукоять "%1$s"
 item.mod_joint.name=Плечи "%1$s"
 
-component.head.name=%1$s Head
-component.shaft.name=%1$s Shaft
-component.grip.name=%1$s Grip
-component.brace.name=%1$s Brace
+component.head.name=%1$s навершие
+component.shaft.name=%1$s древко
+component.grip.name=%1$s рукоять
+component.brace.name=%1$s крепление
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MATERIAL LIST/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -163,7 +163,7 @@ materialtype.workable.name=Темп. ковки: %1$s°C - %2$s°C
 materialtype.resist.name=Сопротивление %1$s
 materialtype.fireresist.name=Сопротивление огню %1$s
 materialtype.maxtemp.name=Темп. плавления: %1$s°C
-material.any.name=Any
+material.any.name=Любой
 
 WOOD
 material.scrapwood.name=Древесные отходы
@@ -246,9 +246,9 @@ material.compositealloy.name=Композитный слиток
 MOD
 material.thaumium.name=Таум металл
 material.void.name=Пустотный металл
-material.manasteel.name=Манафрам
+material.manasteel.name=Манасталь
 material.elvenelementium.name=Элементиум
-material.terrasteel.name=Терразий
+material.terrasteel.name=Террасталь
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /ITEM STATS/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -694,6 +694,9 @@ tile.tanner.name=Ветхий дубильный станок
 tile.tannerStrong.name=Дубильный станок
 tile.tannerMetal.name=Продвинутый дубильный станок
 tile.bombBench.name=Стол изготовления бомб
+method.bomb_bench=Стол сборки бомб
+method.crossbow_bench=Стол сборки арбалетов
+method.bomb_press=Бомбовый пресс
 tile.crossbowBench.name=Стол изготовления арбалетов
 tile.bombPress.name=Бомбовый пресс
 tile.carpenterBench.name=Плотницкий верстак
@@ -1080,7 +1083,7 @@ item.sugarpot.name=Сахарница
 item.bread_uncooked.name=Хлебная заготовка
 item.guts.name=Кишки
 
-item.raw_bread.name=Сырой хлеба
+item.raw_bread.name=Сырой хлеб
 item.dough.name=Тесто
 item.pastry.name=Тесто для торта
 item.stew.name=Тушёнка
@@ -1120,7 +1123,7 @@ item.choccake_slice.name=Кусок шоколадного торта
 item.bfcake_slice.name=Кусок "Чернолесья"
 
 item.coca_powder.name=Какао-порошок
-item.chocolate.name=Шоколадный
+item.chocolate.name=Шоколад
 item.chocchips.name=Шоколадные кусочки
 item.eclair.name=Эклер
 item.eclair_raw.name=Эклерное тесто
@@ -1224,6 +1227,7 @@ item.skillbook_provisioning2.name=История Торговли
 item.skillbook_provisioning2.desc=Максимальный уровень ремесла снабжения
 item.skillbook_engineering2.name=Лексикон инженера
 item.skillbook_engineering2.desc=Максимальный уровень инженерного дела
+item.engin_anvil_tools.name=Инженерные инструменты
 item.skillbook_combat2.name=Повесть о великой войне
 item.skillbook_combat2.desc=Максимальный уровень мастерства
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1240,6 +1244,10 @@ method.crucibleT2=Огнеупорный тигель
 method.crucibleT3=Мифический тигель
 method.crucibleT4=Мастерский тигель
 method.quern=Ручная мельница
+method.cooking=Готовка
+method.oven=Печь
+method.salvage=Разбор
+method.paintOil=Покрытие маслом
 info.hasKnowledge=Можно изучить
 
 gui.purchase=Покупка
@@ -1258,25 +1266,22 @@ knowledge.minotaurs=Минотавр
 knowledge.minotaurs.desc=Ужасные монстры
 
 knowledge.minotaurs.1=Немногие существа могут тягаться с минотаврами силой и яростью. Легенда гласит, что эти существа были людьми и коровами, пока не стали тем, чем являются сейчас. Минотавры всеядные и достаточно вспыльчивые существа.^Минотавры чрезвычайно сильны и быстры - они способны мгновенно убить зазевавшуюся жертву, так же они удивительно быстро восстанавливаются после ранений. Минотавры не обладают высоким интеллектом, однако, некоторые из них собираются в группы и живут согласно строгой иерархии.
-knowledge.minotaurs.2=$hLesser Minotaur-$r^It may be common sight to see lesser minotaurs in the wild proving a threat to those unfortunate enough to come close.^These creatures are little more than beasts yet provide a misconception of actual minotaur behavior. Lesser minotaurs either have no home or are set out to scavenge for their greater counterparts.
-knowledge.minotaurs.3=$hGreater Minotaur-$r^Greater minotaurs are found dwelling in dwarven complexes underground providing a challenge to explorers.^The minotaurs that are housed within these ruins are more organised and deadly. Standard minotaur warriors are brutal and armed while the elite and warlords that can be found deeper within ruins are powerful foes. It shall be made clear that ruins should be explored only by the prepared. One warrior may prove a challenge, but a group? few have survived.
-knowledge.minotaurs.4=$hSpecies-$r^There are three known species of minotaur found in both wild and ruin. There is no difference to the behavior or living patterns of minotaurs of different species but physical properties do vary. 
-knowledge.minotaurs.combat=$hCombat-$r^The best advice that could be given to fighting off a minotaur would be range. Don't let them get close enough to hit you, even the strongest armour buckles under the force of their fury. Many minotaurs are heavily armoured as well but both hide and plate are vulnerable to piercing attacks a spear would be capable of exploiting both these weaknesses. Spears, explosives, distance and heavy armour give the best chances of survival.
+knowledge.minotaurs.2=$hМладший минотавр-$r^Нередко в дикой природе можно встретить младших минотавров, и для тех, кому не повезло подойти близко, это представляет угрозу.^Эти существа мало чем отличаются от зверей, но по внешнему виду легко создают неверное впечатление о поведении настоящих минотавров. Младшие минотавры либо не имеют дома, либо бродят в поисках добычи для более сильных сородичей.
+knowledge.minotaurs.3=$hСтарший минотавр-$r^Старшие минотавры обитают в подземных дварфийских комплексах и представляют собой серьёзное испытание для исследователей.^Минотавры, живущие в этих руинах, более организованы и смертоносны. Обычные минотаврьи воины жестоки и хорошо вооружены, а элита и вожди, встречающиеся глубже в руинах, являются опасными противниками. Следует ясно понимать, что исследовать руины стоит только будучи хорошо подготовленным. Один воин может стать проблемой, но что насчёт группы? Немногие выжили.
+knowledge.minotaurs.4=$hВиды-$r^Известны три вида минотавров, встречающихся как в дикой природе, так и в руинах. Между видами нет различий в поведении или образе жизни, но их физические свойства отличаются.
+knowledge.minotaurs.combat=$hБой-$r^Лучший совет в сражении с минотавром - держать дистанцию. Не позволяйте ему подойти достаточно близко, чтобы ударить вас: даже самая крепкая броня не выдержит их ярости. Многие минотавры к тому же хорошо бронированы, но и их шкура, и их пластины уязвимы для колющих атак, которыми может воспользоваться копьё. Копья, взрывчатка, дистанция и тяжёлая броня дают лучшие шансы на выживание.
 
 knowledge.mob.minotaur.name=Коричневый минотавр
 
 knowledge.minotaur.1=В основном, в нашем мире обитает именно этот вид минотавров. Они чрезвычайно сильны, быстры, выносливы. Обычным минотаврам недостаёт интеллекта, и они бесцельно бродят по миру.
-knowledge.minotaur.1=Brown-fur minotaurs are the more common species in the overworld. They are found to have excessive strength and prove to be a powerful foe. Standard minotaurs have no natural armour but are still hard to kill.
 
 knowledge.mob.minotaur_frost.name=Снежный минотавр
 
 knowledge.minotaur_frost.1=Обитает в холодных регионах. Эти минотавры считаются более опасными, чем коричневые. Минотавра-альбиноса очень трудно заметить в снежной местности, что создаёт проблему для всех путешественников.
-knowledge.minotaur_frost.1=Found in colder regions, these Minotaurs appear to have thicker hide than the brown minotaurs, resulting in natural armour. The Albino minotaur is difficult to see in the snow and can unleash a devistating rage on the unsuspecting traveller.
 
 knowledge.mob.minotaur_dread.name=Яростный минотавр
 
 knowledge.minotaur_dread.1=Доподлинно неизвестно, кто начал их так называть. Жители Нижнего Мира вооружённые железным оружием, яростно патрулирующие пустоши. Удивительно, но когда их несколько, они действуют сообща.
-knowledge.minotaur_dread.1=Not as much is known about what some call the Dread Minotaur. Denizens of the nether, dark-grey or black fur, powerfully thick skin, and immunity to fire. This species are far hardier than their overworld cousins.
 
 knowledge.dragons=Драконы
 knowledge.dragons.desc=Смерть с небес
@@ -1295,9 +1300,9 @@ knowledge.mob.green_dragon.name=Зелёный дракон
 knowledge.green_dragon.1=Зелёные драконы так же известны как "Ядовитые драконы". Они обитают в наиболее влажных местностях типа болот, озёр и морей. Способны изрыгать кислоту, разъедающую броню и отравляющую жертву.
 
 knowledge.mob.ash_dragon.name=Ash Dragon
-knowledge.ash_dragon.1=Ash dragons are found in the hot and dry such as deserts and can be easily identified by their two legs (rather than four). Ash dragons are blind, and require the use of sound and smell to track their target. keep your distance and remain quiet to avoid attack.
+knowledge.ash_dragon.1=Пепельные драконы обитают в жарких и сухих местах, например в пустынях, и их легко узнать по двум лапам вместо четырёх. Пепельные драконы слепы и выслеживают добычу по звуку и запаху. Держитесь на расстоянии и сохраняйте тишину, чтобы не стать целью атаки.
 
-knowledge.dragons.combat=$hCombat-$r^Dragons may be fast and have the sky advantage, but they have a few weaknesses to exploit. Firstly is the ability to leave and return the battlefield, you are best to pay attention and avoid losing sight of your foe. As the dragon swoops, make your strike. A proerly lined ranged attack will grant an advantage when it takes off again. As well as that: specialised dragonforged items may be crafted to give an edge to the battle.
+knowledge.dragons.combat=$hБой с драконами-$r^Драконы быстры и обладают преимуществом высоты, но у них есть несколько уязвимостей, которыми можно воспользоваться. Прежде всего, они могут покинуть поле боя и вернуться, поэтому важно не терять их из виду. Когда дракон пикирует, наносите удар. Хорошо подготовленная дальняя атака даст преимущество, когда он снова поднимется в воздух. Кроме того, можно изготовить специальные предметы из драконьего металла, чтобы получить перевес в бою.
 
 knowledge.gettingStarted=Начало развития
 knowledge.gettingStarted.desc=С нуля
@@ -1325,7 +1330,7 @@ knowledge.gettingStarted.5=Теперь у вас есть доступ ко в�
 
 knowledge.gettingStarted.6=С установленным горном можно выковать медные инструменты. Проверьте секцию кованых инструментов для просмотра альтернатив медному инструментарию.
 
-knowledge.gettingStarted.upgrade=$hUpgrading-$r^ Книга и стол исследований помогут вам постичь новые рецепты и умения, но перед этим нужно создать стол исследований.
+knowledge.gettingStarted.upgrade=$hУлучшение-$r^ Книга и стол исследований помогут вам постичь новые рецепты и умения, но перед этим нужно создать стол исследований.
 
 knowledge.gettingStarted.7=Этот стол позволяет превратить свитки исследований в завершённые исследования. Однако для этого Вам надо где-то достать свиток. ^Откройте свою книгу - в ней находится большое количество доступных исследований, подсвеченных зелёным цветом. Попробуйте к примеру технологию изготовления лёгкой брони на вкладке кузнечного ремесла.
 
@@ -1778,7 +1783,7 @@ knowledge.lance.info=Копьё всадника практически бесп
 knowledge.firemaker=Разведение огня
 knowledge.firemaker.desc=СОЖГИ ИХ ВСЕХ!
 knowledge.dryrocks.info=Сухие камни это базовый инструмент для разведения огня, они не создают блоков огня, но ими можно разжечь горн.
-knowledge.tinderbox.info=Трутница является хорошим средством для разведения огня, к тому же она более долговечная чем сухие камни. It still may take a few tries to get a flame, but the extra uses pays off.
+knowledge.tinderbox.info=Трутница является хорошим средством для разведения огня, к тому же она более долговечная, чем сухие камни. Однако, чтобы получить пламя, всё ещё может потребоваться несколько попыток, и дополнительные применения того стоят.
 knowledge.flintsteel.info=Разумеется, огниво лучшее средство для разведения огня. Имеет самую большую прочность.
 
 knowledge.craftCrafters=Изготовление инструменов
@@ -1843,6 +1848,7 @@ knowledge.engTanner=Улучшенный дубильный станок
 knowledge.engTanner.desc=Лёгкая обработка кожи
 
 knowledge.engTanner.1=Выделка кож довольно монотонное занятие, но Вы нашли способ упростить его.^Этот станок может как обрабатывать кожу, так и резать её. Всё, что нужно - поместить материал на станок и щёлкнуть ПКМ по станку.
+nei.method.tanning.tool=Инструмент
 
 knowledge.advcrucible=Продвинутый тигель
 knowledge.advcrucible.desc=Делаем сплавы легко!
@@ -2011,11 +2017,11 @@ knowledge.cogArmour.2=Ни одного экземпляра механичес�
 knowledge.cogArmour.station=$hМеханическая станция$r^Механическая станция необходима для экипирования или улучшения механической брони. Механическая станция состоит из остова и шкива, представляет из себя 3 остова высотой в 4 блока, со скрепляющим остовом по середине.
 //Example
 knowledge.cogwork_station=Механическая станция
-knowledge.cogArmour.station.2=Когда станция готова, Вам нужно сделать шкив, затем нажать ПКМ по центральному остову для его установки. Убедитесь, что шкив расположен в нужном месте, ведь после установки его нельзя будет снять.
+knowledge.cogArmour.station.2=Когда станция готова, вам нужно сделать шкив, затем нажать ПКМ по центральному остову для его установки. Убедитесь, что шкив расположен в нужном месте, ведь после установки его нельзя будет снять.
 //Pulley Recipe
 knowledge.cogArmour.crafting=Для создания механической брони: Вам нужно три блока - шлем, нагрудник и поножи. Разместите их на механической станции. Затем, нажмите ПКМ гаечным ключом по нагруднику.
 //Piece Recipes
-knowledge.cogArmour.armour=$hБроневые элементы$r^Для того, чтобы разместить броню на каркас, Вам нужно сделать её. Для этого потребуется много металла, поэтому рекомендуется использовать что-то вроде стали. Броня устанавливается через нажатие ПКМ по каркасу костюма. Так же Вам понадобится 16 болтов которые расходуются перед установкой брони. Броню можно легко снять с помощью гаечного ключа.
+knowledge.cogArmour.armour=$hБроневые элементы$r^Для того, чтобы разместить броню на каркас, вам нужно сделать её. Для этого потребуется много металла, поэтому рекомендуется использовать что-то вроде стали. Броня устанавливается через нажатие ПКМ по каркасу костюма. Также вам понадобится 16 болтов, которые расходуются перед установкой брони. Броню можно легко снять с помощью гаечного ключа.
 //Armour Recipe
 knowledge.cogArmour.fuel=$hЗаправка$r^Механическая броня потребляет только чистое топливо(кокс или магму). ПКМ по костюму, чтобы заправить его топливом.^Чем тяжелее защита на механической броне, тем больше топлива она потребляет.
 knowledge.cogArmour.advantage=$hПреимущества$r^Небронированная механическая броня защищает носителя от дыма, урона от падений, увеличивает наносимый урон и снижает затраты выносливости.
@@ -2252,3 +2258,10 @@ knowledge.firstaid.1=Вы должны быть предельно быстры 
 knowledge.doctor=Доктор
 knowledge.doctor.desc=Спасая жизни
 knowledge.doctor.1=Постоянная врачебная практика помогла Вам увеличить эффективность использования повязок. Теперь вы излечиваете ими на 50% лучше.
+
+nei.minefantasy2.special_output=Требует %s в выходном слоте
+nei.minefantasy2.tool=Инструмент: %s
+nei.minefantasy2.station=Станция: %s
+nei.minefantasy2.tier=Уровень: %s
+nei.method.big_furnace=Большая печь
+nei.minefantasy2.salvage.durability_note=Показан выход для полной прочности; изношенные предметы дают меньше

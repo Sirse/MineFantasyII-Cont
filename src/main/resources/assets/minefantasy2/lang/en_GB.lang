@@ -29,6 +29,7 @@ attribute.armour.heavy=Heavy Armour
 /COMPONENT/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 item.nitre.name=Nitre
+item.engin_anvil_tools.name=Engineering Tools
 tile.oreNitre.name=Nitre Deposit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /ARMOUR/
@@ -86,3 +87,5 @@ item.ignotumite_hvypick.name=Heavy Ignotumite Pick
 item.mithium_hvypick.name=Heavy Mithium Pick
 
 item.ender_hvypick.name=Heavy Enderforge Pick
+nei.method.big_furnace=Big Furnace
+nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn items yield less

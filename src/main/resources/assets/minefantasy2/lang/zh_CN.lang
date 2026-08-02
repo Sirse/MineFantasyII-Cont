@@ -686,6 +686,9 @@ tile.tanner.name=简陋的制革架
 tile.tannerStrong.name=制革架
 tile.tannerMetal.name=高级制革架
 tile.bombBench.name=炸弹组装台
+method.bomb_bench=炸弹工作台
+method.crossbow_bench=弩组装台
+method.bomb_press=炸弹压机
 tile.crossbowBench.name=弓弩组装台
 tile.bombPress.name=炸弹组装机
 tile.carpenterBench.name=木匠工作台
@@ -1218,6 +1221,7 @@ item.skillbook_provisioning2.name=贸易史
 item.skillbook_provisioning2.desc=烹饪-MAX
 item.skillbook_engineering2.name=工程师词典
 item.skillbook_engineering2.desc=机械-MAX
+item.engin_anvil_tools.name=工程工具
 item.skillbook_combat2.name=作战制胜日志
 item.skillbook_combat2.desc=锻铸-MAX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1234,6 +1238,10 @@ method.crucibleT2=耐火坩埚
 method.crucibleT3=传说坩埚
 method.crucibleT4=大师级坩埚
 method.quern=磨盘
+method.cooking=烹饪
+method.oven=烤炉
+method.salvage=拆解
+method.paintOil=涂油
 info.hasKnowledge=可研究
 
 gui.purchase=购买
@@ -1835,6 +1843,7 @@ knowledge.engTanner=高级制革架
 knowledge.engTanner.desc=简易制革
 
 knowledge.engTanner.1=制革可能是最累人的生产方式之一，现在你可以用机器使生产更简易。^制革架可为你将干净的兽皮切片切条，只需右键将物品放在制革架上面。
+nei.method.tanning.tool=工具
 
 knowledge.advcrucible=自动化坩埚
 knowledge.advcrucible.desc=简化合金
@@ -2244,3 +2253,10 @@ knowledge.firstaid.1=你需要时刻准备治疗伤口。^绷带使用速度显�
 knowledge.doctor=医生
 knowledge.doctor.desc=救死扶伤
 knowledge.doctor.1=你不断救助你的同伴，因此获得了医学上的经验。^绑带治疗加成50%。
+
+nei.minefantasy2.special_output=需要在输出槽放置%s
+nei.minefantasy2.tool=工具：%s
+nei.minefantasy2.station=工作站：%s
+nei.minefantasy2.tier=等级：%s
+nei.method.big_furnace=大型熔炉
+nei.minefantasy2.salvage.durability_note=显示的是满耐久度的产出；磨损的物品产出更少
