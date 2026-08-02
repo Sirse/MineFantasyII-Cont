@@ -1,5 +1,7 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.ArrayList;
+
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -10,6 +12,7 @@ import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
+import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -49,6 +52,27 @@ public class CarpentersBench {
                         anvil,
                         time,
                         ingreds));
+    }
+
+    @ZenMethod
+    public static void remove(@NotNull IIngredient output, IIngredient input) {
+        ArrayList<ICarpenterRecipe> recipesToRemove = new ArrayList<ICarpenterRecipe>();
+        for (Object object : CraftingManagerCarpenter.getInstance().getRecipeList()) {
+            if (!(object instanceof ICarpenterRecipe)) {
+                continue;
+            }
+            ICarpenterRecipe recipe = (ICarpenterRecipe) object;
+            if (recipe != null && recipe.getRecipeOutput() != null
+                    && output.matches(new MCItemStack(recipe.getRecipeOutput()))
+                    && (input == null || matchesAnyIngredient(recipe, input))) {
+                recipesToRemove.add(recipe);
+            }
+        }
+        if (recipesToRemove.isEmpty()) {
+            MineTweakerAPI.logWarning("No Carpenter recipes for " + output.toString());
+            return;
+        }
+        MineTweakerAPI.apply(new RemoveAction(recipesToRemove));
     }
 
     public static class CarpentersAction implements IUndoableAction {
@@ -128,6 +152,92 @@ public class CarpentersBench {
             CraftingManagerCarpenter.getInstance().recipes.remove(r);
         }
 
+    }
+
+    private static class RemoveAction implements IUndoableAction {
+
+        private final ArrayList<ICarpenterRecipe> recipes;
+
+        private RemoveAction(ArrayList<ICarpenterRecipe> recipes) {
+            this.recipes = recipes;
+        }
+
+        @Override
+        public void apply() {
+            CraftingManagerCarpenter.getInstance().recipes.removeAll(recipes);
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            CraftingManagerCarpenter.getInstance().recipes.addAll(recipes);
+        }
+
+        @Override
+        public String describe() {
+            return "Removing " + recipes.size() + " Carpenter recipes";
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Restoring " + recipes.size() + " Carpenter recipes";
+        }
+
+        @Override
+        public Object getOverrideKey() {
+            return null;
+        }
+    }
+
+    private static boolean matchesAnyIngredient(ICarpenterRecipe recipe, IIngredient input) {
+        if (recipe instanceof TweakedShapedCBRecipes) {
+            return matchesIngredientGrid(((TweakedShapedCBRecipes) recipe).getIngredients(), input);
+        }
+        if (recipe instanceof TweakedShapelessCBRecipes) {
+            return matchesIngredientList(((TweakedShapelessCBRecipes) recipe).getIngredients(), input);
+        }
+        return false;
+    }
+
+    private static boolean matchesIngredientGrid(IIngredient[][] ingredients, IIngredient input) {
+        if (ingredients == null) {
+            return false;
+        }
+        for (IIngredient[] row : ingredients) {
+            if (row == null) {
+                continue;
+            }
+            for (IIngredient ingredient : row) {
+                if (ingredient != null) {
+                    for (minetweaker.api.item.IItemStack stack : ingredient.getItems()) {
+                        if (input.matches(stack)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean matchesIngredientList(IIngredient[] ingredients, IIngredient input) {
+        if (ingredients == null) {
+            return false;
+        }
+        for (IIngredient ingredient : ingredients) {
+            if (ingredient != null) {
+                for (minetweaker.api.item.IItemStack stack : ingredient.getItems()) {
+                    if (input.matches(stack)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }

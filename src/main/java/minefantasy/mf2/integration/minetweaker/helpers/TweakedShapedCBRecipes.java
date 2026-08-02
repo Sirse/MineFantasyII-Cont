@@ -124,4 +124,8 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
         return false;
     }
 
+    public IIngredient[][] getIngredients() {
+        return ingreds;
+    }
+
 }

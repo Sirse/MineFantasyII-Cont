@@ -32,6 +32,9 @@ public class TanningRack {
         List<TanningRecipe> recipesToRemove = new ArrayList<TanningRecipe>();
 
         for (TanningRecipe recipe : recipeList) {
+            if (recipe == null || recipe.input == null || recipe.output == null) {
+                continue;
+            }
             if (output.matches(new MCItemStack(recipe.output))
                     && (input == null || input.matches(new MCItemStack(recipe.input)))) {
                 recipesToRemove.add(recipe);
@@ -65,9 +68,17 @@ public class TanningRack {
 
         @Override
         public void apply() {
+            ItemStack outputStack = MineTweakerMC.getItemStack(output);
+            if (outputStack == null || outputStack.getItem() == null) {
+                MineTweakerAPI.logWarning("Skipping tanning rack recipe with invalid output " + output);
+                return;
+            }
             for (IItemStack s : input.getItems()) {
                 ItemStack stack = MineTweakerMC.getItemStack(s);
-                addedRecipes.add(TanningRecipe.addRecipe(stack, time, tier, tool, MineTweakerMC.getItemStack(output)));
+                TanningRecipe recipe = TanningRecipe.addRecipe(stack, time, tier, tool, outputStack);
+                if (recipe != null) {
+                    addedRecipes.add(recipe);
+                }
             }
         }
 

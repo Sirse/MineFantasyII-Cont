@@ -126,4 +126,8 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
         return false;
     }
 
+    public IIngredient[] getIngredients() {
+        return ingreds;
+    }
+
 }

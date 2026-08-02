@@ -131,4 +131,8 @@ public class TweakedShapelessCBRecipes implements ICarpenterRecipe {
         return sound;
     }
 
+    public IIngredient[] getIngredients() {
+        return ingreds;
+    }
+
 }

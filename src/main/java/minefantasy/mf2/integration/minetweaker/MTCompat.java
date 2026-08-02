@@ -19,6 +19,8 @@ public class MTCompat {
         MineTweakerAPI.registerClass(Cooking.class);
         MineTweakerAPI.registerClass(Crucible.class);
         MineTweakerAPI.registerClass(Forge.class);
+        MineTweakerAPI.registerClass(PaintOil.class);
+        MineTweakerAPI.registerClass(SpecialForging.class);
         MineTweakerAPI.registerClass(TanningRack.class);
         MineTweakerAPI.registerClass(Quern.class);
         MineTweakerAPI.registerClass(SalvageTweaker.class);
@@ -35,6 +37,12 @@ public class MTCompat {
         @Optional.Method(modid = "MineTweaker3")
         @Override
         public void remove(IIngredient iIngredient) {
+            Anvil.remove(iIngredient, null);
+            CarpentersBench.remove(iIngredient, null);
+            BigFurnace.remove(iIngredient, null);
+            Cooking.remove(iIngredient, null);
+            Crucible.remove(iIngredient, null);
+            SalvageTweaker.remove(iIngredient, null);
             Bloomery.remove(iIngredient, null);
             Quern.remove(iIngredient, null);
             TanningRack.remove(iIngredient, null);

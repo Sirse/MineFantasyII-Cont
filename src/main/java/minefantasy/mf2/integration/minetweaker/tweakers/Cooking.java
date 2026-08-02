@@ -7,11 +7,14 @@ import java.util.Map;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
+import minetweaker.mc1710.item.MCItemStack;
+import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
@@ -24,6 +27,35 @@ public class Cooking {
             boolean requireBaking, @Optional boolean canBurn) {
         MineTweakerAPI
                 .apply(new AddRecipeAction(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn));
+    }
+
+    @ZenMethod
+    public static void remove(@NotNull IIngredient output, IIngredient input) {
+        ArrayList<String> keysToRemove = new ArrayList<String>();
+        ArrayList<CookRecipe> recipesToRemove = new ArrayList<CookRecipe>();
+        for (Map.Entry<String, CookRecipe> entry : CookRecipe.recipeList.entrySet()) {
+            if (entry.getValue() != null && entry.getValue().output != null
+                    && output.matches(new MCItemStack(entry.getValue().output))
+                    && (input == null || matchesInputKey(entry.getKey(), input))) {
+                keysToRemove.add(entry.getKey());
+                recipesToRemove.add(entry.getValue());
+            }
+        }
+        if (keysToRemove.isEmpty()) {
+            MineTweakerAPI.logWarning("No Cooking recipes for " + output.toString());
+            return;
+        }
+        MineTweakerAPI.apply(new RemoveAction(keysToRemove, recipesToRemove));
+    }
+
+    private static boolean matchesInputKey(String key, IIngredient input) {
+        for (IItemStack stack : input.getItems()) {
+            ItemStack mcInput = MineTweakerMC.getItemStack(stack);
+            if (mcInput != null && key.equals(CustomToolHelper.getReferenceName(mcInput))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static class AddRecipeAction implements IUndoableAction {
@@ -97,6 +129,64 @@ public class Cooking {
         @Override
         public Object getOverrideKey() {
             return null;
+        }
+    }
+
+    private static class RemoveAction implements IUndoableAction {
+
+        private final ArrayList<RemovedRecipeState> removed = new ArrayList<RemovedRecipeState>();
+
+        private RemoveAction(ArrayList<String> keys, ArrayList<CookRecipe> recipes) {
+            if (keys != null && recipes != null) {
+                for (int i = 0; i < keys.size() && i < recipes.size(); i++) {
+                    this.removed.add(new RemovedRecipeState(keys.get(i), recipes.get(i)));
+                }
+            }
+        }
+
+        @Override
+        public void apply() {
+            for (RemovedRecipeState state : removed) {
+                CookRecipe.recipeList.remove(state.key);
+            }
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            for (RemovedRecipeState state : removed) {
+                CookRecipe.recipeList.put(state.key, state.recipe);
+            }
+        }
+
+        @Override
+        public String describe() {
+            return "Removing " + removed.size() + " Cooking recipes";
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Restoring " + removed.size() + " Cooking recipes";
+        }
+
+        @Override
+        public Object getOverrideKey() {
+            return null;
+        }
+    }
+
+    private static class RemovedRecipeState {
+
+        private final String key;
+        private final CookRecipe recipe;
+
+        private RemovedRecipeState(String key, CookRecipe recipe) {
+            this.key = key;
+            this.recipe = recipe;
         }
     }
 
