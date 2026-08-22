@@ -155,7 +155,7 @@ public class CombatMechanics {
     public static void tickParryCooldown(EntityLivingBase user) {
         int ticks = getParryCooldown(user);
         if (ticks > 0) {
-            setParryCooldown(user, ticks - 1);
+            user.getEntityData().setInteger(parryCooldownNBT, ticks - 1);
         }
     }
 
@@ -566,10 +566,6 @@ public class CombatMechanics {
                 if (RPGElements.isSystemActive && user instanceof EntityPlayer && !user.worldObj.isRemote) {
                     SkillList.combat.addXP((EntityPlayer) user, (int) (damage / 5F));
                 }
-            } else {
-                if (source instanceof EntityArrow && src.isProjectile()) {
-                    onArrowHit(source, target, hitter, damage);
-                }
             }
         }
         CombatMechanics.setPostHitCooldown(target, 10);
@@ -593,13 +589,6 @@ public class CombatMechanics {
         if (ConfigWeapon.useBalance && user instanceof EntityPlayer) {
             applyBalance((EntityPlayer) user);
         }
-    }
-
-    private void onArrowHit(Entity arrow, Entity target, Entity shooter, float damage) {
-        /*
-         * if(RPGElements.isSystemActive && shooter instanceof EntityPlayer) { SkillList.archery.addXP((EntityPlayer)
-         * shooter, (int)damage); }
-         */
     }
 
     private float onUserHit(EntityLivingBase user, Entity entityHitting, DamageSource source, float dam,
@@ -683,7 +672,7 @@ public class CombatMechanics {
                         if (hitter.getHeldItem() != null) {
                             ItemStack attackingWep = hitter.getHeldItem();
                             if (attackingWep.getItem() instanceof IWeaponSpeed) {
-                                hitTime += ((IWeaponSpeed) attackingWep.getItem()).modifyHitTime(hitter, weapon);
+                                hitTime += ((IWeaponSpeed) attackingWep.getItem()).modifyHitTime(hitter, attackingWep);
                             }
                         }
                         if (hitTime > 0) {
@@ -730,7 +719,7 @@ public class CombatMechanics {
             }
         }
 
-        if (dam > 0 && user instanceof EntityPlayer
+        if ((dam > 0 && user instanceof EntityPlayer)
                 || (entityHitting != null && entityHitting instanceof EntityPlayer)) {
             if (!user.worldObj.isRemote) {
                 String type = "Mixed";
