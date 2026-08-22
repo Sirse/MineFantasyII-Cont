@@ -39,7 +39,6 @@ public class XSTRandom extends Random {
      */
     double nextNextGaussian = 0;
     private long seed;
-    private long last;
 
     /**
      * Creates a new pseudo random number generator. The seed is initialized to the current time, as if by
@@ -190,12 +189,20 @@ public class XSTRandom extends Random {
      * @since 1.2
      */
     public int nextInt(int bound) {
-        last = seed ^ (seed << 21);
-        last ^= (last >>> 35);
-        last ^= (last << 4);
-        seed = last;
-        int out = (int) last % bound;
-        return (out < 0) ? -out : out;
+        if (bound <= 0) {
+            throw new IllegalArgumentException("bound must be positive");
+        }
+
+        if ((bound & -bound) == bound) {
+            return (int) ((bound * (long) next(31)) >> 31);
+        }
+
+        int bits, val;
+        do {
+            bits = next(31);
+            val = bits % bound;
+        } while (bits - val + (bound - 1) < 0);
+        return val;
     }
 
     public int nextInt() {
