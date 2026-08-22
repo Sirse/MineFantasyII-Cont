@@ -15,11 +15,11 @@ public class ConfigIntegration extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
-        neiIntegration = Boolean.parseBoolean(
-                config.get(CATEGORY_MODS, "NEI Integration", true, "Enable Not Enough Items integration").getString());
-        mtIntegration = Boolean.parseBoolean(
-                config.get(CATEGORY_MODS, "MT Integration", true, "Enable MineTweaker (CraftTweaker) integration")
-                        .getString());
+        neiIntegration = config.get(CATEGORY_MODS, "NEI Integration", true, "Enable Not Enough Items integration")
+                .getBoolean();
+        mtIntegration = config
+                .get(CATEGORY_MODS, "MT Integration", true, "Enable MineTweaker (CraftTweaker) integration")
+                .getBoolean();
 
         if (FMLCommonHandler.instance().getSide() == Side.SERVER) {
             pluginsList = config.get(

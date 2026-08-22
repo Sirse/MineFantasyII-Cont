@@ -10,23 +10,21 @@ public class ConfigTools extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
-        handpickBonus = Float.parseFloat(
-                config.get(
-                        CATEGORY_BONUS,
-                        "Handpick double-drop chance",
-                        20F,
-                        "This is the percent value (0-100) handpicks double item drops").getString());
+        handpickBonus = (float) config.get(
+                CATEGORY_BONUS,
+                "Handpick double-drop chance",
+                20F,
+                "This is the percent value (0-100) handpicks double item drops").getDouble();
 
         handpickFortune = Boolean.getBoolean(
                 config.get(CATEGORY_BONUS, "Fortune enchantment for handpick", false, "Be careful, may ruin balance!")
                         .getString());
 
-        hvyDropChance = Float.parseFloat(
-                config.get(
-                        CATEGORY_PENALTIES,
-                        "Heavy ruin-drop chance",
-                        25F,
-                        "This is the percent value (0-100) heavy picks/shovels and lumber axe do NOT drop blocks on break")
-                        .getString());
+        hvyDropChance = (float) config.get(
+                CATEGORY_PENALTIES,
+                "Heavy ruin-drop chance",
+                25F,
+                "This is the percent value (0-100) heavy picks/shovels and lumber axe do NOT drop blocks on break")
+                .getDouble();
     }
 }

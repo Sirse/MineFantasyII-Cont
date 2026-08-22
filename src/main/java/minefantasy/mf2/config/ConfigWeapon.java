@@ -11,31 +11,29 @@ public class ConfigWeapon extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
-        useBalance = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_PENALTIES,
-                        "Heavy Weapon Balance",
-                        true,
-                        "This causes heavy weapons to throw the camera off angle. This is recommended as it gives a downside to avoid overpowering heavy weapons. With this active: spamming hits is difficult")
-                        .getString());
-        breakArrowsGround = Boolean.parseBoolean(
-                config.get(CATEGORY_PENALTIES, "Arrow Ground Break", true, "Arrows can break when hitting the ground")
-                        .getString());
-        arrowBreakMod = Float.parseFloat(
-                config.get(
-                        CATEGORY_PENALTIES,
-                        "Arrow Break Chance modifier",
-                        1.0F,
-                        "This modifies the rate that arrows break when hitting blocks, 1.0=normal higher numbers increases the break chance")
-                        .getString());
+        useBalance = config.get(
+                CATEGORY_PENALTIES,
+                "Heavy Weapon Balance",
+                true,
+                "This causes heavy weapons to throw the camera off angle. This is recommended as it gives a downside to avoid overpowering heavy weapons. With this active: spamming hits is difficult")
+                .getBoolean();
+        breakArrowsGround = config
+                .get(CATEGORY_PENALTIES, "Arrow Ground Break", true, "Arrows can break when hitting the ground")
+                .getBoolean();
+        arrowBreakMod = (float) config.get(
+                CATEGORY_PENALTIES,
+                "Arrow Break Chance modifier",
+                1.0F,
+                "This modifies the rate that arrows break when hitting blocks, 1.0=normal higher numbers increases the break chance")
+                .getDouble();
 
-        xpTrain = Boolean.parseBoolean(
-                config.get(
+        xpTrain = config
+                .get(
                         CATEGORY_BONUS,
                         "Training weapon xp",
                         true,
                         "This option allows training weapons to increase your xp level slowly when hitting with them")
-                        .getString());
+                .getBoolean();
     }
 
 }

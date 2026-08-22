@@ -32,145 +32,126 @@ public class ConfigHardcore extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
-        HCCreduceIngots = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Hardcore Ingots",
-                        true,
-                        "Some Metals (Like iron, steel and direct ore smelts) Must be worked manually on an anvil rather than smelted. They may also cost more! Big furnace still works.")
-                        .getString());
-        HCChotBurn = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Hot burns",
-                        true,
-                        "You cannot hold hot items (apron or not), tongs must be used.").getString());
-        Heatable.HCCquenchRuin = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Hardcore Quench",
-                        true,
-                        "Hot items can be damaged if a trough is not used.").getString());
-        HCCWeakItems = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Weaken Basic items",
-                        true,
-                        "This will significantly reduce the durability of basic items (made on basic crafting table), they can still be crafted but are practically useless.")
-                        .getString());
-        HCCallowRocks = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Allow Stone-Age",
-                        true,
-                        "Allows punching stone for sharp rocks, and using them on leaves for sticks/vines: These make primitive stone tools")
-                        .getString());
-        HCCRemoveCraft = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Remove Recipes",
-                        true,
-                        "Some recipes (Such as Bread, or Flint and Steel) will be removed, since MF has its own recipe for such items.")
-                        .getString());
-        HCCRemoveBooksCraft = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_CRAFTING,
-                        "Remove Books Recipes",
-                        false,
-                        "Skill books recipes will be disabled, but you still can find them it the world.").getString());
-        HCCRemoveTalismansCraft = Boolean.parseBoolean(
-                config.get(
+        HCCreduceIngots = config.get(
+                CATEGORY_CRAFTING,
+                "Hardcore Ingots",
+                true,
+                "Some Metals (Like iron, steel and direct ore smelts) Must be worked manually on an anvil rather than smelted. They may also cost more! Big furnace still works.")
+                .getBoolean();
+        HCChotBurn = config.get(
+                CATEGORY_CRAFTING,
+                "Hot burns",
+                true,
+                "You cannot hold hot items (apron or not), tongs must be used.").getBoolean();
+        Heatable.HCCquenchRuin = config
+                .get(CATEGORY_CRAFTING, "Hardcore Quench", true, "Hot items can be damaged if a trough is not used.")
+                .getBoolean();
+        HCCWeakItems = config.get(
+                CATEGORY_CRAFTING,
+                "Weaken Basic items",
+                true,
+                "This will significantly reduce the durability of basic items (made on basic crafting table), they can still be crafted but are practically useless.")
+                .getBoolean();
+        HCCallowRocks = config.get(
+                CATEGORY_CRAFTING,
+                "Allow Stone-Age",
+                true,
+                "Allows punching stone for sharp rocks, and using them on leaves for sticks/vines: These make primitive stone tools")
+                .getBoolean();
+        HCCRemoveCraft = config.get(
+                CATEGORY_CRAFTING,
+                "Remove Recipes",
+                true,
+                "Some recipes (Such as Bread, or Flint and Steel) will be removed, since MF has its own recipe for such items.")
+                .getBoolean();
+        HCCRemoveBooksCraft = config.get(
+                CATEGORY_CRAFTING,
+                "Remove Books Recipes",
+                false,
+                "Skill books recipes will be disabled, but you still can find them it the world.").getBoolean();
+        HCCRemoveTalismansCraft = config
+                .get(
                         CATEGORY_CRAFTING,
                         "Remove Talismans Recipes",
                         false,
                         "Research talismans recipes will be disabled, but you still can find them it the world.")
-                        .getString());
+                .getBoolean();
 
-        ResearchLogic.knowledgelyr = Integer.parseInt(
-                config.get(
-                        CATEGORY_RESEARCH,
-                        "###CHANGE RESEARCH ID###",
-                        0,
-                        "This changes the research ID, removing all entries").getString());
-        InformationBase.unlockAll = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_RESEARCH,
-                        "Unlock entries",
-                        false,
-                        "If you don't want to research, this will unlock all entries.").getString());
-        InformationBase.easyResearch = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_RESEARCH,
-                        "Baby-Mode Research",
-                        false,
-                        "This removes the process of examining artefacts, research is unlocked by clicking entries in the book.")
-                        .getString());
+        ResearchLogic.knowledgelyr = config.get(
+                CATEGORY_RESEARCH,
+                "###CHANGE RESEARCH ID###",
+                0,
+                "This changes the research ID, removing all entries").getInt();
+        InformationBase.unlockAll = config.get(
+                CATEGORY_RESEARCH,
+                "Unlock entries",
+                false,
+                "If you don't want to research, this will unlock all entries.").getBoolean();
+        InformationBase.easyResearch = config.get(
+                CATEGORY_RESEARCH,
+                "Baby-Mode Research",
+                false,
+                "This removes the process of examining artefacts, research is unlocked by clicking entries in the book.")
+                .getBoolean();
 
-        hunterKnife = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_FOOD,
-                        "Restrict to hunting weapon",
-                        false,
-                        "This option means animals ONLY drop meat and hide when killed with a hunting weapon such as a knife, only the killing blow counts")
-                        .getString());
-        lessHunt = Boolean.parseBoolean(
-                config.get(
+        hunterKnife = config.get(
+                CATEGORY_FOOD,
+                "Restrict to hunting weapon",
+                false,
+                "This option means animals ONLY drop meat and hide when killed with a hunting weapon such as a knife, only the killing blow counts")
+                .getBoolean();
+        lessHunt = config
+                .get(
                         CATEGORY_FOOD,
                         "Reduce Meat Drops",
                         false,
                         "This will alter the stack size of animal meat drops, meaning they only drop 1 every time")
-                        .getString());
-        preventCook = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_FOOD,
-                        "Prevent furnace food",
-                        false,
-                        "Stop food and ceramic from being cooked in a furnace").getString());
-        HungerSystemMF.slowdownRate = Integer.parseInt(
-                config.get(
-                        CATEGORY_FOOD,
-                        "Hunger slow rate",
-                        3,
-                        "how many added points per haunch is slows by. Default is 3: meaning it's takes 3 additional haunches to remove 1, meaning each haunch takes 4 times to be removed")
-                        .getString());
-        TileEntityRoast.enableOverheat = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_FOOD,
-                        "Burn at high temperature",
-                        true,
-                        "Cooking food on a stove or oven will automatically burn at high temperatures").getString());
+                .getBoolean();
+        preventCook = config.get(
+                CATEGORY_FOOD,
+                "Prevent furnace food",
+                false,
+                "Stop food and ceramic from being cooked in a furnace").getBoolean();
+        HungerSystemMF.slowdownRate = config.get(
+                CATEGORY_FOOD,
+                "Hunger slow rate",
+                3,
+                "how many added points per haunch is slows by. Default is 3: meaning it's takes 3 additional haunches to remove 1, meaning each haunch takes 4 times to be removed")
+                .getInt();
+        TileEntityRoast.enableOverheat = config.get(
+                CATEGORY_FOOD,
+                "Burn at high temperature",
+                true,
+                "Cooking food on a stove or oven will automatically burn at high temperatures").getBoolean();
 
-        upgradeZombieWep = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_MOB,
-                        "Give Zombie Weapon",
-                        true,
-                        "Zombies have a chance of spawning with forged weapons. It also affects MF-armoured zombie variants.")
-                        .getString());
-        zombieWepChance = Float.parseFloat(
-                config.get(
-                        CATEGORY_MOB,
-                        "Zombie Weapon Spawn Chance Modifier",
-                        1.0F,
-                        "Multiplier for zombie forged-weapon chance and MF-armoured zombie variants. Difficulty still modifies the final chance.")
-                        .getString());
-        spiderRiders = Boolean.parseBoolean(
-                config.get(CATEGORY_MOB, "Enable Spider Riders", true, "Allow witches/creepers to spawn riding spiders")
-                        .getString());
-        fastZombies = Boolean.parseBoolean(
-                config.get(
+        upgradeZombieWep = config.get(
+                CATEGORY_MOB,
+                "Give Zombie Weapon",
+                true,
+                "Zombies have a chance of spawning with forged weapons. It also affects MF-armoured zombie variants.")
+                .getBoolean();
+        zombieWepChance = (float) config.get(
+                CATEGORY_MOB,
+                "Zombie Weapon Spawn Chance Modifier",
+                1.0F,
+                "Multiplier for zombie forged-weapon chance and MF-armoured zombie variants. Difficulty still modifies the final chance.")
+                .getDouble();
+        spiderRiders = config
+                .get(CATEGORY_MOB, "Enable Spider Riders", true, "Allow witches/creepers to spawn riding spiders")
+                .getBoolean();
+        fastZombies = config
+                .get(
                         CATEGORY_MOB,
                         "Speed up zombies",
                         true,
                         "Speed up zombies (Sure it's not as real.. but it makes them a bit more dangerous)")
-                        .getString());
-        critLimp = Boolean.parseBoolean(
-                config.get(
-                        CATEGORY_MOB,
-                        "Critical Injury Limp",
-                        true,
-                        "This means when you're badly wounded, you slow down and limp").getString());
-        CombatMechanics.swordSkeleton = Boolean.parseBoolean(
-                config.get(CATEGORY_MOB, "Skeleton Swords", true, "Some Skeletons use swords").getString());
+                .getBoolean();
+        critLimp = config.get(
+                CATEGORY_MOB,
+                "Critical Injury Limp",
+                true,
+                "This means when you're badly wounded, you slow down and limp").getBoolean();
+        CombatMechanics.swordSkeleton = config.get(CATEGORY_MOB, "Skeleton Swords", true, "Some Skeletons use swords")
+                .getBoolean();
     }
 }
