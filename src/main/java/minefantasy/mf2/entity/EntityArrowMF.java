@@ -364,12 +364,8 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                     explode();
                 }
                 if (movingobjectposition.entityHit != null) {
-                    f2 = MathHelper.sqrt_double(
-                            this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ)
-                            / velocityModifier;
-
                     float dam = Math.max(0.1F, this.getHitDamage() * firepower);// (getDamageModifier()*power) / 10F *
-                    // (float)k;
+                                                                                // (float)k;
 
                     dam *= getDamageModifier(movingobjectposition.entityHit);
 
@@ -566,14 +562,6 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     private float getDamageModifier(Entity target) {
         CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(getArrowStack());
         return CombatMechanics.getSpecialModifier(material, "standard", target, true);
-    }
-
-    private float getModifiedVelocity() {
-        String s = "MF_Bow_Velocity";
-        if (getEntityData().hasKey(s)) {
-            return getEntityData().getFloat(s);
-        }
-        return 1.0F;
     }
 
     private boolean isExplosive() {
@@ -935,27 +923,27 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                     }
                 }
             }
-            this.setDead();
-        }
 
-        int filling = getFilling();
-        if (filling > 0) {
-            for (int a = 0; a < 16; a++) {
-                float range = 0.6F;
-                EntityShrapnel shrapnel = new EntityShrapnel(
-                        worldObj,
-                        posX,
-                        posY + 0.5D,
-                        posZ,
-                        (rand.nextDouble() - 0.5) * range,
-                        (rand.nextDouble() - 0.5) * range,
-                        (rand.nextDouble() - 0.5) * range);
+            int filling = getFilling();
+            if (filling > 0) {
+                for (int a = 0; a < 16; a++) {
+                    float range = 0.6F;
+                    EntityShrapnel shrapnel = new EntityShrapnel(
+                            worldObj,
+                            posX,
+                            posY + 0.5D,
+                            posZ,
+                            (rand.nextDouble() - 0.5) * range,
+                            (rand.nextDouble() - 0.5) * range,
+                            (rand.nextDouble() - 0.5) * range);
 
-                if (filling == 2) {
-                    shrapnel.setFire(10);
+                    if (filling == 2) {
+                        shrapnel.setFire(10);
+                    }
+                    worldObj.spawnEntityInWorld(shrapnel);
                 }
-                worldObj.spawnEntityInWorld(shrapnel);
             }
+            this.setDead();
         }
     }
 
