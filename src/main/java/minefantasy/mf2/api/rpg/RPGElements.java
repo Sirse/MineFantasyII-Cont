@@ -84,7 +84,7 @@ public class RPGElements {
             if (skill.getMaxLevel() - minLevel <= 0) {
                 return 1.0F;
             }
-            float progress = (level - minLevel) / (skill.getMaxLevel() - minLevel);
+            float progress = (float) (level - minLevel) / (float) (skill.getMaxLevel() - minLevel);
             return 1.5F - progress;
         }
     }
