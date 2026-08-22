@@ -244,7 +244,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                     .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
         if (block.getMaterial() == Material.leaves) {
-            worldObj.setBlock(x, y, z, Blocks.water, 0, 2);
+            worldObj.setBlockToAir(x, y, z);
             this.worldObj
                     .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
         }
@@ -290,7 +290,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                 }
             }
         }
-        if (ticksExisted % 100 == 0) {
+        if (!worldObj.isRemote && ticksExisted % 100 == 0) {
             if (rand.nextInt(20) == 0) {
                 this.playSound("minefantasy2:entity.cogwork.toot", 0.5F, 1.0F);
             }
@@ -352,7 +352,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     public void setJumpControl(boolean b) {
-        this.jumpControl = b;;
+        this.jumpControl = b;
     }
 
     protected void applyEntityAttributes() {
@@ -551,11 +551,9 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                 forward *= 0.5F;// Backstep slower
             }
 
-            if (!this.worldObj.isRemote) {
-                this.setAIMoveSpeed(
-                        (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
-                moveCogwork(strafe, forward);
-            }
+            this.setAIMoveSpeed(
+                    (float) this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).getAttributeValue());
+            moveCogwork(strafe, forward);
 
             user.prevLimbSwingAmount = user.limbSwingAmount;
             double d1 = this.posX - this.prevPosX;
@@ -573,10 +571,6 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         }
     }
 
-    private float getSpeedModifier() {
-        return isSprinting() ? 2.0F : 1.0F;
-    }
-
     public void moveCogwork(float p_70612_1_, float p_70612_2_) {
         double d0;
 
@@ -591,88 +585,86 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                 this.motionY = 0.30000001192092896D;
             }
         }
-        {
-            float f2 = 0.91F;
+        float f2 = 0.91F;
 
-            if (this.onGround) {
-                f2 = this.worldObj.getBlock(
-                        MathHelper.floor_double(this.posX),
-                        MathHelper.floor_double(this.boundingBox.minY) - 1,
-                        MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
-            }
-
-            float f3 = 0.16277136F / (f2 * f2 * f2);
-            float f4;
-
-            if (this.onGround) {
-                f4 = this.getAIMoveSpeed() * f3;
-            } else {
-                f4 = this.jumpMovementFactor;
-            }
-            if (riddenByEntity == null) {
-                f4 = 0F;
-            }
-            if (isSprinting()) {
-                f4 *= 2.0F;
-            }
-
-            this.moveFlying(p_70612_1_, p_70612_2_, f4);
-            f2 = 0.91F;
-
-            if (this.onGround) {
-                f2 = this.worldObj.getBlock(
-                        MathHelper.floor_double(this.posX),
-                        MathHelper.floor_double(this.boundingBox.minY) - 1,
-                        MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
-            }
-
-            if (this.isOnLadder()) {
-                float f5 = 0.15F;
-
-                if (this.motionX < (-f5)) {
-                    this.motionX = (-f5);
-                }
-
-                if (this.motionX > f5) {
-                    this.motionX = f5;
-                }
-
-                if (this.motionZ < (-f5)) {
-                    this.motionZ = (-f5);
-                }
-
-                if (this.motionZ > f5) {
-                    this.motionZ = f5;
-                }
-
-                this.fallDistance = 0.0F;
-
-                if (this.motionY < -0.15D) {
-                    this.motionY = -0.15D;
-                }
-            }
-
-            this.moveEntity(this.motionX, this.motionY, this.motionZ);
-
-            if (this.isCollidedHorizontally && this.isOnLadder()) {
-                this.motionY = 0.2D;
-            }
-
-            if (this.worldObj.isRemote && (!this.worldObj.blockExists((int) this.posX, 0, (int) this.posZ)
-                    || !this.worldObj.getChunkFromBlockCoords((int) this.posX, (int) this.posZ).isChunkLoaded)) {
-                if (this.posY > 0.0D) {
-                    this.motionY = -0.1D;
-                } else {
-                    this.motionY = 0.0D;
-                }
-            } else {
-                this.motionY -= 0.08D;
-            }
-
-            this.motionY *= 0.9800000190734863D;
-            this.motionX *= f2;
-            this.motionZ *= f2;
+        if (this.onGround) {
+            f2 = this.worldObj.getBlock(
+                    MathHelper.floor_double(this.posX),
+                    MathHelper.floor_double(this.boundingBox.minY) - 1,
+                    MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
         }
+
+        float f3 = 0.16277136F / (f2 * f2 * f2);
+        float f4;
+
+        if (this.onGround) {
+            f4 = this.getAIMoveSpeed() * f3;
+        } else {
+            f4 = this.jumpMovementFactor;
+        }
+        if (riddenByEntity == null) {
+            f4 = 0F;
+        }
+        if (isSprinting()) {
+            f4 *= 2.0F;
+        }
+
+        this.moveFlying(p_70612_1_, p_70612_2_, f4);
+        f2 = 0.91F;
+
+        if (this.onGround) {
+            f2 = this.worldObj.getBlock(
+                    MathHelper.floor_double(this.posX),
+                    MathHelper.floor_double(this.boundingBox.minY) - 1,
+                    MathHelper.floor_double(this.posZ)).slipperiness * 0.91F;
+        }
+
+        if (this.isOnLadder()) {
+            float f5 = 0.15F;
+
+            if (this.motionX < (-f5)) {
+                this.motionX = (-f5);
+            }
+
+            if (this.motionX > f5) {
+                this.motionX = f5;
+            }
+
+            if (this.motionZ < (-f5)) {
+                this.motionZ = (-f5);
+            }
+
+            if (this.motionZ > f5) {
+                this.motionZ = f5;
+            }
+
+            this.fallDistance = 0.0F;
+
+            if (this.motionY < -0.15D) {
+                this.motionY = -0.15D;
+            }
+        }
+
+        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+
+        if (this.isCollidedHorizontally && this.isOnLadder()) {
+            this.motionY = 0.2D;
+        }
+
+        if (this.worldObj.isRemote && (!this.worldObj.blockExists((int) this.posX, 0, (int) this.posZ)
+                || !this.worldObj.getChunkFromBlockCoords((int) this.posX, (int) this.posZ).isChunkLoaded)) {
+            if (this.posY > 0.0D) {
+                this.motionY = -0.1D;
+            } else {
+                this.motionY = 0.0D;
+            }
+        } else {
+            this.motionY -= 0.08D;
+        }
+
+        this.motionY *= 0.9800000190734863D;
+        this.motionX *= f2;
+        this.motionZ *= f2;
 
         this.prevLimbSwingAmount = this.limbSwingAmount;
         d0 = this.posX - this.prevPosX;
@@ -898,16 +890,22 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         if (!isSprinting() || !isPowered() || hit == riddenByEntity) {
             return;
         }
-        this.playSound(this.getHurtSound(), this.getSoundVolume(), this.getSoundPitch());
-        float modifier = width * width * height / hit.width * hit.width * hit.height;// compare volume
+        if (hit instanceof EntityLivingBase && ((EntityLivingBase) hit).hurtResistantTime > 0) {
+            return;
+        }
+
+        float modifier = (width * width * height) / (hit.width * hit.width * hit.height);// compare volume
         float force = (float) Math.hypot(motionX, motionZ) * modifier;
         TacticalManager.knockbackEntity(hit, this, force, force / 4F);
-        hit.attackEntityFrom(
+        boolean damaged = hit.attackEntityFrom(
                 DamageSource.causeMobDamage(
                         (riddenByEntity != null && riddenByEntity instanceof EntityLivingBase)
                                 ? (EntityLivingBase) riddenByEntity
                                 : this),
                 force);
+        if (damaged) {
+            this.playSound(this.getHurtSound(), this.getSoundVolume(), this.getSoundPitch());
+        }
     }
 
     /**
