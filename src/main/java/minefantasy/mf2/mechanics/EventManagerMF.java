@@ -234,7 +234,8 @@ public class EventManagerMF {
         EntityLivingBase dropper = event.entityLiving;
 
         if (dropper instanceof EntityChicken) {
-            int dropCount = 1 + random.nextInt(event.lootingLevel + 1 * 4);
+            // Archery buff: chickens always drop feathers (base 1-4, +1 per Looting level)
+            int dropCount = 1 + random.nextInt(event.lootingLevel + 4);
 
             for (int a = 0; a < dropCount; a++) {
                 dropper.entityDropItem(new ItemStack(Items.feather), 0.0F);
@@ -584,9 +585,7 @@ public class EventManagerMF {
 
     @SubscribeEvent
     public void breakBlock(BreakEvent event) {
-        // Block block = event.block;
         Block base = event.world.getBlock(event.x, event.y - 1, event.z);
-        // int meta = event.blockMetadata;
 
         if (base != null && base == Blocks.farmland && FarmingHelper.didHarvestRuinBlock(event.world, false)) {
             event.world.setBlock(event.x, event.y - 1, event.z, Blocks.dirt);

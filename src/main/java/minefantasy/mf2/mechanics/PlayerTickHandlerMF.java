@@ -222,12 +222,6 @@ public class PlayerTickHandlerMF {
                     onStep(event.player, event.player.getEntityData().getInteger(stepNBT) % 2 == 0);
                 }
             }
-            /*
-             * if(RPGElements.isSystemActive) { if(event.player.isSprinting() && event.player.ticksExisted % 10 == 0) {
-             * SkillList.athletics.addXP(event.player, 1); } else if(event.player.isSneaking() &&
-             * TacticalManager.isEntityMoving(event.player) && event.player.ticksExisted % 10 == 0) {
-             * SkillList.sneak.addXP(event.player, 1); } }
-             */
             // DRAGON EVENT
             if (!event.player.worldObj.isRemote) {
                 tickDragonSpawner(event.player);
@@ -235,8 +229,6 @@ public class PlayerTickHandlerMF {
             if (!event.player.worldObj.isRemote) {
                 tryResetBed(event.player);
             }
-            // updatePitch(event.player); (This keeps track of player camera angles, could
-            // make a mechanic based on swinging the camera)
         }
 
         if (event.phase == TickEvent.Phase.START) {
@@ -318,13 +310,6 @@ public class PlayerTickHandlerMF {
         return prevStep != stepcount;
     }
 
-    /*
-     * private static String lastPitchNBT = "MF_last_AimPitch"; public static void setLastPitch(EntityPlayer user, float
-     * value) { user.getEntityData().setFloat(lastPitchNBT, value); } public static void updatePitch(EntityPlayer user)
-     * { user.getEntityData().setFloat(lastPitchNBT, user.rotationPitch); } public static float
-     * getPitchMovement(EntityPlayer user) { float lastPitch = user.getEntityData().getFloat(lastPitchNBT) + 1000F;
-     * float nowPitch = user.rotationPitch + 1000F; return nowPitch - lastPitch; }
-     */
     private void tickDragonSpawner(EntityPlayer player) {
         if (player.worldObj.difficultySetting != EnumDifficulty.PEACEFUL && player.dimension == 0) {
             int i = ConfigMobs.dragonInterval;

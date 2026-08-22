@@ -4,7 +4,6 @@ import java.io.File;
 
 import net.minecraft.init.Items;
 import net.minecraft.world.biome.BiomeGenBase;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -133,7 +132,6 @@ public class MineFantasyII {
 
     @EventHandler
     public void load(FMLInitializationEvent evt) {
-        MinecraftForge.EVENT_BUS.register(this);
         proxy.registerMain();
         GameRegistry.registerWorldGenerator(worldGenManager, 0);
 
