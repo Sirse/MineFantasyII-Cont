@@ -218,7 +218,7 @@ public class WorldGenGeological {
                 int z = chunkZ * 16 + seed.nextInt(16);
 
                 if (isNeibourNear(world, x, y, z, neighbour)) {
-                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {}
+                    new WorldGenMinableMF(ore, size, bed).generate(world, seed, x, y, z);
                 }
             }
         }
@@ -252,14 +252,14 @@ public class WorldGenGeological {
                 int z = chunkZ * 16 + seed.nextInt(16);
 
                 if (isNeibourNear(world, x, y, z, neighbour)) {
-                    if ((new WorldGenMinableMF(ore, size, bed)).generate(world, seed, x, y, z)) {}
+                    new WorldGenMinableMF(ore, size, bed).generate(world, seed, x, y, z);
                 }
             }
         }
     }
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Block neighbour) {
-        return world.getBlock(x - 1, y, z) == neighbour || world.getBlock(+1, y, z) == neighbour
+        return world.getBlock(x - 1, y, z) == neighbour || world.getBlock(x + 1, y, z) == neighbour
                 || world.getBlock(x, y - 1, z) == neighbour
                 || world.getBlock(x, y + 1, z) == neighbour
                 || world.getBlock(x, y, z - 1) == neighbour
@@ -268,7 +268,7 @@ public class WorldGenGeological {
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Material neighbour) {
         return world.getBlock(x - 1, y, z).getMaterial() == neighbour
-                || world.getBlock(+1, y, z).getMaterial() == neighbour
+                || world.getBlock(x + 1, y, z).getMaterial() == neighbour
                 || world.getBlock(x, y - 1, z).getMaterial() == neighbour
                 || world.getBlock(x, y + 1, z).getMaterial() == neighbour
                 || world.getBlock(x, y, z - 1).getMaterial() == neighbour
