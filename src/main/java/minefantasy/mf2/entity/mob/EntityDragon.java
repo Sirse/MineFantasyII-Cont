@@ -43,6 +43,7 @@ public class EntityDragon extends EntityFlyingMF
     public int fireBreathCooldown;
     private Entity targetedEntity;
     private int attackCounter;
+    private int targetScanCooldown;
     private int fireBreathTick;
     private Entity lastEnemy;
     private int interestTime;
@@ -315,11 +316,12 @@ public class EntityDragon extends EntityFlyingMF
             this.targetedEntity = null;
         }
 
-        if (this.targetedEntity == null) {
+        if (this.targetedEntity == null && --this.targetScanCooldown <= 0) {
+            this.targetScanCooldown = 20;
             this.setEntityToAttack(EntityPlayer.class);
-        }
-        if (ConfigMobs.dragonKillNPC && this.targetedEntity == null) {
-            this.setEntityToAttack(EntityLiving.class);
+            if (ConfigMobs.dragonKillNPC && this.targetedEntity == null) {
+                this.setEntityToAttack(EntityLiving.class);
+            }
         }
 
         double var9 = 200.0D;
@@ -531,9 +533,10 @@ public class EntityDragon extends EntityFlyingMF
         if (source == DamageSource.inWall) return false;
 
         if (source.getEntity() != null && source.getEntity() instanceof EntityPlayer) {
-            if (getDisengageTime() <= 0 && getAttackTarget() == null || damage > 16
-                    || (targetedEntity != null && !(targetedEntity instanceof EntityPlayer)))
+            if ((getDisengageTime() <= 0 && getAttackTarget() == null) || damage > 16
+                    || (targetedEntity != null && !(targetedEntity instanceof EntityPlayer))) {
                 setTarget(source.getEntity());
+            }
         }
 
         if (source.getEntity() != null) {
@@ -678,7 +681,7 @@ public class EntityDragon extends EntityFlyingMF
         super.writeEntityToNBT(nbt);
 
         nbt.setInteger("FireBreath", fireBreathTick);
-        nbt.setInteger("FireBreathCooldown", fireBreathTick);
+        nbt.setInteger("FireBreathCooldown", fireBreathCooldown);
 
         nbt.setInteger("Breed", getBreed());
         nbt.setInteger("Tier", getTier());
