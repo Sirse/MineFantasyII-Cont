@@ -53,10 +53,16 @@ public class MineFantasyAPI {
 
     public static void removeAllRecipes(Item result) {
         List recipeList = CraftingManager.getInstance().getRecipeList();
-        for (int i = 0; i < recipeList.size(); i++) {
-            IRecipe recipe = (IRecipe) recipeList.get(i);
-            if (recipe != null && recipe.getRecipeOutput() != null && recipe.getRecipeOutput().getItem() == result) {
-                debugMsg("Removed Recipe for " + recipe.getRecipeOutput().getDisplayName());
+        for (int i = recipeList.size() - 1; i >= 0; i--) {
+            Object entry = recipeList.get(i);
+            if (!(entry instanceof IRecipe)) {
+                continue;
+            }
+            IRecipe recipe = (IRecipe) entry;
+            ItemStack output = recipe.getRecipeOutput();
+            if (output != null && output.getItem() == result) {
+                debugMsg("Removed Recipe for " + output.getDisplayName());
+                recipeList.remove(i);
             }
         }
     }
