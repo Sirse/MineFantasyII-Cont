@@ -35,8 +35,9 @@ public class StaminaMechanics {
         float[] packet = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getBaseMaxStamina(entity),
                 StaminaBar.getFlashTime(entity), StaminaBar.getBonusStamina(entity) };
         float[] values = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getTotalMaxStamina(entity) };
-        if (entity.worldObj.isRemote && ConfigClient.playBreath) {
-            if (!StaminaBar.isPercentStamAvailable(entity, 0.2F, false) && !entity.isInsideOfMaterial(Material.water)) {
+        if (entity.worldObj.isRemote) {
+            if (ConfigClient.playBreath && !StaminaBar.isPercentStamAvailable(entity, 0.2F, false)
+                    && !entity.isInsideOfMaterial(Material.water)) {
                 if (entity.ticksExisted % 20 == 0) {
                     entity.playSound("mob.blaze.breathe", 0.1F, 1.8F);
                 }
@@ -69,9 +70,6 @@ public class StaminaMechanics {
                 StaminaBar.modifyStaminaValue(entity, regen);
             }
         }
-
-        // float[] stam = new float[]{StaminaBar.getStaminaValue(player),
-        // StaminaBar.getMaxStamina(player)};
 
         // out of stamina
         if (values[0] <= 0) {
@@ -110,20 +108,29 @@ public class StaminaMechanics {
         StaminaBar.tickBonus(entity);
         StaminaBar.tickBonusRegen(entity);
 
-        // if changed, resync
-        // if((StaminaBar.getStaminaValue(player) != stam[0] ||
-        // StaminaBar.getMaxStamina(player) != stam[1]) || player.ticksExisted % 20 ==
-        // 0)
         if (entity instanceof EntityPlayer) {
             syncStamina((EntityPlayer) entity, packet);
         }
     }
 
-    private static void syncStamina(EntityPlayer player, float[] stam) {
-        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
-            StaminaPacket packet = new StaminaPacket(stam, player);
-            MineFantasyII.packetHandler.sendPacketToPlayer(packet.generatePacket(), (EntityPlayerMP) player);
+    private static void syncStamina(EntityPlayer player, float[] previous) {
+        if (player.worldObj.isRemote || !(player instanceof EntityPlayerMP)) {
+            return;
         }
+
+        float[] current = new float[] { StaminaBar.getStaminaValue(player), StaminaBar.getBaseMaxStamina(player),
+                StaminaBar.getFlashTime(player), StaminaBar.getBonusStamina(player) };
+
+        boolean changed = current[0] != previous[0] || current[1] != previous[1]
+                || current[2] != previous[2]
+                || current[3] != previous[3];
+
+        if (!changed && player.ticksExisted % 60 != 0) {
+            return;
+        }
+
+        StaminaPacket packet = new StaminaPacket(current, player);
+        MineFantasyII.packetHandler.sendPacketToPlayer(packet.generatePacket(), (EntityPlayerMP) player);
     }
 
     public static float getConstantDecay(EntityLivingBase user) {
@@ -190,7 +197,6 @@ public class StaminaMechanics {
             StaminaBar.modifyStaminaValue(user, -getJumpDecay(user));
         }
         StaminaBar.setIdleTime(user, 40F * getIdleRate(user));
-        // syncStamina(user, new float[]{stam, StaminaBar.getMaxStamina(user)});
     }
 
     public static float getJumpDecay(EntityLivingBase user) {

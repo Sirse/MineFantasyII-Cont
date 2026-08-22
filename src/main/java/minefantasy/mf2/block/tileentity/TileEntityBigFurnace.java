@@ -59,6 +59,10 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private int ticksExisted;
     private int ticksSinceSync;
     private boolean wasBurning;
+    private int lastSyncedFuel = Integer.MIN_VALUE;
+    private int lastSyncedProgress = Integer.MIN_VALUE;
+    private int lastSyncedBurn = -1;
+    private int lastSyncedDoorAngle = -1;
 
     public TileEntityBigFurnace() {
         super();
@@ -172,7 +176,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             return;
         }
         if (isBurning()) {
-            puffSmoke(new Random(), worldObj, xCoord, yCoord, zCoord);
+            puffSmoke(rand, worldObj, xCoord, yCoord, zCoord);
         }
         TileEntityBigFurnace heater = getHeater();
 
@@ -626,25 +630,30 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     }
 
     private void sendPacketToClients() {
-        if (!worldObj.isRemote) {
-            NetworkUtils.sendToWatchers(
-                    new BigFurnacePacket(this).generatePacket(),
-                    (WorldServer) worldObj,
-                    this.xCoord,
-                    this.zCoord);
-            /*
-             * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-             * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-             * worldObj).getEntityTracker().func_151248_b(player, new BigFurnacePacket(this).generatePacket()); }
-             */
+        if (worldObj.isRemote) {
+            return;
         }
-    }
 
-    /*
-     * @Override public void recievePacket(ByteArrayDataInput data) { fuel = data.readInt(); progress = data.readInt();
-     * direction = data.readInt(); heat = data.readInt(); int burn = data.readInt(); isBurningClient = burn == 1;
-     * justShared = data.readInt(); doorAngle = data.readInt(); }
-     */
+        int burn = isBurning() ? 1 : 0;
+        boolean changed = fuel != lastSyncedFuel || progress != lastSyncedProgress
+                || doorAngle != lastSyncedDoorAngle
+                || burn != lastSyncedBurn;
+
+        if (!changed && ticksExisted % 40 != 0) {
+            return;
+        }
+
+        lastSyncedFuel = fuel;
+        lastSyncedProgress = progress;
+        lastSyncedDoorAngle = doorAngle;
+        lastSyncedBurn = burn;
+
+        NetworkUtils.sendToWatchers(
+                new BigFurnacePacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
+    }
 
     public int getBlockMetadata() {
         if (worldObj == null) return itemMeta * 2;
