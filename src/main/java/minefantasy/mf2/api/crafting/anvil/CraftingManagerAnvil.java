@@ -5,6 +5,7 @@ import java.util.*;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.rpg.Skill;
@@ -144,6 +145,20 @@ public class CraftingManagerAnvil {
         return recipe;
     }
 
+    private ItemStack getRepairResult(ItemStack first, ItemStack second) {
+        Item item = first.getItem();
+        int remainFirst = item.getMaxDamage() - first.getItemDamageForDisplay();
+        int remainSecond = item.getMaxDamage() - second.getItemDamageForDisplay();
+        int combined = remainFirst + remainSecond + item.getMaxDamage() * 10 / 100;
+        int damage = Math.max(0, item.getMaxDamage() - combined);
+
+        ItemStack repaired = new ItemStack(item, 1, damage);
+        if (first.hasTagCompound()) {
+            repaired.setTagCompound((NBTTagCompound) first.getTagCompound().copy());
+        }
+        return repaired;
+    }
+
     public ItemStack findMatchingRecipe(AnvilCraftMatrix matrix) {
         int var2 = 0;
         ItemStack var3 = null;
@@ -166,17 +181,7 @@ public class CraftingManagerAnvil {
         }
 
         if (var2 == 2 && canRepair(var3, var4)) {
-            Item var10 = var3.getItem();
-            int var12 = var10.getMaxDamage() - var3.getItemDamageForDisplay();
-            int var7 = var10.getMaxDamage() - var4.getItemDamageForDisplay();
-            int var8 = var12 + var7 + var10.getMaxDamage() * 10 / 100;
-            int var9 = var10.getMaxDamage() - (var8) * 2;
-
-            if (var9 < 0) {
-                var9 = 0;
-            }
-
-            return new ItemStack(var3.getItem(), 1, var9);
+            return getRepairResult(var3, var4);
         } else {
             Iterator var11 = this.recipes.iterator();
             IAnvilRecipe var13;
@@ -238,17 +243,7 @@ public class CraftingManagerAnvil {
                 && var3.stackSize == 1
                 && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
-            Item var10 = var3.getItem();
-            int var12 = var10.getMaxDamage() - var3.getItemDamageForDisplay();
-            int var7 = var10.getMaxDamage() - var4.getItemDamageForDisplay();
-            int var8 = var12 + var7 + var10.getMaxDamage() * 10 / 100;
-            int var9 = var10.getMaxDamage() - var8;
-
-            if (var9 < 0) {
-                var9 = 0;
-            }
-
-            return new ItemStack(var3.getItem(), 1, var9);
+            return getRepairResult(var3, var4);
         } else {
             Iterator var11 = this.recipes.iterator();
             IAnvilRecipe var13 = null;
