@@ -41,6 +41,10 @@ public class NEIConfig implements IConfigureNEI {
             API.registerRecipeHandler(handlerCarpenter);
             API.registerUsageHandler(handlerCarpenter);
 
+            RecipeHandlerKitchen handlerKitchen = new RecipeHandlerKitchen();
+            API.registerRecipeHandler(handlerKitchen);
+            API.registerUsageHandler(handlerKitchen);
+
             RecipeHandlerAnvil handlerAnvil = new RecipeHandlerAnvil();
             API.registerRecipeHandler(handlerAnvil);
             API.registerUsageHandler(handlerAnvil);
@@ -98,6 +102,7 @@ public class NEIConfig implements IConfigureNEI {
 
     private void registerRecipeCatalysts() {
         addCatalyst(BlockListMF.carpenter, "minefantasy2.carpenter", 100);
+        addCatalyst(BlockListMF.kitchenBench, "minefantasy2.kitchen", 100);
         addCatalyst(BlockListMF.anvilStone, "minefantasy2.anvil", 100);
         if (BlockListMF.anvil != null) {
             for (int tier = 0; tier < BlockListMF.anvil.length; tier++) {
@@ -152,6 +157,11 @@ public class NEIConfig implements IConfigureNEI {
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setMaxRecipesPerPage(1));
+        event.registerHandlerInfo(
+                "minefantasy2.kitchen",
+                MineFantasyII.MODID,
+                MineFantasyII.NAME,
+                builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.anvil",
                 MineFantasyII.MODID,

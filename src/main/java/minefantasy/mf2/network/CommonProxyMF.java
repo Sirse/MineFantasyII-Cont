@@ -58,6 +58,9 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
             if (tile instanceof TileEntityCarpenterMF) {
                 return new ContainerCarpenterMF(player.inventory, (TileEntityCarpenterMF) tile);
             }
+            if (tile instanceof TileEntityKitchenBench) {
+                return new ContainerKitchenBench(player.inventory, (TileEntityKitchenBench) tile);
+            }
             if (tile instanceof TileEntityBombBench) {
                 return new ContainerBombBench(player.inventory, (TileEntityBombBench) tile);
             }
@@ -109,6 +112,7 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
     protected void registerTileEntities() {
         GameRegistry.registerTileEntity(TileEntityAnvilMF.class, "MF_Anvil");
         GameRegistry.registerTileEntity(TileEntityCarpenterMF.class, "MF_CarpenterBench");
+        GameRegistry.registerTileEntity(TileEntityKitchenBench.class, "MF_KitchenBench");
         GameRegistry.registerTileEntity(TileEntityBombBench.class, "MF_BombBench");
         GameRegistry.registerTileEntity(TileEntityCrossbowBench.class, "MF_CrossbowBench");
         GameRegistry.registerTileEntity(TileEntityBlastFC.class, "MF_BlastChamber");

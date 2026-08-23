@@ -99,6 +99,7 @@ public class BlockListMF {
     public static BlockAnvilMF anvilStone;
     public static BlockAnvilMF[] anvil = new BlockAnvilMF[anvils.length];
     public static BlockCarpenter carpenter = new BlockCarpenter();
+    public static BlockKitchenBench kitchenBench = new BlockKitchenBench();
     public static BlockBombBench bombBench = new BlockBombBench();
     public static BlockCrossbowBench crossbowBench = new BlockCrossbowBench();
 

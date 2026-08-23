@@ -128,4 +128,8 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
         return ingreds;
     }
 
+    @Override
+    public float getDirtyAmount() {
+        return 0F;
+    }
 }

@@ -16,6 +16,7 @@ public class MTCompat {
         MineTweakerAPI.registerClass(BigFurnace.class);
         MineTweakerAPI.registerClass(BlastFurnace.class);
         MineTweakerAPI.registerClass(CarpentersBench.class);
+        MineTweakerAPI.registerClass(KitchenBench.class);
         MineTweakerAPI.registerClass(Cooking.class);
         MineTweakerAPI.registerClass(Crucible.class);
         MineTweakerAPI.registerClass(Forge.class);

@@ -2268,6 +2268,10 @@ nei.minefantasy2.salvage.durability_note=Показан выход для пол
 # GUI inventory names
 gui.anvilmf.name=Наковальня
 gui.carpentermf.name=Плотницкий верстак
+tile.kitchen_bench.name=Кухонный стол
+gui.kitchenbench.name=Кухонный стол
+gui.kitchenbench.dirty=Стол загрязнён - помойте его водой!
+method.kitchenbench=Кухонный стол
 gui.quern.name=Ручная мельница
 gui.crucible.name=Тигель
 gui.forge.name=Горн

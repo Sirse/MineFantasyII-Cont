@@ -2264,6 +2264,10 @@ nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn i
 # GUI inventory names
 gui.anvilmf.name=Anvil
 gui.carpentermf.name=Carpenter's Bench
+tile.kitchen_bench.name=Kitchen Bench
+gui.kitchenbench.name=Kitchen Bench
+gui.kitchenbench.dirty=The bench is filthy - wash it with water!
+method.kitchenbench=Kitchen Bench
 gui.quern.name=Quern
 gui.crucible.name=Crucible
 gui.forge.name=Forge

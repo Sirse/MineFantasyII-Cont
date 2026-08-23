@@ -162,6 +162,9 @@ public class ClientProxyMF extends CommonProxyMF {
             if (tile instanceof TileEntityCarpenterMF) {
                 return new GuiCarpenterMF(player.inventory, (TileEntityCarpenterMF) tile);
             }
+            if (tile instanceof TileEntityKitchenBench) {
+                return new GuiKitchenBench(player.inventory, (TileEntityKitchenBench) tile);
+            }
             if (tile instanceof TileEntityBombBench) {
                 return new GuiBombBench(player.inventory, (TileEntityBombBench) tile);
             }

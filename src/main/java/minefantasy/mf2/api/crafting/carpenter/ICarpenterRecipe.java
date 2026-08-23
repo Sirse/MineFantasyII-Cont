@@ -43,4 +43,9 @@ public interface ICarpenterRecipe {
     String getResearch();
 
     Skill getSkill();
+
+    /**
+     * How much dirty progress this recipe adds to a kitchen bench (0 for regular carpenter recipes)
+     */
+    float getDirtyAmount();
 }

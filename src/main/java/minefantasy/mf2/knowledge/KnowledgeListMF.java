@@ -94,6 +94,7 @@ public class KnowledgeListMF {
     public static ICarpenterRecipe dirtRockR, lStripsR, threadR1, threadR2, stringR, sharpRocksR, stonePickR, stoneAxeR,
             stoneSpadeR, stoneHoeR, stoneSwordR, stoneWarR, stoneMaceR, stoneSpearR, stoneHammerR, stoneTongsR,
             boneNeedleR, stoneKnifeR, quernR, stoneovenRecipe;
+    public static ICarpenterRecipe kitchenBenchRecipe;
     public static Alloy[] reStone, bronze, steel, obsidalloy, black, red, blue, mithril, adamantium, ignotumite,
             mithium, enderforge, wolframiteR;
     public static IAnvilRecipe coalfluxR, encrustedR, steelR, obsidianHunkR, diamondR;

@@ -117,6 +117,7 @@ public class MineFantasyII {
         new ConfigWorldGen().setConfig(getCfg(event, "WorldGen"));
         new ConfigCrafting().setConfig(getCfg(event, "Crafting"));
         new ConfigMobs().setConfig(getCfg(event, "Mobs"));
+        new ConfigKitchen().setConfig(getCfg(event, "Kitchen"));
 
         BaseMaterialMF.init();
         MineFantasyAPI.isInDebugMode = isDebug();

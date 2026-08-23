@@ -40,6 +40,10 @@ public class ShapedCarpenterRecipes implements ICarpenterRecipe {
      * Is the ItemStack that you get when craft the recipe.
      */
     public ItemStack recipeOutput;
+    /**
+     * Dirty progress added to a kitchen bench when this recipe is crafted
+     */
+    private float dirtyAmount;
 
     public ShapedCarpenterRecipes(int wdth, int heit, ItemStack[] inputs, ItemStack output, String toolType, int time,
             int hammer, int anvi, float exp, boolean hot, String sound, String research, Skill skill) {
@@ -188,5 +192,15 @@ public class ShapedCarpenterRecipes implements ICarpenterRecipe {
     @Override
     public Skill getSkill() {
         return skillUsed;
+    }
+
+    @Override
+    public float getDirtyAmount() {
+        return dirtyAmount;
+    }
+
+    public ShapedCarpenterRecipes setDirtyAmount(float amount) {
+        this.dirtyAmount = amount;
+        return this;
     }
 }

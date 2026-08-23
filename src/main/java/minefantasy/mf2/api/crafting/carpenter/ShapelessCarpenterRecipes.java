@@ -167,4 +167,16 @@ public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
     public Skill getSkill() {
         return skillUsed;
     }
+
+    private float dirtyAmount;
+
+    @Override
+    public float getDirtyAmount() {
+        return dirtyAmount;
+    }
+
+    public ShapelessCarpenterRecipes setDirtyAmount(float amount) {
+        this.dirtyAmount = amount;
+        return this;
+    }
 }

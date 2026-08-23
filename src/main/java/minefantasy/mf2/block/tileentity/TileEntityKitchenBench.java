@@ -5,38 +5,37 @@ import java.util.Random;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.WorldServer;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenter;
-import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
+import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
-import minefantasy.mf2.container.ContainerCarpenterMF;
-import minefantasy.mf2.item.armour.ItemArmourMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.CarpenterPacket;
-import minefantasy.mf2.util.MFLogUtil;
+import minefantasy.mf2.config.ConfigKitchen;
+import minefantasy.mf2.container.ContainerKitchenBench;
 
-public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICarpenter {
+public class TileEntityKitchenBench extends TileEntity implements IInventory, ICarpenter {
 
     public final int width = 4;
     public final int height = 4;
     public float progressMax;
     public float progress;
-    private int tier;
+    public float dirtyProgress;
+    private float pendingDirtyAmount;
     private ItemStack[] inventory;
     private Random rand = new Random();
     private int ticksExisted;
-    private ContainerCarpenterMF syncCarpenter;
+    private ContainerKitchenBench syncBench;
     private CarpenterCraftMatrix craftMatrix;
     private String lastPlayerHit = "";
     private String toolTypeRequired = "hands";
@@ -45,23 +44,15 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     private Skill skillUsed;
     private boolean resetRecipe = false;
     private ItemStack recipe;
-    private int hammerTierRequired;
-    private int CarpenterTierRequired;
 
-    public TileEntityCarpenterMF() {
-        this(0);
-    }
-
-    public TileEntityCarpenterMF(int tier) {
+    public TileEntityKitchenBench() {
         inventory = new ItemStack[width * height + 5];
-        this.tier = tier;
-        setContainer(new ContainerCarpenterMF(this));
+        setContainer(new ContainerKitchenBench(this));
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        tier = nbt.getInteger("tier");
 
         NBTTagList savedItems = nbt.getTagList("Items", 10);
         this.inventory = new ItemStack[this.getSizeInventory()];
@@ -76,6 +67,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         }
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
+        dirtyProgress = nbt.getFloat("DirtyProgress");
         toolTypeRequired = nbt.getString("toolTypeRequired");
         craftSound = nbt.getString("craftSound");
         researchRequired = nbt.getString("researchRequired");
@@ -84,10 +76,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setInteger("tier", tier);
 
         NBTTagList savedItems = new NBTTagList();
-
         for (int i = 0; i < this.inventory.length; ++i) {
             if (this.inventory[i] != null) {
                 NBTTagCompound savedSlot = new NBTTagCompound();
@@ -96,11 +86,11 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 savedItems.appendTag(savedSlot);
             }
         }
-
         nbt.setTag("Items", savedItems);
 
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
+        nbt.setFloat("DirtyProgress", dirtyProgress);
         nbt.setString("toolTypeRequired", toolTypeRequired);
         nbt.setString("craftSound", craftSound);
         nbt.setString("researchRequired", researchRequired);
@@ -128,16 +118,13 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 return itemstack;
             } else {
                 itemstack = this.inventory[slot].splitStack(num);
-
                 if (this.inventory[slot].stackSize == 0) {
                     this.inventory[slot] = null;
                 }
-
                 return itemstack;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     @Override
@@ -158,7 +145,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
     @Override
     public String getInventoryName() {
-        return "gui.carpentermf.name";
+        return "gui.kitchenbench.name";
     }
 
     @Override
@@ -190,15 +177,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     @Override
     public void updateEntity() {
         ++ticksExisted;
-        super.updateEntity();
-        if (!worldObj.isRemote) {
-            if (ticksExisted % 20 == 0) {
-                updateCraftingData();
-            }
-            if (!canCraft() && ticksExisted > 1) {
-                progress = progressMax = 0;
-                this.recipe = null;
-            }
+        if (!worldObj.isRemote && ticksExisted % 20 == 0) {
+            updateCraftingData();
         }
         resetRecipe = false;
     }
@@ -206,38 +186,43 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     public void onInventoryChanged() {
         if (!resetRecipe) {
             updateCraftingData();
-            MFLogUtil.logDebug("Carpenter: Optimised Inv Tick");
             resetRecipe = true;
         }
     }
 
-    public boolean tryCraft(EntityPlayer user) {
-        if (user == null) return false;
+    /**
+     * Right-click interaction: crafting hits with the proper tool, washing with a water container.
+     */
+    public boolean interact(EntityPlayer user) {
+        ItemStack held = user.getHeldItem();
 
-        String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
-        int hammerTier = ToolHelper.getCrafterTier(user.getHeldItem());
-        if (!toolType.equalsIgnoreCase("nothing")) {
-            if (user.getHeldItem() != null) {
-                user.getHeldItem().damageItem(1, user);
-                if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
-                    if (worldObj.isRemote) user.renderBrokenItemStack(user.getHeldItem());
+        if (isWaterContainer(held)) {
+            washBench(user);
+            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.splash", 0.75F, 1.0F);
+            return true;
+        }
 
+        String toolType = ToolHelper.getCrafterTool(held);
+        int toolTier = ToolHelper.getCrafterTier(held);
+        float efficiency = ToolHelper.getCrafterEfficiency(held);
+        if (!toolType.equalsIgnoreCase("hands") || recipeRequiresHands()) {
+            if (worldObj.isRemote) {
+                return true;
+            }
+            if (held != null && !recipeRequiresHands()) {
+                held.damageItem(1, user);
+                if (held.getItemDamage() >= held.getMaxDamage()) {
+                    if (worldObj.isRemote) user.renderBrokenItemStack(held);
                     user.destroyCurrentEquippedItem();
                 }
             }
-            if (worldObj.isRemote) return true;
 
-            if (doesPlayerKnowCraft(user) && canCraft()
-                    && toolType.equalsIgnoreCase(toolTypeRequired)
-                    && tier >= CarpenterTierRequired
-                    && hammerTier >= hammerTierRequired) {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getUseSound(), 1.0F, 1.0F);
-                float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem());
+            if (doesPlayerKnowCraft(user) && canCraft() && isToolSufficient(toolType, toolTier)) {
+                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getCraftingSound(), 1.0F, 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
                     efficiency *= (0.5F - user.swingProgress);
                 }
-
                 progress += Math.max(0.2F, efficiency);
                 if (progress >= progressMax) {
                     craftItem(user);
@@ -253,26 +238,50 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         return false;
     }
 
-    private String getUseSound() {
-        if (craftSound.equalsIgnoreCase("engineering")) {
-            if (rand.nextInt(5) == 0) {
-                return "random.click";
-            }
-            if (rand.nextInt(20) == 0) {
-                return "random.door_open";
-            }
-            return "step.wood";
+    private boolean recipeRequiresHands() {
+        return toolTypeRequired.equalsIgnoreCase("hands");
+    }
+
+    private boolean isToolSufficient(String toolType, int toolTier) {
+        if (toolTier < getToolTierNeeded()) {
+            return false;
         }
-        return craftSound;
+        if (recipeRequiresHands()) {
+            return true;// hands recipes may also be hit with any tool
+        }
+        return toolType.equalsIgnoreCase(toolTypeRequired);
+    }
+
+    private boolean isWaterContainer(ItemStack held) {
+        if (held == null) {
+            return false;
+        }
+        FluidStack fluid = FluidContainerRegistry.getFluidForFilledItem(held);
+        return fluid != null && fluid.getFluid() == FluidRegistry.WATER;
+    }
+
+    private void washBench(EntityPlayer user) {
+        float strength = ConfigKitchen.dirtyProgressMax * ConfigKitchen.washStrengthFraction;
+        dirtyProgress = Math.max(0F, dirtyProgress - strength);
+
+        ItemStack held = user.getHeldItem();
+        ItemStack empty = FluidContainerRegistry.drainFluidContainer(held);
+        user.inventory.decrStackSize(user.inventory.currentItem, 1);
+        if (empty != null && !user.inventory.addItemStackToInventory(empty)) {
+            user.entityDropItem(empty, 0.0F);
+        }
+        updateCraftingData();
+    }
+
+    public boolean isDirty() {
+        return dirtyProgress >= ConfigKitchen.dirtyProgressMax;
     }
 
     private void craftItem(EntityPlayer user) {
-        if (this.canCraft()) {
+        if (this.canCraft() && !isDirty()) {
             addXP(user);
+            addDirtyProgress(user);
             ItemStack result = recipe.copy();
-            if (result != null && result.getItem() instanceof ItemArmourMF) {
-                result = modifyArmour(result);
-            }
             int output = getOutputSlotNum();
 
             if (this.inventory[output] == null) {
@@ -285,16 +294,14 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                         ItemStack outputStack = this.inventory[output];
                         int max = outputStack.getMaxStackSize();
                         int toAdd = Math.min(result.stackSize, max - outputStack.stackSize);
-                        if (toAdd > 0) {
-                            outputStack.stackSize += toAdd;
-                        }
+                        outputStack.stackSize += toAdd;
                         if (result.stackSize > toAdd) {
                             ItemStack overflow = result.copy();
                             overflow.stackSize = result.stackSize - toAdd;
-                            this.dropItem(overflow);
+                            dropItem(overflow);
                         }
                     } else {
-                        this.dropItem(result);
+                        dropItem(result);
                     }
             consumeResources();
         }
@@ -302,30 +309,27 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         progress = 0;
     }
 
-    private int getOutputSlotNum() {
-        return getSizeInventory() - 5;
+    /**
+     * More provisioning skill means less mess.
+     */
+    private void addDirtyProgress(EntityPlayer user) {
+        if (pendingDirtyAmount <= 0) {
+            return;
+        }
+        float amount = pendingDirtyAmount;
+        if (skillUsed == null) {
+            dirtyProgress += amount;
+            return;
+        }
+        float maxLevel = skillUsed.getMaxLevel();
+        float level = RPGElements.getLevel(user, skillUsed);
+        float levelMod = maxLevel > 0 ? (level / maxLevel) : 0F;
+        float reduction = amount / ConfigKitchen.dirtyProgressSkillModifier * levelMod;
+        dirtyProgress += Math.max(0F, amount - reduction);
     }
 
-    private ItemStack modifyArmour(ItemStack result) {
-        ItemArmourMF item = (ItemArmourMF) result.getItem();
-        boolean canColour = item.canColour();
-        int colour = -1;
-        for (int a = 0; a < getOutputSlotNum(); a++) {
-            ItemStack slot = getStackInSlot(a);
-            if (slot != null && slot.getItem() instanceof ItemArmor) {
-                ItemArmor slotitem = (ItemArmor) slot.getItem();
-                if (canColour && slotitem.hasColor(slot)) {
-                    colour = slotitem.getColor(slot);
-                }
-                if (result.isItemStackDamageable()) {
-                    result.setItemDamage(slot.getItemDamage());
-                }
-            }
-        }
-        if (colour != -1 && canColour) {
-            item.func_82813_b(result, colour);
-        }
-        return result;
+    private int getOutputSlotNum() {
+        return getSizeInventory() - 5;
     }
 
     private NBTTagCompound getNBT(ItemStack item) {
@@ -336,54 +340,23 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     private void dropItem(ItemStack itemstack) {
-        if (itemstack != null) {
-            float f = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f1 = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f2 = this.rand.nextFloat() * 0.8F + 0.1F;
-
-            while (itemstack.stackSize > 0) {
-                int j1 = this.rand.nextInt(21) + 10;
-
-                if (j1 > itemstack.stackSize) {
-                    j1 = itemstack.stackSize;
-                }
-
-                itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(
-                        worldObj,
-                        xCoord + f,
-                        yCoord + f1,
-                        zCoord + f2,
-                        new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
-
-                if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
-                }
-
-                float f3 = 0.05F;
-                entityitem.motionX = (float) this.rand.nextGaussian() * f3;
-                entityitem.motionY = (float) this.rand.nextGaussian() * f3 + 0.2F;
-                entityitem.motionZ = (float) this.rand.nextGaussian() * f3;
-                worldObj.spawnEntityInWorld(entityitem);
+        while (itemstack.stackSize > 0) {
+            int j1 = Math.min(itemstack.stackSize, itemstack.getMaxStackSize());
+            itemstack.stackSize -= j1;
+            EntityItem entityitem = new EntityItem(
+                    worldObj,
+                    xCoord + 0.5D,
+                    yCoord + 0.75D,
+                    zCoord + 0.5D,
+                    new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
+            if (itemstack.hasTagCompound()) {
+                entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
             }
+            entityitem.motionX = (float) rand.nextGaussian() * 0.05F;
+            entityitem.motionY = 0.2F;
+            entityitem.motionZ = (float) rand.nextGaussian() * 0.05F;
+            worldObj.spawnEntityInWorld(entityitem);
         }
-    }
-
-    public void syncData() {
-
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(
-                new CarpenterPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new CarpenterPacket(this).generatePacket()); }
-         */
     }
 
     public String getResultName() {
@@ -401,17 +374,12 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         return craftSound;
     }
 
-    @Override
-    public void setCraftingSound(String sound) {
-        this.craftSound = sound;
-    }
-
     public int getToolTierNeeded() {
-        return this.hammerTierRequired;
+        return 0;
     }
 
-    public int getCarpenterTierNeeded() {
-        return this.CarpenterTierRequired;
+    public int getBenchTierNeeded() {
+        return -1;
     }
 
     public void consumeResources() {
@@ -424,39 +392,37 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                 } else {
                     ItemStack drop = processSurplus(item.getItem().getContainerItem(item));
                     if (drop != null) {
-                        this.dropItem(drop);
+                        dropItem(drop);
                     }
-                    this.decrStackSize(slot, 1);
+                    decrStackSize(slot, 1);
                 }
             } else {
-                this.decrStackSize(slot, 1);
+                decrStackSize(slot, 1);
             }
         }
         resetRecipe = false;
-        this.onInventoryChanged();
+        onInventoryChanged();
     }
 
     private ItemStack processSurplus(ItemStack item) {
         for (int a = 0; a < 4; a++) {
             if (item == null) {
-                return null;// If item was sorted
+                return null;
             }
-
             int s = getSizeInventory() - 4 + a;
             ItemStack slot = inventory[s];
             if (slot == null) {
                 setInventorySlotContents(s, item);
-                return null;// All Placed
+                return null;
             } else {
                 if (slot.isItemEqual(item) && ItemStack.areItemStackTagsEqual(slot, item)
                         && slot.stackSize < slot.getMaxStackSize()) {
-                    if (slot.stackSize + item.stackSize <= slot.getMaxStackSize()) {
-                        slot.stackSize += item.stackSize;
-                        return null;// All Shared
-                    } else {
-                        int room_left = slot.getMaxStackSize() - slot.stackSize;
-                        slot.stackSize += room_left;
-                        item.stackSize -= room_left;// Share
+                    int roomLeft = slot.getMaxStackSize() - slot.stackSize;
+                    int toMove = Math.min(roomLeft, item.stackSize);
+                    slot.stackSize += toMove;
+                    item.stackSize -= toMove;
+                    if (item.stackSize <= 0) {
+                        return null;
                     }
                 }
             }
@@ -479,69 +445,37 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
     // CRAFTING CODE
     public ItemStack getResult() {
-        if (syncCarpenter == null || craftMatrix == null) {
+        if (syncBench == null || craftMatrix == null) {
             return null;
         }
-
         if (ticksExisted <= 1) return null;
 
         for (int a = 0; a < getOutputSlotNum(); a++) {
             craftMatrix.setInventorySlotContents(a, inventory[a]);
         }
-
-        return CraftingManagerCarpenter.getInstance().findMatchingRecipe(this, craftMatrix);
+        return CraftingManagerKitchen.getInstance().findMatchingRecipe(this, craftMatrix);
     }
 
     public void updateCraftingData() {
         if (!worldObj.isRemote) {
             ItemStack oldRecipe = recipe;
             recipe = getResult();
-            // syncItems();
 
-            if (!canCraft() && progress > 0) {
+            if ((!canCraft() || isDirty()) && progress > 0) {
                 progress = 0;
-                // quality = 100;
             }
             if (recipe != null && oldRecipe != null && !recipe.isItemEqual(oldRecipe)) {
                 progress = 0;
             }
             if (progress > progressMax) progress = progressMax - 1;
-            syncData();
         }
     }
 
     public boolean canCraft() {
-        if (progressMax > 0 && recipe != null && recipe instanceof ItemStack) {
-            return this.canFitResult(recipe);
+        if (isDirty()) {
+            return false;
         }
-        return false;
-    }
-
-    @Override
-    public void setForgeTime(int i) {
-        progressMax = i;
-    }
-
-    @Override
-    public void setToolTier(int i) {
-        hammerTierRequired = i;
-    }
-
-    @Override
-    public void setRequiredCarpenter(int i) {
-        CarpenterTierRequired = i;
-    }
-
-    @Override
-    public void setHotOutput(boolean i) {}
-
-    public void setContainer(ContainerCarpenterMF container) {
-        syncCarpenter = container;
-        craftMatrix = new CarpenterCraftMatrix(
-                this,
-                syncCarpenter,
-                ShapelessCarpenterRecipes.globalWidth,
-                ShapelessCarpenterRecipes.globalHeight);
+        return progressMax > 0 && recipe != null && canFitResult(recipe);
     }
 
     public boolean shouldRenderCraftMetre() {
@@ -555,14 +489,51 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         return (int) Math.ceil((i * progress) / progressMax);
     }
 
+    public int getDirtyBar(int i) {
+        float max = ConfigKitchen.dirtyProgressMax;
+        if (max <= 0) {
+            return 0;
+        }
+        return (int) Math.ceil((i * dirtyProgress) / max);
+    }
+
+    @Override
+    public void setForgeTime(int i) {
+        progressMax = i;
+    }
+
+    @Override
+    public void setToolTier(int i) {}
+
+    @Override
+    public void setRequiredCarpenter(int i) {}
+
+    @Override
+    public void setHotOutput(boolean hot) {}
+
     @Override
     public void setToolType(String toolType) {
         this.toolTypeRequired = toolType;
     }
 
     @Override
+    public void setCraftingSound(String sound) {
+        this.craftSound = sound;
+    }
+
+    @Override
     public void setResearch(String research) {
         this.researchRequired = research;
+    }
+
+    @Override
+    public void setSkill(Skill skill) {
+        skillUsed = skill;
+    }
+
+    @Override
+    public void setDirtyAmount(float amount) {
+        pendingDirtyAmount = amount;
     }
 
     public String getResearchNeeded() {
@@ -583,11 +554,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         }
     }
 
-    @Override
-    public void setSkill(Skill skill) {
-        skillUsed = skill;
+    public void setContainer(ContainerKitchenBench container) {
+        syncBench = container;
+        craftMatrix = new CarpenterCraftMatrix(this, syncBench, width, height);
     }
-
-    @Override
-    public void setDirtyAmount(float amount) {}
 }

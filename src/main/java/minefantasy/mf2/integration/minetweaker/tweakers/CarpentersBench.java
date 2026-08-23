@@ -198,7 +198,7 @@ public class CarpentersBench {
         }
     }
 
-    private static boolean matchesAnyIngredient(ICarpenterRecipe recipe, IIngredient input) {
+    public static boolean matchesAnyIngredient(ICarpenterRecipe recipe, IIngredient input) {
         if (recipe instanceof TweakedShapedCBRecipes) {
             return matchesIngredientGrid(((TweakedShapedCBRecipes) recipe).getIngredients(), input);
         }

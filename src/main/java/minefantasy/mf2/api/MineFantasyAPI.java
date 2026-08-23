@@ -24,6 +24,7 @@ import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
+import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.refine.Alloy;
@@ -257,11 +258,42 @@ public class MineFantasyAPI {
     }
 
     /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
+     * {@link MineFantasyAPI#addShapelessCarpenterRecipe}
      */
     public static ICarpenterRecipe addShapelessCarpenterRecipe(Skill skill, ItemStack result, String research,
             String sound, int craftTime, Object... input) {
         return addShapelessCarpenterRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
+    }
+
+    /**
+     * Adds a shaped recipe for the kitchen bench. Dirty progress defaults from the craft time.
+     */
+    public static ICarpenterRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
+            String toolType, int toolTier, int craftTime, Object... input) {
+        float dirtyAmount = Math.max(1F, Math.min(8F, craftTime * 0.04F));
+        return CraftingManagerKitchen.getInstance()
+                .addRecipe(result, skill, research, sound, toolType, toolTier, craftTime, dirtyAmount, input);
+    }
+
+    /**
+     * {@link MineFantasyAPI#addKitchenRecipe} with bare hands as the tool
+     */
+    public static ICarpenterRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
+            int craftTime, Object... input) {
+        return addKitchenRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
+    }
+
+    /**
+     * Adds a shapeless recipe for the kitchen bench. Dirty progress defaults from the craft time.
+     */
+    public static ICarpenterRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
+            String toolType, int toolTier, int craftTime, boolean shapeless, Object... input) {
+        if (!shapeless) {
+            return addKitchenRecipe(skill, result, research, sound, toolType, toolTier, craftTime, input);
+        }
+        float dirtyAmount = Math.max(1F, Math.min(8F, craftTime * 0.04F));
+        return CraftingManagerKitchen.getInstance()
+                .addShapelessRecipe(result, skill, research, sound, toolType, toolTier, craftTime, dirtyAmount, input);
     }
 
     public static void addBlastFurnaceRecipe(Block input, ItemStack output) {
