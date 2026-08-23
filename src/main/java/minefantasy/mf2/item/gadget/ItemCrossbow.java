@@ -97,7 +97,7 @@ public class ItemCrossbow extends Item
 
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
-        if (!world.isRemote && user.isSneaking() || AmmoMechanicsMF.isDepleted(item))// OPEN INV
+        if (user.isSneaking() || AmmoMechanicsMF.isDepleted(item))// OPEN INV
         {
             user.openGui(MineFantasyII.instance, 1, user.worldObj, 1, 0, 0);
             return item;
@@ -193,6 +193,9 @@ public class ItemCrossbow extends Item
     }
 
     private void recoilUser(EntityPlayer user, float value) {
+        if (!user.worldObj.isRemote) {
+            return;
+        }
         if (PowerArmour.isPowered(user)) {
             return;
         }

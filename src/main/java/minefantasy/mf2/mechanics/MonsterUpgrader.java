@@ -34,7 +34,7 @@ public class MonsterUpgrader {
         if (ConfigHardcore.upgradeZombieWep) {
             if (mob instanceof EntitySkeleton) {
                 if (((EntitySkeleton) mob).getSkeletonType() == 1) {
-                    giveEntityWeapon(mob, "Diamond", random.nextInt(8));
+                    giveEntityWeapon(mob, "Obsidian", random.nextInt(8));
                 } else if (CombatMechanics.swordSkeleton && random.nextInt(3) == 0) {
                     mob.setCurrentItemOrArmor(0, CustomToolListMF.standard_sword.construct("Bronze", "OakWood"));
                     ((EntitySkeleton) mob).setCombatTask();
