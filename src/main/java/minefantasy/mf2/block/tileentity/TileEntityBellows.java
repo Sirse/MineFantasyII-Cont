@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.tileentity;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -21,14 +22,18 @@ public class TileEntityBellows extends TileEntity {
     }
 
     public void interact(EntityPlayer player, float powerLevel) {
+        interact((EntityLivingBase) player, powerLevel);
+    }
+
+    public void interact(EntityLivingBase entity, float powerLevel) {
         int x = xCoord;
         int y = yCoord;
         int z = zCoord;
         IBellowsUseable forge = getFacingForge();
         if (press < 10) {
-            if (player != null) {
-                player.playSound("minefantasy2:block.bellows", 1, 1);
-            } else {
+            if (entity instanceof EntityPlayer) {
+                ((EntityPlayer) entity).playSound("minefantasy2:block.bellows", 1, 1);
+            } else if (!worldObj.isRemote) {
                 worldObj.playSound(xCoord, yCoord, zCoord, "minefantasy2:block.bellows", 1.0F, 1.0F, false);
             }
             press = 50;

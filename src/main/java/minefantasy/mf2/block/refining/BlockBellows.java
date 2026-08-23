@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -76,6 +77,17 @@ public class BlockBellows extends BlockContainer {
             bellows.interact(player, 2F);
         }
         return true;
+    }
+
+    @Override
+    public void onFallenUpon(World world, int x, int y, int z, Entity entity, float fallDistance) {
+        super.onFallenUpon(world, x, y, z, entity, fallDistance);
+        if (!world.isRemote && entity instanceof EntityLivingBase && fallDistance > 1F) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof TileEntityBellows) {
+                ((TileEntityBellows) tile).interact((EntityLivingBase) entity, 2F);
+            }
+        }
     }
 
     @Override
