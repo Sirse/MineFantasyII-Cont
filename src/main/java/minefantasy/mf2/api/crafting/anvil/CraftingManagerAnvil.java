@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.rpg.Skill;
 
 /**
@@ -147,14 +148,16 @@ public class CraftingManagerAnvil {
 
     private ItemStack getRepairResult(ItemStack first, ItemStack second) {
         Item item = first.getItem();
-        int remainFirst = item.getMaxDamage() - first.getItemDamageForDisplay();
-        int remainSecond = item.getMaxDamage() - second.getItemDamageForDisplay();
-        int combined = remainFirst + remainSecond + item.getMaxDamage() * 10 / 100;
-        int damage = Math.max(0, item.getMaxDamage() - combined);
+        int remainFirst = first.getMaxDamage() - first.getItemDamageForDisplay();
+        int remainSecond = second.getMaxDamage() - second.getItemDamageForDisplay();
+        int maxDamage = first.getMaxDamage();
+        int combined = remainFirst + remainSecond + maxDamage * 10 / 100;
+        int damage = Math.max(0, maxDamage - combined);
 
         ItemStack repaired = new ItemStack(item, 1, damage);
-        if (first.hasTagCompound()) {
-            repaired.setTagCompound((NBTTagCompound) first.getTagCompound().copy());
+        ItemStack nbtSource = ToolHelper.getQualityLevel(first) >= ToolHelper.getQualityLevel(second) ? first : second;
+        if (nbtSource.hasTagCompound()) {
+            repaired.setTagCompound((NBTTagCompound) nbtSource.getTagCompound().copy());
         }
         return repaired;
     }
