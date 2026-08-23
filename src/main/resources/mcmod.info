@@ -1,25 +1,19 @@
 [
-  {
-    "modid":"MineFantasy2",
-    "name":"Mine FantasyII",
-    "description":"NOTE: This is an incomplete mod, crafting has not been implemented. Make sure to have a recipe guide installed. Not all items are obtainable or balanced",
-    "version":"${version}",
-    "mcversion":"${mcversion}",
-    "url":"",
-    "updateUrl":"",
-    "authors":[
-      "Anonymous"
-    ],
-    "credits":"-",
-    "logoFile":"",
-    "screenshots":[
-
-    ],
-    "dependencies":[
-      "MineTweaker3",
-      "NotEnoughItems",
-      "BuildCraft|Core",
-      "CoFHCore"
-    ]
-  }
+{
+  "modid": "minefantasy2",
+  "name": "MineFantasyII",
+  "description": "Unofficial continuation of MineFantasy 2: medieval crafting, smithing, archery and RPG mechanics. A recipe guide is recommended - not all items are obtainable through vanilla means.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/Sirse/MineFantasyII-Cont",
+  "updateUrl": "",
+  "authorList": [
+    "Anonymous Productions",
+    "Sirse"
+  ],
+  "credits": "Original mod by Anonymous Productions. Continuation maintained by Sirse.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
 ]
