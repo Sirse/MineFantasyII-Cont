@@ -2261,3 +2261,12 @@ nei.minefantasy2.station=Station: %s
 nei.minefantasy2.tier=Tier: %s
 nei.method.big_furnace=Big Furnace
 nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn items yield less
+# GUI inventory names
+gui.anvilmf.name=Anvil
+gui.carpentermf.name=Carpenter's Bench
+gui.quern.name=Quern
+gui.crucible.name=Crucible
+gui.forge.name=Forge
+gui.bloomery.name=Bloomery
+gui.research.name=Research Station
+gui.blastfurnace.name=Blast Furnace

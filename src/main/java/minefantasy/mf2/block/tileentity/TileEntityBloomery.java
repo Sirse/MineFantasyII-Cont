@@ -264,7 +264,7 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
 
     @Override
     public String getInventoryName() {
-        return "gui.carpentermf.name";
+        return "gui.bloomery.name";
     }
 
     @Override

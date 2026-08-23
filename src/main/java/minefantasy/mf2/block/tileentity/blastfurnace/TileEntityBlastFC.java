@@ -223,7 +223,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
 
     @Override
     public String getInventoryName() {
-        return "gui.bombcraftmf.name";
+        return "gui.blastfurnace.name";
     }
 
     @Override

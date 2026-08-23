@@ -326,7 +326,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
 
     @Override
     public String getInventoryName() {
-        return "gui.crucible.name";
+        return "gui.forge.name";
     }
 
     @Override

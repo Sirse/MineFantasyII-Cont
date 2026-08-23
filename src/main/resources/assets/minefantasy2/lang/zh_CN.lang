@@ -2260,3 +2260,12 @@ nei.minefantasy2.station=工作站：%s
 nei.minefantasy2.tier=等级：%s
 nei.method.big_furnace=大型熔炉
 nei.minefantasy2.salvage.durability_note=显示的是满耐久度的产出；磨损的物品产出更少
+# GUI inventory names
+gui.anvilmf.name=铁砧
+gui.carpentermf.name=木工台
+gui.quern.name=石磨
+gui.crucible.name=坩埚
+gui.forge.name=锻造炉
+gui.bloomery.name=熟铁炉
+gui.research.name=研究台
+gui.blastfurnace.name=高炉

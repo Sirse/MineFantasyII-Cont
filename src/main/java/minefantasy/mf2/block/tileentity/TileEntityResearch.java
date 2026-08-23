@@ -298,7 +298,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
 
     @Override
     public String getInventoryName() {
-        return "gui.bombcraftmf.name";
+        return "gui.research.name";
     }
 
     @Override

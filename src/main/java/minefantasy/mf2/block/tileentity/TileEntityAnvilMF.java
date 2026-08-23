@@ -184,7 +184,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     @Override
     public String getInventoryName() {
-        return "gui.carpentermf.name";
+        return "gui.anvilmf.name";
     }
 
     @Override

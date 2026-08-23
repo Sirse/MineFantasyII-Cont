@@ -2265,3 +2265,12 @@ nei.minefantasy2.station=Станция: %s
 nei.minefantasy2.tier=Уровень: %s
 nei.method.big_furnace=Большая печь
 nei.minefantasy2.salvage.durability_note=Показан выход для полной прочности; изношенные предметы дают меньше
+# GUI inventory names
+gui.anvilmf.name=Наковальня
+gui.carpentermf.name=Плотницкий верстак
+gui.quern.name=Ручная мельница
+gui.crucible.name=Тигель
+gui.forge.name=Горн
+gui.bloomery.name=Домница
+gui.research.name=Исследовательская станция
+gui.blastfurnace.name=Доменная печь
