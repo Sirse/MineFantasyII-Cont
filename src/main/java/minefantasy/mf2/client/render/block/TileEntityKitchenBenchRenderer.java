@@ -47,8 +47,8 @@ public class TileEntityKitchenBenchRenderer extends TileEntitySpecialRenderer {
         bindTextureByName("textures/models/tileentity/kitchen_bench.png");
 
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.25F, (float) d2 + 0.5F);
-        GL11.glRotatef(j + 180F, 0.0F, 1.0F, 0.0F);
+        GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.0F, (float) d2 + 0.5F);
+        GL11.glRotatef(j, 0.0F, 1.0F, 0.0F);
         GL11.glScalef(1F, -1F, -1F);
         GL11.glPushMatrix();
         model.renderModel(0.0625F);
