@@ -50,6 +50,10 @@ public class ItemHeated extends Item implements IHotItem {
         return Heatable.getUnstableTemp(item);
     }
 
+    public static int getMaxTemp(ItemStack item) {
+        return Heatable.getMaxTemp(item);
+    }
+
     public static ItemStack getItem(ItemStack item) {
         return Heatable.getItem(item);
     }
@@ -70,6 +74,11 @@ public class ItemHeated extends Item implements IHotItem {
         NBTTagCompound nbt = getNBT(item);
         MFLogUtil.logDebug("Set Unstable Temp: " + heat);
         nbt.setInteger(Heatable.NBT_UnstableTemp, heat);
+    }
+
+    public static void setMaxTemp(ItemStack item, int heat) {
+        NBTTagCompound nbt = getNBT(item);
+        nbt.setInteger(Heatable.NBT_MaxTemp, heat);
     }
 
     public static ItemStack createHotItem(ItemStack item) {
@@ -95,6 +104,7 @@ public class ItemHeated extends Item implements IHotItem {
             nbt.setBoolean(Heatable.NBT_ShouldDisplay, true);
             setWorkTemp(out, stats.getWorkableStat(item));
             setUnstableTemp(out, stats.getUnstableStat(item));
+            setMaxTemp(out, stats.getMaxStat(item));
 
             return out;
         } else if (ignoreStats) {
@@ -107,6 +117,7 @@ public class ItemHeated extends Item implements IHotItem {
             nbt.setBoolean(Heatable.NBT_ShouldDisplay, false);
             setWorkTemp(out, 0);
             setUnstableTemp(out, 0);
+            setMaxTemp(out, 0);
 
             return out;
         }

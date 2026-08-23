@@ -191,7 +191,13 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
             if (temp <= 0) {
                 // this.setInventorySlotContents(slot, ItemHeated.getItem(item));
             } else {
-                ItemHeated.setTemp(item, Math.max(0, temp));
+                int maxTemp = ItemHeated.getMaxTemp(item);
+                if (maxTemp > 0 && temp >= maxTemp) {
+                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.fizz", 0.7F, 0.5F);
+                    this.setInventorySlotContents(slot, null);
+                } else {
+                    ItemHeated.setTemp(item, Math.max(0, temp));
+                }
             }
         } else if (temperature > 0) {
             this.setInventorySlotContents(slot, ItemHeated.createHotItem(item));

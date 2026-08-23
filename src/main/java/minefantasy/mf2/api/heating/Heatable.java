@@ -19,6 +19,7 @@ public class Heatable {
     public static final String NBT_CurrentTemp = "MFHeatable_Temperature";
     public static final String NBT_WorkableTemp = "MFHeatable_WorkTemp";
     public static final String NBT_UnstableTemp = "MFHeatable_UnstableTemp";
+    public static final String NBT_MaxTemp = "MFHeatable_MaxTemp";
     public static boolean requiresHeating = true;
     public static HashMap<String, Heatable> registerList = new HashMap<String, Heatable>();
     /**
@@ -111,6 +112,17 @@ public class Heatable {
         NBTTagCompound tag = getNBT(item);
 
         if (tag.hasKey(NBT_UnstableTemp)) return tag.getInteger(NBT_UnstableTemp);
+
+        return 0;
+    }
+
+    public static int getMaxTemp(ItemStack item) {
+        if (item == null || !(item.getItem() instanceof IHotItem)) {
+            return 0;
+        }
+        NBTTagCompound tag = getNBT(item);
+
+        if (tag.hasKey(NBT_MaxTemp)) return tag.getInteger(NBT_MaxTemp);
 
         return 0;
     }
@@ -208,5 +220,13 @@ public class Heatable {
             if (material != null) return material.getHeatableStats()[1];
         }
         return this.unstableTemperature;
+    }
+
+    public int getMaxStat(ItemStack item) {
+        if (this.maxTemperature == -1) {
+            CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(item);
+            if (material != null) return material.getHeatableStats()[2];
+        }
+        return this.maxTemperature;
     }
 }
