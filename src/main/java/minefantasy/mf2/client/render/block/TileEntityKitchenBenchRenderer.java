@@ -44,7 +44,7 @@ public class TileEntityKitchenBenchRenderer extends TileEntitySpecialRenderer {
             j = 90;
         }
 
-        bindTextureByName("textures/models/tileentity/carpenter.png");
+        bindTextureByName("textures/models/tileentity/kitchen_bench.png");
 
         GL11.glPushMatrix();
         GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.25F, (float) d2 + 0.5F);

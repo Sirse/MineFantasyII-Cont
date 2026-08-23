@@ -1,135 +1,194 @@
 package minefantasy.mf2.client.model.block;
 
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelRenderer;
+import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.client.model.TexturedQuad;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.Vec3;
 
 /**
- * Kitchen bench: carpenter-style table with a knife and spoon on top instead of a hammer and vice. Reuses the carpenter
- * texture layout.
+ * Kitchen bench geometry ported 1:1 from the 1.12 fork's Blockbench model, including its per-face UV mapping onto the
+ * original 64x64 texture.
+ *
+ * Built on raw TexturedQuads because ModelRenderer boxes only support the standard auto-generated UV layout, while the
+ * source model uses arbitrary per-face regions of a shared atlas.
  */
-public class ModelKitchenBench extends ModelBase {
+public class ModelKitchenBench {
 
-    ModelRenderer top;
-    ModelRenderer FRleg;
-    ModelRenderer bottom;
-    ModelRenderer BRleg;
-    ModelRenderer BLleg;
-    ModelRenderer FLleg;
-    ModelRenderer plank2;
-    ModelRenderer knifeHandle;
-    ModelRenderer block;
-    ModelRenderer nail;
-    ModelRenderer spoonHandle;
-    ModelRenderer knifeBlade;
-    ModelRenderer plank;
+    private static final double TEX_SIZE = 64D;
+
+    private final List<Box> boxes = new ArrayList<Box>();
+
+    private Box currentBox;
 
     public ModelKitchenBench() {
-        textureWidth = 64;
-        textureHeight = 64;
+        makeBox(0F, 12F, 0F, 16F, 16F, 16F);
+        face(0, 0, 4, 4, 5);
+        face(1, 8, 4, 12, 5);
+        face(2, 8, 0, 12, 4);
+        face(3, 12, 12, 16, 16);
+        face(4, 4, 4, 8, 5);
+        face(5, 12, 4, 16, 5);
+        makeBox(1.5F, 3F, 1.5F, 14.5F, 5F, 14.5F);
+        face(0, 0, 8.25, 3, 8.75);
+        face(1, 6.5, 8.25, 9.75, 8.75);
+        face(2, 6.5, 5, 9.75, 8);
+        face(3, 3.25, 5, 6.5, 8.25);
+        face(4, 3.25, 8.25, 6.5, 8.75);
+        face(5, 9.75, 8.25, 13, 8.75);
+        makeBox(11F, 0F, 1F, 15F, 12F, 5F);
+        face(0, 2, 1, 3, 4);
+        face(1, 0, 1, 1, 4);
+        face(2, 2, 0, 3, 1);
+        face(3, 1, 0, 2, 1);
+        face(4, 1, 1, 2, 4);
+        face(5, 3, 1, 4, 4);
+        makeBox(1F, 0F, 1F, 5F, 12F, 5F);
+        face(0, 2, 1, 3, 4);
+        face(1, 0, 1, 1, 4);
+        face(2, 2, 0, 3, 1);
+        face(3, 1, 0, 2, 1);
+        face(4, 1, 1, 2, 4);
+        face(5, 3, 1, 4, 4);
+        makeBox(11F, 0F, 11F, 15F, 12F, 15F);
+        face(0, 2, 1, 3, 4);
+        face(1, 0, 1, 1, 4);
+        face(2, 2, 0, 3, 1);
+        face(3, 1, 0, 2, 1);
+        face(4, 1, 1, 2, 4);
+        face(5, 3, 1, 4, 4);
+        makeBox(1F, 0F, 11F, 5F, 12F, 15F);
+        face(0, 0, 1, 1, 4);
+        face(1, 2, 1, 3, 4);
+        face(2, 2, 0, 3, 1);
+        face(3, 1, 0, 2, 1);
+        face(4, 1, 1, 2, 4);
+        face(5, 3, 1, 4, 4);
+        makeBox(6F, 5F, 5F, 10F, 9F, 9F);
+        face(0, 0, 9.75, 1, 10.75);
+        face(1, 2, 9.75, 3, 10.75);
+        face(2, 2, 8.75, 3, 9.75);
+        face(3, 1, 8.75, 2, 9.75);
+        face(4, 1, 9.75, 2, 10.75);
+        face(5, 3, 9.75, 4, 10.75);
+        makeBox(1.75F, 15.5F, 2.5F, 2.75F, 16.499F, 7.5F);
+        face(0, 0, 12.25, 2, 12.5);
+        face(1, 2, 12.25, 3, 12.5);
+        face(2, 2, 11, 2, 12);
+        face(3, 1.5, 11, 1.75, 12.5);
+        face(4, 1.5, 12.5, 1.75, 12.75);
+        face(5, 1.75, 12.5, 2, 12.75);
+        makeBox(14F, 15.5F, 9F, 17F, 16.5F, 10F);
+        face(0, 0.25, 14, 0.5, 14);
+        face(1, 1.25, 14, 1.5, 14);
+        face(2, 1, 13.75, 2, 14);
+        face(3, 0.5, 14, 1.25, 14);
+        face(4, 0.5, 14, 1.25, 14);
+        face(5, 1.5, 14, 2.25, 14);
+        makeBox(10F, 15.5F, 9F, 14F, 16.5F, 11F);
+        face(0, 0, 13.5, 0, 13.75);
+        face(1, 1.5, 13.5, 2, 13.75);
+        face(2, 1.5, 13, 2.5, 14);
+        face(3, 0.5, 13, 1.5, 13.5);
+        face(4, 0.5, 13.5, 1.5, 13.75);
+        face(5, 2, 13.5, 3, 13.75);
+        makeBox(7.2748F, 15.5F, 12.32685F, 8.2748F, 16.499F, 14.32685F);
+        face(0, 1.25, 15, 1.5, 15);
+        face(1, 0.75, 15, 1, 15);
+        face(2, 1.25, 14.75, 1.5, 15);
+        face(3, 1, 15, 1.25, 15);
+        face(4, 1.5, 15, 1.75, 15);
+        face(5, 1, 15, 1, 15);
+        makeBox(1.25F, 15.5F, 7.5F, 3.25F, 16.5F, 9.5F);
+        face(0, 2.25, 11.75, 2.75, 12);
+        face(1, 3.25, 11.75, 3.75, 12);
+        face(2, 3.25, 11.25, 3.75, 11.75);
+        face(3, 2.75, 11.25, 3.25, 11.75);
+        face(4, 2.75, 11.75, 3.25, 12);
+        face(5, 3.75, 11.75, 4.25, 12);
 
-        top = new ModelRenderer(this, 0, 0);
-        top.addBox(-8F, 4F, -8F, 16, 4, 16);
-        top.setRotationPoint(0F, 0F, 0F);
-        top.setTextureSize(64, 64);
-        top.mirror = true;
-        setRotation(top, 0F, 0F, 0F);
-        FRleg = new ModelRenderer(this, 0, 35);
-        FRleg.addBox(3F, 8F, -7F, 4, 12, 4);
-        FRleg.setRotationPoint(0F, 0F, 0F);
-        FRleg.setTextureSize(64, 64);
-        FRleg.mirror = true;
-        setRotation(FRleg, 0F, 0F, 0F);
-        bottom = new ModelRenderer(this, 0, 20);
-        bottom.addBox(-6.5F, 14F, -6.5F, 13, 2, 13);
-        bottom.setRotationPoint(0F, 0F, 0F);
-        bottom.setTextureSize(64, 64);
-        bottom.mirror = true;
-        setRotation(bottom, 0F, 0F, 0F);
-        BRleg = new ModelRenderer(this, 0, 35);
-        BRleg.addBox(3F, 8F, 3F, 4, 12, 4);
-        BRleg.setRotationPoint(0F, 0F, 0F);
-        BRleg.setTextureSize(64, 64);
-        BRleg.mirror = true;
-        setRotation(BRleg, 0F, 0F, 0F);
-        BLleg = new ModelRenderer(this, 0, 35);
-        BLleg.addBox(-7F, 8F, 3F, 4, 12, 4);
-        BLleg.setRotationPoint(0F, 0F, 0F);
-        BLleg.setTextureSize(64, 64);
-        BLleg.mirror = true;
-        setRotation(BLleg, 0F, 0F, 0F);
-        FLleg = new ModelRenderer(this, 0, 35);
-        FLleg.addBox(-7F, 8F, -7F, 4, 12, 4);
-        FLleg.setRotationPoint(0F, 0F, 0F);
-        FLleg.setTextureSize(64, 64);
-        FLleg.mirror = true;
-        setRotation(FLleg, 0F, 0F, 0F);
-        plank2 = new ModelRenderer(this, 0, 51);
-        plank2.addBox(-5F, -1F, -1F, 10, 1, 2);
-        plank2.setRotationPoint(2F, 4F, 6F);
-        plank2.setTextureSize(64, 64);
-        plank2.mirror = true;
-        setRotation(plank2, 0F, -0.0698132F, 0F);
-
-        // Knife lying on the table (flat blade + handle)
-        knifeBlade = new ModelRenderer(this, 5, 51);
-        knifeBlade.addBox(-3F, 0F, -1F, 6, 1, 1);
-        knifeBlade.setRotationPoint(-2F, 13F, 2F);
-        knifeBlade.setTextureSize(64, 64);
-        knifeBlade.mirror = true;
-        setRotation(knifeBlade, 0F, 0.7853982F, 0F);
-        knifeHandle = new ModelRenderer(this, 5, 51);
-        knifeHandle.addBox(-2F, 0F, 0F, 3, 1, 1);
-        knifeHandle.setRotationPoint(1.5F, 13F, 3.5F);
-        knifeHandle.setTextureSize(64, 64);
-        knifeHandle.mirror = true;
-        setRotation(knifeHandle, 0F, 0.7853982F, 0F);
-
-        block = new ModelRenderer(this, 0, 0);
-        block.addBox(-2F, -2F, -2F, 4, 4, 4);
-        block.setRotationPoint(0F, 2F, 0F);
-        block.setTextureSize(64, 64);
-        block.mirror = true;
-        setRotation(block, 0F, -0.0523599F, 0F);
-        nail = new ModelRenderer(this, 0, 8);
-        nail.addBox(0F, -2F, 0F, 1, 3, 1);
-        nail.setRotationPoint(0F, 0F, 0F);
-        nail.setTextureSize(64, 64);
-        nail.mirror = true;
-        setRotation(nail, 0F, 0F, 0F);
-        // Spoon resting by the bowl
-        spoonHandle = new ModelRenderer(this, 5, 51);
-        spoonHandle.addBox(-3F, 0F, 0F, 6, 1, 1);
-        spoonHandle.setRotationPoint(3F, 13F, -3F);
-        spoonHandle.setTextureSize(64, 64);
-        spoonHandle.mirror = true;
-        setRotation(spoonHandle, 0F, 2.3561945F, 0F);
-        plank = new ModelRenderer(this, 0, 51);
-        plank.addBox(-5F, -1F, -1F, 10, 1, 2);
-        plank.setRotationPoint(-4F, 4F, -3F);
-        plank.setTextureSize(64, 64);
-        plank.mirror = true;
-        setRotation(plank, 0F, 0.7679449F, 0F);
+        build();
     }
 
-    private void setRotation(ModelRenderer model, float x, float y, float z) {
-        model.rotateAngleX = x;
-        model.rotateAngleY = y;
-        model.rotateAngleZ = z;
+    public void makeBox(float x1, float y1, float z1, float x2, float y2, float z2) {
+        currentBox = new Box(x1 - 8F, -y2, z1 - 8F, x2 - 8F, -y1, z2 - 8F);
+        boxes.add(currentBox);
     }
 
-    public void renderModel(float f) {
-        top.render(f);
-        FRleg.render(f);
-        bottom.render(f);
-        BRleg.render(f);
-        BLleg.render(f);
-        FLleg.render(f);
-        plank2.render(f);
-        knifeBlade.render(f);
-        knifeHandle.render(f);
-        block.render(f);
-        nail.render(f);
-        spoonHandle.render(f);
-        plank.render(f);
+    /**
+     * quad indices: 0=+X east, 1=-X west, 2=-Y down, 3=+Y up, 4=-Z north, 5=+Z south
+     */
+    public void face(int quad, double u1, double v1, double u2, double v2) {
+        currentBox.uvs[quad] = new double[] { u2 / TEX_SIZE, v1 / TEX_SIZE, u1 / TEX_SIZE, v2 / TEX_SIZE };
+    }
+
+    public void renderModel(float scale) {
+        Tessellator tessellator = Tessellator.instance;
+        for (Box box : boxes) {
+            for (int i = 0; i < 6; i++) {
+                if (box.quads[i] != null) {
+                    box.quads[i].draw(tessellator, scale);
+                }
+            }
+        }
+    }
+
+    public void build() {
+        for (Box box : boxes) {
+            box.build();
+        }
+    }
+
+    private static class Box {
+
+        final TexturedQuad[] quads = new TexturedQuad[6];
+        final double[][] uvs = new double[6][4];
+
+        final float x1;
+        final float y1;
+        final float z1;
+        final float x2;
+        final float y2;
+        final float z2;
+
+        Box(float x1, float y1, float z1, float x2, float y2, float z2) {
+            this.x1 = x1;
+            this.y1 = y1;
+            this.z1 = z1;
+            this.x2 = x2;
+            this.y2 = y2;
+            this.z2 = z2;
+        }
+
+        void build() {
+            // corners follow the vanilla ModelBox vertex layout
+            Vec3[] v = new Vec3[8];
+            v[0] = Vec3.createVectorHelper(x1, y1, z1);
+            v[1] = Vec3.createVectorHelper(x2, y1, z1);
+            v[2] = Vec3.createVectorHelper(x2, y2, z1);
+            v[3] = Vec3.createVectorHelper(x1, y2, z1);
+            v[4] = Vec3.createVectorHelper(x1, y1, z2);
+            v[5] = Vec3.createVectorHelper(x2, y1, z2);
+            v[6] = Vec3.createVectorHelper(x2, y2, z2);
+            v[7] = Vec3.createVectorHelper(x1, y2, z2);
+
+            quads[0] = makeQuad(new Vec3[] { v[4], v[1], v[2], v[6] }, uvs[0]);
+            quads[1] = makeQuad(new Vec3[] { v[0], v[4], v[7], v[3] }, uvs[1]);
+            quads[2] = makeQuad(new Vec3[] { v[5], v[4], v[0], v[1] }, uvs[2]);
+            quads[3] = makeQuad(new Vec3[] { v[2], v[3], v[7], v[6] }, uvs[3]);
+            quads[4] = makeQuad(new Vec3[] { v[1], v[0], v[3], v[2] }, uvs[4]);
+            quads[5] = makeQuad(new Vec3[] { v[4], v[5], v[6], v[7] }, uvs[5]);
+        }
+
+        private static TexturedQuad makeQuad(Vec3[] corners, double[] uv) {
+            net.minecraft.client.model.PositionTextureVertex[] verts = new net.minecraft.client.model.PositionTextureVertex[4];
+            for (int i = 0; i < 4; i++) {
+                double u = i == 0 || i == 3 ? uv[0] : uv[2];
+                double v = i < 2 ? uv[1] : uv[3];
+                verts[i] = new net.minecraft.client.model.PositionTextureVertex(corners[i], (float) u, (float) v);
+            }
+            return new TexturedQuad(verts);
+        }
     }
 }
