@@ -147,9 +147,8 @@ public class ItemLootSack extends Item {
         if (!user.capabilities.isCreativeMode) {
             --item.stackSize;
         }
-        user.playSound("mob.horse.leather", 1.0F, 1.5F);
-
         if (!world.isRemote) {
+            user.playSound("mob.horse.leather", 1.0F, 1.5F);
             ChestGenHooks gen = ChestGenHooks.getInfo(pool);
             IInventory inv = new Loot(amount);
             Random rand = new Random();

@@ -87,6 +87,9 @@ public class BlockRack extends BlockWoodDecor {
                 if (hung.isItemEqual(held)) {
                     int space = hung.getMaxStackSize() - hung.stackSize;
 
+                    if (space <= 0) {
+                        return false;
+                    }
                     if (held.stackSize > space) {
                         if (!world.isRemote) {
                             held.stackSize -= space;
