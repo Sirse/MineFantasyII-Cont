@@ -39,7 +39,7 @@ public class AlloyRecipes {
      * @param the amount of times the ratio can be added
      */
     public static Alloy[] addRatioRecipe(ItemStack out, int level, List in, int levels) {
-        levels = (int) (9F / in.size());
+        levels = Math.min(Math.max(levels, 1), (int) (9F / Math.max(1, in.size())));
         Alloy[] alloys = new Alloy[levels];
         for (int a = 1; a <= levels; a++) {
             List list2 = createDupeList(in, a);
