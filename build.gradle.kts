@@ -3,9 +3,9 @@ import org.jetbrains.gradle.ext.RunConfigurationContainer
 
 plugins {
   id("java-library")
-  id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.8"
+  id("org.jetbrains.gradle.plugin.idea-ext") version "1.4.1"
   id("eclipse")
-  id("com.gtnewhorizons.retrofuturagradle") version "1.4.9"
+  id("com.gtnewhorizons.retrofuturagradle") version "2.0.3"
   id("com.diffplug.spotless") version "6.25.0"
 }
 
