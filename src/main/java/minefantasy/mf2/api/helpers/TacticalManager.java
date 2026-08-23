@@ -100,7 +100,7 @@ public class TacticalManager {
                 return false;
             }
         } else {
-            if (!isMobBlocking(user) && didParrySucceed(user, source)) {
+            if (!isMobBlocking(user) && !didParrySucceed(user, source)) {
                 return false;
             }
         }
