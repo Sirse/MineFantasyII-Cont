@@ -341,6 +341,11 @@ public abstract class StructureModuleMF {
         placeSpawner(x, y, z, DungeonHooks.getRandomDungeonMob(rand));
     }
 
+    public static int getFacingMeta(int dir) {
+        int[] facings = new int[] { 3, 4, 2, 5 };
+        return facings[Math.min(3, Math.max(0, dir))];
+    }
+
     public void placeSpawner(int x, int y, int z, String mob) {
         this.placeBlock(Blocks.mob_spawner, 0, x, y, z);
         TileEntityMobSpawner tileentitymobspawner = (TileEntityMobSpawner) getTileEntity(x, y, z, direction);

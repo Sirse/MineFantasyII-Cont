@@ -93,7 +93,7 @@ public class StructureGenDSHall extends StructureModuleMF {
                             meta = (Boolean) blockarray[1] ? StructureGenAncientForge.getRandomMetadata(rand) : 0;
                         }
                         if (blockarray[1] instanceof String) {
-                            meta = (String) blockarray[1] == "Hall" ? getRandomEngravedWall(rand) : 0;
+                            meta = "Hall".equals(blockarray[1]) ? getRandomEngravedWall(rand) : 0;
                         }
                         placeBlock((Block) blockarray[0], meta, x, y, z);
                     }

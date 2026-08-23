@@ -76,7 +76,7 @@ public class StructureGenAFRoom extends StructureModuleMF {
 
     private void placeChest(int x, int y, int z, String loot) {
         int[] coords = this.offsetPos(x, y, z, direction);
-        worldObj.setBlock(coords[0], coords[1], coords[2], Blocks.chest, direction, 2);
+        worldObj.setBlock(coords[0], coords[1], coords[2], Blocks.chest, getFacingMeta(direction), 2);
         TileEntityChest tileentitychest = (TileEntityChest) worldObj.getTileEntity(coords[0], coords[1], coords[2]);
 
         if (tileentitychest != null) {

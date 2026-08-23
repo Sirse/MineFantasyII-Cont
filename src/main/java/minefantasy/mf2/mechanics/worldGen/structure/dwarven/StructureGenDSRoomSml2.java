@@ -161,7 +161,7 @@ public class StructureGenDSRoomSml2 extends StructureModuleMF {
     }
 
     private void placeChest(int x, int y, int z, int d, String loot) {
-        placeBlock(Blocks.chest, d, x, y, z);
+        placeBlock(Blocks.chest, getFacingMeta(d), x, y, z);
         TileEntityChest tile = (TileEntityChest) getTileEntity(x, y, z, direction);
 
         if (tile != null) {
