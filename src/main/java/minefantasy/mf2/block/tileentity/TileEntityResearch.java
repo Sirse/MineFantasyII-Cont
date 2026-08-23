@@ -30,6 +30,9 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     private ItemStack[] items = new ItemStack[1];
     private Random rand = new Random();
     private int ticksExisted;
+    private int lastSyncedId = Integer.MIN_VALUE;
+    private float lastSyncedProgress = Float.NaN;
+    private float lastSyncedMaxProgress = Float.NaN;
 
     public static ArrayList<String> getInfo(ItemStack item) {
         if (item == null) {
@@ -186,23 +189,29 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     public void updateEntity() {
         super.updateEntity();
 
+        ++ticksExisted;
         syncData();
     }
 
     public void syncData() {
         if (worldObj.isRemote) return;
 
+        boolean changed = researchID != lastSyncedId || progress != lastSyncedProgress
+                || maxProgress != lastSyncedMaxProgress;
+
+        if (!changed && ticksExisted % 40 != 0) {
+            return;
+        }
+
+        lastSyncedId = researchID;
+        lastSyncedProgress = progress;
+        lastSyncedMaxProgress = maxProgress;
+
         NetworkUtils.sendToWatchers(
                 new ResearchTablePacket(this).generatePacket(),
                 (WorldServer) worldObj,
                 this.xCoord,
                 this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new ResearchTablePacket(this).generatePacket()); }
-         */
     }
 
     @Override
