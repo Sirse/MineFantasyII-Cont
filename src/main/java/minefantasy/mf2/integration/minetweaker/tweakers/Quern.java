@@ -120,12 +120,12 @@ public class Quern {
 
         @Override
         public String describe() {
-            return "Removing " + recipesToRemove.size() + " bloomery recipes";
+            return "Removing " + recipesToRemove.size() + " quern recipes";
         }
 
         @Override
         public String describeUndo() {
-            return "Restoring " + recipesToRemove.size() + " bloomery recipes";
+            return "Restoring " + recipesToRemove.size() + " quern recipes";
         }
 
         @Override

@@ -3,6 +3,8 @@ package minefantasy.mf2.integration.minetweaker.tweakers;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedAlloyRecipe;
@@ -52,6 +54,10 @@ public class Crucible {
                 }
             } else if (object instanceof IItemStack) {
                 if (input.matches((IItemStack) object)) {
+                    return true;
+                }
+            } else if (object instanceof ItemStack) {
+                if (input.matches(new MCItemStack((ItemStack) object))) {
                     return true;
                 }
             }

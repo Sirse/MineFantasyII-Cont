@@ -84,8 +84,8 @@ public class Cooking {
                 ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
                 addedRecipes.add(
                         CookRecipe.addRecipe(
-                                MineTweakerMC.getItemStack(output),
                                 mcInput,
+                                MineTweakerMC.getItemStack(output),
                                 new ItemStack(CookRecipe.burnt_food),
                                 minTemp,
                                 maxTemp,
@@ -118,12 +118,12 @@ public class Cooking {
 
         @Override
         public String describe() {
-            return null;
+            return "Adding cooking recipe for " + output.getDisplayName();
         }
 
         @Override
         public String describeUndo() {
-            return null;
+            return "Removing cooking recipe for " + output.getDisplayName();
         }
 
         @Override
