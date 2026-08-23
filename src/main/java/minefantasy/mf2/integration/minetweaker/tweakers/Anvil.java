@@ -1,9 +1,14 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
+import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedAnvilRecipe;
@@ -27,7 +32,7 @@ public class Anvil {
         MineTweakerAPI.apply(
                 new AnvilAction(
                         output,
-                        RPGElements.getSkillByName(skill),
+                        getSkillOrWarn(skill, output),
                         research,
                         hot,
                         tool,
@@ -43,7 +48,7 @@ public class Anvil {
         MineTweakerAPI.apply(
                 new AnvilAction(
                         output,
-                        RPGElements.getSkillByName(skill),
+                        getSkillOrWarn(skill, output),
                         research,
                         hot,
                         tool,
@@ -121,6 +126,7 @@ public class Anvil {
         @Override
         public void apply() {
             CraftingManagerAnvil.getInstance().recipes.add(recipe);
+            CraftingManagerAnvil.getInstance().sortRecipes();
         }
 
         @Override
@@ -148,6 +154,7 @@ public class Anvil {
         @Override
         public void undo() {
             CraftingManagerAnvil.getInstance().recipes.remove(recipe);
+            CraftingManagerAnvil.getInstance().sortRecipes();
         }
     }
 
@@ -158,7 +165,45 @@ public class Anvil {
         if (recipe instanceof TweakedShapelessAnvilRecipe) {
             return matchesIngredientList(((TweakedShapelessAnvilRecipe) recipe).getIngredients(), input);
         }
+        if (recipe instanceof ShapedAnvilRecipes) {
+            return matchesStackArray(((ShapedAnvilRecipes) recipe).recipeItems, input);
+        }
+        if (recipe instanceof ShapelessAnvilRecipes) {
+            return matchesStackList(((ShapelessAnvilRecipes) recipe).recipeItems, input);
+        }
         return false;
+    }
+
+    private static boolean matchesStackArray(ItemStack[] items, IIngredient input) {
+        if (items == null) {
+            return false;
+        }
+        for (ItemStack item : items) {
+            if (item != null && input.matches(new MCItemStack(item))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean matchesStackList(List items, IIngredient input) {
+        if (items == null) {
+            return false;
+        }
+        for (Object object : items) {
+            if (object instanceof ItemStack && input.matches(new MCItemStack((ItemStack) object))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Skill getSkillOrWarn(String skill, IItemStack output) {
+        Skill s = RPGElements.getSkillByName(skill);
+        if (s == null && skill != null && !skill.isEmpty()) {
+            MineTweakerAPI.logWarning("Unknown MineFantasy skill '" + skill + "' for anvil recipe -> " + output);
+        }
+        return s;
     }
 
     private static boolean matchesIngredientGrid(IIngredient[][] ingredients, IIngredient input) {
@@ -209,6 +254,7 @@ public class Anvil {
         @Override
         public void apply() {
             CraftingManagerAnvil.getInstance().getRecipeList().removeAll(recipes);
+            CraftingManagerAnvil.getInstance().sortRecipes();
         }
 
         @Override
@@ -219,6 +265,7 @@ public class Anvil {
         @Override
         public void undo() {
             CraftingManagerAnvil.getInstance().getRecipeList().addAll(recipes);
+            CraftingManagerAnvil.getInstance().sortRecipes();
         }
 
         @Override

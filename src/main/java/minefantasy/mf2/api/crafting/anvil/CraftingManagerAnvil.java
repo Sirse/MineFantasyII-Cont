@@ -291,4 +291,8 @@ public class CraftingManagerAnvil {
     public List getRecipeList() {
         return this.recipes;
     }
+
+    public void sortRecipes() {
+        Collections.sort(this.recipes, new RecipeSorterAnvil(this));
+    }
 }

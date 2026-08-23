@@ -1,9 +1,14 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
+import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
+import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
@@ -26,7 +31,7 @@ public class CarpentersBench {
         MineTweakerAPI.apply(
                 new CarpentersAction(
                         output,
-                        RPGElements.getSkillByName(skill),
+                        getSkillOrWarn(skill, output),
                         research,
                         sound,
                         (float) exp,
@@ -43,7 +48,7 @@ public class CarpentersBench {
         MineTweakerAPI.apply(
                 new CarpentersAction(
                         output,
-                        RPGElements.getSkillByName(skill),
+                        getSkillOrWarn(skill, output),
                         research,
                         sound,
                         (float) exp,
@@ -200,7 +205,45 @@ public class CarpentersBench {
         if (recipe instanceof TweakedShapelessCBRecipes) {
             return matchesIngredientList(((TweakedShapelessCBRecipes) recipe).getIngredients(), input);
         }
+        if (recipe instanceof ShapedCarpenterRecipes) {
+            return matchesStackArray(((ShapedCarpenterRecipes) recipe).recipeItems, input);
+        }
+        if (recipe instanceof ShapelessCarpenterRecipes) {
+            return matchesStackList(((ShapelessCarpenterRecipes) recipe).recipeItems, input);
+        }
         return false;
+    }
+
+    private static boolean matchesStackArray(ItemStack[] items, IIngredient input) {
+        if (items == null) {
+            return false;
+        }
+        for (ItemStack item : items) {
+            if (item != null && input.matches(new MCItemStack(item))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean matchesStackList(List items, IIngredient input) {
+        if (items == null) {
+            return false;
+        }
+        for (Object object : items) {
+            if (object instanceof ItemStack && input.matches(new MCItemStack((ItemStack) object))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Skill getSkillOrWarn(String skill, IItemStack output) {
+        Skill s = RPGElements.getSkillByName(skill);
+        if (s == null && skill != null && !skill.isEmpty()) {
+            MineTweakerAPI.logWarning("Unknown MineFantasy skill '" + skill + "' for carpenter recipe -> " + output);
+        }
+        return s;
     }
 
     private static boolean matchesIngredientGrid(IIngredient[][] ingredients, IIngredient input) {
