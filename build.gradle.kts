@@ -5,7 +5,7 @@ plugins {
   id("java-library")
   id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.8"
   id("eclipse")
-  id("com.gtnewhorizons.retrofuturagradle") version "1.4.0"
+  id("com.gtnewhorizons.retrofuturagradle") version "1.4.9"
   id("com.diffplug.spotless") version "6.25.0"
 }
 
