@@ -695,6 +695,9 @@ public class KnowledgePageRegistry {
                 new EntryPageText("knowledge.repair_ornate.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.repairOrnateR));
 
+        KnowledgeListMF.kitchen_bench.addPages(
+                new EntryPageText("knowledge.kitchen_bench.1"),
+                new EntryPageRecipeCarpenter(KnowledgeListMF.kitchenBenchRecipe));
         KnowledgeListMF.refined_planks.addPages(
                 new EntryPageText("knowledge.refined_planks.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.nailPlanksR),

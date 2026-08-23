@@ -193,7 +193,7 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
             if (toolType != null) {
                 drawIcon(toolType, toolTier, TOOL_ICON_X, ICON_Y);
             }
-            drawIcon("carpenter", -1, STATION_ICON_X, ICON_Y);
+            drawIcon("kitchenbench", -1, STATION_ICON_X, ICON_Y);
         }
 
         private void drawIcon(String type, int tier, int x, int y) {

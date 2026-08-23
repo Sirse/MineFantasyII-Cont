@@ -67,7 +67,7 @@ public class KnowledgeListMF {
             smeltRedSteel, smeltMithril, smeltAdamant, smeltMaster, smeltMithium, smeltIgnotumite, smeltEnderforge;
     public static InformationBase bellows, trough, forge, anvil, bar, apron, craftTools, craftAdvTools, craftWeapons,
             craftAdvWeapons, arrows, craftOrnate, craftArmourLight, craftArmourMedium, craftArmourHeavy, arrowsBodkin,
-            arrowsBroad, repair_basic, repair_advanced, repair_ornate;
+            arrowsBroad, repair_basic, repair_advanced, repair_ornate, kitchen_bench;
     public static InformationBase coke, etools, ecomponents, tungsten, climber, spyglass, parachute, syringe, engTanner,
             advforge, advcrucible, blackpowder, advblackpowder, bombs, bpress, bombarrow, bombFuse, shrapnel, firebomb,
             stickybomb, bombCeramic, bombIron, bombObsidian, bombCrystal, mineCeramic, mineIron, mineObsidian,
@@ -411,6 +411,14 @@ public class KnowledgeListMF {
         compPlate = (new InformationBase("compPlate", 10, -3, 1, ComponentListMF.ingotCompositeAlloy, tungsten))
                 .registerStat().setPage(engineering).addSkill(SkillList.engineering, 50)
                 .addSkill(SkillList.artisanry, 40);
+
+        kitchen_bench = (new InformationBase(
+                "kitchen_bench",
+                10,
+                0,
+                1,
+                BlockListMF.kitchenBench,
+                (InformationBase) null)).registerStat().setPage(provisioning).addSkill(SkillList.provisioning, 0);
 
         repair_basic = (new InformationBase("repair_basic", 8, 0, 2, BlockListMF.repair_basic, (InformationBase) null))
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 10);

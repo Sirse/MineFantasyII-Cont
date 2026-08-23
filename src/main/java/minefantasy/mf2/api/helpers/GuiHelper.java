@@ -70,6 +70,9 @@ public class GuiHelper {
         if (s.equalsIgnoreCase("carpenter")) {
             return new int[] { width * 1, height * 1 };
         }
+        if (s.equalsIgnoreCase("kitchenbench")) {
+            return new int[] { width * 2, height * 1 };
+        }
         return new int[] { 0, 0 };
     }
 

@@ -60,7 +60,13 @@ public class GuiKitchenBench extends GuiContainer {
 
         if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null
                 && !tile.getResultName().equalsIgnoreCase("")) {
-            GuiHelper.renderToolIcon(this, "carpenter", tile.getBenchTierNeeded(), xPoint + regularXSize, yPoint, true);
+            GuiHelper.renderToolIcon(
+                    this,
+                    "kitchenbench",
+                    tile.getBenchTierNeeded(),
+                    xPoint + regularXSize,
+                    yPoint,
+                    true);
 
             if (tile.getToolNeeded() != null) {
                 GuiHelper.renderToolIcon(
