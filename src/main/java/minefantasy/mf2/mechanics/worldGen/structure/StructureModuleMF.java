@@ -267,22 +267,22 @@ public abstract class StructureModuleMF {
         int z = zCoord;
 
         switch (dir) {
-            case 0:// NORTH
+            case 0:// SOUTH
                 x += xo;
                 z += zo;
                 break;
 
-            case 1:// EAST
+            case 1:// WEST
                 x -= zo;
                 z += xo;
                 break;
 
-            case 2:// SOUTH
+            case 2:// NORTH
                 x -= xo;
                 z -= zo;
                 break;
 
-            case 3:// WEST
+            case 3:// EAST
                 x += zo;
                 z -= xo;
                 break;

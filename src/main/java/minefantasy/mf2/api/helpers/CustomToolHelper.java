@@ -109,7 +109,7 @@ public class CustomToolHelper {
             dura = (int) (head.durability * 100);
         }
         if (haft != null) {
-            dura += (int) (haft.durability * 100);// Hafts add 50% to the durability
+            dura += (int) (haft.durability * 50);// Hafts add 50% to the durability
         }
         return ToolHelper.setDuraOnQuality(stack, dura);
     }
@@ -365,9 +365,11 @@ public class CustomToolHelper {
             if (mass > 0) list.add(CustomMaterial.getWeightString(mass));
 
             if (base.isHeatable()) {
-                int maxTemp = base.getHeatableStats()[0];
-                int beyondMax = base.getHeatableStats()[1];
-                list.add(StatCollector.translateToLocalFormatted("materialtype.workable.name", maxTemp, beyondMax));
+                int workableTemp = base.getHeatableStats()[0];
+                int unstableTemp = base.getHeatableStats()[1];
+                list.add(
+                        StatCollector
+                                .translateToLocalFormatted("materialtype.workable.name", workableTemp, unstableTemp));
             }
         }
     }
