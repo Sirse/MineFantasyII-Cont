@@ -49,6 +49,9 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         super.updateEntity();
 
         if (worldObj.isRemote) {
+            if (this.getTier() >= 2 && rand.nextInt(8) == 0) {
+                spawnStructureParticles();
+            }
             return;
         }
 
@@ -128,10 +131,6 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             }
         }
         onInventoryChanged(); // Update recipe after consuming ingredients
-
-        if (worldObj.isRemote && getTier() >= 2) {
-            spawnStructureParticles();
-        }
     }
 
     private void spawnStructureParticles() {
@@ -142,7 +141,8 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     private void spawnParticle(int x, int y, int z) {
-        this.worldObj.playAuxSFX(2003, xCoord + x, yCoord + y, zCoord + z, 0);
+        this.worldObj
+                .spawnParticle("portal", xCoord + x + 0.5D, yCoord + y + 0.5D, zCoord + z + 0.5D, 0.0D, -0.5D, 0.0D);
     }
 
     private boolean canSmelt() {
@@ -205,22 +205,22 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             return 0F;
         }
         if (getTier() >= 2) {
-            return 500F;
+            return 5000F;
         }
 
         Block under = worldObj.getBlock(xCoord, yCoord - 1, zCoord);
         Material underMaterial = under.getMaterial();
 
         if (underMaterial == Material.fire) {
-            return 10F;
+            return 250F;
         }
         if (underMaterial == Material.lava) {
-            return 50F;
+            return 750F;
         }
 
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
         if (tile instanceof TileEntityForge) {
-            return ((TileEntityForge) tile).getBlockTemperature();
+            return Math.min(((TileEntityForge) tile).getBlockTemperature(), 2500F);
         }
         return 0F;
     }
