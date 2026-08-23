@@ -47,7 +47,7 @@ public class GuiKitchenBench extends GuiContainer {
     @Override
     protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/carpenter.png"));
+        this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/kitchen.png"));
         int xPoint = (this.width - this.xSize) / 2;
         int yPoint = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(xPoint, yPoint, 0, 0, this.xSize, this.ySize);

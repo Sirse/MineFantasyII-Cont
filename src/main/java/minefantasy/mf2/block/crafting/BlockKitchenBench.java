@@ -23,6 +23,8 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockKitchenBench extends BlockContainer {
 
+    public static int kitchen_RI = 119;
+
     public BlockKitchenBench() {
         super(Material.wood);
         GameRegistry.registerBlock(this, "MF_KitchenBench");
@@ -35,17 +37,23 @@ public class BlockKitchenBench extends BlockContainer {
 
     @Override
     public boolean renderAsNormalBlock() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isOpaqueCube() {
-        return true;
+        return false;
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public int getRenderType() {
+        return kitchen_RI;
     }
 
     @Override
     public IIcon getIcon(int side, int meta) {
-        return Blocks.crafting_table.getIcon(side, meta);
+        return Blocks.planks.getIcon(side, meta);
     }
 
     @Override
