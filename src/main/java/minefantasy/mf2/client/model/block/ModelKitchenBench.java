@@ -112,7 +112,9 @@ public class ModelKitchenBench {
     }
 
     public void makeBox(float x1, float y1, float z1, float x2, float y2, float z2) {
-        currentBox = new Box(x1 - 8F, -y2, z1 - 8F, x2 - 8F, -y1, z2 - 8F);
+        // JSON space is y-up pixels from the ground; the TESR pipeline translates
+        // +1.25 blocks and flips Y, so model_y = 20 - json_y keeps geometry grounded
+        currentBox = new Box(x1 - 8F, 20F - y2, z1 - 8F, x2 - 8F, 20F - y1, z2 - 8F);
         boxes.add(currentBox);
     }
 
