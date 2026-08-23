@@ -140,9 +140,9 @@ public class BaseMaterialMF {
         bronze = addMaterial("Bronze", 1, 300, 2, 1.5F, 5, 1.00F, 5).setForgeStats(1, 1, 2.5F, 100, 250); // lvl 5-14
         iron = addMaterial("Iron", 2, 500, 2, 2.0F, 5, 1.00F, 15).setForgeStats(2, 2, 2.0F, 90, 250); // lvl 15-24
         steel = addMaterial("Steel", 3, 750, 2, 2.5F, 10, 1.00F, 25).setForgeStats(3, 3, 2.5F, 120, 250); // lvl 25-39
-        encrusted = addMaterial("Encrusted", 3, 2000, 3, 3.5F, 25, 1.00F, 40).setForgeStats(3, 3, 5.0F, 130, 240); // lvl
+        encrusted = addMaterial("Encrusted", 3, 1500, 3, 3.5F, 30, 1.00F, 40).setForgeStats(3, 3, 5.0F, 130, 240); // lvl
         // 40-49
-        obsidian = addMaterial("Obsidian", 3, 2000, 3, 3.5F, 25, 1.00F, 40).setForgeStats(3, 3, 5.0F, 130, 240); // lvl
+        obsidian = addMaterial("Obsidian", 3, 2600, 3, 3.5F, 12, 1.00F, 40).setForgeStats(3, 3, 5.0F, 130, 240); // lvl
         // 40-49
         // Advanced Materials (3 - 4) Levels 50-75
         blacksteel = addMaterial("BlackSteel", 4, 1500, 4, 4.0F, 12, 1.00F, 50).setForgeStats(4, 4, 4.0F, 150, 350);// lvl
