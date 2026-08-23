@@ -136,6 +136,9 @@ public class Heatable {
     public static ItemStack getQuenchedItem(ItemStack item, float hazard) {
         ItemStack cold = Heatable.getItem(item);
 
+        if (cold == null) {
+            return null;
+        }
         if (HCCquenchRuin && cold.isItemStackDamageable() && hazard > 0) {
             cold.setItemDamage((int) (cold.getMaxDamage() * hazard / 100F));
         }
@@ -178,7 +181,7 @@ public class Heatable {
         if (specific != null) {
             return specific;
         }
-        return registerList.get(item.getUnlocalizedName() + "_any");// Try Any;
+        return registerList.get(item.getItem().getUnlocalizedName() + "_any");// Try Any;
     }
 
     public static String getRegistrationForItem(ItemStack item) {
