@@ -86,9 +86,9 @@ public class ResearchLogic {
         if (load.getInteger("Layer") != knowledgelyr) {
             persistant.removeTag(KnowledgeNBT);
 
-            NBTTagCompound tag = new NBTTagCompound();
-            tag.setInteger("Layer", knowledgelyr);
-            persistant.setTag(KnowledgeNBT, tag);
+            load = new NBTTagCompound();
+            load.setInteger("Layer", knowledgelyr);
+            persistant.setTag(KnowledgeNBT, load);
         }
         return load;
     }
