@@ -38,7 +38,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     public int swing;
     private int grabCooldown;
     private boolean targetTasksRegistered;
-    private int hitCooldownTime;
     private int specialAttackTime;
     private float[] punch = new float[] { 0F, 1F, 0F };
     private float[] headbutt = new float[] { 0F, 1F, 4F };
@@ -156,7 +155,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
                     }
                 }
             }
-            if (hitCooldownTime > 0) --hitCooldownTime;
             if (grabCooldown > 0) {
                 --grabCooldown;
             }
@@ -325,14 +323,12 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     public void initPowerAttack() {
         setSprinting(true);
         specialAttackTime = 30;
-        hitCooldownTime = 0;
         setAttack((byte) 3);
     }
 
     public void initHeadbutt() {
         setSprinting(true);
         specialAttackTime = 20;
-        this.hitCooldownTime = 0;
         setAttack((byte) 1);
     }
 
@@ -532,7 +528,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
             if (grabCooldown <= 0 && rand.nextInt(100) < getGrabChance() && canPickUp(target)) {
                 target.mountEntity(this);
             }
-        } else if (rand.nextInt(100) < ConfigMobs.minotaurTC && riddenByEntity == target) {
+        } else if (rand.nextInt(100) < getThrowChance() && riddenByEntity == target) {
             riddenByEntity.mountEntity(null);
             grabCooldown = 60;
             TacticalManager.knockbackEntity(target, this, 4F, 1F);
@@ -554,7 +550,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         boolean flag = target.attackEntityFrom(new DamageSourceMobMF(getAttackType(), this), dam);
 
         if (flag) {
-            this.hitCooldownTime = getAttackSpeed();
             this.swingItem();
             if (i > 0) {
                 target.addVelocity(
@@ -592,14 +587,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
 
     private float getVolume(Entity entity) {
         return entity.width * entity.width * entity.height;
-    }
-
-    private int getAttackSpeed() {
-        return 0;
-        /*
-         * if(rage >= 100) { return 10; } if(rage > 80) { return 15; } if(rage > 50) { return 20; } if(rage > 25) {
-         * return 30; } return 35;
-         */
     }
 
     @Override
