@@ -37,6 +37,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     private static final int dataID = 12;
     public int swing;
     private int grabCooldown;
+    private boolean targetTasksRegistered;
     private int hitCooldownTime;
     private int specialAttackTime;
     private float[] punch = new float[] { 0F, 1F, 0F };
@@ -457,7 +458,8 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         this.isImmuneToFire = species == 1;
         this.experienceValue = minotaur.experienceValue;
 
-        if (subspecies == 0) {
+        if (subspecies == 0 && !targetTasksRegistered) {
+            targetTasksRegistered = true;
             this.targetTasks.addTask(2, new AI_MinotaurFindTarget(this, EntityLiving.class, 0, false));
         }
         if (subspecies >= 3) {
