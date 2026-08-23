@@ -426,8 +426,8 @@ public class CustomToolHelper {
 
     public static boolean areToolsSame(ItemStack item1, ItemStack item2) {
         CustomMaterial main1 = getCustomPrimaryMaterial(item1);
-        CustomMaterial main2 = getCustomSecondaryMaterial(item2);
-        CustomMaterial haft1 = getCustomPrimaryMaterial(item1);
+        CustomMaterial main2 = getCustomPrimaryMaterial(item2);
+        CustomMaterial haft1 = getCustomSecondaryMaterial(item1);
         CustomMaterial haft2 = getCustomSecondaryMaterial(item2);
         if ((main1 == null && main2 != null) || (main2 == null && main1 != null)) return false;
         if ((haft1 == null && haft2 != null) || (haft2 == null && haft1 != null)) return false;
@@ -440,7 +440,7 @@ public class CustomToolHelper {
 
     public static boolean isMythic(ItemStack result) {
         CustomMaterial main1 = getCustomPrimaryMaterial(result);
-        CustomMaterial haft1 = getCustomPrimaryMaterial(result);
+        CustomMaterial haft1 = getCustomSecondaryMaterial(result);
         if (main1 != null && main1.isUnbrekable()) {
             return true;
         }
