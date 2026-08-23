@@ -15,6 +15,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.config.ConfigStamina;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class ArrowHandlerMF {
 
@@ -138,10 +139,12 @@ public class ArrowHandlerMF {
         }
         // Use loaded arrow if present; otherwise fall back to a default when infinite
         ItemStack arrow = (loaded != null) ? loaded : new ItemStack(Items.arrow);
+        boolean fired = false;
         if (AmmoMechanicsMF.handlers != null && AmmoMechanicsMF.handlers.size() > 0) {
             for (int a = 0; a < AmmoMechanicsMF.handlers.size(); a++) {
                 // If the Arrow handler succeeds at firing an arrow
                 if (AmmoMechanicsMF.handlers.get(a).onFireArrow(world, arrow, bow, user, charge, creative)) {
+                    fired = true;
                     if (!user.capabilities.isCreativeMode) {
                         bow.damageItem(1, user);
                     }
@@ -151,7 +154,6 @@ public class ArrowHandlerMF {
                             0.5F,
                             1.0F / (world.rand.nextFloat() * 0.4F + 1.2F) + charge * 0.5F);
                     loadArrow(user, bow, null);
-                    event.setCanceled(true);
                     // Only consume ammo when not infinite; handlers may also account for this
                     if (!infinite) {
                         AmmoMechanicsMF.consumeAmmo(user, bow);
@@ -159,6 +161,9 @@ public class ArrowHandlerMF {
                     break;
                 }
             }
+        }
+        if (!fired) {
+            MFLogUtil.warnOnce("arrow_fire", "No arrow handler accepted the loaded item: " + arrow.getDisplayName());
         }
     }
 

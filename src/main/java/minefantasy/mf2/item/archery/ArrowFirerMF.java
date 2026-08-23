@@ -22,13 +22,10 @@ public class ArrowFirerMF implements IArrowHandler {
             return false;
         }
 
-        float maxCharge = 20F;
-        if (bow != null && bow.getItem() instanceof ISpecialBow) {
-            // maxCharge = ((ISpecialBow)bow.getItem()).getMaxCharge();
-        } else {
+        if (bow == null || !(bow.getItem() instanceof ISpecialBow)) {
             return false;
         }
-        float firepower = charge / maxCharge * 20F;
+        float firepower = charge;
 
         if (firepower < 0.1D) {
             return false;

@@ -14,7 +14,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
@@ -202,7 +201,7 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     /// Item is the bow.
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
 
-        if (!world.isRemote && player.isSneaking() || AmmoMechanicsMF.isDepleted(item)) {
+        if (player.isSneaking() || AmmoMechanicsMF.isDepleted(item)) {
             reloadBow(item, player);
             return item;
         }
@@ -237,13 +236,6 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     @Override
     public int getItemEnchantability() {
         return enchantmentLvl;
-    }
-
-    @Override
-    public void onUpdate(ItemStack item, World world, Entity entity, int i, boolean b) {
-        super.onUpdate(item, world, entity, i, b);
-        if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
-        item.stackTagCompound.setInteger("Use", i);
     }
 
     public int getDrawAmount(int timer) {

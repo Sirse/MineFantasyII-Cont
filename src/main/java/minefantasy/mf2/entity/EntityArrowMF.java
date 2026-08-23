@@ -68,7 +68,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
      * The amount of knockback an arrow applies when it hits a mob.
      */
     private int knockbackStrength;
-    private float power = 0F;
+    private float power = 1.0F;
 
     public EntityArrowMF(World world) {
         super(world);
@@ -371,6 +371,9 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
                     if (this.getIsCritical()) {
                         dam *= (rand.nextFloat() * 0.5F) + 1.0F;
+                    }
+                    if (power > 0F) {
+                        dam *= power;
                     }
 
                     DamageSource damagesource = null;
