@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Setup JDK 17 (for Gradle)
-        uses: actions/setup-java@v4
+      - name: Setup JDK (for Gradle)
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -40,7 +40,7 @@ jobs:
 
       - name: Upload JARs
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-artifacts
           path: build/libs/*.jar
