@@ -73,7 +73,7 @@ public class ToolHelper {
     }
 
     public static ItemStack setQuality(ItemStack item, float qualityLvl) {
-        if (item.getMaxStackSize() > 0) return item;
+        if (item.getMaxStackSize() > 1) return item;
 
         NBTTagCompound nbt = getOrCreateNBT(item);
         nbt.setFloat("MFCraftQuality", qualityLvl);
