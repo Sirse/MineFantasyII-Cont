@@ -338,7 +338,7 @@ public class ArmourCalculator {
 
     public static String getEntityRegisterName(Entity entity) {
         if (entity == null) {
-            return "genetic";
+            return "generic";
         }
         String s = EntityList.getEntityString(entity);
 
@@ -552,16 +552,16 @@ public class ArmourCalculator {
                     } else {
                         armour.setItemDamage(armour.getMaxDamage());
                     }
-                }
-                if (armour.getItemDamage() >= armour.getMaxDamage()) {
-                    user.setCurrentItemOrArmor(a + 1, null);
-                    user.worldObj.playSoundEffect(
-                            user.posX,
-                            user.posY + user.getEyeHeight() - (0.4F * a),
-                            user.posZ,
-                            "random.break",
-                            1.0F,
-                            1.0F);
+                    if (armour.getItemDamage() >= armour.getMaxDamage()) {
+                        user.setCurrentItemOrArmor(a + 1, null);
+                        user.worldObj.playSoundEffect(
+                                user.posX,
+                                user.posY + user.getEyeHeight() - (0.4F * a),
+                                user.posZ,
+                                "random.break",
+                                1.0F,
+                                1.0F);
+                    }
                 }
             }
         }

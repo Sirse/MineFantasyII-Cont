@@ -113,19 +113,6 @@ public class ItemHeated extends Item implements IHotItem {
         return item;
     }
 
-    private static void shareTraits(NBTTagCompound nbt, ItemStack item) {
-        NBTTagCompound itemtag = getNBT(item);
-        if (itemtag.hasKey("Unbreakable")) {
-            nbt.setBoolean("Unbreakable", itemtag.getBoolean("Unbreakable"));
-        }
-        if (itemtag.hasKey("MF_Inferior")) {
-            nbt.setBoolean("MF_Inferior", itemtag.getBoolean("MF_Inferior"));
-        }
-        if (itemtag.hasKey("MFCraftQuality")) {
-            nbt.setFloat("MFCraftQuality", itemtag.getFloat("MFCraftQuality"));
-        }
-    }
-
     public static boolean showTemp(ItemStack stack) {
         if (stack == null) return false;
 
