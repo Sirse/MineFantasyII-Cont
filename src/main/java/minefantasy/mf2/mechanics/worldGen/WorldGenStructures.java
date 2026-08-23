@@ -77,13 +77,13 @@ public class WorldGenStructures {
                 if (stronghold.generate(world, seed, x + x1, 0, z + z1)) {
                     ++strongholdCount;
                     MFLogUtil.logDebug("Placed Dwarven Stronghold in wall at " + x + x1 + " " + z + z1);
-                    String s = "Gen: " + strongholdCount
-                            + " Strongholds in "
-                            + chunkCount
-                            + " Chunks = "
-                            + ((float) strongholdCount / (float) chunkCount * 100F)
-                            + "% cases";
-                    System.out.println(s);
+                    MFLogUtil.log(
+                            "Gen: " + strongholdCount
+                                    + " Strongholds in "
+                                    + chunkCount
+                                    + " Chunks = "
+                                    + ((float) strongholdCount / (float) chunkCount * 100F)
+                                    + "% cases");
                     return;
                 }
             }
@@ -94,13 +94,13 @@ public class WorldGenStructures {
         if (stronghold.generate(world, seed, x + x1, 0, z + z1)) {
             ++strongholdCount;
             MFLogUtil.logDebug("Placed Dwarven Stronghold on ground at " + x + x1 + " " + z + z1);
-            String s = "Gen: " + strongholdCount
-                    + " Strongholds in "
-                    + chunkCount
-                    + " Chunks = "
-                    + ((float) strongholdCount / (float) chunkCount * 100F)
-                    + "% cases";
-            System.out.println(s);
+            MFLogUtil.log(
+                    "Gen: " + strongholdCount
+                            + " Strongholds in "
+                            + chunkCount
+                            + " Chunks = "
+                            + ((float) strongholdCount / (float) chunkCount * 100F)
+                            + "% cases");
             return;
         }
         stronghold = null;

@@ -41,8 +41,8 @@ public class TileEntityWorldGenMarker extends TileEntity {
                 && chunkLoaded(0, 16);
     }
 
-    private boolean chunkLoaded(int x, int z) {
-        Chunk chunk = worldObj.getChunkFromBlockCoords(x, z);
+    private boolean chunkLoaded(int xOffset, int zOffset) {
+        Chunk chunk = worldObj.getChunkFromBlockCoords(xCoord + xOffset, zCoord + zOffset);
         return chunk != null && chunk.isChunkLoaded;
     }
 
