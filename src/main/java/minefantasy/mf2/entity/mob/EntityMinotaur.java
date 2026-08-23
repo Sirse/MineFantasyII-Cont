@@ -716,8 +716,28 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
     }
 
     public void throwBomb(EntityLivingBase attackTarget, float spread) {
+        if (attackTarget == null) {
+            return;
+        }
+
+        double dx = attackTarget.posX - posX;
+        double dy = (attackTarget.boundingBox.minY + attackTarget.height / 2.0F) - (posY + getEyeHeight());
+        double dz = attackTarget.posZ - posZ;
+        double horizDist = (double) MathHelper.sqrt_double(dx * dx + dz * dz);
+
+        if (horizDist < 1.0E-4D) {
+            return;
+        }
+
+        float arc = (float) horizDist * 0.15F;// Lob the bomb onto the target
+        float velocity = MathHelper.clamp_float(0.6F + (float) horizDist / 20.0F, 0.8F, 1.5F);
+
+        this.faceEntity(attackTarget, 360.0F, 360.0F);
+
         EntityBomb bomb = new EntityBomb(worldObj, this).setType((byte) 1, (byte) 0, (byte) 0, (byte) 0);
         worldObj.spawnEntityInWorld(bomb);
+        bomb.setThrowableHeading(dx, dy + arc, dz, velocity, spread);
+
         this.swingItem();
     }
 
