@@ -84,7 +84,7 @@ public class ConfigStamina extends ConfigurationBaseMF {
                 .get(VALUES, "Mining Modifier", 1.0F, "Modifies the rate block breaking drains stamina").getDouble();
         exhaustDamage = (float) config.get(
                 VALUES,
-                "Exhausted Damage Modifier",
+                "Exhausted Damage Taken",
                 1.5F,
                 "How much damage you take when out of stamina (1.5 = +50% more damage)").getDouble();
 
