@@ -42,14 +42,14 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     /**
      * Gets the burn time
      * <p>
-     * Wood tools and plank item are 1 minute sticks and saplings are 30seconds
+     * Planks are 10 seconds, sticks are 15 seconds
      */
     public static int getItemBurnTime(ItemStack input) {
         if (input == null) {
             return 0;
         } else {
             Item i = input.getItem();
-            if (i == Items.stick) return 600;// 30Sec
+            if (i == Items.stick) return 150;// 15Sec
             if (i == ComponentListMF.plank || i == ComponentListMF.plank_cut) {
                 return (int) (200 * CustomToolHelper.getBurnModifier(input));
             }
