@@ -13,6 +13,8 @@ import net.minecraftforge.event.entity.item.ItemExpireEvent;
 
 public class EntityItemUnbreakable extends EntityItem {
 
+    public static final String persistNBT = "MF_Persist";
+
     public EntityItemUnbreakable(World world) {
         super(world);
     }

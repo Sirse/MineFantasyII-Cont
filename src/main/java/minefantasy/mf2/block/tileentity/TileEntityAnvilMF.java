@@ -27,6 +27,7 @@ import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.container.ContainerAnvilMF;
+import minefantasy.mf2.entity.EntityItemUnbreakable;
 import minefantasy.mf2.item.armour.ItemArmourMF;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
@@ -456,6 +457,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             this.setTrait(result, "MF_Inferior", false);
             if (CustomToolHelper.isMythic(result)) {
                 result.getTagCompound().setBoolean("Unbreakable", true);
+                result.getTagCompound().setBoolean(EntityItemUnbreakable.persistNBT, true);
             } else {
                 ToolHelper.setQuality(result, 200.0F);
             }

@@ -420,7 +420,7 @@ public class EventManagerMF {
             EntityItem eitem = (EntityItem) event.entity;
             if (eitem.getEntityItem() != null) {
                 if (eitem.getEntityItem().hasTagCompound()
-                        && eitem.getEntityItem().getTagCompound().hasKey("Unbreakable")) {
+                        && eitem.getEntityItem().getTagCompound().hasKey(EntityItemUnbreakable.persistNBT)) {
                     EntityItem newEntity = new EntityItemUnbreakable(event.world, eitem);
                     event.world.spawnEntityInWorld(newEntity);
                     eitem.setDead();
