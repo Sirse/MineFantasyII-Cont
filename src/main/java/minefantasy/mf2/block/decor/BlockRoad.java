@@ -6,12 +6,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -91,6 +95,16 @@ public class BlockRoad extends BlockContainer {
             world.setBlock(x, y - 1, z, Blocks.dirt, 0, 2);
         }
         super.updateTick(world, x, y, z, random);
+    }
+
+    /**
+     * Walking on a maintained road grants a short speed boost, refreshed every step.
+     */
+    @Override
+    public void onEntityWalking(World world, int x, int y, int z, Entity entity) {
+        if (!world.isRemote && entity instanceof EntityLivingBase) {
+            ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 0));
+        }
     }
 
     @Override
