@@ -18,6 +18,8 @@ import minefantasy.mf2.api.crafting.IQualityBalance;
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
 import minefantasy.mf2.api.crafting.anvil.IAnvil;
+import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
 import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.heating.Heatable;
@@ -59,6 +61,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private boolean craftingDataDirty = true;
     private boolean isFakeAnvil = false;
     private ItemStack recipe;
+    private IAnvilRecipe activeRecipe;
     private int hammerTierRequired;
     private int anvilTierRequired;
 
@@ -617,20 +620,31 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         return this.anvilTierRequired;
     }
 
+    private int getRequiredAmount(int slot) {
+        if (activeRecipe instanceof ShapedAnvilRecipes) {
+            ShapedAnvilRecipes shaped = (ShapedAnvilRecipes) activeRecipe;
+            if (slot < shaped.recipeItems.length && shaped.recipeItems[slot] != null) {
+                return Math.max(1, shaped.recipeItems[slot].stackSize);
+            }
+        }
+        return 1;
+    }
+
     public void consumeResources() {
         resetRecipe = true;
         for (int slot = 0; slot < getSizeInventory() - 1; slot++) {
             ItemStack item = getStackInSlot(slot);
+            int take = getRequiredAmount(slot);
             ItemStack container = getContainerItem(item);
             if (container != null) {
-                if (item.stackSize == 1) {
+                if (item.stackSize <= take) {
                     setInventorySlotContents(slot, container.copy());
                 } else {
                     this.dropItem(container.copy());
-                    this.decrStackSize(slot, 1);
+                    this.decrStackSize(slot, take);
                 }
             } else {
-                this.decrStackSize(slot, 1);
+                this.decrStackSize(slot, take);
             }
         }
         resetRecipe = false;
@@ -692,7 +706,14 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     public void updateCraftingData() {
         if (!worldObj.isRemote) {
             ItemStack oldRecipe = recipe;
-            recipe = getResult();
+            if (craftMatrix != null) {
+                for (int a = 0; a < getSizeInventory() - 1; a++) {
+                    craftMatrix.setInventorySlotContents(a, inventory[a]);
+                }
+            }
+            activeRecipe = craftMatrix == null ? null
+                    : CraftingManagerAnvil.getInstance().getMatchingRecipe(this, craftMatrix);
+            recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
             // syncItems();
 
             if (!canCraft() && progress > 0) {

@@ -217,6 +217,47 @@ public class CraftingManagerAnvil {
     }
 
     public ItemStack findMatchingRecipe(IAnvil anvil, AnvilCraftMatrix matrix) {
+        ItemStack repair = findRepairResult(matrix);
+        if (repair != null) {
+            return repair;
+        }
+        IAnvilRecipe recipe = getMatchingRecipe(anvil, matrix);
+        return recipe == null ? null : recipe.getCraftingResult(matrix);
+    }
+
+    private ItemStack findRepairResult(AnvilCraftMatrix matrix) {
+        ItemStack var3 = null;
+        ItemStack var4 = null;
+        int var2 = 0;
+
+        for (int var5 = 0; var5 < matrix.getSizeInventory(); ++var5) {
+            ItemStack var6 = matrix.getStackInSlot(var5);
+
+            if (var6 != null) {
+                if (var2 == 0) {
+                    var3 = var6;
+                }
+                if (var2 == 1) {
+                    var4 = var6;
+                }
+                ++var2;
+            }
+        }
+
+        if (var2 == 2 && var3.getItem() == var4.getItem()
+                && var3.stackSize == 1
+                && var4.stackSize == 1
+                && var3.getItem().isRepairable()) {
+            return getRepairResult(var3, var4);
+        }
+        return null;
+    }
+
+    /**
+     * First-match recipe lookup that also pushes recipe parameters onto the anvil. A repair pair yields null (handled
+     * by findRepairResult).
+     */
+    public IAnvilRecipe getMatchingRecipe(IAnvil anvil, AnvilCraftMatrix matrix) {
         int time = 200;
         int anvi = 1;
         boolean hot = false;
@@ -246,7 +287,7 @@ public class CraftingManagerAnvil {
                 && var3.stackSize == 1
                 && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
-            return getRepairResult(var3, var4);
+            return null; // repair pair: handled by findRepairResult
         } else {
             Iterator var11 = this.recipes.iterator();
             IAnvilRecipe var13 = null;
@@ -279,7 +320,7 @@ public class CraftingManagerAnvil {
                 }
                 anvil.setSkill(var13.getSkill());
 
-                return var13.getCraftingResult(matrix);
+                return var13;
             }
             return null;
         }

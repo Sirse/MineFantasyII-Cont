@@ -141,6 +141,9 @@ public class ShapedAnvilRecipes implements IAnvilRecipe {
                     if (!CustomToolHelper.doesMatchForRecipe(recipeItem, inputItem)) {
                         return false;
                     }
+                    if (recipeItem.stackSize > 1 && inputItem.stackSize < recipeItem.stackSize) {
+                        return false;
+                    }
                 }
             }
         }

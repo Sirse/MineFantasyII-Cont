@@ -60,6 +60,11 @@ public class CraftingManagerKitchen {
     }
 
     public ItemStack findMatchingRecipe(IKitchen bench, CarpenterCraftMatrix matrix) {
+        IKitchenRecipe recipe = getMatchingRecipe(bench, matrix);
+        return recipe == null ? null : recipe.getCraftingResult(matrix);
+    }
+
+    public IKitchenRecipe getMatchingRecipe(IKitchen bench, CarpenterCraftMatrix matrix) {
         Iterator it = this.recipes.iterator();
         IKitchenRecipe found = null;
 
@@ -82,7 +87,7 @@ public class CraftingManagerKitchen {
             bench.setSkill(found.getSkill());
             bench.setDirtyAmount(found.getDirtyAmount());
 
-            return found.getCraftingResult(matrix);
+            return found;
         }
         return null;
     }

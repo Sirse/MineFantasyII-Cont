@@ -243,6 +243,47 @@ public class CraftingManagerCarpenter {
     }
 
     public ItemStack findMatchingRecipe(ICarpenter bench, CarpenterCraftMatrix matrix) {
+        ItemStack repair = findRepairResult(matrix);
+        if (repair != null) {
+            return repair;
+        }
+        ICarpenterRecipe recipe = getMatchingRecipe(bench, matrix);
+        return recipe == null ? null : recipe.getCraftingResult(matrix);
+    }
+
+    private ItemStack findRepairResult(CarpenterCraftMatrix matrix) {
+        ItemStack var3 = null;
+        ItemStack var4 = null;
+        int var2 = 0;
+
+        for (int var5 = 0; var5 < matrix.getSizeInventory(); ++var5) {
+            ItemStack var6 = matrix.getStackInSlot(var5);
+
+            if (var6 != null) {
+                if (var2 == 0) {
+                    var3 = var6;
+                }
+                if (var2 == 1) {
+                    var4 = var6;
+                }
+                ++var2;
+            }
+        }
+
+        if (var2 == 2 && var3.getItem() == var4.getItem()
+                && var3.stackSize == 1
+                && var4.stackSize == 1
+                && var3.getItem().isRepairable()) {
+            return getRepairResult(var3, var4);
+        }
+        return null;
+    }
+
+    /**
+     * First-match recipe lookup that also pushes recipe parameters onto the bench. Repair-pair handling stays inside; a
+     * repair result is reported as null recipe.
+     */
+    public ICarpenterRecipe getMatchingRecipe(ICarpenter bench, CarpenterCraftMatrix matrix) {
         int time = 200;
         int anvi = 1;
         boolean hot = false;
@@ -273,7 +314,7 @@ public class CraftingManagerCarpenter {
                 && var3.stackSize == 1
                 && var4.stackSize == 1
                 && var3.getItem().isRepairable()) {
-            return getRepairResult(var3, var4);
+            return null; // repair pair: handled by findRepairResult
         } else {
             Iterator var11 = this.recipes.iterator();
             ICarpenterRecipe var13 = null;
@@ -283,6 +324,7 @@ public class CraftingManagerCarpenter {
 
                 if (rec.matches(matrix)) {
                     var13 = rec;
+                    break; // vanilla semantics: first match wins
                 }
             }
 
@@ -303,7 +345,7 @@ public class CraftingManagerCarpenter {
                 bench.setResearch(var13.getResearch());
                 bench.setSkill(var13.getSkill());
 
-                return var13.getCraftingResult(matrix);
+                return var13;
             }
             return null;
         }

@@ -142,6 +142,9 @@ public class ShapedCarpenterRecipes implements IKitchenRecipe {
                             && recipeItem.getItemDamage() != inputItem.getItemDamage()) {
                         return false;
                     }
+                    if (recipeItem.stackSize > 1 && inputItem.stackSize < recipeItem.stackSize) {
+                        return false;
+                    }
                 }
             }
         }

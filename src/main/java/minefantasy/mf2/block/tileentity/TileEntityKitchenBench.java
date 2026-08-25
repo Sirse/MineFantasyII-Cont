@@ -15,8 +15,10 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
+import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.crafting.kitchen.IKitchen;
+import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -45,6 +47,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     private Skill skillUsed;
     private boolean resetRecipe = false;
     private ItemStack recipe;
+    private IKitchenRecipe activeRecipe;
 
     public TileEntityKitchenBench() {
         inventory = new ItemStack[width * height + 5];
@@ -348,6 +351,16 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         return getSizeInventory() - 5;
     }
 
+    private int getRequiredAmount(int slot) {
+        if (activeRecipe instanceof ShapedCarpenterRecipes) {
+            ShapedCarpenterRecipes shaped = (ShapedCarpenterRecipes) activeRecipe;
+            if (slot < shaped.recipeItems.length && shaped.recipeItems[slot] != null) {
+                return Math.max(1, shaped.recipeItems[slot].stackSize);
+            }
+        }
+        return 1;
+    }
+
     private NBTTagCompound getNBT(ItemStack item) {
         if (!item.hasTagCompound()) {
             item.setTagCompound(new NBTTagCompound());
@@ -402,18 +415,19 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         resetRecipe = true;
         for (int slot = 0; slot < getOutputSlotNum(); slot++) {
             ItemStack item = getStackInSlot(slot);
+            int take = getRequiredAmount(slot);
             if (item != null && item.getItem() != null && item.getItem().getContainerItem(item) != null) {
-                if (item.stackSize == 1) {
+                if (item.stackSize <= take) {
                     setInventorySlotContents(slot, item.getItem().getContainerItem(item));
                 } else {
                     ItemStack drop = processSurplus(item.getItem().getContainerItem(item));
                     if (drop != null) {
                         dropItem(drop);
                     }
-                    decrStackSize(slot, 1);
+                    decrStackSize(slot, take);
                 }
             } else {
-                decrStackSize(slot, 1);
+                decrStackSize(slot, take);
             }
         }
         resetRecipe = false;
@@ -475,7 +489,14 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     public void updateCraftingData() {
         if (!worldObj.isRemote) {
             ItemStack oldRecipe = recipe;
-            recipe = getResult();
+            if (craftMatrix != null) {
+                for (int a = 0; a < getOutputSlotNum(); a++) {
+                    craftMatrix.setInventorySlotContents(a, inventory[a]);
+                }
+            }
+            activeRecipe = craftMatrix == null ? null
+                    : CraftingManagerKitchen.getInstance().getMatchingRecipe(this, craftMatrix);
+            recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
 
             if ((!canCraft() || isDirty()) && progress > 0) {
                 progress = 0;
