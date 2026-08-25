@@ -12,6 +12,7 @@ import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.FMLCommonHandler;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.config.ConfigCrafting;
 import minefantasy.mf2.mechanics.TransformationHandler;
 
 /**
@@ -70,60 +71,71 @@ public class TransformationRecipes {
             return;
         }
 
-        // Any log chops into planks of the same species
-        addRecipe(Blocks.log, -1, Blocks.planks, 0, true, "axe", -1, 1, null, null, "dig.wood", null, 0, null, 1);
-        // Any plank saws into two slabs of the same species
-        addRecipe(
-                Blocks.planks,
-                -1,
-                Blocks.wooden_slab,
-                0,
-                true,
-                "saw",
-                -1,
-                1,
-                null,
-                null,
-                "dig.wood",
-                null,
-                0,
-                null,
-                2);
-        // Cobblestone hammers into stone bricks over three stages (stage stored in unused metadata)
-        addRecipe(
-                Blocks.cobblestone,
-                0,
-                Blocks.stonebrick,
-                0,
-                false,
-                "hammer",
-                -1,
-                3,
-                null,
-                null,
-                "dig.stone",
-                null,
-                0,
-                null,
-                1);
-        // Refined MF planks saw into vanilla planks
-        addRecipe(
-                BlockListMF.refined_planks,
-                -1,
-                Blocks.planks,
-                0,
-                false,
-                "saw",
-                -1,
-                1,
-                null,
-                null,
-                "dig.wood",
-                null,
-                0,
-                null,
-                2);
+        if (ConfigCrafting.transformationLogChopping) {
+            // Any log chops into planks of the same species
+            addRecipe(Blocks.log, -1, Blocks.planks, 0, true, "axe", -1, 1, null, null, "dig.wood", null, 0, null, 1);
+        }
+        if (ConfigCrafting.transformationPlankSawing) {
+            // Any plank saws into two slabs of the same species
+            addRecipe(
+                    Blocks.planks,
+                    -1,
+                    Blocks.wooden_slab,
+                    0,
+                    true,
+                    "saw",
+                    -1,
+                    1,
+                    null,
+                    null,
+                    "dig.wood",
+                    null,
+                    0,
+                    null,
+                    2);
+        }
+        if (ConfigCrafting.transformationCobbleHammering) {
+            // Cobblestone hammers into stone bricks over three stages (stage stored in unused metadata)
+            addRecipe(
+                    Blocks.cobblestone,
+                    0,
+                    Blocks.stonebrick,
+                    0,
+                    false,
+                    "hammer",
+                    -1,
+                    3,
+                    null,
+                    null,
+                    "dig.stone",
+                    null,
+                    0,
+                    null,
+                    1);
+        }
+        if (ConfigCrafting.transformationRefinedPlankSawing) {
+            // Refined MF planks saw into vanilla planks
+            addRecipe(
+                    BlockListMF.refined_planks,
+                    -1,
+                    Blocks.planks,
+                    0,
+                    false,
+                    "saw",
+                    -1,
+                    1,
+                    null,
+                    null,
+                    "dig.wood",
+                    null,
+                    0,
+                    null,
+                    2);
+        }
 
+        if (recipes.isEmpty()) {
+            return;
+        }
         TransformationHandler handler = new TransformationHandler();
         MinecraftForge.EVENT_BUS.register(handler);
         FMLCommonHandler.instance().bus().register(handler);
