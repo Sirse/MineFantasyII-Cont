@@ -215,14 +215,15 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
             if (worldObj.isRemote) {
                 return true;
             }
-            if (held != null && !recipeRequiresHands()) {
+            boolean dirty = isDirty();
+            if (!dirty && held != null && !recipeRequiresHands()) {
                 held.damageItem(1, user);
                 if (held.getItemDamage() >= held.getMaxDamage()) {
                     user.destroyCurrentEquippedItem();
                 }
             }
 
-            if (isDirty()) {
+            if (dirty) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
             } else if (doesPlayerKnowCraft(user) && canCraft() && isToolSufficient(toolType, toolTier)) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getCraftingSound(), 1.0F, 1.0F);
@@ -505,7 +506,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     }
 
     public int getDirtyBar(int i) {
-        float max = ConfigKitchen.dirtyProgressMax;
+        float max = dirtyMax;
         if (max <= 0) {
             return 0;
         }
