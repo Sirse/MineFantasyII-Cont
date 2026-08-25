@@ -3,6 +3,7 @@ package minefantasy.mf2.recipe;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,10 @@ import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 
 public class BasicRecipesMF {
+
+    private static void addBarsRecipe(Block bars, String material) {
+        GameRegistry.addRecipe(new ItemStack(bars, 16), new Object[] { "III", 'I', ComponentListMF.bar(material), });
+    }
 
     public static void init() {
         addFoodOutput();

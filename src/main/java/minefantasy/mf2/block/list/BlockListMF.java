@@ -2,6 +2,7 @@ package minefantasy.mf2.block.list;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -266,6 +267,151 @@ public class BlockListMF {
     public static Block mythic_decor = new BlockMythicDecor();
     public static Block WG_Mark = new BlockWorldGenMarker();
     public static Block components = new BlockComponent();
+    // BEGIN 1.12 parity content: slabs, metal bars, limestone brick
+    public static Block slab_mud_brick = BlockSlabMF.create(
+            "mud_brick_slab",
+            "basic/mud_brick",
+            Material.rock,
+            2.0F,
+            10F,
+            CreativeTabs.tabBlock,
+            new ItemStack(mud_brick));
+    public static Block slab_cobble_brick = BlockSlabMF.create(
+            "cobble_brick_slab",
+            "basic/cobble_brick",
+            Material.rock,
+            2.0F,
+            10F,
+            CreativeTabs.tabBlock,
+            new ItemStack(cobble_brick));
+    public static Block slab_thatch = BlockSlabMF.create(
+            "thatch_slab",
+            "basic/thatch",
+            Material.plants,
+            0.5F,
+            2F,
+            CreativeTabs.tabBlock,
+            new ItemStack(thatch));
+    public static Block slab_firebricks = BlockSlabMF.create(
+            "firebricks_slab",
+            "basic/firebricks",
+            Material.rock,
+            2.0F,
+            12F,
+            CreativeTabs.tabBlock,
+            new ItemStack(firebricks));
+    public static Block slab_clay_wall = BlockSlabMF.create(
+            "clay_wall_slab",
+            "basic/clayWall",
+            Material.wood,
+            1.0F,
+            4F,
+            CreativeTabs.tabBlock,
+            new ItemStack(clayWall));
+    public static Block slab_refined_planks = BlockSlabMF.create(
+            "refined_planks_slab",
+            "basic/refined_planks",
+            Material.wood,
+            2.0F,
+            10F,
+            CreativeTabs.tabBlock,
+            new ItemStack(refined_planks));
+    public static Block slab_nailed_planks = BlockSlabMF.create(
+            "nailed_planks_slab",
+            "basic/nailed_planks",
+            Material.wood,
+            1.5F,
+            7F,
+            CreativeTabs.tabBlock,
+            new ItemStack(nailed_planks));
+    public static Block slab_yew_planks = BlockSlabMF.create(
+            "yew_planks_slab",
+            "basic/yew_planks",
+            Material.wood,
+            2.0F,
+            6F,
+            CreativeTabs.tabBlock,
+            new ItemStack(yew_planks));
+    public static Block slab_ironbark_planks = BlockSlabMF.create(
+            "ironbark_planks_slab",
+            "basic/ironbark_planks",
+            Material.wood,
+            2.0F,
+            8F,
+            CreativeTabs.tabBlock,
+            new ItemStack(ironbark_planks));
+    public static Block slab_ebony_planks = BlockSlabMF.create(
+            "ebony_planks_slab",
+            "basic/ebony_planks",
+            Material.wood,
+            2.5F,
+            10F,
+            CreativeTabs.tabBlock,
+            new ItemStack(ebony_planks));
+    public static Block slab_reinforced_stone = BlockSlabMF.create(
+            "reinforced_stone_slab",
+            "meta/reinforced_stone_base",
+            Material.rock,
+            2.0F,
+            15F,
+            CreativeTabs.tabBlock,
+            new ItemStack(reinforced_stone));
+    public static Block slab_reinforced_stone_bricks = BlockSlabMF.create(
+            "reinforced_stone_bricks_slab",
+            "meta/reinforced_stone_bricks_base",
+            Material.rock,
+            2.0F,
+            15F,
+            CreativeTabs.tabBlock,
+            new ItemStack(reinforced_stone_bricks));
+    public static Block slab_reinforced_stone_bricks_mossy = BlockSlabMF.create(
+            "reinforced_stone_bricks_mossy_slab",
+            "meta/reinforced_stone_bricks_mossy",
+            Material.rock,
+            2.0F,
+            15F,
+            CreativeTabs.tabBlock,
+            new ItemStack(reinforced_stone_bricks, 1, 1));
+    public static Block slab_reinforced_stone_bricks_cracked = BlockSlabMF.create(
+            "reinforced_stone_bricks_cracked_slab",
+            "meta/reinforced_stone_bricks_cracked",
+            Material.rock,
+            2.0F,
+            15F,
+            CreativeTabs.tabBlock,
+            new ItemStack(reinforced_stone_bricks, 1, 2));
+    public static Block slab_limestone = BlockSlabMF.create(
+            "limestone_slab",
+            "basic/limestone",
+            Material.rock,
+            1.5F,
+            8F,
+            CreativeTabs.tabBlock,
+            new ItemStack(limestone, 1, 0));
+    public static Block slab_limestone_cobble = BlockSlabMF.create(
+            "limestone_cobble_slab",
+            "basic/limestone_cobblestone",
+            Material.rock,
+            1.5F,
+            8F,
+            CreativeTabs.tabBlock,
+            new ItemStack(limestone, 1, 1));
+    public static Block slab_limestone_brick = BlockSlabMF.create(
+            "limestone_brick_slab",
+            "basic/limestone_brick",
+            Material.rock,
+            1.5F,
+            10F,
+            CreativeTabs.tabBlock,
+            new ItemStack(limestone, 1, 2));
+
+    public static Block bars_bronze = new BlockPaneMF("bronze_bars", "decor/bronze_bars", 0.4F, 10F);
+    public static Block bars_steel = new BlockPaneMF("steel_bars", "decor/steel_bars", 0.5F, 12F);
+    public static Block bars_black_steel = new BlockPaneMF("black_steel_bars", "decor/black_steel_bars", 0.6F, 14F);
+    public static Block bars_red_steel = new BlockPaneMF("red_steel_bars", "decor/red_steel_bars", 0.7F, 16F);
+    public static Block bars_blue_steel = new BlockPaneMF("blue_steel_bars", "decor/blue_steel_bars", 0.7F, 16F);
+    // END 1.12 parity content
+
     public static Block schematic_general = new BlockSchematic("schematic_general");
 
     public static void load() {
