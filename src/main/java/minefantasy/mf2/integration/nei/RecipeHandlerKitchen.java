@@ -17,6 +17,11 @@ import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
+import minetweaker.api.item.IIngredient;
+import minetweaker.api.item.IItemStack;
+import minetweaker.api.minecraft.MineTweakerMC;
 
 public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
 
@@ -97,9 +102,9 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
     public void drawBackground(int recipe) {
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GuiDraw.changeTexture(getGuiTexture());
         GuiDraw.drawTexturedModalRect(0, 0, 5, 33, 166, 171);
+        GL11.glDisable(GL11.GL_BLEND);
     }
 
     @Override
@@ -112,8 +117,26 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
             return new CachedKitchenRecipe((ShapedCarpenterRecipes) irecipe);
         } else if (irecipe instanceof ShapelessCarpenterRecipes) {
             return new CachedKitchenRecipe((ShapelessCarpenterRecipes) irecipe);
+        } else if (irecipe instanceof TweakedShapedCBRecipes) {
+            return new CachedKitchenRecipe((TweakedShapedCBRecipes) irecipe);
+        } else if (irecipe instanceof TweakedShapelessCBRecipes) {
+            return new CachedKitchenRecipe((TweakedShapelessCBRecipes) irecipe);
         }
         return null;
+    }
+
+    private static List<ItemStack> resolveIngredient(IIngredient ingredient) {
+        ArrayList<ItemStack> stacks = new ArrayList<ItemStack>();
+        if (ingredient == null) {
+            return stacks;
+        }
+        for (IItemStack item : ingredient.getItems()) {
+            ItemStack stack = MineTweakerMC.getItemStack(item);
+            if (NEIHelper.isValidStack(stack)) {
+                stacks.add(stack.copy());
+            }
+        }
+        return stacks;
     }
 
     class CachedKitchenRecipe extends CachedRecipe {
@@ -138,6 +161,60 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
             toolTier = recipe.getRecipeHammer();
             result = NEIHelper.positionedStack(recipe.getRecipeOutput(), 75, 8);
             setIngredients(recipe.recipeItems);
+        }
+
+        public CachedKitchenRecipe(TweakedShapedCBRecipes recipe) {
+            kitchenRecipe = recipe;
+            toolType = recipe.getToolType();
+            toolTier = recipe.getRecipeHammer();
+            result = NEIHelper.positionedStack(recipe.getRecipeOutput(), 75, 8);
+            setIngredients(recipe.getIngredients());
+        }
+
+        public CachedKitchenRecipe(TweakedShapelessCBRecipes recipe) {
+            kitchenRecipe = recipe;
+            toolType = recipe.getToolType();
+            toolTier = recipe.getRecipeHammer();
+            result = NEIHelper.positionedStack(recipe.getRecipeOutput(), 75, 8);
+            setIngredients(recipe.getIngredients());
+        }
+
+        public void setIngredients(IIngredient[][] ingreds) {
+            for (int y = 0; y < ingreds.length && y < 4; y++) {
+                IIngredient[] row = ingreds[y];
+                if (row == null) continue;
+
+                for (int x = 0; x < row.length && x < 4; x++) {
+                    List<ItemStack> stacks = resolveIngredient(row[x]);
+                    if (stacks.isEmpty()) continue;
+
+                    MFPositionedStack stack = NEIHelper.mfPositionedStack(stacks, 41 + x * 23, 47 + y * 23, false);
+                    if (stack == null) {
+                        continue;
+                    }
+                    stack.setMaxSize(1);
+                    ingredients.add(stack);
+                }
+            }
+        }
+
+        public void setIngredients(IIngredient[] ingreds) {
+            int slot = 0;
+            for (IIngredient ingredient : ingreds) {
+                if (ingredient == null || slot >= stackorder.length) continue;
+
+                List<ItemStack> stacks = resolveIngredient(ingredient);
+                if (stacks.isEmpty()) continue;
+
+                MFPositionedStack stack = NEIHelper
+                        .mfPositionedStack(stacks, 41 + stackorder[slot][0] * 23, 47 + stackorder[slot][1] * 23, false);
+                if (stack == null) {
+                    continue;
+                }
+                stack.setMaxSize(1);
+                ingredients.add(stack);
+                slot++;
+            }
         }
 
         public void setIngredients(int width, int height, ItemStack[] items) {

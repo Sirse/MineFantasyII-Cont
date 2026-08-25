@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL12;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
+import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 
@@ -30,6 +31,10 @@ public class EntryPageRecipeCarpenter extends EntryPage {
     private boolean shapelessRecipe = false;
     private boolean oreDictRecipe = false;
     private ItemStack tooltipStack;
+    /**
+     * Station label/icon key. Null means it is derived from where the recipe is registered.
+     */
+    private String station;
 
     public EntryPageRecipeCarpenter(List<ICarpenterRecipe> recipes) {
         ICarpenterRecipe[] array = new ICarpenterRecipe[recipes.size()];
@@ -44,6 +49,14 @@ public class EntryPageRecipeCarpenter extends EntryPage {
         this.recipes = recipes;
     }
 
+    /**
+     * @param station tool type key used for the station label and icon, e.g. "carpenter" or "kitchenbench"
+     */
+    public EntryPageRecipeCarpenter(String station, ICarpenterRecipe... recipes) {
+        this.recipes = recipes;
+        this.station = station;
+    }
+
     @Override
     public void render(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
         if (onTick) {
@@ -56,7 +69,7 @@ public class EntryPageRecipeCarpenter extends EntryPage {
         parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
 
         ICarpenterRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : recipes[recipeID];
-        String cft = "<" + StatCollector.translateToLocal("method.carpenter") + ">";
+        String cft = "<" + StatCollector.translateToLocal("method." + getStation(recipe)) + ">";
         mc.fontRenderer.drawSplitString(
                 cft,
                 posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2),
@@ -82,6 +95,21 @@ public class EntryPageRecipeCarpenter extends EntryPage {
 
     }
 
+    /**
+     * Recipes registered with the kitchen manager belong to the kitchen bench; everything else is a carpenter recipe.
+     * Deriving it keeps the page correct when the kitchen bench is disabled and its recipes fall back to the carpenter
+     * bench.
+     */
+    private String getStation(ICarpenterRecipe recipe) {
+        if (station != null) {
+            return station;
+        }
+        if (recipe != null && CraftingManagerKitchen.getInstance().getRecipeList().contains(recipe)) {
+            return "kitchenbench";
+        }
+        return "carpenter";
+    }
+
     private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, ICarpenterRecipe recipe) {
         if (parent == null) return;
         if (recipe == null) return;
@@ -97,7 +125,7 @@ public class EntryPageRecipeCarpenter extends EntryPage {
                 posY + 51,
                 true,
                 true);
-        GuiHelper.renderToolIcon(parent, "carpenter", recipe.getAnvil(), posX + 124, posY + 51, true, true);
+        GuiHelper.renderToolIcon(parent, getStation(recipe), recipe.getAnvil(), posX + 124, posY + 51, true, true);
 
         if (recipe instanceof ShapedCarpenterRecipes) {
             ShapedCarpenterRecipes shaped = (ShapedCarpenterRecipes) recipe;

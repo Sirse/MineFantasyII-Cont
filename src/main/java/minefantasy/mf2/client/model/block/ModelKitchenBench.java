@@ -4,23 +4,19 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 
 /**
- * Kitchen bench, ported from the 1.12 fork's Blockbench model. Texture is a standard techne-style layout generated from
- * the original atlas.
+ * Kitchen bench, ported from the granite Blockbench project (64x64 atlas, hand-fixed UVs). All four legs share the
+ * 16x16 slot at (0,0) and are differentiated by mirroring; the decorations use their own per-part pivots.
  */
 public class ModelKitchenBench extends ModelBase {
 
     private final ModelRenderer top;
     private final ModelRenderer bottom;
-    private final ModelRenderer leg1;
-    private final ModelRenderer leg2;
-    private final ModelRenderer leg3;
-    private final ModelRenderer leg4;
-    private final ModelRenderer wood;
+    private final ModelRenderer legs;
     private final ModelRenderer spoonHandle;
     private final ModelRenderer spoonEnd;
-    private final ModelRenderer knifeHandle;
     private final ModelRenderer knifeBlade;
-    private final ModelRenderer knifeBlade2;
+    private final ModelRenderer knifeTip;
+    private final ModelRenderer wood;
 
     public ModelKitchenBench() {
         textureWidth = 64;
@@ -30,64 +26,57 @@ public class ModelKitchenBench extends ModelBase {
         top.addBox(-8F, 0F, -8F, 16, 4, 16);
         top.setRotationPoint(0F, 0F, 0F);
 
-        bottom = new ModelRenderer(this, 0, 22);
+        bottom = new ModelRenderer(this, 0, 20);
         bottom.addBox(-6.5F, 11F, -6.5F, 13, 2, 13);
         bottom.setRotationPoint(0F, 0F, 0F);
 
-        leg1 = new ModelRenderer(this, 0, 28);
-        leg1.addBox(3F, 4F, -7F, 4, 12, 4);
-        leg1.setRotationPoint(0F, 0F, 0F);
+        legs = new ModelRenderer(this, 0, 0);
+        legs.mirror = true;
+        legs.addBox(3F, 4F, -7F, 4, 12, 4);
+        legs.mirror = true;
+        legs.addBox(-7F, 4F, -7F, 4, 12, 4);
+        legs.mirror = true;
+        legs.addBox(3F, 4F, 3F, 4, 12, 4);
+        legs.mirror = false;
+        legs.addBox(-7F, 4F, 3F, 4, 12, 4);
+        legs.setRotationPoint(0F, 0F, 0F);
 
-        leg2 = new ModelRenderer(this, 16, 28);
-        leg2.addBox(-7F, 4F, -7F, 4, 12, 4);
-        leg2.setRotationPoint(0F, 0F, 0F);
-
-        leg3 = new ModelRenderer(this, 32, 28);
-        leg3.addBox(3F, 4F, 3F, 4, 12, 4);
-        leg3.setRotationPoint(0F, 0F, 0F);
-
-        leg4 = new ModelRenderer(this, 48, 28);
-        leg4.addBox(-7F, 4F, 3F, 4, 12, 4);
-        leg4.setRotationPoint(0F, 0F, 0F);
-
-        wood = new ModelRenderer(this, 0, 46);
-        wood.addBox(-2F, 7F, -3F, 4, 4, 4);
-        wood.setRotationPoint(0F, 0F, 0F);
-
-        spoonHandle = new ModelRenderer(this, 18, 46);
-        spoonHandle.addBox(-6.25F, -0.5F, -5.5F, 1, 1, 5);
+        spoonHandle = new ModelRenderer(this, 1, 44);
+        spoonHandle.addBox(-6.25F, -0.499F, -5.5F, 1, 1, 5);
         spoonHandle.setRotationPoint(0F, 0F, 0F);
 
-        spoonEnd = new ModelRenderer(this, 34, 46);
+        spoonEnd = new ModelRenderer(this, 9, 45);
         spoonEnd.addBox(-6.75F, -0.5F, -0.5F, 2, 1, 2);
         spoonEnd.setRotationPoint(0F, 0F, 0F);
 
-        knifeHandle = new ModelRenderer(this, 18, 50);
-        knifeHandle.addBox(6F, -0.5F, 1F, 3, 1, 1);
-        knifeHandle.setRotationPoint(0F, 0F, 0F);
+        knifeBlade = new ModelRenderer(this, 0, 52);
+        knifeBlade.setTextureOffset(0, 52);
+        knifeBlade.addBox(-7F, -4F, -7F, 4, 1, 2);
+        knifeBlade.setTextureOffset(1, 55);
+        knifeBlade.addBox(-3F, -4F, -7F, 3, 1, 1);
+        knifeBlade.setRotationPoint(9F, 3.5F, 8F);
+        knifeBlade.rotateAngleY = 0.3927F;
 
-        knifeBlade = new ModelRenderer(this, 44, 46);
-        knifeBlade.addBox(2F, -0.5F, 1F, 4, 1, 2);
-        knifeBlade.setRotationPoint(0F, 0F, 0F);
+        knifeTip = new ModelRenderer(this, 1, 58);
+        knifeTip.mirror = true;
+        knifeTip.addBox(-0.5F, -0.4995F, -1F, 1, 1, 2);
+        knifeTip.setRotationPoint(-0.2252F, 0.0005F, 5.3269F);
+        knifeTip.rotateAngleY = 0.3927F;
 
-        knifeBlade2 = new ModelRenderer(this, 44, 50);
-        knifeBlade2.addBox(-0.7252F, -0.5F, 4.32685F, 1, 1, 2);
-        knifeBlade2.setRotationPoint(0F, 0F, 0F);
-        knifeBlade2.rotateAngleY = -0.3927F;
+        wood = new ModelRenderer(this, 0, 35);
+        wood.addBox(-2.25F, 10.5F, -3.25F, 4, 4, 4);
+        wood.setRotationPoint(0.25F, -3.5F, 0.25F);
+        wood.rotateAngleY = 0.3927F;
     }
 
     public void renderModel(float scale) {
         top.render(scale);
         bottom.render(scale);
-        leg1.render(scale);
-        leg2.render(scale);
-        leg3.render(scale);
-        leg4.render(scale);
+        legs.render(scale);
         wood.render(scale);
         spoonHandle.render(scale);
         spoonEnd.render(scale);
-        knifeHandle.render(scale);
         knifeBlade.render(scale);
-        knifeBlade2.render(scale);
+        knifeTip.render(scale);
     }
 }

@@ -1,11 +1,14 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.IUndoableAction;
@@ -28,6 +31,21 @@ public class KitchenBench {
     }
 
     @ZenMethod
+    public static void addShapedRecipe(@NotNull IItemStack output, String skill, String research, String sound,
+            String tool, int time, float dirtyAmount, IIngredient[][] ingreds) {
+        MineTweakerAPI.apply(
+                new KitchenAction(
+                        output,
+                        getSkillOrWarn(skill, output),
+                        research,
+                        sound,
+                        tool,
+                        time,
+                        dirtyAmount,
+                        ingreds));
+    }
+
+    @ZenMethod
     public static void addShapelessRecipe(@NotNull IItemStack output, String skill, String research, String sound,
             String tool, int time, IIngredient[] ingreds) {
         MineTweakerAPI
@@ -35,9 +53,24 @@ public class KitchenBench {
     }
 
     @ZenMethod
+    public static void addShapelessRecipe(@NotNull IItemStack output, String skill, String research, String sound,
+            String tool, int time, float dirtyAmount, IIngredient[] ingreds) {
+        MineTweakerAPI.apply(
+                new KitchenAction(
+                        output,
+                        getSkillOrWarn(skill, output),
+                        research,
+                        sound,
+                        tool,
+                        time,
+                        dirtyAmount,
+                        ingreds));
+    }
+
+    @ZenMethod
     public static void remove(@NotNull IIngredient output, IIngredient input) {
         ArrayList<ICarpenterRecipe> recipesToRemove = new ArrayList<ICarpenterRecipe>();
-        for (Object object : CraftingManagerKitchen.getInstance().getRecipeList()) {
+        for (Object object : targetRecipes()) {
             if (!(object instanceof ICarpenterRecipe)) {
                 continue;
             }
@@ -65,13 +98,27 @@ public class KitchenBench {
         }
 
         public KitchenAction(IItemStack out, Skill s, String research, String sound, String tool, int time,
+                float dirtyAmount, IIngredient[][] ingreds) {
+            recipes.add(
+                    new TweakedShapedCBRecipes(ingreds, out, tool, time, -1, -1, 0F, sound, research, s)
+                            .setDirtyAmount(dirtyAmount));
+        }
+
+        public KitchenAction(IItemStack out, Skill s, String research, String sound, String tool, int time,
                 IIngredient[] ingreds) {
             recipes.add(new TweakedShapelessCBRecipes(ingreds, out, tool, time, -1, -1, 0F, sound, research, s));
         }
 
+        public KitchenAction(IItemStack out, Skill s, String research, String sound, String tool, int time,
+                float dirtyAmount, IIngredient[] ingreds) {
+            recipes.add(
+                    new TweakedShapelessCBRecipes(ingreds, out, tool, time, -1, -1, 0F, sound, research, s)
+                            .setDirtyAmount(dirtyAmount));
+        }
+
         @Override
         public void apply() {
-            CraftingManagerKitchen.getInstance().recipes.addAll(recipes);
+            targetRecipes().addAll(recipes);
         }
 
         @Override
@@ -96,7 +143,7 @@ public class KitchenBench {
 
         @Override
         public void undo() {
-            CraftingManagerKitchen.getInstance().recipes.removeAll(recipes);
+            targetRecipes().removeAll(recipes);
         }
     }
 
@@ -110,7 +157,7 @@ public class KitchenBench {
 
         @Override
         public void apply() {
-            CraftingManagerKitchen.getInstance().recipes.removeAll(recipes);
+            targetRecipes().removeAll(recipes);
         }
 
         @Override
@@ -120,7 +167,7 @@ public class KitchenBench {
 
         @Override
         public void undo() {
-            CraftingManagerKitchen.getInstance().recipes.addAll(recipes);
+            targetRecipes().addAll(recipes);
         }
 
         @Override
@@ -137,6 +184,11 @@ public class KitchenBench {
         public Object getOverrideKey() {
             return null;
         }
+    }
+
+    private static List targetRecipes() {
+        return ConfigKitchen.enableBench ? CraftingManagerKitchen.getInstance().recipes
+                : CraftingManagerCarpenter.getInstance().recipes;
     }
 
     private static Skill getSkillOrWarn(String skill, IItemStack output) {

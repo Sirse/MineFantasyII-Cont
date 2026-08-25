@@ -32,6 +32,7 @@ import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class MineFantasyAPI {
@@ -266,13 +267,25 @@ public class MineFantasyAPI {
     }
 
     /**
-     * Adds a shaped recipe for the kitchen bench. Dirty progress defaults from the craft time.
+     * Adds a shaped recipe for the kitchen bench. Dirty progress defaults from the craft time. When the kitchen bench
+     * is disabled in the config the recipe falls back to the carpenter bench so the food stays obtainable.
      */
     public static ICarpenterRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
             String toolType, int toolTier, int craftTime, Object... input) {
-        float dirtyAmount = Math.max(1F, Math.min(8F, craftTime * 0.04F));
-        return CraftingManagerKitchen.getInstance()
-                .addRecipe(result, skill, research, sound, toolType, toolTier, craftTime, dirtyAmount, input);
+        if (!ConfigKitchen.enableBench) {
+            return CraftingManagerCarpenter.getInstance()
+                    .addRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
+        }
+        return CraftingManagerKitchen.getInstance().addRecipe(
+                result,
+                skill,
+                research,
+                sound,
+                toolType,
+                toolTier,
+                craftTime,
+                kitchenDirtyFor(craftTime),
+                input);
     }
 
     /**
@@ -284,16 +297,37 @@ public class MineFantasyAPI {
     }
 
     /**
-     * Adds a shapeless recipe for the kitchen bench. Dirty progress defaults from the craft time.
+     * Adds a shapeless recipe for the kitchen bench. Dirty progress defaults from the craft time. Falls back to the
+     * carpenter bench when the kitchen bench is disabled in the config.
      */
-    public static ICarpenterRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, boolean shapeless, Object... input) {
-        if (!shapeless) {
-            return addKitchenRecipe(skill, result, research, sound, toolType, toolTier, craftTime, input);
+    public static ICarpenterRecipe addShapelessKitchenRecipe(Skill skill, ItemStack result, String research,
+            String sound, String toolType, int toolTier, int craftTime, Object... input) {
+        if (!ConfigKitchen.enableBench) {
+            return CraftingManagerCarpenter.getInstance()
+                    .addShapelessRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
         }
-        float dirtyAmount = Math.max(1F, Math.min(8F, craftTime * 0.04F));
-        return CraftingManagerKitchen.getInstance()
-                .addShapelessRecipe(result, skill, research, sound, toolType, toolTier, craftTime, dirtyAmount, input);
+        return CraftingManagerKitchen.getInstance().addShapelessRecipe(
+                result,
+                skill,
+                research,
+                sound,
+                toolType,
+                toolTier,
+                craftTime,
+                kitchenDirtyFor(craftTime),
+                input);
+    }
+
+    /**
+     * {@link MineFantasyAPI#addShapelessKitchenRecipe} with bare hands as the tool
+     */
+    public static ICarpenterRecipe addShapelessKitchenRecipe(Skill skill, ItemStack result, String research,
+            String sound, int craftTime, Object... input) {
+        return addShapelessKitchenRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
+    }
+
+    public static float kitchenDirtyFor(int craftTime) {
+        return Math.max(1F, Math.min(8F, craftTime * 0.04F));
     }
 
     public static void addBlastFurnaceRecipe(Block input, ItemStack output) {

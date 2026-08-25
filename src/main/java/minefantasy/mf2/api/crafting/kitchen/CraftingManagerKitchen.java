@@ -9,8 +9,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.ICarpenter;
-import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 
 /**
@@ -29,9 +27,9 @@ public class CraftingManagerKitchen {
         return instance;
     }
 
-    public ICarpenterRecipe addRecipe(ItemStack result, Skill skill, String research, String sound, String tool,
+    public IKitchenRecipe addRecipe(ItemStack result, Skill skill, String research, String sound, String tool,
             int toolTier, int time, float dirtyAmount, Object... input) {
-        ICarpenterRecipe recipe = new ShapedCarpenterRecipesShim(
+        IKitchenRecipe recipe = new ShapedCarpenterRecipesShim(
                 result,
                 skill,
                 research,
@@ -45,9 +43,9 @@ public class CraftingManagerKitchen {
         return recipe;
     }
 
-    public ICarpenterRecipe addShapelessRecipe(ItemStack result, Skill skill, String research, String sound,
-            String tool, int toolTier, int time, float dirtyAmount, Object... input) {
-        ICarpenterRecipe recipe = new ShapelessCarpenterRecipesShim(
+    public IKitchenRecipe addShapelessRecipe(ItemStack result, Skill skill, String research, String sound, String tool,
+            int toolTier, int time, float dirtyAmount, Object... input) {
+        IKitchenRecipe recipe = new ShapelessCarpenterRecipesShim(
                 result,
                 skill,
                 research,
@@ -61,14 +59,15 @@ public class CraftingManagerKitchen {
         return recipe;
     }
 
-    public ItemStack findMatchingRecipe(ICarpenter bench, CarpenterCraftMatrix matrix) {
+    public ItemStack findMatchingRecipe(IKitchen bench, CarpenterCraftMatrix matrix) {
         Iterator it = this.recipes.iterator();
-        ICarpenterRecipe found = null;
+        IKitchenRecipe found = null;
 
         while (it.hasNext()) {
-            ICarpenterRecipe rec = (ICarpenterRecipe) it.next();
+            IKitchenRecipe rec = (IKitchenRecipe) it.next();
             if (rec.matches(matrix)) {
                 found = rec;
+                break; // vanilla semantics: first match wins
             }
         }
 
@@ -129,76 +128,78 @@ public class CraftingManagerKitchen {
         }
     }
 
-    private static int parseWidth(Object... input) {
-        return patternWidth(input);
-    }
-
-    private static int parseHeight(Object... input) {
-        return patternHeight(input);
-    }
-
     /**
-     * Mirrors the shaped-recipe parsing of {@link minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter}.
+     * Mirrors the shaped-recipe parsing of {@link minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter}, but
+     * tolerates ragged patterns and unknown keys (they resolve to empty cells).
      */
     private static ItemStack[] parseItems(Object... input) {
-        String pattern = "";
+        int width = parseWidth(input);
+        int height = parseHeight(input);
+        List rows = new ArrayList();
         int keyStart = 0;
-        int width = 0;
-        int height = 0;
 
-        if (input[keyStart] instanceof String[]) {
-            String[] rows = (String[]) input[keyStart++];
-            height = rows.length;
-            for (String row : rows) {
-                width = row.length();
-                pattern = pattern + row;
+        if (input[0] instanceof String[]) {
+            String[] patternRows = (String[]) input[0];
+            keyStart = 1;
+            for (String row : patternRows) {
+                rows.add(row);
             }
         } else {
-            while (input[keyStart] instanceof String) {
-                String row = (String) input[keyStart++];
-                ++height;
-                width = row.length();
-                pattern = pattern + row;
+            while (keyStart < input.length && input[keyStart] instanceof String) {
+                rows.add((String) input[keyStart++]);
             }
         }
 
         java.util.HashMap keys = new java.util.HashMap();
         for (; keyStart < input.length; keyStart += 2) {
             Character ch = (Character) input[keyStart];
-            ItemStack stack = null;
             Object raw = input[keyStart + 1];
+            ItemStack stack = null;
 
             if (raw instanceof Item) {
                 stack = new ItemStack((Item) raw, 1, 32767);
-            } else if (raw instanceof net.minecraft.block.Block) {
+            } else if (raw instanceof Block) {
                 stack = new ItemStack((Block) raw, 1, 32767);
             } else if (raw instanceof ItemStack) {
                 stack = (ItemStack) raw;
             }
-            keys.put(ch, stack);
+            if (stack != null) {
+                keys.put(ch, stack);
+            }
         }
 
         ItemStack[] items = new ItemStack[width * height];
-        for (int i = 0; i < width * height; ++i) {
-            char ch = pattern.charAt(i);
-            items[i] = keys.containsKey(ch) ? ((ItemStack) keys.get(ch)).copy() : null;
+        for (int rowIdx = 0; rowIdx < height; ++rowIdx) {
+            String row = (String) rows.get(rowIdx);
+            for (int col = 0; col < width; ++col) {
+                char ch = col < row.length() ? row.charAt(col) : ' ';
+                items[rowIdx * width + col] = keys.containsKey(ch) ? ((ItemStack) keys.get(ch)).copy() : null;
+            }
         }
         return items;
     }
 
-    private static int patternWidth(Object... input) {
-        Object first = input[0];
-        if (first instanceof String[]) {
-            String[] rows = (String[]) first;
-            return rows.length > 0 ? rows[0].length() : 0;
+    private static int parseWidth(Object... input) {
+        int width = 0;
+        if (input[0] instanceof String[]) {
+            for (String row : (String[]) input[0]) {
+                width = Math.max(width, row.length());
+            }
+            return width;
         }
-        return first instanceof String ? ((String) first).length() : 0;
+        for (Object o : input) {
+            if (o instanceof String) {
+                width = Math.max(width, ((String) o).length());
+            } else {
+                break;
+            }
+        }
+        return width;
     }
 
-    private static int patternHeight(Object... input) {
-        Object first = input[0];
-        if (first instanceof String[]) {
-            return ((String[]) first).length;
+    private static int parseHeight(Object... input) {
+        if (input[0] instanceof String[]) {
+            return ((String[]) input[0]).length;
         }
         int height = 0;
         for (Object o : input) {

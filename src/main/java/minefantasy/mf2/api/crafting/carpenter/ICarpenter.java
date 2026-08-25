@@ -23,9 +23,4 @@ public interface ICarpenter {
     void setResearch(String research);
 
     void setSkill(Skill skill);
-
-    /**
-     * Called by kitchen recipes so the bench knows how much dirt this craft adds
-     */
-    void setDirtyAmount(float amount);
 }

@@ -13,7 +13,6 @@ import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.tileentity.TileEntityKitchenBench;
-import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.container.ContainerKitchenBench;
 
 @SideOnly(Side.CLIENT)
@@ -84,7 +83,7 @@ public class GuiKitchenBench extends GuiContainer {
      * The dirt meter reuses the progress bar strip below the crafting grid.
      */
     private void drawDirtyBar(int xPoint, int yPoint) {
-        float max = ConfigKitchen.dirtyProgressMax;
+        float max = tile.getDirtyMax();
         if (max <= 0 || tile.dirtyProgress <= 0) {
             return;
         }

@@ -587,7 +587,4 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     public void setSkill(Skill skill) {
         skillUsed = skill;
     }
-
-    @Override
-    public void setDirtyAmount(float amount) {}
 }

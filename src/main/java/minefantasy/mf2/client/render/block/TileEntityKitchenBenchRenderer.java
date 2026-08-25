@@ -29,11 +29,8 @@ public class TileEntityKitchenBenchRenderer extends TileEntitySpecialRenderer {
     }
 
     public void renderModelAt(int meta, double d, double d1, double d2, float f) {
-        int j = 90 * meta;
+        int j = 0;
 
-        if (meta == 0) {
-            j = 0;
-        }
         if (meta == 1) {
             j = 270;
         }
@@ -50,10 +47,7 @@ public class TileEntityKitchenBenchRenderer extends TileEntitySpecialRenderer {
         GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.0F, (float) d2 + 0.5F);
         GL11.glRotatef(j, 0.0F, 1.0F, 0.0F);
         GL11.glScalef(1F, -1F, -1F);
-        GL11.glPushMatrix();
         model.renderModel(0.0625F);
-
-        GL11.glPopMatrix();
         GL11.glColor3f(1F, 1F, 1F);
         GL11.glPopMatrix();
     }

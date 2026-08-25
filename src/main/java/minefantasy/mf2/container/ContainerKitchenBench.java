@@ -43,7 +43,7 @@ public class ContainerKitchenBench extends ContainerMF {
             trackFloat(() -> tile.progress, value -> tile.progress = value);
             trackFloat(() -> tile.progressMax, value -> tile.progressMax = value);
             trackFloat(() -> tile.dirtyProgress, value -> tile.dirtyProgress = value);
-            trackInt(tile::getToolTierNeeded, tile::setToolTier);
+            trackFloat(tile::getDirtyMax, tile::setDirtyMax);
         }
     }
 
@@ -66,18 +66,17 @@ public class ContainerKitchenBench extends ContainerMF {
         ItemStack originalStack = stackInSlot.copy();
 
         int tileSlotCount = tile.getSizeInventory();
+        int gridEnd = tileSlotCount - 5;
 
-        if (slotIndex == tileSlotCount - 5) {
-            if (!this.mergeItemStack(stackInSlot, tileSlotCount, this.inventorySlots.size(), true)) {
-                return null;
-            }
-        } else if (slotIndex < tileSlotCount) {
+        if (slotIndex < tileSlotCount) {
+            // bench slots (grid, output, surplus) go to the player inventory
             if (!this.mergeItemStack(stackInSlot, tileSlotCount, this.inventorySlots.size(), true)) {
                 return null;
             }
         } else {
-            if (!this.mergeItemStack(stackInSlot, 0, tileSlotCount - 5, false)
-                    && !this.mergeItemStack(stackInSlot, tileSlotCount - 5, tileSlotCount, false)) {
+            // player inventory goes to the crafting grid, then the surplus slots (never the output)
+            if (!this.mergeItemStack(stackInSlot, 0, gridEnd, false)
+                    && !this.mergeItemStack(stackInSlot, gridEnd + 1, tileSlotCount, false)) {
                 return null;
             }
         }

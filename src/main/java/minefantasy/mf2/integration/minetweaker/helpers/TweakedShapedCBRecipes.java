@@ -2,18 +2,20 @@ package minefantasy.mf2.integration.minetweaker.helpers;
 
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
+import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 
-public class TweakedShapedCBRecipes implements ICarpenterRecipe {
+public class TweakedShapedCBRecipes implements IKitchenRecipe {
 
     private int hammer, anvil, /* craft, */
             time, width, height;
     private float exp;
+    private float dirtyAmount;
     private IItemStack result;
     private IIngredient[][] ingreds;
     private Skill s;
@@ -33,6 +35,7 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
         this.research = research;
         this.s = s;
         this.time = time;
+        this.dirtyAmount = MineFantasyAPI.kitchenDirtyFor(time);
     }
 
     @Override
@@ -130,6 +133,11 @@ public class TweakedShapedCBRecipes implements ICarpenterRecipe {
 
     @Override
     public float getDirtyAmount() {
-        return 0F;
+        return dirtyAmount;
+    }
+
+    public TweakedShapedCBRecipes setDirtyAmount(float amount) {
+        this.dirtyAmount = amount;
+        return this;
     }
 }

@@ -4,23 +4,19 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.event.NEIRegisterHandlerInfosEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigIntegration;
+import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 @Optional.Interface(iface = "codechicken.nei.api.IConfigureNEI", modid = "NotEnoughItems")
 public class NEIConfig implements IConfigureNEI {
-
-    private static boolean registeredHandlerInfoEvents;
 
     @Override
     public String getName() {
@@ -35,15 +31,15 @@ public class NEIConfig implements IConfigureNEI {
     @Override
     public void loadConfig() {
         if (ConfigIntegration.neiIntegration) {
-            registerHandlerInfoEvents();
-
             RecipeHandlerCarpenter handlerCarpenter = new RecipeHandlerCarpenter();
             API.registerRecipeHandler(handlerCarpenter);
             API.registerUsageHandler(handlerCarpenter);
 
-            RecipeHandlerKitchen handlerKitchen = new RecipeHandlerKitchen();
-            API.registerRecipeHandler(handlerKitchen);
-            API.registerUsageHandler(handlerKitchen);
+            if (ConfigKitchen.enableBench) {
+                RecipeHandlerKitchen handlerKitchen = new RecipeHandlerKitchen();
+                API.registerRecipeHandler(handlerKitchen);
+                API.registerUsageHandler(handlerKitchen);
+            }
 
             RecipeHandlerAnvil handlerAnvil = new RecipeHandlerAnvil();
             API.registerRecipeHandler(handlerAnvil);
@@ -95,14 +91,15 @@ public class NEIConfig implements IConfigureNEI {
 
             registerRecipeCatalysts();
 
-            // GTNH NEI may not fire NEIRegisterHandlerInfosEvent after this plugin loads.
             registerHandlerInfos(new NEIRegisterHandlerInfosEvent());
         }
     }
 
     private void registerRecipeCatalysts() {
         addCatalyst(BlockListMF.carpenter, "minefantasy2.carpenter", 100);
-        addCatalyst(BlockListMF.kitchenBench, "minefantasy2.kitchen", 100);
+        if (ConfigKitchen.enableBench) {
+            addCatalyst(BlockListMF.kitchenBench, "minefantasy2.kitchen", 100);
+        }
         addCatalyst(BlockListMF.anvilStone, "minefantasy2.anvil", 100);
         if (BlockListMF.anvil != null) {
             for (int tier = 0; tier < BlockListMF.anvil.length; tier++) {
@@ -141,27 +138,22 @@ public class NEIConfig implements IConfigureNEI {
         }
     }
 
-    private void registerHandlerInfoEvents() {
-        if (registeredHandlerInfoEvents) {
-            return;
-        }
-        registeredHandlerInfoEvents = true;
-        MinecraftForge.EVENT_BUS.register(this);
-        FMLCommonHandler.instance().bus().register(this);
-    }
-
-    @SubscribeEvent
-    public void registerHandlerInfos(NEIRegisterHandlerInfosEvent event) {
+    // Called explicitly instead of subscribed as an event: GTNH NEI may not fire NEIRegisterHandlerInfosEvent after
+    // this plugin loads, and a live subscription would register everything a second time ("Replaced handler info"
+    // log noise). registerHandlerInfo writes into a static map, so the event object is only used as a carrier.
+    private void registerHandlerInfos(NEIRegisterHandlerInfosEvent event) {
         event.registerHandlerInfo(
                 "minefantasy2.carpenter",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
-                "minefantasy2.kitchen",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setMaxRecipesPerPage(1));
+        if (ConfigKitchen.enableBench) {
+            event.registerHandlerInfo(
+                    "minefantasy2.kitchen",
+                    MineFantasyII.MODID,
+                    MineFantasyII.NAME,
+                    builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setMaxRecipesPerPage(1));
+        }
         event.registerHandlerInfo(
                 "minefantasy2.anvil",
                 MineFantasyII.MODID,

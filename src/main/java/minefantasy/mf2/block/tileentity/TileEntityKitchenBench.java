@@ -15,8 +15,8 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.ICarpenter;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
+import minefantasy.mf2.api.crafting.kitchen.IKitchen;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -24,13 +24,14 @@ import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.container.ContainerKitchenBench;
 
-public class TileEntityKitchenBench extends TileEntity implements IInventory, ICarpenter {
+public class TileEntityKitchenBench extends TileEntity implements IInventory, IKitchen {
 
     public final int width = 4;
     public final int height = 4;
     public float progressMax;
     public float progress;
     public float dirtyProgress;
+    public float dirtyMax = ConfigKitchen.dirtyProgressMax;
     private float pendingDirtyAmount;
     private ItemStack[] inventory;
     private Random rand = new Random();
@@ -177,6 +178,9 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IC
     @Override
     public void updateEntity() {
         ++ticksExisted;
+        if (!worldObj.isRemote) {
+            dirtyMax = ConfigKitchen.dirtyProgressMax;
+        }
         if (!worldObj.isRemote && ticksExisted % 20 == 0) {
             updateCraftingData();
         }
@@ -196,9 +200,11 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IC
     public boolean interact(EntityPlayer user) {
         ItemStack held = user.getHeldItem();
 
-        if (isWaterContainer(held)) {
-            washBench(user);
-            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.splash", 0.75F, 1.0F);
+        if (!worldObj.isRemote && isWaterContainer(held)) {
+            if (dirtyProgress > 0 || user.capabilities.isCreativeMode) {
+                washBench(user);
+                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.splash", 0.75F, 1.0F);
+            }
             return true;
         }
 
@@ -212,12 +218,13 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IC
             if (held != null && !recipeRequiresHands()) {
                 held.damageItem(1, user);
                 if (held.getItemDamage() >= held.getMaxDamage()) {
-                    if (worldObj.isRemote) user.renderBrokenItemStack(held);
                     user.destroyCurrentEquippedItem();
                 }
             }
 
-            if (doesPlayerKnowCraft(user) && canCraft() && isToolSufficient(toolType, toolTier)) {
+            if (isDirty()) {
+                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
+            } else if (doesPlayerKnowCraft(user) && canCraft() && isToolSufficient(toolType, toolTier)) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getCraftingSound(), 1.0F, 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
@@ -274,7 +281,15 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IC
     }
 
     public boolean isDirty() {
-        return dirtyProgress >= ConfigKitchen.dirtyProgressMax;
+        return dirtyProgress >= dirtyMax;
+    }
+
+    public float getDirtyMax() {
+        return dirtyMax;
+    }
+
+    public void setDirtyMax(float max) {
+        dirtyMax = max;
     }
 
     private void craftItem(EntityPlayer user) {
@@ -289,7 +304,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IC
                     getNBT(result).setString("MF_CraftedByName", lastPlayerHit);
                 }
                 this.inventory[output] = result;
-            } else if (this.inventory[output].getItem() == result.getItem()
+            } else if (this.inventory[output].isItemEqual(result)
                     && ItemStack.areItemStackTagsEqual(this.inventory[output], result)) {
                         ItemStack outputStack = this.inventory[output];
                         int max = outputStack.getMaxStackSize();

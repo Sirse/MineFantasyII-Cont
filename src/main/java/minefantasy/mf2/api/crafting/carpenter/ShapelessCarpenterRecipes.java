@@ -7,13 +7,14 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
+import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.rpg.Skill;
 
 /**
  * @author AnonymousProductions
  */
-public class ShapelessCarpenterRecipes implements ICarpenterRecipe {
+public class ShapelessCarpenterRecipes implements IKitchenRecipe {
 
     public static final int globalWidth = 4;
     public static final int globalHeight = 4;
