@@ -20,6 +20,7 @@ import cpw.mods.fml.relauncher.Side;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.CustomArmourEntry;
+import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.commands.CommandMF;
 import minefantasy.mf2.config.*;
@@ -170,6 +171,7 @@ public class MineFantasyII {
         KnowledgeListMF.init();
         ArtefactListMF.init();
         BasicRecipesMF.init();
+        TransformationRecipes.init();
         ItemLootSack.addItems();
         proxy.postInit();
         proxy.registerTickHandlers();
