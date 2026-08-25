@@ -1,16 +1,14 @@
 package minefantasy.mf2.block.tileentity;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
-import net.minecraft.client.entity.EntityClientPlayerMP;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.RoadPacket;
 
@@ -18,23 +16,23 @@ public class TileEntityRoad extends TileEntity {
 
     public int[] surface = new int[] { 0, 0 };
     public boolean isLocked = false;
-    private int ticksExisted;
-    private Random rand = new Random();
 
     public TileEntityRoad() {}
 
+    /**
+     * Vanilla pushes this to every player entering tracking range, so no periodic resync polling is needed.
+     */
     @Override
-    public void updateEntity() {
-        super.updateEntity();
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        writeToNBT(nbt);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, nbt);
+    }
 
-        ++ticksExisted;
-        if (!worldObj.isRemote) {
-            if (ticksExisted % 1200 == 0) {
-                sendPacketToClients();
-            }
-        } else if (ticksExisted == 20) {
-            requestPacket();
-        }
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        readFromNBT(packet.func_148857_g());
+        refreshSurface();
     }
 
     public void setSurface(Block id, int meta) {
@@ -65,21 +63,6 @@ public class TileEntityRoad extends TileEntity {
          * i++) { EntityPlayer player = players.get(i); ((WorldServer)
          * worldObj).getEntityTracker().func_151248_b(player, new RoadPacket(this).generatePacket()); }
          */
-    }
-
-    public void requestPacket() {
-        if (!worldObj.isRemote) return;
-        EntityPlayer player = MineFantasyII.proxy.getClientPlayer();
-        if (player != null) {
-            ((EntityClientPlayerMP) player).sendQueue.addToSendQueue(new RoadPacket(this).request().generatePacket());
-        }
-    }
-
-    private boolean blockChange(int id, int meta) {
-        if (id != surface[0]) return true;
-        if (meta != surface[1]) return true;
-
-        return false;
     }
 
     public void writeToNBT(NBTTagCompound nbt) {
