@@ -59,8 +59,16 @@ public class BlastFurnace {
         @Override
         public void apply() {
             ItemStack mcOutput = MineTweakerMC.getItemStack(output);
+            if (mcOutput == null) {
+                MineTweakerAPI.logWarning("Skipping blast furnace recipe with invalid output " + output);
+                return;
+            }
             for (IIngredient ingredient : input.getItems()) {
                 ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
+                if (mcInput == null) {
+                    MineTweakerAPI.logWarning("Skipping blast furnace recipe input " + ingredient + " -> " + output);
+                    continue;
+                }
                 BlastFurnaceRecipes.smelting().addRecipe(mcInput, mcOutput);
             }
         }

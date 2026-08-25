@@ -34,7 +34,13 @@ public class TileEntityBellows extends TileEntity {
             if (entity instanceof EntityPlayer) {
                 ((EntityPlayer) entity).playSound("minefantasy2:block.bellows", 1, 1);
             } else if (!worldObj.isRemote) {
-                worldObj.playSound(xCoord, yCoord, zCoord, "minefantasy2:block.bellows", 1.0F, 1.0F, false);
+                worldObj.playSoundEffect(
+                        xCoord + 0.5D,
+                        yCoord + 0.5D,
+                        zCoord + 0.5D,
+                        "minefantasy2:block.bellows",
+                        1.0F,
+                        1.0F);
             }
             press = 50;
             if (forge != null) {

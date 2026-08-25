@@ -1,5 +1,7 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minetweaker.MineTweakerAPI;
 import minetweaker.OneWayAction;
@@ -28,7 +30,12 @@ public class Fuels {
 
         @Override
         public void apply() {
-            MineFantasyFuels.addCarbon(MineTweakerMC.getItemStack(stack), uses);
+            ItemStack mcStack = MineTweakerMC.getItemStack(stack);
+            if (mcStack == null) {
+                MineTweakerAPI.logWarning("Skipping carbon fuel with invalid item " + stack);
+                return;
+            }
+            MineFantasyFuels.addCarbon(mcStack, uses);
         }
 
         @Override

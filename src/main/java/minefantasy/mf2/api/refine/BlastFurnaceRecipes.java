@@ -41,6 +41,9 @@ public class BlastFurnaceRecipes {
     }
 
     public void addRecipe(ItemStack input, ItemStack output) {
+        if (input == null || output == null) {
+            return;
+        }
         this.smeltingList.put(input, output);
     }
 

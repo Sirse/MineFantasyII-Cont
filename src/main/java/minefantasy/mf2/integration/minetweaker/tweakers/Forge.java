@@ -1,5 +1,7 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import net.minecraft.item.ItemStack;
+
 import minefantasy.mf2.api.heating.Heatable;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -32,7 +34,12 @@ public class Forge {
         @Override
         public void apply() {
             for (IItemStack s : input.getItems()) {
-                Heatable.addItem(MineTweakerMC.getItemStack(s), min, unstable, max);
+                ItemStack stack = MineTweakerMC.getItemStack(s);
+                if (stack == null) {
+                    MineTweakerAPI.logWarning("Skipping heatable registration for invalid item " + s);
+                    continue;
+                }
+                Heatable.addItem(stack, min, unstable, max);
             }
         }
 
@@ -59,7 +66,11 @@ public class Forge {
         @Override
         public void undo() {
             for (IItemStack s : input.getItems()) {
-                Heatable.registerList.remove(Heatable.getRegistrationForItem(MineTweakerMC.getItemStack(s)));
+                ItemStack stack = MineTweakerMC.getItemStack(s);
+                if (stack == null) {
+                    continue;
+                }
+                Heatable.registerList.remove(Heatable.getRegistrationForItem(stack));
             }
         }
     }

@@ -60,9 +60,21 @@ public class BigFurnace {
 
         @Override
         public void apply() {
+            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
+            if (mcOutput == null) {
+                MineTweakerAPI.logWarning("Skipping big furnace recipe with invalid output " + output);
+                return;
+            }
             for (IIngredient ingredient : input.getItems()) {
                 ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
-                addedRecipes.add(BigFurnaceRecipes.addRecipe(mcInput, MineTweakerMC.getItemStack(output), tier));
+                if (mcInput == null) {
+                    MineTweakerAPI.logWarning("Skipping big furnace recipe input " + ingredient + " -> " + output);
+                    continue;
+                }
+                BigFurnaceRecipes recipe = BigFurnaceRecipes.addRecipe(mcInput, mcOutput, tier);
+                if (recipe != null) {
+                    addedRecipes.add(recipe);
+                }
             }
         }
 

@@ -30,6 +30,9 @@ public class BigFurnaceRecipes {
     }
 
     public static BigFurnaceRecipes addRecipe(ItemStack input, ItemStack output, int tier) {
+        if (input == null || output == null) {
+            return null;
+        }
         BigFurnaceRecipes recipe = new BigFurnaceRecipes(input, output, tier);
         recipeList.put(CustomToolHelper.getReferenceName(input), recipe);
         return recipe;

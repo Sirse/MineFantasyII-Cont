@@ -5,6 +5,8 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.util.MFLogUtil;
+
 public class AlloyRecipes {
 
     public static List<Alloy> alloys = new ArrayList<Alloy>();
@@ -39,7 +41,16 @@ public class AlloyRecipes {
      * @param the amount of times the ratio can be added
      */
     public static Alloy[] addRatioRecipe(ItemStack out, int level, List in, int levels) {
-        levels = Math.min(Math.max(levels, 1), (int) (9F / Math.max(1, in.size())));
+        int maxLevels = (int) (9F / Math.max(1, in.size()));
+        if (maxLevels <= 0) {
+            MFLogUtil.logWarn(
+                    "Skipping alloy ratio recipe for " + out.getDisplayName()
+                            + ": "
+                            + in.size()
+                            + " ingredients do not fit the 9 crucible slots");
+            return new Alloy[0];
+        }
+        levels = Math.min(Math.max(levels, 1), maxLevels);
         Alloy[] alloys = new Alloy[levels];
         for (int a = 1; a <= levels; a++) {
             List list2 = createDupeList(in, a);

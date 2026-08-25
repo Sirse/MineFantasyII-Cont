@@ -80,19 +80,30 @@ public class Cooking {
 
         @Override
         public void apply() {
+            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
+            if (mcOutput == null) {
+                MineTweakerAPI.logWarning("Skipping cooking recipe with invalid output " + output);
+                return;
+            }
             for (IIngredient ingredient : input.getItems()) {
                 ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
-                addedRecipes.add(
-                        CookRecipe.addRecipe(
-                                mcInput,
-                                MineTweakerMC.getItemStack(output),
-                                new ItemStack(CookRecipe.burnt_food),
-                                minTemp,
-                                maxTemp,
-                                time,
-                                burnTime,
-                                requireBaking,
-                                canBurn));
+                if (mcInput == null) {
+                    MineTweakerAPI.logWarning("Skipping cooking recipe input " + ingredient + " -> " + output);
+                    continue;
+                }
+                CookRecipe recipe = CookRecipe.addRecipe(
+                        mcInput,
+                        mcOutput,
+                        new ItemStack(CookRecipe.burnt_food),
+                        minTemp,
+                        maxTemp,
+                        time,
+                        burnTime,
+                        requireBaking,
+                        canBurn);
+                if (recipe != null) {
+                    addedRecipes.add(recipe);
+                }
             }
         }
 

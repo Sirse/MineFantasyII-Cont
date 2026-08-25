@@ -150,12 +150,12 @@ public class CraftingManagerAnvil {
         Item item = first.getItem();
         int remainFirst = first.getMaxDamage() - first.getItemDamageForDisplay();
         int remainSecond = second.getMaxDamage() - second.getItemDamageForDisplay();
-        int maxDamage = first.getMaxDamage();
+        ItemStack nbtSource = ToolHelper.getQualityLevel(first) >= ToolHelper.getQualityLevel(second) ? first : second;
+        int maxDamage = nbtSource.getMaxDamage();
         int combined = remainFirst + remainSecond + maxDamage * 10 / 100;
         int damage = Math.max(0, maxDamage - combined);
 
         ItemStack repaired = new ItemStack(item, 1, damage);
-        ItemStack nbtSource = ToolHelper.getQualityLevel(first) >= ToolHelper.getQualityLevel(second) ? first : second;
         if (nbtSource.hasTagCompound()) {
             repaired.setTagCompound((NBTTagCompound) nbtSource.getTagCompound().copy());
         }

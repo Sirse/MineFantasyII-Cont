@@ -32,6 +32,9 @@ public class QuernRecipes {
     }
 
     public static QuernRecipes addRecipe(ItemStack input, ItemStack output, int tier, boolean consumePot) {
+        if (input == null || output == null) {
+            return null;
+        }
         QuernRecipes recipe = new QuernRecipes(input, output, tier, consumePot);
         recipeList.add(recipe);
         return recipe;

@@ -17,7 +17,6 @@ import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
 import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -131,9 +130,7 @@ public class Anvil {
 
         @Override
         public String describe() {
-            return "Adding a " + (hot ? "hot" : "")
-                    + " Anvil Recipe resulting in "
-                    + MineTweakerMC.getItemStack(output);
+            return "Adding a " + (hot ? "hot" : "") + " Anvil Recipe resulting in " + output;
         }
 
         @Override

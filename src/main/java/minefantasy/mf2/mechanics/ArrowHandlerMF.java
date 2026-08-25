@@ -118,6 +118,9 @@ public class ArrowHandlerMF {
         charge = (charge * charge + charge * 2.0F) / 3.0F;
 
         if (charge < 0.1D) {
+            // Cancel anyway, otherwise ItemBowMF falls through to its legacy vanilla-arrow path,
+            // which uses a different charge divisor and can fire without consuming MF ammo.
+            event.setCanceled(true);
             return;
         }
 

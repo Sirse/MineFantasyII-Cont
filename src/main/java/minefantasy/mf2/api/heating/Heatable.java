@@ -51,6 +51,9 @@ public class Heatable {
     }
 
     public static void addItem(ItemStack item, int min, int unstable, int max) {
+        if (item == null) {
+            return;
+        }
         registerList.put(getRegistrationForItem(item), new Heatable(item, min, unstable, max));
     }
 

@@ -60,9 +60,18 @@ public class Bloomery {
 
         @Override
         public void apply() {
+            ItemStack mcResult = MineTweakerMC.getItemStack(result);
+            if (mcResult == null) {
+                MineTweakerAPI.logWarning("Skipping bloomery recipe with invalid output " + result);
+                return;
+            }
             for (IItemStack stack : input.getItems()) {
                 ItemStack s = MineTweakerMC.getItemStack(stack);
-                BloomRecipe.addRecipe(s, MineTweakerMC.getItemStack(result));
+                if (s == null) {
+                    MineTweakerAPI.logWarning("Skipping bloomery recipe input " + stack + " -> " + result);
+                    continue;
+                }
+                BloomRecipe.addRecipe(s, mcResult);
             }
         }
 

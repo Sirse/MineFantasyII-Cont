@@ -59,6 +59,9 @@ public class CookRecipe {
      */
     public static CookRecipe addRecipe(ItemStack in, ItemStack out, ItemStack burnt, int min, int max, int time,
             int burntime, boolean bake, boolean canBurn) {
+        if (in == null || out == null) {
+            return null;
+        }
         CookRecipe recipe = new CookRecipe(out, burnt, min, max, time, bake, canBurn);
         recipeList.put(CustomToolHelper.getReferenceName(in), recipe);
 

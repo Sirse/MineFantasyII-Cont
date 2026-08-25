@@ -55,10 +55,21 @@ public class Quern {
 
         @Override
         public void apply() {
+            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
+            if (mcOutput == null) {
+                MineTweakerAPI.logWarning("Skipping quern recipe with invalid output " + output);
+                return;
+            }
             for (IItemStack stack : input.getItems()) {
                 ItemStack s = MineTweakerMC.getItemStack(stack);
-                recipesToRemove
-                        .add(QuernRecipes.addRecipe(s, MineTweakerMC.getItemStack(output), this.tier, consumePot));
+                if (s == null) {
+                    MineTweakerAPI.logWarning("Skipping quern recipe input " + stack + " -> " + output);
+                    continue;
+                }
+                QuernRecipes recipe = QuernRecipes.addRecipe(s, mcOutput, this.tier, consumePot);
+                if (recipe != null) {
+                    recipesToRemove.add(recipe);
+                }
             }
         }
 

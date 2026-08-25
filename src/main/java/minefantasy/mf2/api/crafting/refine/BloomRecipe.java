@@ -23,6 +23,9 @@ public class BloomRecipe {// FurnaceRecipes
     }
 
     public static void addRecipe(ItemStack input, ItemStack output) {
+        if (input == null || output == null) {
+            return;
+        }
         recipeList.put(input, output);
     }
 

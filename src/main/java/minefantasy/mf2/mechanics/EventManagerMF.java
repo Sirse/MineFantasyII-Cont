@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -419,8 +420,10 @@ public class EventManagerMF {
         if (event.entity instanceof EntityItem && !(event.entity instanceof EntityItemUnbreakable)) {
             EntityItem eitem = (EntityItem) event.entity;
             if (eitem.getEntityItem() != null) {
-                if (eitem.getEntityItem().hasTagCompound()
-                        && eitem.getEntityItem().getTagCompound().hasKey(EntityItemUnbreakable.persistNBT)) {
+                // MF_Persist marks new mythic gear; pre-migration worlds only carry vanilla Unbreakable
+                NBTTagCompound itemNBT = eitem.getEntityItem().getTagCompound();
+                if (itemNBT != null
+                        && (itemNBT.hasKey(EntityItemUnbreakable.persistNBT) || itemNBT.hasKey("Unbreakable"))) {
                     EntityItem newEntity = new EntityItemUnbreakable(event.world, eitem);
                     event.world.spawnEntityInWorld(newEntity);
                     eitem.setDead();

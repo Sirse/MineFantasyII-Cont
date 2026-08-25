@@ -40,7 +40,7 @@ public class HudHandlerMF {
             zoomModifier = ((IScope) item).getZoom(stack);
         } else if (item instanceof ItemBowMF) {
             float maxCharge = ((ItemBowMF) item).getMaxCharge();
-            float chargeProgress = event.entity.getItemInUseDuration() / maxCharge;
+            float chargeProgress = maxCharge > 0F ? (event.entity.getItemInUseDuration() / maxCharge) : 0F;
 
             if (chargeProgress > 1.0F) {
                 chargeProgress = 1.0F;
