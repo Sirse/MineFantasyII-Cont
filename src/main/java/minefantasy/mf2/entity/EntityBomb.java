@@ -156,19 +156,21 @@ public class EntityBomb extends Entity {
             this.motionZ *= d;
             this.motionY *= -0.99D;
         }
-        List collide = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox);
-        if (!collide.isEmpty() && !(thrower != null && collide.contains(thrower))) {
-            if (isSticky()) {
-                Object object = collide.get(0);
-                if (object instanceof Entity && object != this) {
-                    if (this.ridingEntity == null && ((Entity) object).riddenByEntity == null
-                            && canStick((Entity) object)) {
-                        this.mountEntity((Entity) object);
-                        this.fuse = getFuseTime();
+        if (ticksExisted % 3 == 0) {
+            List collide = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox);
+            if (!collide.isEmpty() && !(thrower != null && collide.contains(thrower))) {
+                if (isSticky()) {
+                    Object object = collide.get(0);
+                    if (object instanceof Entity && object != this) {
+                        if (this.ridingEntity == null && ((Entity) object).riddenByEntity == null
+                                && canStick((Entity) object)) {
+                            this.mountEntity((Entity) object);
+                            this.fuse = getFuseTime();
+                        }
                     }
                 }
+                this.motionX = motionZ = 0;
             }
-            this.motionX = motionZ = 0;
         }
 
         if (this.fuse-- <= 0) {

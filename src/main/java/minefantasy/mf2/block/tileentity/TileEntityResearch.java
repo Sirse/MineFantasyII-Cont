@@ -199,7 +199,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         boolean changed = researchID != lastSyncedId || progress != lastSyncedProgress
                 || maxProgress != lastSyncedMaxProgress;
 
-        if (!changed && ticksExisted % 40 != 0) {
+        if (!changed) {
             return;
         }
 

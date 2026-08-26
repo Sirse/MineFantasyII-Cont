@@ -33,6 +33,8 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
 
     public float progress, progressMax;
     public boolean hasBloom, isActive;
+    private boolean lastSyncedActive;
+    private float lastSyncedProgress = Float.NaN;
     private ItemStack[] inv = new ItemStack[3];
     private Random rand = new Random();
     private int ticksExisted;
@@ -89,8 +91,13 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
                 }
             }
         }
-        if (!worldObj.isRemote && ticksExisted % 20 == 0) {
-            syncData();
+        if (!worldObj.isRemote) {
+            boolean changed = isActive != lastSyncedActive || progress != lastSyncedProgress;
+            if (changed || (isActive && ticksExisted % 20 == 0)) {
+                lastSyncedActive = isActive;
+                lastSyncedProgress = progress;
+                syncData();
+            }
         }
     }
 

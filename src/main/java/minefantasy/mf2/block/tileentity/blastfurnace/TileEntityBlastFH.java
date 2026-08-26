@@ -60,7 +60,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             if (fuel > 0) --fuel;
             smokeStorage++;
             fireTime--;
-            if (ticksExisted % 2 == 0) shootFire();
+            if (ticksExisted % 10 == 0) shootFire();
 
         }
         if (!worldObj.isRemote && wasBurning != isBurning()) {

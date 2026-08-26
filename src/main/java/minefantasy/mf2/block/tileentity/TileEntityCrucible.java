@@ -37,6 +37,9 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private final int[] outputSlots = new int[] { OUTPUT_SLOT };
     private final int[] allSlots = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
+    private int ticksExisted;
+    private int cachedTier = -1;
+    private boolean cachedCoated;
     public float progress = 0;
     public float progressMax = BASE_PROGRESS_MAX;
     public float temperature;
@@ -47,6 +50,11 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     @Override
     public void updateEntity() {
         super.updateEntity();
+        ++ticksExisted;
+
+        if (cachedTier < 0 || ticksExisted % 40 == 0) {
+            refreshStructureCache();
+        }
 
         if (worldObj.isRemote) {
             if (this.getTier() >= 2 && rand.nextInt(8) == 0) {
@@ -185,11 +193,16 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     public int getTier() {
-        Block block = this.getBlockType();
-        if (block instanceof BlockCrucible) {
-            return ((BlockCrucible) block).tier;
+        if (cachedTier < 0) {
+            refreshStructureCache();
         }
-        return 0;
+        return cachedTier;
+    }
+
+    private void refreshStructureCache() {
+        Block block = this.getBlockType();
+        cachedTier = block instanceof BlockCrucible ? ((BlockCrucible) block).tier : 0;
+        cachedCoated = computeCoated();
     }
 
     public boolean isAuto() {
@@ -226,6 +239,13 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     public boolean isCoated() {
+        if (cachedTier < 0) {
+            refreshStructureCache();
+        }
+        return cachedCoated;
+    }
+
+    private boolean computeCoated() {
         if (this.getTier() >= 2) {
             return isEnderAlter(-1, -1, -3) && isEnderAlter(-1, -1, 3)
                     && isEnderAlter(-3, -1, -1)
