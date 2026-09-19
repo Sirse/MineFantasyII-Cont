@@ -596,11 +596,13 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         nbt.setFloat("firepower", firepower);
         nbt.setBoolean("PlayedSound", playedSound);
         nbt.setFloat("pierceChance", velocityModifier);
-        nbt.setShort("xTile", (short) this.xTile);
-        nbt.setShort("yTile", (short) this.yTile);
-        nbt.setShort("zTile", (short) this.zTile);
+        // Vanilla 1.7.10 stores these as short/byte, which truncates far out coordinates and any block id above
+        // 255. Integers are read back by getInteger for both the old and the new tag type.
+        nbt.setInteger("xTile", this.xTile);
+        nbt.setInteger("yTile", this.yTile);
+        nbt.setInteger("zTile", this.zTile);
         nbt.setShort("life", (short) this.ticksInGround);
-        nbt.setByte("inTile", (byte) Block.getIdFromBlock(this.inBlock));
+        nbt.setInteger("inTile", Block.getIdFromBlock(this.inBlock));
         nbt.setByte("inData", (byte) this.inData);
         nbt.setByte("shake", (byte) this.arrowShake);
         nbt.setByte("inGround", (byte) (this.inGround ? 1 : 0));
@@ -620,11 +622,13 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
         firepower = nbt.getFloat("firepower");
         playedSound = nbt.getBoolean("PlayedSound");
         velocityModifier = nbt.getFloat("pierceChance");
-        this.xTile = nbt.getShort("xTile");
-        this.yTile = nbt.getShort("yTile");
-        this.zTile = nbt.getShort("zTile");
+        this.xTile = nbt.getInteger("xTile");
+        this.yTile = nbt.getInteger("yTile");
+        this.zTile = nbt.getInteger("zTile");
         this.ticksInGround = nbt.getShort("life");
-        this.inBlock = Block.getBlockById(nbt.getByte("inTile") & 255);
+        // A legacy inTile is a byte holding the id masked to eight bits, so it still needs the unsigned read
+        this.inBlock = Block
+                .getBlockById(nbt.hasKey("inTile", 3) ? nbt.getInteger("inTile") : nbt.getByte("inTile") & 255);
         this.inData = nbt.getByte("inData") & 255;
         this.arrowShake = nbt.getByte("shake") & 255;
         this.inGround = nbt.getByte("inGround") == 1;
