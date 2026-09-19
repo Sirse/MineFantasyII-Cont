@@ -24,8 +24,9 @@ public class DodgeCommand extends PacketMF {
         if (!NetworkUtils.isServer(player)) {
             return;
         }
-        ID = packet.readInt();
-        if (ID != -1 && ID != 0 && ID != 1) {
+        // Local, not a field: this handler instance is shared by every player through packetList
+        int dodgeId = packet.readInt();
+        if (dodgeId != -1 && dodgeId != 0 && dodgeId != 1) {
             return;
         }
         long now = player.worldObj.getTotalWorldTime();
@@ -34,7 +35,7 @@ public class DodgeCommand extends PacketMF {
             return;
         }
         player.getEntityData().setLong(LAST_DODGE_CMD_TICK_NBT, now);
-        CombatMechanics.initDodge(player, ID);
+        CombatMechanics.initDodge(player, dodgeId);
     }
 
     @Override

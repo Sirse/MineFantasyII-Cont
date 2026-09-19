@@ -44,17 +44,19 @@ public class ExtendedReachPacket extends PacketMF {
         }
 
         int id = in.readInt();
-        Entity target = user.worldObj.getEntityByID(id);
-        if (!(target instanceof EntityLivingBase) || !canReach((EntityPlayerMP) user, target)) {
-            return;
-        }
 
+        // Rate limit first: canReach runs a block ray trace, so an unthrottled client could force one per packet
         long now = user.worldObj.getTotalWorldTime();
         long last = user.getEntityData().getLong(LAST_ATTACK_TICK_NBT);
         if (now - last < ATTACK_COOLDOWN_TICKS) {
             return;
         }
         user.getEntityData().setLong(LAST_ATTACK_TICK_NBT, now);
+
+        Entity target = user.worldObj.getEntityByID(id);
+        if (!(target instanceof EntityLivingBase) || !canReach((EntityPlayerMP) user, target)) {
+            return;
+        }
 
         user.attackTargetEntityWithCurrentItem(target);
     }
@@ -73,7 +75,13 @@ public class ExtendedReachPacket extends PacketMF {
         }
 
         double maxDist = Math.min(extendedReach + 4.0D, MAX_ALLOWED_REACH_BLOCKS);
-        Vec3 start = player.getPosition(1.0F);
+        // EntityPlayer.getPosition is @SideOnly(CLIENT) and is stripped by the SideTransformer on a dedicated
+        // server, so build the same vector explicitly. In 1.7.10 posY already sits at eye level (yOffset 1.62),
+        // and the eye-height delta is the sneak/sleep correction that getPosition(1.0F) applies.
+        Vec3 start = Vec3.createVectorHelper(
+                player.posX,
+                player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()),
+                player.posZ);
         Vec3 look = player.getLook(1.0F);
         Vec3 end = start.addVector(look.xCoord * maxDist, look.yCoord * maxDist, look.zCoord * maxDist);
         MovingObjectPosition blockHit = player.worldObj.rayTraceBlocks(start, end, false);

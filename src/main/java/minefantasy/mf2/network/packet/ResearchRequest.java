@@ -28,8 +28,9 @@ public class ResearchRequest extends PacketMF {
         if (!NetworkUtils.isServer(player)) {
             return;
         }
-        researchID = packet.readInt();
-        if (researchID < 0 || researchID >= InformationList.knowledgeList.size()) {
+        // Local, not a field: this handler instance is shared by every player through packetList
+        int requestedId = packet.readInt();
+        if (requestedId < 0 || requestedId >= InformationList.knowledgeList.size()) {
             return;
         }
         long now = player.worldObj.getTotalWorldTime();
@@ -39,7 +40,7 @@ public class ResearchRequest extends PacketMF {
         }
         player.getEntityData().setLong(LAST_REQUEST_TICK_NBT, now);
 
-        InformationBase research = InformationList.knowledgeList.get(researchID);
+        InformationBase research = InformationList.knowledgeList.get(requestedId);
         if (research != null && research.isEasy()) {
             if (research.onPurchase(player)) {
                 ResearchLogic.syncData(player);

@@ -32,15 +32,18 @@ public class CogworkControlPacket extends PacketMF {
             return;
         }
 
+        // Locals, not fields: this handler instance is shared by every player through packetList
         int id = packet.readInt();
-        forward = packet.readFloat();
-        strafe = packet.readFloat();
-        isJumping = packet.readBoolean();
-        if (Float.isNaN(forward) || Float.isInfinite(forward) || Float.isNaN(strafe) || Float.isInfinite(strafe)) {
+        float moveForward = packet.readFloat();
+        float moveStrafe = packet.readFloat();
+        boolean jumping = packet.readBoolean();
+        if (Float.isNaN(moveForward) || Float.isInfinite(moveForward)
+                || Float.isNaN(moveStrafe)
+                || Float.isInfinite(moveStrafe)) {
             return;
         }
-        forward = Math.max(-1.0F, Math.min(1.0F, forward));
-        strafe = Math.max(-1.0F, Math.min(1.0F, strafe));
+        moveForward = Math.max(-1.0F, Math.min(1.0F, moveForward));
+        moveStrafe = Math.max(-1.0F, Math.min(1.0F, moveStrafe));
         long now = player.worldObj.getTotalWorldTime();
         long last = player.getEntityData().getLong(LAST_COGWORK_CTRL_TICK_NBT);
         if (now - last < CONTROL_COOLDOWN_TICKS) {
@@ -51,15 +54,15 @@ public class CogworkControlPacket extends PacketMF {
         Entity entity = player.worldObj.getEntityByID(id);
 
         if (entity instanceof EntityCogwork) {
-            suit = (EntityCogwork) entity;
+            EntityCogwork target = (EntityCogwork) entity;
 
-            if (!suit.isDead && suit.riddenByEntity == player
-                    && player.ridingEntity == suit
-                    && suit.worldObj == player.worldObj
-                    && player.getDistanceSqToEntity(suit) <= 64D) {
-                suit.setMoveForward(forward);
-                suit.setMoveStrafe(strafe);
-                suit.setJumpControl(isJumping);
+            if (!target.isDead && target.riddenByEntity == player
+                    && player.ridingEntity == target
+                    && target.worldObj == player.worldObj
+                    && player.getDistanceSqToEntity(target) <= 64D) {
+                target.setMoveForward(moveForward);
+                target.setMoveStrafe(moveStrafe);
+                target.setJumpControl(jumping);
             }
         }
     }

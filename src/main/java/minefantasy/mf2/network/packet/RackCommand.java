@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 import minefantasy.mf2.network.NetworkUtils;
 
 public class RackCommand extends PacketMF {
@@ -31,11 +32,29 @@ public class RackCommand extends PacketMF {
             return;
         }
 
+        // Keep everything the packet carries in locals: this instance is shared through packetList
         int x = packet.readInt();
         int y = packet.readInt();
         int z = packet.readInt();
-        slot = packet.readInt();
-        if (slot < 0 || slot >= 4) {
+        int wantedSlot = packet.readInt();
+        if (wantedSlot < 0 || wantedSlot >= 4 || y < 0 || y >= 256) {
+            return;
+        }
+
+        // Rate limit before doing any work, so rejected requests cannot be spammed either
+        long now = player.worldObj.getTotalWorldTime();
+        long last = player.getEntityData().getLong(LAST_RACK_CMD_TICK_NBT);
+        if (now - last < RACK_COOLDOWN_TICKS) {
+            return;
+        }
+        player.getEntityData().setLong(LAST_RACK_CMD_TICK_NBT, now);
+
+        // Distance first, then a loaded-chunk test: World.getTileEntity would otherwise load or even generate the
+        // chunk for arbitrary coordinates sent by a modified client
+        if (!NetworkUtils.isWithinDistanceSq(player, new int[] { x, y, z }, 64)) {
+            return;
+        }
+        if (!player.worldObj.blockExists(x, y, z)) {
             return;
         }
 
@@ -43,21 +62,16 @@ public class RackCommand extends PacketMF {
         if (!(tile instanceof TileEntityRack)) {
             return;
         }
-
-        if (!NetworkUtils.isWithinDistanceSq(player, new int[] { x, y, z }, 64)) {
+        TileEntityRack target = (TileEntityRack) tile;
+        if (!target.isUseableByPlayer(player)) {
             return;
         }
-        rack = (TileEntityRack) tile;
-        if (!rack.isUseableByPlayer(player)) {
+        // This path replaces a right-click that never reached the vanilla handler, so raise the same interaction
+        // event region protection relies on
+        if (!ProtectionHelper.canInteract(player, player.worldObj, x, y, z)) {
             return;
         }
-        long now = player.worldObj.getTotalWorldTime();
-        long last = player.getEntityData().getLong(LAST_RACK_CMD_TICK_NBT);
-        if (now - last < RACK_COOLDOWN_TICKS) {
-            return;
-        }
-        player.getEntityData().setLong(LAST_RACK_CMD_TICK_NBT, now);
-        BlockRack.interact(slot, player.worldObj, rack, player);
+        BlockRack.interact(wantedSlot, player.worldObj, target, player);
     }
 
     @Override
