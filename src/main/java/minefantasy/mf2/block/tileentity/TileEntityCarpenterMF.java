@@ -17,7 +17,7 @@ import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenter;
 import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
-import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
+import minefantasy.mf2.api.crafting.carpenter.IStackedCarpenterRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -544,8 +544,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                     : CraftingManagerCarpenter.getInstance().findRepairResult(craftMatrix);
             activeRecipe = repair != null || craftMatrix == null ? null
                     : CraftingManagerCarpenter.getInstance().getMatchingRecipe(this, craftMatrix);
-            requiredAmounts = activeRecipe instanceof ShapedCarpenterRecipes
-                    ? ((ShapedCarpenterRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+            requiredAmounts = activeRecipe instanceof IStackedCarpenterRecipe
+                    ? ((IStackedCarpenterRecipe) activeRecipe).getRequiredAmounts(craftMatrix)
                     : null;
             recipe = repair != null ? repair
                     : activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);

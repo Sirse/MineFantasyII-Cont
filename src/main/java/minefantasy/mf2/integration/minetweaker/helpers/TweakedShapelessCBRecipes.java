@@ -4,13 +4,15 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
+import minefantasy.mf2.api.crafting.carpenter.IStackedCarpenterRecipe;
+import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 
-public class TweakedShapelessCBRecipes implements IKitchenRecipe {
+public class TweakedShapelessCBRecipes implements IKitchenRecipe, IStackedCarpenterRecipe {
 
     private int hammer, anvil, /* craft, */
             time, width, height;
@@ -90,6 +92,23 @@ public class TweakedShapelessCBRecipes implements IKitchenRecipe {
 
     @Override
     public boolean matches(CarpenterCraftMatrix inv) {
+        return assign(inv, null);
+    }
+
+    @Override
+    public int[] getRequiredAmounts(CarpenterCraftMatrix matrix) {
+        int gridW = ShapelessCarpenterRecipes.globalWidth;
+        int[] amounts = new int[gridW * ShapelessCarpenterRecipes.globalHeight];
+        java.util.Arrays.fill(amounts, 1);
+        assign(matrix, amounts);
+        return amounts;
+    }
+
+    /**
+     * Runs the greedy ingredient to cell assignment once. Passing an amounts array records how many items each cell
+     * owes, so matching and consuming always agree on which ingredient landed where.
+     */
+    private boolean assign(CarpenterCraftMatrix inv, int[] amounts) {
         boolean matches[] = new boolean[this.ingreds.length];
         boolean items[][] = new boolean[4][4];
         for (int a = 0; a < this.ingreds.length; a++) {
@@ -104,6 +123,9 @@ public class TweakedShapelessCBRecipes implements IKitchenRecipe {
                         matches[a] = true;
                         items[x][y] = true;
                         found = true;
+                        if (amounts != null) {
+                            amounts[x + y * ShapelessCarpenterRecipes.globalWidth] = Math.max(1, i.getAmount());
+                        }
                     }
                 }
             }

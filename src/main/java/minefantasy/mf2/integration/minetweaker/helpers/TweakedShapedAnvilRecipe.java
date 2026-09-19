@@ -4,13 +4,14 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.IStackedAnvilRecipe;
 import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 
-public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
+public class TweakedShapedAnvilRecipe implements IAnvilRecipe, IStackedAnvilRecipe {
 
     private int hammer, anvil, time, recipeWidth, recipeHeight;
     private float exp;
@@ -103,6 +104,25 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
         }
 
         return true;
+    }
+
+    @Override
+    public int[] getRequiredAmounts(AnvilCraftMatrix matrix) {
+        int gridW = ShapelessAnvilRecipes.globalWidth;
+        int gridH = ShapelessAnvilRecipes.globalHeight;
+        int[] amounts = new int[gridW * gridH];
+        java.util.Arrays.fill(amounts, 1);
+        for (int y = 0; y < gridH; ++y) {
+            for (int x = 0; x < gridW; ++x) {
+                IIngredient ingredient = x < this.recipeWidth && y < this.recipeHeight
+                        ? TweakedIngredients.gridCell(ingredients, y, x)
+                        : null;
+                if (ingredient != null) {
+                    amounts[x + y * gridW] = Math.max(1, ingredient.getAmount());
+                }
+            }
+        }
+        return amounts;
     }
 
     private void calculateRecipeSize() {

@@ -11,7 +11,7 @@ import minefantasy.mf2.api.rpg.Skill;
 /**
  * @author AnonymousProductions
  */
-public class ShapedCarpenterRecipes implements IKitchenRecipe {
+public class ShapedCarpenterRecipes implements IKitchenRecipe, IStackedCarpenterRecipe {
 
     public final int recipeHammer;
     public final boolean outputHot;
@@ -173,6 +173,7 @@ public class ShapedCarpenterRecipes implements IKitchenRecipe {
      * matched layout offset and mirroring are honoured, so each matrix slot maps to the correct recipe cell. Slots
      * outside the matched region require 1.
      */
+    @Override
     public int[] getRequiredAmounts(CarpenterCraftMatrix matrix) {
         if (!hasStackedIngredients) {
             // Every slot needs exactly one item: the caller treats null as "all ones" and skips the scan

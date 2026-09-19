@@ -19,7 +19,7 @@ import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
 import minefantasy.mf2.api.crafting.anvil.IAnvil;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
-import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
+import minefantasy.mf2.api.crafting.anvil.IStackedAnvilRecipe;
 import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.heating.Heatable;
@@ -731,8 +731,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     : CraftingManagerAnvil.getInstance().findRepairResult(craftMatrix);
             activeRecipe = repair != null || craftMatrix == null ? null
                     : CraftingManagerAnvil.getInstance().getMatchingRecipe(this, craftMatrix);
-            requiredAmounts = activeRecipe instanceof ShapedAnvilRecipes
-                    ? ((ShapedAnvilRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+            requiredAmounts = activeRecipe instanceof IStackedAnvilRecipe
+                    ? ((IStackedAnvilRecipe) activeRecipe).getRequiredAmounts(craftMatrix)
                     : null;
             recipe = repair != null ? repair
                     : activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);

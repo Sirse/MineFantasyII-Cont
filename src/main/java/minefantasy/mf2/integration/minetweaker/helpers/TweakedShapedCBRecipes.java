@@ -4,13 +4,15 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
+import minefantasy.mf2.api.crafting.carpenter.IStackedCarpenterRecipe;
+import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 
-public class TweakedShapedCBRecipes implements IKitchenRecipe {
+public class TweakedShapedCBRecipes implements IKitchenRecipe, IStackedCarpenterRecipe {
 
     private int hammer, anvil, /* craft, */
             time, width, height;
@@ -118,6 +120,23 @@ public class TweakedShapedCBRecipes implements IKitchenRecipe {
     @Override
     public boolean outputHot() {
         return false;
+    }
+
+    @Override
+    public int[] getRequiredAmounts(CarpenterCraftMatrix matrix) {
+        int gridW = ShapelessCarpenterRecipes.globalWidth;
+        int gridH = ShapelessCarpenterRecipes.globalHeight;
+        int[] amounts = new int[gridW * gridH];
+        java.util.Arrays.fill(amounts, 1);
+        for (int x = 0; x < gridW; x++) {
+            for (int y = 0; y < gridH; y++) {
+                IIngredient ingredient = TweakedIngredients.gridCell(this.ingreds, y, x);
+                if (ingredient != null) {
+                    amounts[x + y * gridW] = Math.max(1, ingredient.getAmount());
+                }
+            }
+        }
+        return amounts;
     }
 
     public IIngredient[][] getIngredients() {

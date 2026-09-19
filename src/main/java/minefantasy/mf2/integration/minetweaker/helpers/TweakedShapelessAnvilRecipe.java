@@ -4,12 +4,14 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.IStackedAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 
-public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
+public class TweakedShapelessAnvilRecipe implements IAnvilRecipe, IStackedAnvilRecipe {
 
     private int hammer, anvil, /* craft, */
             time, width, height;
@@ -81,6 +83,22 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
 
     @Override
     public boolean matches(AnvilCraftMatrix inv) {
+        return assign(inv, null);
+    }
+
+    @Override
+    public int[] getRequiredAmounts(AnvilCraftMatrix matrix) {
+        int[] amounts = new int[ShapelessAnvilRecipes.globalWidth * ShapelessAnvilRecipes.globalHeight];
+        java.util.Arrays.fill(amounts, 1);
+        assign(matrix, amounts);
+        return amounts;
+    }
+
+    /**
+     * Runs the greedy ingredient to cell assignment once. Passing an amounts array records how many items each cell
+     * owes, so matching and consuming always agree on which ingredient landed where.
+     */
+    private boolean assign(AnvilCraftMatrix inv, int[] amounts) {
         boolean matches[] = new boolean[this.ingreds.length];
         boolean items[][] = new boolean[6][4];
         for (int a = 0; a < this.ingreds.length; a++) {
@@ -95,6 +113,9 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe {
                         matches[a] = true;
                         items[x][y] = true;
                         found = true;
+                        if (amounts != null) {
+                            amounts[x + y * ShapelessAnvilRecipes.globalWidth] = Math.max(1, i.getAmount());
+                        }
                     }
                 }
             }

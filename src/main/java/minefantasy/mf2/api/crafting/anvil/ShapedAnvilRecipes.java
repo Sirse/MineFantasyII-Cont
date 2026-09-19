@@ -12,7 +12,7 @@ import minefantasy.mf2.api.rpg.Skill;
 /**
  * @author AnonymousProductions
  */
-public class ShapedAnvilRecipes implements IAnvilRecipe {
+public class ShapedAnvilRecipes implements IAnvilRecipe, IStackedAnvilRecipe {
 
     public final int recipeHammer;
     public final boolean outputHot;
@@ -172,6 +172,7 @@ public class ShapedAnvilRecipes implements IAnvilRecipe {
      * matched layout offset and mirroring are honoured, so each matrix slot maps to the correct recipe cell. Slots
      * outside the matched region require 1.
      */
+    @Override
     public int[] getRequiredAmounts(AnvilCraftMatrix matrix) {
         if (!hasStackedIngredients) {
             // Every slot needs exactly one item: the caller treats null as "all ones" and skips the scan

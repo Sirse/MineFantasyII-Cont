@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
 import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
+import minefantasy.mf2.api.crafting.carpenter.IStackedCarpenterRecipe;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.crafting.kitchen.IKitchen;
 import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
@@ -515,8 +515,8 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
             }
             activeRecipe = craftMatrix == null ? null
                     : CraftingManagerKitchen.getInstance().getMatchingRecipe(this, craftMatrix);
-            requiredAmounts = activeRecipe instanceof ShapedCarpenterRecipes
-                    ? ((ShapedCarpenterRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+            requiredAmounts = activeRecipe instanceof IStackedCarpenterRecipe
+                    ? ((IStackedCarpenterRecipe) activeRecipe).getRequiredAmounts(craftMatrix)
                     : null;
             recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
 
