@@ -8,8 +8,9 @@ import net.minecraft.item.ItemStack;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedAlloyRecipe;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedRemoval;
+import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
-import minetweaker.OneWayAction;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.mc1710.item.MCItemStack;
@@ -65,7 +66,7 @@ public class Crucible {
         return false;
     }
 
-    private static class AddAlloyAction extends OneWayAction {
+    private static class AddAlloyAction implements IUndoableAction {
 
         private Alloy alloy;
         private IItemStack out;
@@ -90,8 +91,29 @@ public class Crucible {
         }
 
         @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            // Remove the exact object this action added; equal looking alloys from other scripts must survive
+            for (int i = AlloyRecipes.alloys.size() - 1; i >= 0; i--) {
+                if (AlloyRecipes.alloys.get(i) == alloy) {
+                    AlloyRecipes.alloys.remove(i);
+                    break;
+                }
+            }
+        }
+
+        @Override
         public String describe() {
             return "Adding Custom Alloy";
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Removing Custom Alloy";
         }
 
         @Override
@@ -101,22 +123,39 @@ public class Crucible {
 
     }
 
-    private static class RemoveAction extends OneWayAction {
+    private static class RemoveAction implements IUndoableAction {
 
         private final ArrayList<Alloy> recipes;
+        private final TweakedRemoval removal;
 
         private RemoveAction(ArrayList<Alloy> recipes) {
             this.recipes = recipes;
+            this.removal = new TweakedRemoval(AlloyRecipes.alloys, recipes);
         }
 
         @Override
         public void apply() {
-            AlloyRecipes.alloys.removeAll(recipes);
+            removal.apply();
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            removal.undo();
         }
 
         @Override
         public String describe() {
             return "Removing " + recipes.size() + " Crucible recipes";
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Restoring " + recipes.size() + " Crucible recipes";
         }
 
         @Override
