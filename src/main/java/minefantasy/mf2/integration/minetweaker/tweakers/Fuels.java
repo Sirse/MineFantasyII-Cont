@@ -18,6 +18,10 @@ public class Fuels {
         MineTweakerAPI.apply(new AddCarbonAction(stack, uses));
     }
 
+    /**
+     * One way on purpose: carbon fuel is stored as an OreDictionary entry, and 1.7.10 Forge has no API for taking an
+     * entry back out again. A script reload logs this as stuck instead of silently half undoing it.
+     */
     private static class AddCarbonAction extends OneWayAction {
 
         private final IItemStack stack;

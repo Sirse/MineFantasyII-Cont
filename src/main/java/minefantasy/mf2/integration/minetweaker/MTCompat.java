@@ -20,6 +20,7 @@ public class MTCompat {
         MineTweakerAPI.registerClass(Cooking.class);
         MineTweakerAPI.registerClass(Crucible.class);
         MineTweakerAPI.registerClass(Forge.class);
+        MineTweakerAPI.registerClass(Fuels.class);
         MineTweakerAPI.registerClass(PaintOil.class);
         MineTweakerAPI.registerClass(SpecialForging.class);
         MineTweakerAPI.registerClass(TanningRack.class);
