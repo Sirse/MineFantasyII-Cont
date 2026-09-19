@@ -60,17 +60,21 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
             if (alloy == null || !NEIHelper.isValidStack(alloy.recipeOutput)) {
                 continue;
             }
+            boolean used = false;
             for (Object object : alloy.recipeItems) {
-                if (!(object instanceof ItemStack)) {
-                    continue;
+                for (ItemStack recipeIngredient : NEIHelper.resolveEntry(object)) {
+                    if (NEIHelper.isValidStack(recipeIngredient)
+                            && CustomToolHelper.areEqual(recipeIngredient, ingredient)) {
+                        used = true;
+                        break;
+                    }
                 }
-                ItemStack recipeIngredient = (ItemStack) object;
-                if (NEIHelper.isValidStack(recipeIngredient)
-                        && CustomToolHelper.areEqual(recipeIngredient, ingredient)) {
-                    CachedAlloyRecipe recipe = new CachedAlloyRecipe(alloy);
-                    arecipes.add(recipe);
+                if (used) {
                     break;
                 }
+            }
+            if (used) {
+                arecipes.add(new CachedAlloyRecipe(alloy));
             }
         }
     }
@@ -111,15 +115,8 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
                 for (int y = 0; y < 3; y++) {
                     int index = y * 3 + x;
                     if (recipeItems.size() > index) {
-                        if (!(recipeItems.get(index) instanceof ItemStack)) {
-                            continue;
-                        }
-                        ItemStack currentStack = (ItemStack) recipeItems.get(index);
-                        if (!NEIHelper.isValidStack(currentStack)) {
-                            continue;
-                        }
-
-                        PositionedStack stack = NEIHelper.positionedStack(currentStack, 57 + x * 18, 14 + y * 18);
+                        PositionedStack stack = NEIHelper
+                                .positionedEntry(recipeItems.get(index), 57 + x * 18, 14 + y * 18);
                         if (stack == null) {
                             continue;
                         }

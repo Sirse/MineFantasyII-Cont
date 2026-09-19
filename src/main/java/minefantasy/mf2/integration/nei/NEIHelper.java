@@ -1,15 +1,20 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import codechicken.nei.PositionedStack;
+import cpw.mods.fml.common.Loader;
 import minefantasy.mf2.api.crafting.ITieredComponent;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedNEIStacks;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class NEIHelper {
@@ -44,6 +49,47 @@ public class NEIHelper {
         }
 
         return componentStack;
+    }
+
+    /**
+     * Expands a recipe entry into the stacks NEI should show for it. Script recipes hold CraftTweaker ingredients
+     * rather than plain stacks, and every NEI path used to drop those on the floor.
+     */
+    public static List<ItemStack> resolveEntry(Object entry) {
+        List<ItemStack> stacks = new ArrayList<ItemStack>();
+        if (entry instanceof ItemStack) {
+            if (isValidStack((ItemStack) entry)) {
+                stacks.add((ItemStack) entry);
+            }
+            return stacks;
+        }
+        if (entry != null && Loader.isModLoaded("MineTweaker3")) {
+            try {
+                if (TweakedNEIStacks.isIngredient(entry)) {
+                    return TweakedNEIStacks.resolve(entry);
+                }
+            } catch (Throwable t) {
+                MFLogUtil.warnOnce("nei-tweaked-ingredient", "Could not read a script ingredient for NEI", t);
+            }
+        }
+        return stacks;
+    }
+
+    /** A cycling positioned stack for an entry that several items can satisfy. */
+    public static PositionedStack positionedEntry(Object entry, int x, int y) {
+        List<ItemStack> stacks = resolveEntry(entry);
+        if (stacks.isEmpty()) {
+            return null;
+        }
+        if (stacks.size() == 1) {
+            return positionedStack(stacks.get(0), x, y);
+        }
+        try {
+            return new PositionedStack(stacks, x, y, true);
+        } catch (RuntimeException e) {
+            MFLogUtil.warnOnce("nei-positioned-entry", "Failed to create NEI positioned stack at {},{}", x, y, e);
+            return null;
+        }
     }
 
     public static boolean isValidStack(ItemStack stack) {
