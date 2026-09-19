@@ -35,7 +35,7 @@ import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.util.BukkitUtils;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 /**
  * @author Anonymous Productions
@@ -84,8 +84,7 @@ public class ItemHvyPick extends ItemPickaxe implements IToolMaterial {
                             if (newblock != null && user instanceof EntityPlayer
                                     && ForgeHooks.canHarvestBlock(newblock, (EntityPlayer) user, m)
                             /* && ForgeHooks.isToolEffective(item, newblock, m) */) {
-                                if ((MineFantasyII.isBukkitServer()
-                                        && BukkitUtils.cantBreakBlock((EntityPlayer) user, blockX, blockY, blockZ))) {
+                                if (!ProtectionHelper.canBreak((EntityPlayer) user, world, blockX, blockY, blockZ)) {
                                     continue;
                                 }
 

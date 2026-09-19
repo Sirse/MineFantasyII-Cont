@@ -12,13 +12,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.weapon.IRackItem;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.item.tool.ItemAxeMF;
-import minefantasy.mf2.util.BukkitUtils;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
 
@@ -94,7 +93,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
     private void breakChain(World world, int x, int y, int z, ItemStack item, Block block, EntityLivingBase user,
             int maxLogs, Block orient, int orientM) {
         if (maxLogs > 0 && isLog(world, x, y, z, orient, orientM)) {
-            if (MineFantasyII.isBukkitServer() && BukkitUtils.cantBreakBlock((EntityPlayer) user, x, y, z)) {
+            if (!ProtectionHelper.canBreak((EntityPlayer) user, world, x, y, z)) {
                 return;
             }
 
@@ -144,8 +143,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
                         int blockZ = z + z1 + FD.offsetZ;
 
                         if (!(x1 + FD.offsetX == 0 && y1 + FD.offsetY == 0 && z1 + FD.offsetZ == 0)) {
-                            if (MineFantasyII.isBukkitServer()
-                                    && BukkitUtils.cantBreakBlock((EntityPlayer) user, blockX, blockY, blockZ)) {
+                            if (!ProtectionHelper.canBreak((EntityPlayer) user, world, blockX, blockY, blockZ)) {
                                 break;
                             }
 
