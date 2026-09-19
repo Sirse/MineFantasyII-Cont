@@ -47,7 +47,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         ++tempTicksExisted;
         if (tempTicksExisted == 10) {
             blockMetadata = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-            updateRecipe();
+            restoreRecipe();
         }
         int temp = getTemp();
         ++ticksExisted;
@@ -133,12 +133,28 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         }
     }
 
-    public void updateRecipe() {
+    private void cacheRecipe() {
         recipe = CookRecipe.getResult(getStackInSlot(0), isOven());
         if (recipe != null) {
             maxProgress = recipe.time;
         }
+    }
+
+    /**
+     * The cooked item changed, so the recipe and the progress both start over.
+     */
+    public void updateRecipe() {
+        cacheRecipe();
         progress = 0;
+        sendPacketToClients();
+    }
+
+    /**
+     * Rebuilds the recipe cache without touching progress. Used after loading, where the saved progress has to survive:
+     * the item is the same one that was cooking before the chunk unloaded.
+     */
+    public void restoreRecipe() {
+        cacheRecipe();
         sendPacketToClients();
     }
 

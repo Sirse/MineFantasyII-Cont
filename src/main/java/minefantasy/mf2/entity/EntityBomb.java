@@ -237,6 +237,11 @@ public class EntityBomb extends Entity {
     @Override
     protected void writeEntityToNBT(NBTTagCompound nbt) {
         nbt.setInteger("Fuse", this.fuse);
+        // The four components live in the DataWatcher, which the base Entity does not serialise
+        nbt.setByte("Filling", getFilling());
+        nbt.setByte("Casing", getCasing());
+        nbt.setByte("FuseType", getFuse());
+        nbt.setByte("Powder", getPowder());
     }
 
     /**
@@ -244,6 +249,11 @@ public class EntityBomb extends Entity {
      */
     @Override
     protected void readEntityFromNBT(NBTTagCompound nbt) {
+        // Restore the components straight into the DataWatcher: setType would reset the timer to a full fuse
+        dataWatcher.updateObject(typeId, nbt.getByte("Filling"));
+        dataWatcher.updateObject(typeId + 1, nbt.getByte("Casing"));
+        dataWatcher.updateObject(typeId + 2, nbt.getByte("FuseType"));
+        dataWatcher.updateObject(typeId + 3, nbt.getByte("Powder"));
         this.fuse = nbt.getInteger("Fuse");
     }
 

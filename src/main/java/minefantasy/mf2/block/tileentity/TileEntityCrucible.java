@@ -46,11 +46,20 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private ItemStack[] inventory = new ItemStack[INVENTORY_SIZE];
     private final Random rand = new Random();
     private ItemStack cachedRecipeOutput;
+    /**
+     * Set whenever the contents change before a world is available (NBT load); cleared on the next server tick
+     */
+    private boolean recipeCacheDirty = true;
 
     @Override
     public void updateEntity() {
         super.updateEntity();
         ++ticksExisted;
+
+        if (!worldObj.isRemote && recipeCacheDirty) {
+            updateCachedRecipe();
+            recipeCacheDirty = false;
+        }
 
         if (cachedTier < 0 || ticksExisted % 40 == 0) {
             refreshStructureCache();
@@ -196,11 +205,17 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         if (cachedTier < 0) {
             refreshStructureCache();
         }
-        return cachedTier;
+        return Math.max(0, cachedTier);
     }
 
     private void refreshStructureCache() {
         Block block = this.getBlockType();
+        if (block == null || block == Blocks.air) {
+            // Chunk not loaded/ready yet: retry next tick instead of caching a bogus tier
+            cachedTier = -1;
+            cachedCoated = false;
+            return;
+        }
         cachedTier = block instanceof BlockCrucible ? ((BlockCrucible) block).tier : 0;
         cachedCoated = computeCoated();
     }
@@ -301,7 +316,9 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
                 this.inventory[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
             }
         }
-        onInventoryChanged(); // Update cache on load
+        // The world is assigned after readFromNBT, so the recipe cannot be resolved yet: just mark the cache
+        // stale and let the first server tick rebuild it.
+        recipeCacheDirty = true;
     }
 
     @Override
@@ -353,8 +370,14 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     public void onInventoryChanged() {
+        if (worldObj == null) {
+            // Called from readFromNBT before the tile is added to the world
+            recipeCacheDirty = true;
+            return;
+        }
         if (!worldObj.isRemote) {
             updateCachedRecipe();
+            recipeCacheDirty = false;
         }
     }
 

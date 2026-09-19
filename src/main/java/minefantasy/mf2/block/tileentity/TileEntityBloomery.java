@@ -9,6 +9,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -32,12 +35,16 @@ import minefantasy.mf2.util.MFLogUtil;
 public class TileEntityBloomery extends TileEntity implements IInventory {
 
     public float progress, progressMax;
-    public boolean hasBloom, isActive;
+    /**
+     * Client-side render flag, fed by BloomeryPacket and getDescriptionPacket. On the server the truth is the bloom
+     * slot, so always read it through {@link #hasBloom()} rather than touching this directly.
+     */
+    public boolean hasBloom;
+    public boolean isActive;
     private boolean lastSyncedActive;
-    private float lastSyncedProgress = Float.NaN;
+    private boolean lastSyncedBloom;
     private ItemStack[] inv = new ItemStack[3];
     private Random rand = new Random();
-    private int ticksExisted;
 
     public static boolean isInput(ItemStack input) {
         return getResult(input) != null;
@@ -74,7 +81,6 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
 
     @Override
     public void updateEntity() {
-        ++ticksExisted;
         if (isActive && progressMax > 0) {
             if (!worldObj.canBlockSeeTheSky(xCoord, yCoord + 1, zCoord)) {
                 progressMax = progress = 0;
@@ -92,13 +98,34 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
             }
         }
         if (!worldObj.isRemote) {
-            boolean changed = isActive != lastSyncedActive || progress != lastSyncedProgress;
-            if (changed || (isActive && ticksExisted % 20 == 0)) {
+            // BloomeryPacket only carries these two flags, so sync exactly when one of them flips. Clients entering
+            // tracking range get their initial state from getDescriptionPacket instead of a periodic heartbeat.
+            boolean bloom = hasBloom();
+            if (isActive != lastSyncedActive || bloom != lastSyncedBloom) {
                 lastSyncedActive = isActive;
-                lastSyncedProgress = progress;
+                lastSyncedBloom = bloom;
                 syncData();
             }
         }
+    }
+
+    /**
+     * Vanilla pushes this to every player entering tracking range, so no periodic resync polling is needed. Only the
+     * render flags travel here; the inventory stays server-side.
+     */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setBoolean("hasBloom", hasBloom());
+        nbt.setBoolean("isActive", isActive);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        NBTTagCompound nbt = packet.func_148857_g();
+        hasBloom = nbt.getBoolean("hasBloom");
+        isActive = nbt.getBoolean("isActive");
     }
 
     public void syncData() {
@@ -345,7 +372,7 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
 
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
-        nbt.setBoolean("hasBloom", hasBloom);
+        nbt.setBoolean("hasBloom", hasBloom());
         nbt.setBoolean("isActive", isActive);
     }
 

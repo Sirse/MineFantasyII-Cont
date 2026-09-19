@@ -184,6 +184,9 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             heat = heater.heat;
         } else {
             heat -= 4;
+            if (heat < 0) {
+                heat = 0;
+            }
         }
         boolean canSmelt = false;
         boolean smelted = false;
@@ -506,13 +509,17 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         built = nbt.getBoolean("Built");
 
         fuel = nbt.getInteger("fuel");
-        maxFuel = nbt.getInteger("MaxFuel");
+        maxFuel = nbt.hasKey("maxFuel") ? nbt.getInteger("maxFuel") : nbt.getInteger("MaxFuel");
 
         heat = nbt.getFloat("heat");
         maxHeat = nbt.getFloat("maxHeat");
 
         progress = nbt.getInteger("progress");
         aboveType = nbt.getInteger("Level");
+        // Earlier versions let an unheated furnace accumulate negative heat and progress; clamp on load so a saved
+        // debt does not have to be worked off before the first smelt
+        if (heat < 0F) heat = 0F;
+        if (progress < 0) progress = 0;
     }
 
     public void writeToNBT(NBTTagCompound nbt) {
