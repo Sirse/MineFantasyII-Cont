@@ -50,6 +50,10 @@ public class WorldGenStructures {
     }
 
     private static boolean confineToGrid(int chunkX, int chunkZ, int chunkSize) {
+        // A grid size of 0 comes straight from the config and would divide by zero during chunk generation
+        if (chunkSize <= 0) {
+            return false;
+        }
         return chunkX % chunkSize == 0 && chunkZ % chunkSize == 0;
     }
 

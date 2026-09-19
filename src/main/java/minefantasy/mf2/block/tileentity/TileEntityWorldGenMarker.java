@@ -4,7 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.chunk.Chunk;
 
 import minefantasy.mf2.config.ConfigWorldGen;
 import minefantasy.mf2.mechanics.worldGen.structure.StructureModuleMF;
@@ -16,7 +15,8 @@ public class TileEntityWorldGenMarker extends TileEntity {
 
     @Override
     public void updateEntity() {
-        if (!worldObj.isRemote && areChunksLoaded() && ticks >= getSpawnTime()) {
+        // Check the delay before touching neighbouring chunks, so a pending marker costs nothing per tick
+        if (!worldObj.isRemote && ticks >= getSpawnTime() && areChunksLoaded()) {
             Block block = Block.getBlockById(prevID);
             worldObj.setBlock(xCoord, yCoord, zCoord, block != null ? block : Blocks.air, prevMeta, 2);
             StructureModuleMF.placeStructure(
@@ -42,8 +42,9 @@ public class TileEntityWorldGenMarker extends TileEntity {
     }
 
     private boolean chunkLoaded(int xOffset, int zOffset) {
-        Chunk chunk = worldObj.getChunkFromBlockCoords(xCoord + xOffset, zCoord + zOffset);
-        return chunk != null && chunk.isChunkLoaded;
+        // getChunkFromBlockCoords would load or even generate the chunk, which is the opposite of waiting for it to
+        // be ready. blockExists only consults the already-loaded set.
+        return worldObj.blockExists(xCoord + xOffset, yCoord, zCoord + zOffset);
     }
 
     private int getSpawnTime() {
