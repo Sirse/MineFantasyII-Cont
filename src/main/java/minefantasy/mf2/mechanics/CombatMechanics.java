@@ -190,6 +190,9 @@ public class CombatMechanics {
     }
 
     public static void initDodge(EntityPlayer user, int type) {
+        if (!canDodge(user)) {
+            return;
+        }
         float bulk = ArmourCalculator.getTotalBulk(user);
         int cost = (int) ((type == 0 ? 15 : 10) * (bulk + 1));// Medium armour cost 2x more
 
@@ -933,8 +936,16 @@ public class CombatMechanics {
         }
     }
 
+    /**
+     * Shared by the client trigger and by the serverbound DodgeCommand, so a modified client cannot skip the
+     * raised-guard requirement by sending the command on its own.
+     */
+    public static boolean canDodge(EntityPlayer user) {
+        return user != null && user.isBlocking();
+    }
+
     private void tryDodge(EntityPlayer user) {
-        if (user.isBlocking()) {
+        if (canDodge(user)) {
             float forward = user.moveForward;
             float side = user.moveStrafing;
 
