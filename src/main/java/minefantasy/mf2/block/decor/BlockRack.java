@@ -67,7 +67,6 @@ public class BlockRack extends BlockWoodDecor {
                 if (!world.isRemote) {
                     player.setCurrentItemOrArmor(0, hung);
                     tile.setInventorySlotContents(slot, null);
-                    tile.syncItems();
                 }
                 player.swingItem();
                 return true;
@@ -79,7 +78,6 @@ public class BlockRack extends BlockWoodDecor {
                 if (!world.isRemote) {
                     tile.setInventorySlotContents(slot, player.getHeldItem().copy());
                     player.setCurrentItemOrArmor(0, null);
-                    tile.syncItems();
                 }
                 player.swingItem();
                 return true;
@@ -94,6 +92,7 @@ public class BlockRack extends BlockWoodDecor {
                         if (!world.isRemote) {
                             held.stackSize -= space;
                             hung.stackSize += space;
+                            tile.onContentsChanged();
                         }
                         player.swingItem();
                         return true;
@@ -101,6 +100,7 @@ public class BlockRack extends BlockWoodDecor {
                         if (!world.isRemote) {
                             hung.stackSize += held.stackSize;
                             player.setCurrentItemOrArmor(0, null);
+                            tile.onContentsChanged();
                         }
                         player.swingItem();
                         return true;

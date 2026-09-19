@@ -45,14 +45,14 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
             if (inv[i].stackSize <= j) {
                 ItemStack itemstack = inv[i];
                 inv[i] = null;
-                syncItems();
+                onContentsChanged();
                 return itemstack;
             }
             ItemStack itemstack1 = inv[i].splitStack(j);
             if (inv[i].stackSize == 0) {
                 inv[i] = null;
             }
-            syncItems();
+            onContentsChanged();
             return itemstack1;
         } else {
             syncItems();
@@ -65,6 +65,15 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     public void setInventorySlotContents(int i, ItemStack itemstack) {
         inv[i] = itemstack;
         updateInventory();
+        onContentsChanged();
+    }
+
+    /**
+     * Single exit point for content changes: marks the chunk so the new state is saved, then pushes it to clients.
+     * Without markDirty a rack change can be lost when the chunk unloads without any other edit dirtying it.
+     */
+    public void onContentsChanged() {
+        markDirty();
         syncItems();
     }
 
