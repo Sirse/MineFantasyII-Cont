@@ -62,6 +62,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private boolean isFakeAnvil = false;
     private ItemStack recipe;
     private IAnvilRecipe activeRecipe;
+    private int[] requiredAmounts;
     private int hammerTierRequired;
     private int anvilTierRequired;
 
@@ -427,7 +428,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                             if (((TileEntityForge) tile).dragonHeartPower > 0) {
                                 hasHeart = true;
                                 ((TileEntityForge) tile).dragonHeartPower = 0;
-                                worldObj.createExplosion(null, xCoord + x, yCoord + y, zCoord + z, 1F, false);
+                                worldObj.createExplosion(player, xCoord + x, yCoord + y, zCoord + z, 1F, false);
                                 PlayerTickHandlerMF.spawnDragon(player);
                                 PlayerTickHandlerMF.addDragonEnemyPts(player, 2);
 
@@ -621,11 +622,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     private int getRequiredAmount(int slot) {
-        if (activeRecipe instanceof ShapedAnvilRecipes) {
-            ShapedAnvilRecipes shaped = (ShapedAnvilRecipes) activeRecipe;
-            if (slot < shaped.recipeItems.length && shaped.recipeItems[slot] != null) {
-                return Math.max(1, shaped.recipeItems[slot].stackSize);
-            }
+        if (requiredAmounts != null && slot >= 0 && slot < requiredAmounts.length) {
+            return Math.max(1, requiredAmounts[slot]);
         }
         return 1;
     }
@@ -711,9 +709,15 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                     craftMatrix.setInventorySlotContents(a, inventory[a]);
                 }
             }
-            activeRecipe = craftMatrix == null ? null
+            ItemStack repair = craftMatrix == null ? null
+                    : CraftingManagerAnvil.getInstance().findRepairResult(craftMatrix);
+            activeRecipe = repair != null || craftMatrix == null ? null
                     : CraftingManagerAnvil.getInstance().getMatchingRecipe(this, craftMatrix);
-            recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
+            requiredAmounts = activeRecipe instanceof ShapedAnvilRecipes
+                    ? ((ShapedAnvilRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+                    : null;
+            recipe = repair != null ? repair
+                    : activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
             // syncItems();
 
             if (!canCraft() && progress > 0) {

@@ -48,6 +48,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     private boolean resetRecipe = false;
     private ItemStack recipe;
     private ICarpenterRecipe activeRecipe;
+    private int[] requiredAmounts;
     private int hammerTierRequired;
     private int CarpenterTierRequired;
 
@@ -332,11 +333,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     }
 
     private int getRequiredAmount(int slot) {
-        if (activeRecipe instanceof ShapedCarpenterRecipes) {
-            ShapedCarpenterRecipes shaped = (ShapedCarpenterRecipes) activeRecipe;
-            if (slot < shaped.recipeItems.length && shaped.recipeItems[slot] != null) {
-                return Math.max(1, shaped.recipeItems[slot].stackSize);
-            }
+        if (requiredAmounts != null && slot >= 0 && slot < requiredAmounts.length) {
+            return Math.max(1, requiredAmounts[slot]);
         }
         return 1;
     }
@@ -514,9 +512,15 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
                     craftMatrix.setInventorySlotContents(a, inventory[a]);
                 }
             }
-            activeRecipe = craftMatrix == null ? null
+            ItemStack repair = craftMatrix == null ? null
+                    : CraftingManagerCarpenter.getInstance().findRepairResult(craftMatrix);
+            activeRecipe = repair != null || craftMatrix == null ? null
                     : CraftingManagerCarpenter.getInstance().getMatchingRecipe(this, craftMatrix);
-            recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
+            requiredAmounts = activeRecipe instanceof ShapedCarpenterRecipes
+                    ? ((ShapedCarpenterRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+                    : null;
+            recipe = repair != null ? repair
+                    : activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
             // syncItems();
 
             if (!canCraft() && progress > 0) {

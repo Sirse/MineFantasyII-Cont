@@ -225,7 +225,7 @@ public class CraftingManagerAnvil {
         return recipe == null ? null : recipe.getCraftingResult(matrix);
     }
 
-    private ItemStack findRepairResult(AnvilCraftMatrix matrix) {
+    public ItemStack findRepairResult(AnvilCraftMatrix matrix) {
         ItemStack var3 = null;
         ItemStack var4 = null;
         int var2 = 0;

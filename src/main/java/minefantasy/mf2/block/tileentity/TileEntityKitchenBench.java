@@ -48,6 +48,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     private boolean resetRecipe = false;
     private ItemStack recipe;
     private IKitchenRecipe activeRecipe;
+    private int[] requiredAmounts;
 
     public TileEntityKitchenBench() {
         inventory = new ItemStack[width * height + 5];
@@ -352,11 +353,8 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     }
 
     private int getRequiredAmount(int slot) {
-        if (activeRecipe instanceof ShapedCarpenterRecipes) {
-            ShapedCarpenterRecipes shaped = (ShapedCarpenterRecipes) activeRecipe;
-            if (slot < shaped.recipeItems.length && shaped.recipeItems[slot] != null) {
-                return Math.max(1, shaped.recipeItems[slot].stackSize);
-            }
+        if (requiredAmounts != null && slot >= 0 && slot < requiredAmounts.length) {
+            return Math.max(1, requiredAmounts[slot]);
         }
         return 1;
     }
@@ -496,6 +494,9 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
             }
             activeRecipe = craftMatrix == null ? null
                     : CraftingManagerKitchen.getInstance().getMatchingRecipe(this, craftMatrix);
+            requiredAmounts = activeRecipe instanceof ShapedCarpenterRecipes
+                    ? ((ShapedCarpenterRecipes) activeRecipe).getRequiredAmounts(craftMatrix)
+                    : null;
             recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
 
             if ((!canCraft() || isDirty()) && progress > 0) {

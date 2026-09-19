@@ -251,7 +251,7 @@ public class CraftingManagerCarpenter {
         return recipe == null ? null : recipe.getCraftingResult(matrix);
     }
 
-    private ItemStack findRepairResult(CarpenterCraftMatrix matrix) {
+    public ItemStack findRepairResult(CarpenterCraftMatrix matrix) {
         ItemStack var3 = null;
         ItemStack var4 = null;
         int var2 = 0;

@@ -46,6 +46,12 @@ public class ShapedCarpenterRecipes implements IKitchenRecipe {
      */
     private float dirtyAmount;
 
+    /**
+     * True when any slot asks for more than one item. Computed once at registration and never mutated, so the lookup
+     * stays free of per-bench state. Recipes without stacked ingredients skip the second offset scan entirely.
+     */
+    private final boolean hasStackedIngredients;
+
     public ShapedCarpenterRecipes(int wdth, int heit, ItemStack[] inputs, ItemStack output, String toolType, int time,
             int hammer, int anvi, float exp, boolean hot, String sound, String research, Skill skill) {
         this.research = research;
@@ -61,6 +67,16 @@ public class ShapedCarpenterRecipes implements IKitchenRecipe {
         this.toolType = toolType;
         this.soundOfCraft = sound;
         this.skillUsed = skill;
+        boolean stacked = false;
+        if (inputs != null) {
+            for (ItemStack ingredient : inputs) {
+                if (ingredient != null && ingredient.stackSize > 1) {
+                    stacked = true;
+                    break;
+                }
+            }
+        }
+        this.hasStackedIngredients = stacked;
     }
 
     @Override
@@ -150,6 +166,54 @@ public class ShapedCarpenterRecipes implements IKitchenRecipe {
         }
 
         return true;
+    }
+
+    /**
+     * Per-slot item amounts this recipe consumes, indexed like the crafting matrix (col + row * globalWidth). The
+     * matched layout offset and mirroring are honoured, so each matrix slot maps to the correct recipe cell. Slots
+     * outside the matched region require 1.
+     */
+    public int[] getRequiredAmounts(CarpenterCraftMatrix matrix) {
+        if (!hasStackedIngredients) {
+            // Every slot needs exactly one item: the caller treats null as "all ones" and skips the scan
+            return null;
+        }
+        int gridW = ShapelessCarpenterRecipes.globalWidth;
+        int gridH = ShapelessCarpenterRecipes.globalHeight;
+        int[] amounts = new int[gridW * gridH];
+        java.util.Arrays.fill(amounts, 1);
+
+        for (int offX = 0; offX <= gridW - this.recipeWidth; ++offX) {
+            for (int offY = 0; offY <= gridH - this.recipeHeight; ++offY) {
+                if (this.checkMatch(matrix, offX, offY, true)) {
+                    fillAmounts(amounts, gridW, gridH, offX, offY, true);
+                    return amounts;
+                }
+                if (this.checkMatch(matrix, offX, offY, false)) {
+                    fillAmounts(amounts, gridW, gridH, offX, offY, false);
+                    return amounts;
+                }
+            }
+        }
+        return amounts;
+    }
+
+    private void fillAmounts(int[] amounts, int gridW, int gridH, int offX, int offY, boolean mirrored) {
+        for (int col = 0; col < gridW; ++col) {
+            for (int row = 0; row < gridH; ++row) {
+                int recipeX = col - offX;
+                int recipeY = row - offY;
+                if (recipeX < 0 || recipeY < 0 || recipeX >= this.recipeWidth || recipeY >= this.recipeHeight) {
+                    continue;
+                }
+                ItemStack recipeItem = mirrored
+                        ? this.recipeItems[this.recipeWidth - recipeX - 1 + recipeY * this.recipeWidth]
+                        : this.recipeItems[recipeX + recipeY * this.recipeWidth];
+                if (recipeItem != null) {
+                    amounts[col + row * gridW] = Math.max(1, recipeItem.stackSize);
+                }
+            }
+        }
     }
 
     /**
