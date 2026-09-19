@@ -59,6 +59,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private Skill skillUsed;
     private boolean resetRecipe = false;
     private boolean craftingDataDirty = true;
+    /** Saved progress outlives the derived recipe cache, so rebuild it before the first canCraft check. */
+    private boolean needsRecipeRestore;
     private boolean isFakeAnvil = false;
     private ItemStack recipe;
     private IAnvilRecipe activeRecipe;
@@ -99,6 +101,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         }
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
+        needsRecipeRestore = progressMax > 0;
         toolTypeRequired = nbt.getString("toolTypeRequired");
         researchRequired = nbt.getString("researchRequired");
         texName = nbt.getString("TextureName");
@@ -226,6 +229,13 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         }
         super.updateEntity();
         if (!worldObj.isRemote) {
+            if (needsRecipeRestore) {
+                needsRecipeRestore = false;
+                if (!isFakeAnvil) {
+                    updateCraftingData();
+                    craftingDataDirty = false;
+                }
+            }
             if (!isFakeAnvil && craftingDataDirty && ticksExisted % 20 == 0) {
                 updateCraftingData();
                 craftingDataDirty = false;

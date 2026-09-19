@@ -46,6 +46,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
     private String researchRequired = "";
     private Skill skillUsed;
     private boolean resetRecipe = false;
+    /** Saved progress outlives the derived recipe cache, so rebuild it before the first canCraft check. */
+    private boolean needsRecipeRestore;
     private ItemStack recipe;
     private ICarpenterRecipe activeRecipe;
     private int[] requiredAmounts;
@@ -80,6 +82,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         }
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
+        needsRecipeRestore = progressMax > 0;
         toolTypeRequired = nbt.getString("toolTypeRequired");
         craftSound = nbt.getString("craftSound");
         researchRequired = nbt.getString("researchRequired");
@@ -196,6 +199,10 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         ++ticksExisted;
         super.updateEntity();
         if (!worldObj.isRemote) {
+            if (needsRecipeRestore) {
+                needsRecipeRestore = false;
+                updateCraftingData();
+            }
             // onInventoryChanged already refreshes the recipe; this is only a fallback poll, so skip it while the
             // grid is empty and nothing is cached. Idle benches otherwise rescanned the whole recipe list forever.
             if (ticksExisted % 20 == 0 && (hasInputs() || recipe != null || activeRecipe != null)) {
