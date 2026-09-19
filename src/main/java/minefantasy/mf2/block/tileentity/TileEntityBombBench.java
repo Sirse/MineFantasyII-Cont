@@ -201,7 +201,8 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
         if (ItemBomb.getFuse(bomb1) != ItemBomb.getFuse(bomb2)) {
             return false;
         }
-        return bomb1.isItemEqual(bomb2);
+        // isItemEqual ignores NBT, so a plain bomb would merge into a slimed stack and inherit stickiness for free
+        return bomb1.isItemEqual(bomb2) && ItemStack.areItemStackTagsEqual(bomb1, bomb2);
     }
 
     public void onInventoryChanged() {}
@@ -417,7 +418,8 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
 
     @Override
     public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[] { 0, 1, 2, 3, 4 };
+        // Slot 5 holds the empty containers the powder leaves behind; automation has to be able to clear it
+        return new int[] { 0, 1, 2, 3, 4, 5 };
     }
 
     @Override
@@ -427,7 +429,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
 
     @Override
     public boolean canExtractItem(int slot, ItemStack item, int side) {
-        return slot == 4;
+        return slot == 4 || slot == 5;
     }
 
     @Override
