@@ -32,6 +32,9 @@ public class CogworkControlPacket extends PacketMF {
             return;
         }
 
+        if (!NetworkUtils.hasPayload(packet, 13)) {
+            return;
+        }
         // Locals, not fields: this handler instance is shared by every player through packetList
         int id = packet.readInt();
         float moveForward = packet.readFloat();

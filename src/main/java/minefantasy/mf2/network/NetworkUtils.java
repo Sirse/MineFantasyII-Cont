@@ -70,6 +70,14 @@ public class NetworkUtils {
         return player != null && !player.worldObj.isRemote;
     }
 
+    /**
+     * Serverbound handlers call this before decoding. A truncated payload would otherwise throw out of the read itself,
+     * which happens before the handler reaches its own rate limit and so cannot be throttled at all.
+     */
+    public static boolean hasPayload(ByteBuf buf, int bytes) {
+        return buf != null && buf.readableBytes() >= bytes;
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T getTile(World world, int[] coords, Class<T> clazz) {
         if (world == null || coords == null || coords.length < 3) return null;

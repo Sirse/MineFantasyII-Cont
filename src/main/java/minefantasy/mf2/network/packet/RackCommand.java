@@ -32,6 +32,9 @@ public class RackCommand extends PacketMF {
             return;
         }
 
+        if (!NetworkUtils.hasPayload(packet, 16)) {
+            return;
+        }
         // Keep everything the packet carries in locals: this instance is shared through packetList
         int x = packet.readInt();
         int y = packet.readInt();

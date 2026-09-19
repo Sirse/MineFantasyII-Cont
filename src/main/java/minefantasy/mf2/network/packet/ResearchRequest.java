@@ -28,6 +28,9 @@ public class ResearchRequest extends PacketMF {
         if (!NetworkUtils.isServer(player)) {
             return;
         }
+        if (!NetworkUtils.hasPayload(packet, 4)) {
+            return;
+        }
         // Local, not a field: this handler instance is shared by every player through packetList
         int requestedId = packet.readInt();
         if (requestedId < 0 || requestedId >= InformationList.knowledgeList.size()) {
