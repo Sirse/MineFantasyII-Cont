@@ -6,6 +6,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
@@ -50,6 +53,20 @@ public class BlockChimney extends BlockContainer {
         this.setHardness(5F);
         this.setResistance(10F);
         this.setCreativeTab(CreativeTabMF.tabUtil);
+    }
+
+    /**
+     * Remember who built this so a smoke-overload blast is attributed to its owner.
+     */
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
+        super.onBlockPlacedBy(world, x, y, z, placer, item);
+        if (!world.isRemote && placer instanceof EntityPlayer) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof TileEntityChimney) {
+                ((TileEntityChimney) tile).setOwner((EntityPlayer) placer);
+            }
+        }
     }
 
     @Override

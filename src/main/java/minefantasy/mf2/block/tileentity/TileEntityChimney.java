@@ -3,6 +3,7 @@ package minefantasy.mf2.block.tileentity;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -22,6 +23,10 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     public int lastSharedInt = 0;
     protected int smokeStorage;
     private int isIndirect = -1;
+    /**
+     * Name of the player who placed this block; empty when unknown (pre-existing blocks)
+     */
+    private String ownerName = "";
     private Random rand = new Random();
 
     @Override
@@ -43,8 +48,24 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
             }
         }
         if (!worldObj.isRemote && smokeStorage > getMaxSmokeStorage() && rand.nextInt(500) == 0) {
-            worldObj.newExplosion(null, xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 2F, false, true);
+            // Attribute the blast to the block's owner, so protection plugins evaluate the right permissions
+            worldObj.newExplosion(getExplosionCause(), xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 2F, false, true);
         }
+    }
+
+    /**
+     * Records the builder, so the smoke-overload blast is attributed to the owner rather than to whoever happens to
+     * stand nearby and protection plugins evaluate the right permissions. Called from the block on placement.
+     */
+    public void setOwner(EntityPlayer player) {
+        ownerName = player == null ? "" : player.getCommandSenderName();
+    }
+
+    private EntityPlayer getExplosionCause() {
+        if (ownerName == null || ownerName.isEmpty()) {
+            return null;
+        }
+        return worldObj.getPlayerEntityByName(ownerName);
     }
 
     public boolean isPipeChimney() {
@@ -105,6 +126,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
+        nbt.setString("Owner", ownerName == null ? "" : ownerName);
         nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setInteger("StoredSmoke", smokeStorage);
         NBTTagList savedItems = new NBTTagList();
@@ -116,6 +138,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
+        ownerName = nbt.getString("Owner");
         ticksExisted = nbt.getInteger("ticksExisted");
         smokeStorage = nbt.getInteger("StoredSmoke");
         setBlock(nbt.getInteger("BlockID"));
