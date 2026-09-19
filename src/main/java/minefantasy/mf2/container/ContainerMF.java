@@ -42,12 +42,20 @@ public abstract class ContainerMF extends Container {
         this.trackedData.add(new TrackedData<>(getter, setter, Float::floatToIntBits, Float::intBitsToFloat));
     }
 
+    /**
+     * S31PacketWindowProperty writes the value with writeShort, so a progress bar update only carries 16 bits. Each
+     * tracked field therefore occupies two consecutive ids: the low half at index*2 and the high half at index*2+1.
+     */
+    private void sendTracked(ICrafting crafter, int index, int intValue) {
+        crafter.sendProgressBarUpdate(this, index * 2, intValue & 0xFFFF);
+        crafter.sendProgressBarUpdate(this, index * 2 + 1, (intValue >>> 16) & 0xFFFF);
+    }
+
     @Override
     public void addCraftingToCrafters(ICrafting crafter) {
         super.addCraftingToCrafters(crafter);
         for (int i = 0; i < trackedData.size(); i++) {
-            TrackedData<?> tracked = trackedData.get(i);
-            crafter.sendProgressBarUpdate(this, i, tracked.getIntValue());
+            sendTracked(crafter, i, trackedData.get(i).getIntValue());
         }
     }
 
@@ -59,7 +67,7 @@ public abstract class ContainerMF extends Container {
             if (tracked.hasChanged()) {
                 int intValue = tracked.getIntValue();
                 for (Object crafterObj : this.crafters) {
-                    ((ICrafting) crafterObj).sendProgressBarUpdate(this, i, intValue);
+                    sendTracked((ICrafting) crafterObj, i, intValue);
                 }
             }
         }
@@ -68,8 +76,15 @@ public abstract class ContainerMF extends Container {
     @Override
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int id, int value) {
-        if (id >= 0 && id < trackedData.size()) {
-            trackedData.get(id).setFromInt(value);
+        int index = id >> 1;
+        if (index < 0 || index >= trackedData.size()) {
+            return;
+        }
+        // readShort sign-extends, so mask before reassembling the 32-bit value
+        if ((id & 1) == 0) {
+            trackedData.get(index).setLowHalf(value & 0xFFFF);
+        } else {
+            trackedData.get(index).applyHighHalf(value & 0xFFFF);
         }
     }
 
@@ -167,6 +182,10 @@ public abstract class ContainerMF extends Container {
         private final Function<T, Integer> toInt;
         private final Function<Integer, T> fromInt;
         private T lastValue;
+        /**
+         * Low 16 bits received so far; the value is applied once its high half arrives
+         */
+        private int pendingLowHalf;
 
         TrackedData(Supplier<T> getter, Consumer<T> setter, Function<T, Integer> toInt, Function<Integer, T> fromInt) {
             this.getter = getter;
@@ -198,10 +217,17 @@ public abstract class ContainerMF extends Container {
         }
 
         /**
-         * Sets the value from an integer received from the network.
+         * Buffers the low half of a split value until the high half arrives
          */
-        void setFromInt(int value) {
-            setter.accept(fromInt.apply(value));
+        void setLowHalf(int low) {
+            pendingLowHalf = low;
+        }
+
+        /**
+         * Reassembles and applies the value once both halves have been received
+         */
+        void applyHighHalf(int high) {
+            setter.accept(fromInt.apply((high << 16) | pendingLowHalf));
         }
     }
 
