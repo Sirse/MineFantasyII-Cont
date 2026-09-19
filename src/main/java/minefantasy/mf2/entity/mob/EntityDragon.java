@@ -477,19 +477,14 @@ public class EntityDragon extends EntityFlyingMF
                 enClass,
                 AxisAlignedBB.getBoundingBox(posX, posY, posZ, posX + 1.0D, posY + 1.0D, posZ + 1.0D)
                         .expand(getAggro(), getAggro(), getAggro()));
-        while (!list.isEmpty()) {
-            Entity target = (Entity) list.get(0);
-            if (canAttackEntity(target)) {
-                double r = getAggro();
-                boolean inRange = this.getDistanceToEntity(target) <= r;
-                if (getDisengageTime() <= 0 && inRange) {
-                    setTarget(target);
-                    list.clear();
-                } else {
-                    list.remove(0);
-                }
-            } else {
-                list.remove(0);
+        // Walk the list instead of draining it: getEntitiesWithinAABB hands back an ArrayList, so removing the
+        // head per rejected candidate shifted the backing array once for every element still behind it
+        double r = getAggro();
+        for (int i = 0; i < list.size(); i++) {
+            Entity target = (Entity) list.get(i);
+            if (canAttackEntity(target) && this.getDistanceToEntity(target) <= r) {
+                setTarget(target);
+                return;
             }
         }
     }
@@ -499,21 +494,20 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     private boolean canAttackEntity(Entity target) {
-        if (this.getType().isBlind() && !this.canHearEntity(target)) {
-            return false;
-        }
+        // Cheap rejections first: canEntityBeSeen is a ray trace, and it used to run twice for a valid non player
         if (getDisengageTime() > 0) {
             return false;
         }
-        if (!this.canEntityBeSeen(target)) return false;
         if (target instanceof EntityDragon || target == this.riddenByEntity) {
             return false;
         }
-        if (target instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) target;
-            return !player.capabilities.isCreativeMode;
+        if (target instanceof EntityPlayer && ((EntityPlayer) target).capabilities.isCreativeMode) {
+            return false;
         }
-        return canEntityBeSeen(target);
+        if (this.getType().isBlind() && !this.canHearEntity(target)) {
+            return false;
+        }
+        return this.canEntityBeSeen(target);
     }
 
     private double getAggro() {
