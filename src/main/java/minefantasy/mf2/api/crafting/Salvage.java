@@ -117,16 +117,18 @@ public class Salvage {
             float chanceModifier, float chance) {
         List<ItemStack> items = new ArrayList<ItemStack>();
         for (Object entry : entryList) {
-            if (entry != null) {
-                if (entry instanceof Item && random.nextFloat() * chanceModifier < chance) {
-                    items = dropItemStack(mainItem, user, items, new ItemStack((Item) entry), chanceModifier, chance);
-                }
-                if (entry instanceof Block && random.nextFloat() * chanceModifier < chance) {
-                    items = dropItemStack(mainItem, user, items, new ItemStack((Block) entry), chanceModifier, chance);
-                }
-                if (entry instanceof ItemStack) {
-                    items = dropItemStack(mainItem, user, items, (ItemStack) entry, chanceModifier, chance);
-                }
+            // Normalise first: rolling here as well as in dropItemStack gave Item/Block entries a squared chance,
+            // so the same component dropped less often purely because of how the recipe was registered.
+            ItemStack stack = null;
+            if (entry instanceof Item) {
+                stack = new ItemStack((Item) entry);
+            } else if (entry instanceof Block) {
+                stack = new ItemStack((Block) entry);
+            } else if (entry instanceof ItemStack) {
+                stack = (ItemStack) entry;
+            }
+            if (stack != null) {
+                items = dropItemStack(mainItem, user, items, stack, chanceModifier, chance);
             }
         }
         return items;
