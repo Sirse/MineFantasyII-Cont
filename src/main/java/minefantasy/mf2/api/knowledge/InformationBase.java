@@ -180,23 +180,25 @@ public class InformationBase {
         return this.isPerk;
     }
 
+    /**
+     * Attempts to unlock this entry for the player.
+     *
+     * @return true only when something was actually unlocked, so callers can skip a pointless resync
+     */
     public boolean onPurchase(EntityPlayer user) {
-        if (!hasSkillsUnlocked(user)) {
+        if (!hasSkillsUnlocked(user) || !isEasy()) {
             return false;
         }
 
-        boolean success = ResearchLogic.canPurchase(user, this);
-        if (success && !user.worldObj.isRemote) {
+        // tryUnlock applies the same gate canPurchase used to test, so asking it once is enough
+        boolean unlocked = ResearchLogic.tryUnlock(user, this);
+        if (unlocked && !user.worldObj.isRemote) {
             user.worldObj.playSoundAtEntity(user, "minefantasy2:updateResearch", 1.0F, 1.0F);
             if (getPerk()) {
                 user.worldObj.playSoundAtEntity(user, "random.levelup", 1.0F, 1.0F);
             }
         }
-
-        if (isEasy()) {
-            ResearchLogic.tryUnlock(user, this);
-        } else {}
-        return true;
+        return unlocked;
     }
 
     public boolean hasSkillsUnlocked(EntityPlayer player) {
