@@ -48,6 +48,30 @@ public class TransformationRecipes {
         return recipe;
     }
 
+    public static TransformationRecipe addRecipe(Block input, int inputMeta, Block output, int outputMeta,
+            boolean copyMeta, String toolType, int toolTier, int hits, ItemStack consumable, ItemStack dropPerHit,
+            String sound, Skill skill, int skillXp, String research, int outputCount, int copyMetaMask) {
+        TransformationRecipe recipe = new TransformationRecipe(
+                input,
+                inputMeta,
+                output,
+                outputMeta,
+                copyMeta,
+                toolType,
+                toolTier,
+                hits,
+                consumable,
+                dropPerHit,
+                sound,
+                skill,
+                skillXp,
+                research,
+                outputCount,
+                copyMetaMask);
+        recipes.add(recipe);
+        return recipe;
+    }
+
     public static TransformationRecipe findRecipe(Block block, int meta, String heldTool, int heldTier) {
         Iterator it = recipes.iterator();
         while (it.hasNext()) {
@@ -70,10 +94,29 @@ public class TransformationRecipes {
         if (!recipes.isEmpty()) {
             return;
         }
+        if (!ConfigCrafting.enableTransformations) {
+            return;
+        }
 
         if (ConfigCrafting.transformationLogChopping) {
-            // Any log chops into planks of the same species
-            addRecipe(Blocks.log, -1, Blocks.planks, 0, true, "axe", -1, 1, null, null, "dig.wood", null, 0, null, 1);
+            // Any log chops into planks of the same species; mask out the orientation bits of the log meta
+            addRecipe(
+                    Blocks.log,
+                    -1,
+                    Blocks.planks,
+                    0,
+                    true,
+                    "axe",
+                    -1,
+                    1,
+                    null,
+                    null,
+                    "dig.wood",
+                    null,
+                    0,
+                    null,
+                    1,
+                    3);
         }
         if (ConfigCrafting.transformationPlankSawing) {
             // Any plank saws into two slabs of the same species
