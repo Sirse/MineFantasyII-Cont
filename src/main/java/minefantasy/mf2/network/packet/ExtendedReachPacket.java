@@ -43,6 +43,9 @@ public class ExtendedReachPacket extends PacketMF {
             return;
         }
 
+        if (!NetworkUtils.hasPayload(in, 4)) {
+            return;
+        }
         int id = in.readInt();
 
         // Rate limit first: canReach runs a block ray trace, so an unthrottled client could force one per packet
@@ -76,12 +79,9 @@ public class ExtendedReachPacket extends PacketMF {
 
         double maxDist = Math.min(extendedReach + 4.0D, MAX_ALLOWED_REACH_BLOCKS);
         // EntityPlayer.getPosition is @SideOnly(CLIENT) and is stripped by the SideTransformer on a dedicated
-        // server, so build the same vector explicitly. In 1.7.10 posY already sits at eye level (yOffset 1.62),
-        // and the eye-height delta is the sneak/sleep correction that getPosition(1.0F) applies.
-        Vec3 start = Vec3.createVectorHelper(
-                player.posX,
-                player.posY + (player.getEyeHeight() - player.getDefaultEyeHeight()),
-                player.posZ);
+        // server, so build the eye vector explicitly. EntityPlayerMP sets yOffset to 0, so unlike the client
+        // player its posY sits at the feet and the full eye height has to be added.
+        Vec3 start = Vec3.createVectorHelper(player.posX, player.posY + player.getEyeHeight(), player.posZ);
         Vec3 look = player.getLook(1.0F);
         Vec3 end = start.addVector(look.xCoord * maxDist, look.yCoord * maxDist, look.zCoord * maxDist);
         MovingObjectPosition blockHit = player.worldObj.rayTraceBlocks(start, end, false);
