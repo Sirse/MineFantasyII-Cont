@@ -59,8 +59,6 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     private int ticksExisted;
     private int ticksSinceSync;
     private boolean wasBurning;
-    private int lastSyncedFuel = Integer.MIN_VALUE;
-    private int lastSyncedProgress = Integer.MIN_VALUE;
     private int lastSyncedBurn = -1;
     private int lastSyncedDoorAngle = -1;
 
@@ -661,16 +659,15 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         }
 
         int burn = isBurning() ? 1 : 0;
-        boolean changed = fuel != lastSyncedFuel || progress != lastSyncedProgress
-                || doorAngle != lastSyncedDoorAngle
-                || burn != lastSyncedBurn;
+        // Only the burning state and the door angle are rendered outside the GUI. fuel and progress change every
+        // tick while the machine runs, and GuiBigFurnace already gets them through ContainerBigFurnace.trackInt,
+        // so they ride along in the payload for late watchers but no longer trigger a broadcast of their own.
+        boolean changed = doorAngle != lastSyncedDoorAngle || burn != lastSyncedBurn;
 
         if (!changed && ticksExisted % 40 != 0) {
             return;
         }
 
-        lastSyncedFuel = fuel;
-        lastSyncedProgress = progress;
         lastSyncedDoorAngle = doorAngle;
         lastSyncedBurn = burn;
 
