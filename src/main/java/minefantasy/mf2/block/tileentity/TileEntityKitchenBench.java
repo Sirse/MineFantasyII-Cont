@@ -185,7 +185,9 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         if (!worldObj.isRemote) {
             dirtyMax = ConfigKitchen.dirtyProgressMax;
         }
-        if (!worldObj.isRemote && ticksExisted % 20 == 0) {
+        // onInventoryChanged already refreshes the recipe; this is only a fallback poll, so skip it while the
+        // grid is empty and nothing is cached. Idle benches otherwise rescanned the whole recipe list forever.
+        if (!worldObj.isRemote && ticksExisted % 20 == 0 && (hasInputs() || recipe != null || activeRecipe != null)) {
             updateCraftingData();
         }
         resetRecipe = false;
@@ -350,6 +352,15 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
 
     private int getOutputSlotNum() {
         return getSizeInventory() - 5;
+    }
+
+    private boolean hasInputs() {
+        for (int a = 0; a < getOutputSlotNum(); a++) {
+            if (inventory[a] != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private int getRequiredAmount(int slot) {

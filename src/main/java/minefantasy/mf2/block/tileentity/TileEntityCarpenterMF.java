@@ -196,7 +196,9 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         ++ticksExisted;
         super.updateEntity();
         if (!worldObj.isRemote) {
-            if (ticksExisted % 20 == 0) {
+            // onInventoryChanged already refreshes the recipe; this is only a fallback poll, so skip it while the
+            // grid is empty and nothing is cached. Idle benches otherwise rescanned the whole recipe list forever.
+            if (ticksExisted % 20 == 0 && (hasInputs() || recipe != null || activeRecipe != null)) {
                 updateCraftingData();
             }
             if (!canCraft() && ticksExisted > 1) {
@@ -308,6 +310,15 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
 
     private int getOutputSlotNum() {
         return getSizeInventory() - 5;
+    }
+
+    private boolean hasInputs() {
+        for (int a = 0; a < getOutputSlotNum(); a++) {
+            if (inventory[a] != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ItemStack modifyArmour(ItemStack result) {
