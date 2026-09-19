@@ -118,15 +118,21 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         }
         if (result.stackSize <= 0) return;
 
-        if (ConfigHardcore.HCCreduceIngots && rand.nextInt(3) == 0) {
+        // The input is already consumed at this point, so the leftover has to reach the world. Hardcore Ingots is a
+        // reduction on top of that, not the only path that produces anything.
+        if (!ConfigHardcore.HCCreduceIngots || rand.nextInt(3) == 0) {
             EntityItem entity = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, result);
             worldObj.spawnEntityInWorld(entity);
         }
     }
 
     private void startFire(int x, int y, int z) {
-        if (!worldObj.isRemote && worldObj.isAirBlock(x, y, z)) {
-            worldObj.setBlock(xCoord + x, yCoord + y, zCoord + z, Blocks.fire);
+        // x/y/z are offsets: resolve them once so the test and the write look at the same block
+        int blockX = xCoord + x;
+        int blockY = yCoord + y;
+        int blockZ = zCoord + z;
+        if (!worldObj.isRemote && worldObj.isAirBlock(blockX, blockY, blockZ)) {
+            worldObj.setBlock(blockX, blockY, blockZ, Blocks.fire);
         }
     }
 
@@ -157,7 +163,8 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
     private ItemStack getSmeltedResult(TileEntityBlastFC shaft, int y) {
         if (shaft.getIsBuilt()) {
             ItemStack input = shaft.getStackInSlot(1);
-            if (shaft.tempUses <= 0 && shaft.getStackInSlot(0) == null || !isCarbon(shaft.getStackInSlot(0))) {
+            // Carbon is available when charges are left over, or when the slot holds a carbon item
+            if (shaft.tempUses <= 0 && !isCarbon(shaft.getStackInSlot(0))) {
                 return null;
             }
             if (input != null) {
@@ -187,7 +194,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     @Override
     protected boolean getIsBuilt() {
-        return (isFirebrick(-1, 0, -1) && isFirebrick(1, 0, -1) && isFirebrick(-1, 0, 1) && isFirebrick(1, 0, -1))
+        return (isFirebrick(-1, 0, -1) && isFirebrick(1, 0, -1) && isFirebrick(-1, 0, 1) && isFirebrick(1, 0, 1))
                 && (isAir(-1, 0, 0) && isAir(1, 0, 0) && isAir(0, 0, -1) && isAir(0, 0, 1));
     }
 

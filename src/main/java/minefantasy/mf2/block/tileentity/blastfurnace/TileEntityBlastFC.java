@@ -24,6 +24,10 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     public int ticksExisted;
     public boolean isBuilt = false;
     public int fireTime;
+    /**
+     * Name of the player who placed this block; empty when unknown (pre-existing blocks)
+     */
+    private String ownerName = "";
     public int tempUses;
     protected ItemStack[] items = new ItemStack[2];
     protected int smokeStorage;
@@ -68,8 +72,24 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
             SmokeMechanics.emitSmokeFromCarrier(worldObj, xCoord, yCoord, zCoord, this, 5);
         }
         if (!worldObj.isRemote && smokeStorage > getMaxSmokeStorage() && rand.nextInt(1000) == 0) {
-            worldObj.newExplosion(null, xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 5F, true, true);
+            // Attribute the blast to the block's owner, so protection plugins evaluate the right permissions
+            worldObj.newExplosion(getExplosionCause(), xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 5F, true, true);
         }
+    }
+
+    /**
+     * Records the builder, so the smoke-overload blast is attributed to the owner rather than to whoever happens to
+     * stand nearby and protection plugins evaluate the right permissions. Called from the block on placement.
+     */
+    public void setOwner(EntityPlayer player) {
+        ownerName = player == null ? "" : player.getCommandSenderName();
+    }
+
+    private EntityPlayer getExplosionCause() {
+        if (ownerName == null || ownerName.isEmpty()) {
+            return null;
+        }
+        return worldObj.getPlayerEntityByName(ownerName);
     }
 
     protected void interact(TileEntityBlastFC tile) {
@@ -129,7 +149,9 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
+        nbt.setString("Owner", ownerName == null ? "" : ownerName);
         nbt.setInteger("fireTime", fireTime);
+        nbt.setInteger("CarbonUses", tempUses);
         nbt.setBoolean("isBuilt", isBuilt);
         nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setInteger("StoredSmoke", smokeStorage);
@@ -151,7 +173,9 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
+        ownerName = nbt.getString("Owner");
         fireTime = nbt.getInteger("fireTime");
+        tempUses = nbt.getInteger("CarbonUses");
         isBuilt = nbt.getBoolean("isBuilt");
         ticksExisted = nbt.getInteger("ticksExisted");
         smokeStorage = nbt.getInteger("StoredSmoke");

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -40,6 +41,20 @@ public class BlockBFC extends BlockContainer {
         this.setHardness(8F);
         this.setResistance(10F);
         this.setCreativeTab(CreativeTabMF.tabUtil);
+    }
+
+    /**
+     * Remember who built this so a smoke-overload blast is attributed to its owner.
+     */
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
+        super.onBlockPlacedBy(world, x, y, z, placer, item);
+        if (!world.isRemote && placer instanceof EntityPlayer) {
+            TileEntity tile = world.getTileEntity(x, y, z);
+            if (tile instanceof TileEntityBlastFC) {
+                ((TileEntityBlastFC) tile).setOwner((EntityPlayer) placer);
+            }
+        }
     }
 
     @Override
