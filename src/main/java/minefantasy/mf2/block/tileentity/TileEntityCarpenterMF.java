@@ -430,22 +430,32 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
         for (int slot = 0; slot < getOutputSlotNum(); slot++) {
             ItemStack item = getStackInSlot(slot);
             int take = getRequiredAmount(slot);
-            if (item != null && item.getItem() != null && item.getItem().getContainerItem(item) != null) {
-                if (item.stackSize <= take) {
-                    setInventorySlotContents(slot, item.getItem().getContainerItem(item));
-                } else {
-                    ItemStack drop = processSurplus(item.getItem().getContainerItem(item));
-                    if (drop != null) {
-                        this.dropItem(drop);
-                    }
-                    this.decrStackSize(slot, take);
+            // One container comes back per unit actually consumed, not one per slot
+            ItemStack container = getSingleContainer(item);
+            int consumed = item == null ? 0 : Math.min(take, item.stackSize);
+            this.decrStackSize(slot, take);
+            for (int made = 0; made < consumed && container != null; made++) {
+                ItemStack surplus = processSurplus(container.copy());
+                if (surplus != null) {
+                    this.dropItem(surplus);
                 }
-            } else {
-                this.decrStackSize(slot, take);
             }
         }
         resetRecipe = false;
         this.onInventoryChanged();
+    }
+
+    /**
+     * Container left by consuming a single unit of the stack, queried against a stack of one so the count is right.
+     */
+    private ItemStack getSingleContainer(ItemStack item) {
+        if (item == null || item.getItem() == null) {
+            return null;
+        }
+        ItemStack single = item.copy();
+        single.stackSize = 1;
+        ItemStack container = single.getItem().getContainerItem(single);
+        return container == null ? null : container.copy();
     }
 
     private ItemStack processSurplus(ItemStack item) {

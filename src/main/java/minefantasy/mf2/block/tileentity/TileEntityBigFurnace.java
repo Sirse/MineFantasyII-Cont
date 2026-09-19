@@ -4,8 +4,8 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemFood;
@@ -365,12 +365,19 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
             if (inv[0] != null && isItemFuel(inv[0])) {
                 fuel = maxFuel = getItemBurnTime(inv[0]);
                 maxHeat = getItemHeat(inv[0]);
-                ItemStack cont = inv[0].getItem().getContainerItem(inv[0]);
+                // One unit is burned, so only one container comes back. Replacing the whole stack with a single
+                // container destroyed the rest of it.
+                ItemStack single = inv[0].copy();
+                single.stackSize = 1;
+                ItemStack cont = single.getItem().getContainerItem(single);
 
+                decrStackSize(0, 1);
                 if (cont != null) {
-                    inv[0] = cont;
-                } else {
-                    decrStackSize(0, 1);
+                    if (inv[0] == null) {
+                        inv[0] = cont;
+                    } else {
+                        dropItem(cont);
+                    }
                 }
             }
             if (fuel <= 0) {
@@ -414,6 +421,18 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
          */
     }
 
+    private void dropItem(ItemStack itemstack) {
+        if (itemstack == null || worldObj == null || worldObj.isRemote) {
+            return;
+        }
+        EntityItem drop = new EntityItem(worldObj, xCoord + 0.5D, yCoord + 1.0D, zCoord + 0.5D, itemstack);
+        drop.motionX = (rand.nextDouble() - 0.5D) * 0.1D;
+        drop.motionY = 0.2D;
+        drop.motionZ = (rand.nextDouble() - 0.5D) * 0.1D;
+        worldObj.spawnEntityInWorld(drop);
+    }
+
+    @Override
     public int getSizeInventory() {
         return inv.length;
     }
@@ -717,7 +736,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         if (!isHeater()) {
             return slot >= 4;
         }
-        return item != null && item.getItem() == Items.bucket;
+        // Anything left in the fuel slot that no longer burns is spent container, so let automation clear it
+        return item != null && !isItemFuel(item);
     }
 
     public int getCookProgressScaled(int i) {

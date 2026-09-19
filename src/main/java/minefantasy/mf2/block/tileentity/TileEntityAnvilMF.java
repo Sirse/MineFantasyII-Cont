@@ -633,27 +633,35 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
         for (int slot = 0; slot < getSizeInventory() - 1; slot++) {
             ItemStack item = getStackInSlot(slot);
             int take = getRequiredAmount(slot);
+            // One container comes back per unit actually consumed, not one per slot
+            int consumed = item == null ? 0 : Math.min(take, item.stackSize);
             ItemStack container = getContainerItem(item);
+            this.decrStackSize(slot, take);
             if (container != null) {
-                if (item.stackSize <= take) {
-                    setInventorySlotContents(slot, container.copy());
-                } else {
-                    this.dropItem(container.copy());
-                    this.decrStackSize(slot, take);
+                for (int made = 0; made < consumed; made++) {
+                    if (made == 0 && getStackInSlot(slot) == null) {
+                        setInventorySlotContents(slot, container.copy());
+                    } else {
+                        this.dropItem(container.copy());
+                    }
                 }
-            } else {
-                this.decrStackSize(slot, take);
             }
         }
         resetRecipe = false;
         this.onInventoryChanged();
     }
 
+    /**
+     * Container left by consuming a single unit of the stack. Asking with the full stack would still return one
+     * container, so the query is made against a stack of one.
+     */
     private ItemStack getContainerItem(ItemStack item) {
         if (item == null || item.getItem() == null) {
             return null;
         }
-        ItemStack container = item.getItem().getContainerItem(item);
+        ItemStack single = item.copy();
+        single.stackSize = 1;
+        ItemStack container = single.getItem().getContainerItem(single);
         return container == null ? null : container.copy();
     }
 
