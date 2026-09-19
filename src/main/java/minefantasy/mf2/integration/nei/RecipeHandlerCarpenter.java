@@ -26,8 +26,15 @@ import minetweaker.api.minecraft.MineTweakerMC;
 
 public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
 
+    /**
+     * Fill order for shapeless recipes across the bench's 4x4 grid. The first nine entries keep the old ordering so
+     * existing recipes look unchanged; the rest cover the fourth column and row the handler used to drop.
+     */
     public int[][] stackorder = new int[][] { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 }, { 1, 2 }, { 2, 0 },
-            { 2, 1 }, { 2, 2 } };
+            { 2, 1 }, { 2, 2 }, { 3, 0 }, { 3, 1 }, { 3, 2 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 } };
+
+    /** The bench matrix is 4x4, and the NEI background already draws all sixteen cells at a 23 pixel pitch. */
+    private static final int GRID_SIZE = 4;
 
     private static final int TOOL_ICON_X = 10;
     private static final int STATION_ICON_X = 32;
@@ -192,11 +199,11 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
         }
 
         public void setIngredients(IIngredient[][] ingreds) {
-            for (int y = 0; y < ingreds.length && y < 3; y++) {
+            for (int y = 0; y < ingreds.length && y < GRID_SIZE; y++) {
                 IIngredient[] row = ingreds[y];
                 if (row == null) continue;
 
-                for (int x = 0; x < row.length && x < 3; x++) {
+                for (int x = 0; x < row.length && x < GRID_SIZE; x++) {
                     List<ItemStack> stacks = resolveIngredient(row[x]);
                     if (stacks.isEmpty()) continue;
 
