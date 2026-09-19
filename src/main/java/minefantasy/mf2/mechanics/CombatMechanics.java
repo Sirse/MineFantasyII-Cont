@@ -425,6 +425,8 @@ public class CombatMechanics {
         Shockwave explosion = new Shockwave("humanstomp", source.worldObj, source, x, y, z, power);
         explosion.isFlaming = fire;
         explosion.isSmoking = smoke;
+        // Player-caused shockwaves hurt and push entities but never damage blocks
+        explosion.isGriefing = false;
         explosion.initiate();
         explosion.decorateWave(true);
         return explosion;
