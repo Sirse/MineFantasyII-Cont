@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedMapEdit;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
@@ -50,7 +51,8 @@ public class BigFurnace {
         private final IItemStack output;
         private final IIngredient input;
         private final int tier;
-        private final ArrayList<BigFurnaceRecipes> addedRecipes = new ArrayList<BigFurnaceRecipes>();
+        private final TweakedMapEdit<BigFurnaceRecipes> edit = new TweakedMapEdit<BigFurnaceRecipes>(
+                BigFurnaceRecipes.recipeList);
 
         public AddRecipeAction(IItemStack output, IIngredient input, int tier) {
             this.output = output;
@@ -71,10 +73,9 @@ public class BigFurnace {
                     MineTweakerAPI.logWarning("Skipping big furnace recipe input " + ingredient + " -> " + output);
                     continue;
                 }
-                BigFurnaceRecipes recipe = BigFurnaceRecipes.addRecipe(mcInput, mcOutput, tier);
-                if (recipe != null) {
-                    addedRecipes.add(recipe);
-                }
+                // addRecipe replaces whatever answered for this key, so go through the edit log rather than
+                // letting it write straight into the map
+                edit.put(CustomToolHelper.getReferenceName(mcInput), new BigFurnaceRecipes(mcInput, mcOutput, tier));
             }
         }
 
@@ -85,10 +86,7 @@ public class BigFurnace {
 
         @Override
         public void undo() {
-            for (BigFurnaceRecipes recipeToRemove : addedRecipes) {
-                BigFurnaceRecipes.recipeList.remove(CustomToolHelper.getReferenceName(recipeToRemove.input));
-            }
-            addedRecipes.clear();
+            edit.undo();
         }
 
         @Override

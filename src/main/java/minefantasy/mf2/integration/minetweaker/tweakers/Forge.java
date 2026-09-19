@@ -3,6 +3,7 @@ package minefantasy.mf2.integration.minetweaker.tweakers;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedMapEdit;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
@@ -23,6 +24,7 @@ public class Forge {
 
         private final IIngredient input;
         private final int min, unstable, max;
+        private final TweakedMapEdit<Heatable> edit = new TweakedMapEdit<Heatable>(Heatable.registerList);
 
         public AddHeatableAction(IIngredient input, int min, int unstable, int max) {
             this.input = input;
@@ -39,7 +41,8 @@ public class Forge {
                     MineTweakerAPI.logWarning("Skipping heatable registration for invalid item " + s);
                     continue;
                 }
-                Heatable.addItem(stack, min, unstable, max);
+                // addItem replaces on put, so record the previous profile for this key before overwriting it
+                edit.put(Heatable.getRegistrationForItem(stack), new Heatable(stack, min, unstable, max));
             }
         }
 
@@ -65,13 +68,7 @@ public class Forge {
 
         @Override
         public void undo() {
-            for (IItemStack s : input.getItems()) {
-                ItemStack stack = MineTweakerMC.getItemStack(s);
-                if (stack == null) {
-                    continue;
-                }
-                Heatable.registerList.remove(Heatable.getRegistrationForItem(stack));
-            }
+            edit.undo();
         }
     }
 }
