@@ -109,11 +109,13 @@ public class BlockAmmoBox extends BlockWoodDecor {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
         int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
         world.setBlockMetadataWithNotify(x, y, z, direction, 2);
+        // Restore the material first: applyItemNbtToTile clamps the stock to the tile's capacity, which depends on
+        // it. Running it against the default material truncated the contents of higher-tier boxes.
+        super.onBlockPlacedBy(world, x, y, z, user, item);
         TileEntityAmmoBox tile = getTile(world, x, y, z);
         if (tile != null) {
             applyItemNbtToTile(item, tile);
         }
-        super.onBlockPlacedBy(world, x, y, z, user, item);
     }
 
     @Override

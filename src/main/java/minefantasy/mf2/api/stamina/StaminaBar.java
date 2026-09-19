@@ -20,6 +20,10 @@ public class StaminaBar {
     public static final String staminaBonusName = "MineFantasy_staminaMaxAddon";
     public static final String staminaBonusTicksName = "MineFantasy_staminaMaxAddonTicks";
     public static final String staminaMaxName = "MineFantasy_staminaMax";
+    /**
+     * Marks that the stored base has been checked for the baked-in level bonus older versions wrote into it
+     */
+    private static final String staminaMaxCleanName = "MineFantasy_staminaMaxClean";
     public static final String staminaValueName = "MineFantasy_staminaValue";
     public static final String staminaIdleName = "MineFantasy_staminaIdle";
     public static final String staminaFlashName = "MineFantasy_staminaFlashing";
@@ -62,15 +66,31 @@ public class StaminaBar {
         return getBaseMaxStamina(user) + getBonusStamina(user);
     }
 
-    public static float getBaseMaxStamina(EntityLivingBase user) {
-        float bonus = getStaminaLevelBoost(user);
-        if (user.getEntityData() != null) {
-            if (!user.getEntityData().hasKey(staminaMaxName)) {
-                setMaxStamina(user, getDefaultMax(user) + bonus);
-            }
-            return user.getEntityData().getFloat(staminaMaxName) + bonus;
+    /**
+     * The persisted maximum without the level bonus. Storing the bonus would bake it into the base on first access and
+     * count it twice on every later read.
+     */
+    private static float getStoredMax(EntityLivingBase user) {
+        NBTTagCompound data = user.getEntityData();
+        if (data == null) {
+            return getDefaultMax(user);
         }
-        return getDefaultMax(user) + bonus;
+        if (!data.hasKey(staminaMaxName)) {
+            setMaxStamina(user, getDefaultMax(user));
+            data.setBoolean(staminaMaxCleanName, true);
+        } else if (!data.getBoolean(staminaMaxCleanName) && user.worldObj != null && !user.worldObj.isRemote) {
+            // Older versions stored defaultMax plus the level bonus of the moment the data was created, so every
+            // later read counted that bonus twice. Nothing else ever writes this field on the server - the network
+            // packet only applies client side - so the base can only be the default, and is restored to it once.
+            // Server only: the client's copy is whatever the last sync delivered and must not be reset.
+            data.setBoolean(staminaMaxCleanName, true);
+            setMaxStamina(user, getDefaultMax(user));
+        }
+        return data.getFloat(staminaMaxName);
+    }
+
+    public static float getBaseMaxStamina(EntityLivingBase user) {
+        return getStoredMax(user) + getStaminaLevelBoost(user);
     }
 
     public static float getDefaultMax(EntityLivingBase user) {
@@ -84,7 +104,8 @@ public class StaminaBar {
     }
 
     public static void modifyMaxStamina(EntityLivingBase user, float mod) {
-        setMaxStamina(user, getBaseMaxStamina(user) + mod);
+        // Write the stored base, not the bonus-inclusive value, or the level bonus becomes permanent
+        setMaxStamina(user, getStoredMax(user) + mod);
 
         if (getStaminaValue(user) < 0) {
             setStaminaValue(user, 0);
@@ -258,7 +279,7 @@ public class StaminaBar {
      * @param maxBonus the maximum this can achieve (not counting base stamina), <0 means no limit
      */
     public static boolean incrStaminaMax(EntityLivingBase user, float value, float maxBonus) {
-        float current = getBaseMaxStamina(user);
+        float current = getStoredMax(user);
         if (maxBonus > 0 && current >= maxBonus) {
             return false;
         }

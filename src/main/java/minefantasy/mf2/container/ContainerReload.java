@@ -15,9 +15,15 @@ public class ContainerReload extends ContainerMF {
 
     private final InventoryBasic weaponInv;
     private final ItemStack weapon;
+    /**
+     * Hotbar index the open weapon lives in. Hiding the slot is not enough: a number-key click addresses the player
+     * inventory directly, so it has to be rejected explicitly.
+     */
+    private final int weaponHotbarIndex;
 
     public ContainerReload(InventoryPlayer playerInventory, ItemStack weapon) {
         this.weapon = weapon;
+        this.weaponHotbarIndex = playerInventory.currentItem;
         this.weaponInv = new InventoryBasic("reload", false, 1);
         weaponInv.setInventorySlotContents(0, AmmoMechanicsMF.getAmmo(weapon));
 
@@ -38,6 +44,12 @@ public class ContainerReload extends ContainerMF {
     @Override
     public ItemStack slotClick(int slotId, int mouseButton, int modifier, EntityPlayer player) {
         if (!canInteractWith(player)) {
+            return null;
+        }
+        // Mode 2 swaps with a hotbar slot through InventoryPlayer directly, bypassing the slot list. Letting it hit
+        // the open weapon moves a copy of it into the inventory while this container keeps editing the original,
+        // which duplicates the loaded ammo.
+        if (modifier == 2 && mouseButton == weaponHotbarIndex) {
             return null;
         }
         ItemStack result = super.slotClick(slotId, mouseButton, modifier, player);

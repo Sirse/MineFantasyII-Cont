@@ -183,17 +183,28 @@ public class PlayerTickHandlerMF {
         if (StaminaBar.isSystemActive) {
             StaminaBar.setStaminaValue(player, StaminaBar.getBaseMaxStamina(player));
         }
-        if (player.getEntityData().hasKey(chunkCoords + "_x")) {
+        if (player.getEntityData().hasKey(chunkCoords + "_saved")) {
             player.getEntityData().setBoolean(resetBed, true);
         }
     }
 
+    /**
+     * Snapshots the whole spawn state before sleeping in a bed roll. "No personal spawn point" has to be recorded too:
+     * vanilla wakeUpPlayer assigns the bed roll as the spawn, and without a snapshot that assignment sticks. The forced
+     * flag matters as well, or a /spawnpoint without a bed stops working after one night.
+     */
     public static void readyToResetBedPosition(EntityPlayer player) {
+        NBTTagCompound data = player.getEntityData();
         ChunkCoordinates coords = player.getBedLocation(player.dimension);
+
+        data.setBoolean(chunkCoords + "_saved", true);
+        data.setInteger(chunkCoords + "_dim", player.dimension);
+        data.setBoolean(chunkCoords + "_has", coords != null);
         if (coords != null) {
-            player.getEntityData().setInteger(chunkCoords + "_x", coords.posX);
-            player.getEntityData().setInteger(chunkCoords + "_y", coords.posY);
-            player.getEntityData().setInteger(chunkCoords + "_z", coords.posZ);
+            data.setInteger(chunkCoords + "_x", coords.posX);
+            data.setInteger(chunkCoords + "_y", coords.posY);
+            data.setInteger(chunkCoords + "_z", coords.posZ);
+            data.setBoolean(chunkCoords + "_forced", player.isSpawnForced(player.dimension));
         }
     }
 
@@ -409,18 +420,37 @@ public class PlayerTickHandlerMF {
     }
 
     private void resetBedPosition(EntityPlayer player) {
-        if (player.getEntityData().hasKey(chunkCoords + "_x")) {
-            MFLogUtil.logDebug("Reset bed data for " + player.getCommandSenderName());
-            int x = player.getEntityData().getInteger(chunkCoords + "_x");
-            int y = player.getEntityData().getInteger(chunkCoords + "_y");
-            int z = player.getEntityData().getInteger(chunkCoords + "_z");
-            ChunkCoordinates coords = new ChunkCoordinates(x, y, z);
-
-            player.getEntityData().removeTag(chunkCoords + "_x");
-            player.getEntityData().removeTag(chunkCoords + "_y");
-            player.getEntityData().removeTag(chunkCoords + "_z");
-
-            player.setSpawnChunk(coords, false);
+        NBTTagCompound data = player.getEntityData();
+        if (!data.hasKey(chunkCoords + "_saved")) {
+            return;
         }
+        MFLogUtil.logDebug("Reset bed data for " + player.getCommandSenderName());
+
+        boolean hadSpawn = data.getBoolean(chunkCoords + "_has");
+        int dimension = data.getInteger(chunkCoords + "_dim");
+        ChunkCoordinates coords = null;
+        boolean forced = false;
+        if (hadSpawn) {
+            coords = new ChunkCoordinates(
+                    data.getInteger(chunkCoords + "_x"),
+                    data.getInteger(chunkCoords + "_y"),
+                    data.getInteger(chunkCoords + "_z"));
+            forced = data.getBoolean(chunkCoords + "_forced");
+        }
+
+        data.removeTag(chunkCoords + "_saved");
+        data.removeTag(chunkCoords + "_has");
+        data.removeTag(chunkCoords + "_dim");
+        data.removeTag(chunkCoords + "_forced");
+        data.removeTag(chunkCoords + "_x");
+        data.removeTag(chunkCoords + "_y");
+        data.removeTag(chunkCoords + "_z");
+
+        // setSpawnChunk writes to the player's current dimension; only restore where the snapshot was taken
+        if (player.dimension != dimension) {
+            return;
+        }
+        // A null coordinate clears the personal spawn, which is what "had no spawn point" has to restore
+        player.setSpawnChunk(coords, forced);
     }
 }
