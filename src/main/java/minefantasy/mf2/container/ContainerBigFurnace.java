@@ -81,6 +81,11 @@ public class ContainerBigFurnace extends ContainerMF {
         if (slotIndex < furnaceSlotCount) {
             if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
                 merged = true;
+                // SlotFurnace counts smelted items in decrStackSize, which mergeItemStack bypasses. Without this the
+                // experience counter stays at zero and onPickupFromSlot awards nothing.
+                if (slot instanceof SlotFurnace) {
+                    slot.onSlotChange(stackInSlot, originalStack);
+                }
             }
         } else {
             if (smelter.isHeater()) {
