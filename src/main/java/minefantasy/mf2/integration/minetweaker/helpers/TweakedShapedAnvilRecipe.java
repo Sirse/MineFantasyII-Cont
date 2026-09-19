@@ -1,11 +1,10 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
-import java.util.List;
-
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.anvil.AnvilCraftMatrix;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
+import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
@@ -82,37 +81,28 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe {
 
     @Override
     public boolean matches(AnvilCraftMatrix matrix) {
-        for (int y = 0; y < this.recipeHeight; ++y) {
-            for (int x = 0; x < this.recipeWidth; ++x) {
+        // Walk the whole grid, not just the pattern: a cell outside it must be empty, otherwise a 1x1 recipe would
+        // match with a stray item elsewhere and consumeResources would then eat that stack too.
+        for (int y = 0; y < ShapelessAnvilRecipes.globalHeight; ++y) {
+            for (int x = 0; x < ShapelessAnvilRecipes.globalWidth; ++x) {
                 ItemStack inputItem = matrix.getStackInRowAndColumn(x, y);
-                IIngredient ingredient = ingredients[y] != null && x < ingredients[y].length ? ingredients[y][x] : null;
-                if ((inputItem == null && ingredient != null) || (inputItem != null && ingredient == null)) {
-                    return false;
-                }
-                if (inputItem == null) {
+                IIngredient ingredient = x < this.recipeWidth && y < this.recipeHeight
+                        ? TweakedIngredients.gridCell(ingredients, y, x)
+                        : null;
+
+                if (inputItem == null && ingredient == null) {
                     continue;
                 }
-                if (!isInList(inputItem, ingredient.getItems())) {
+                if (inputItem == null || ingredient == null) {
+                    return false;
+                }
+                if (!TweakedIngredients.matches(ingredient, inputItem)) {
                     return false;
                 }
             }
         }
 
         return true;
-    }
-
-    private boolean isInList(ItemStack inputStack, List<IItemStack> items) {
-        for (IItemStack i : items) {
-            ItemStack recipeStack = MineTweakerMC.getItemStack(i);
-            if (inputStack.getItem() == recipeStack.getItem()
-                    && inputStack.getItemDamage() == recipeStack.getItemDamage()) {
-                /*
-                 * if (!CustomToolHelper.doesMatchForRecipe(inputStack, recipeStack)) { return false; }
-                 */
-                return true;
-            }
-        }
-        return false;
     }
 
     private void calculateRecipeSize() {

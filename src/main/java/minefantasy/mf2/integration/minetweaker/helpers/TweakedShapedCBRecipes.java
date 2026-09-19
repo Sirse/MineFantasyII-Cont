@@ -90,31 +90,24 @@ public class TweakedShapedCBRecipes implements IKitchenRecipe {
 
     @Override
     public boolean matches(CarpenterCraftMatrix inv) {
-        boolean matches = true;
         for (int x = 0; x < 4; x++) {
             for (int y = 0; y < 4; y++) {
-                if (!matches) return false;
                 ItemStack stack = inv.getStackInRowAndColumn(x, y);
+                // Scripts may declare a pattern smaller than the grid, so cells outside it count as empty
+                IIngredient ingredient = TweakedIngredients.gridCell(this.ingreds, y, x);
 
-                // int a = y + x * 4;
-                if (stack == null && this.ingreds[y][x] == null) {
+                if (stack == null && ingredient == null) {
                     continue;
                 }
-                boolean hasMatch = false;
-                if (stack != null && this.ingreds[y][x] != null) {
-                    for (IItemStack i : this.ingreds[y][x].getItems()) {
-                        ItemStack ingred = MineTweakerMC.getItemStack(i);
-                        if (stack.getItem() == ingred.getItem() && stack.getItemDamage() == ingred.getItemDamage()) {
-                            hasMatch = true;
-                        }
-                    }
-                } else {
-                    matches = false;
+                if (stack == null || ingredient == null) {
+                    return false;
                 }
-                if (!hasMatch) matches = false;
+                if (!TweakedIngredients.matches(ingredient, stack)) {
+                    return false;
+                }
             }
         }
-        return matches;
+        return true;
     }
 
     @Override

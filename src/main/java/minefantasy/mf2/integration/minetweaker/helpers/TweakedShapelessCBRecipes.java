@@ -34,7 +34,7 @@ public class TweakedShapelessCBRecipes implements IKitchenRecipe {
         this.sound = sound;
         this.research = research;
         this.s = s;
-        this.time = 1;
+        this.time = time;
         this.dirtyAmount = MineFantasyAPI.kitchenDirtyFor(time);
     }
 
@@ -94,24 +94,18 @@ public class TweakedShapelessCBRecipes implements IKitchenRecipe {
         boolean items[][] = new boolean[4][4];
         for (int a = 0; a < this.ingreds.length; a++) {
             IIngredient i = this.ingreds[a];
-            for (IItemStack s : i.getItems()) {
-                ItemStack ingred = MineTweakerMC.getItemStack(s);
-                boolean found = false;
-                for (int x = 0; x < 4; x++) {
-                    for (int y = 0; y < 4; y++) {
-                        ItemStack stack = inv.getStackInRowAndColumn(x, y);
-                        if (stack == null) continue;
-                        if (stack.getItem() == ingred.getItem() && stack.getItemDamage() == ingred.getItemDamage()
-                                && !items[x][y]) {
-                            matches[a] = true;
-                            items[x][y] = true;
-                            found = true;
-                            break;
-                        }
+            boolean found = false;
+            for (int x = 0; x < 4 && !found; x++) {
+                for (int y = 0; y < 4 && !found; y++) {
+                    ItemStack stack = inv.getStackInRowAndColumn(x, y);
+                    if (stack == null || items[x][y]) continue;
+                    // Ask the ingredient itself so NBT conditions and wildcard damage are honoured
+                    if (TweakedIngredients.matches(i, stack)) {
+                        matches[a] = true;
+                        items[x][y] = true;
+                        found = true;
                     }
-                    if (found) break;
                 }
-                if (found) break;
             }
         }
         boolean isMatch = true;

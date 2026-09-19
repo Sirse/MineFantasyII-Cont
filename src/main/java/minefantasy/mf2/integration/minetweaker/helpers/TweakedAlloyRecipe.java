@@ -1,11 +1,9 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
 import minefantasy.mf2.api.refine.Alloy;
 import minetweaker.api.item.IIngredient;
@@ -18,40 +16,39 @@ public class TweakedAlloyRecipe extends Alloy {
         super(MineTweakerMC.getItemStack(output), requiredLevel, items);
     }
 
-    @Override
-    public boolean matches(ItemStack[] inv) {
-        ArrayList check = new ArrayList(recipeItems);
-        ArrayList check2 = new ArrayList(recipeItems);
-        for (ItemStack stack : inv) {
-            if (stack != null) {
-                boolean matches = false;
-                Iterator it = check.iterator();
-                while (it.hasNext()) {
-                    IIngredient ingred = (IIngredient) it.next();
-                    for (IItemStack i : ingred.getItems()) {
-                        ItemStack is = MineTweakerMC.getItemStack(i);
-                        if (stack.isItemEqual(is) && (is.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                                || is.getItemDamage() == stack.getItemDamage())) {
-                            matches = true;
-                            check2.remove(ingred);
-                            break;
-                        }
-                        if (areBothCarbon(is, stack)) {
-                            matches = true;
-                            check2.remove(ingred);
-                            break;
-                        }
-                    }
-                    if (matches) break;
-                }
-                if (!matches) return false;
+    /**
+     * Carbon sources are interchangeable, so any carbon item satisfies a carbon ingredient
+     */
+    private boolean matchesCarbon(IIngredient ingred, ItemStack stack) {
+        for (IItemStack i : ingred.getItems()) {
+            if (areBothCarbon(MineTweakerMC.getItemStack(i), stack)) {
+                return true;
             }
         }
-        boolean empty = true;
-        for (Object o : check2) {
-            if (o != null) empty = false;
+        return false;
+    }
+
+    @Override
+    public boolean matches(ItemStack[] inv) {
+        // One list of outstanding requirements: search and removal must happen in the same list, otherwise an
+        // already-satisfied ingredient stays a candidate for the next stack and the recipe accepts extra items.
+        ArrayList<IIngredient> remaining = new ArrayList<IIngredient>(recipeItems);
+        for (ItemStack stack : inv) {
+            if (stack != null) {
+                IIngredient matched = null;
+                for (IIngredient ingred : remaining) {
+                    if (TweakedIngredients.matches(ingred, stack) || matchesCarbon(ingred, stack)) {
+                        matched = ingred;
+                        break;
+                    }
+                }
+                if (matched == null) {
+                    return false;
+                }
+                remaining.remove(matched);
+            }
         }
-        return empty;
+        return remaining.isEmpty();
     }
 
 }
