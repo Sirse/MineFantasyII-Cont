@@ -11,6 +11,7 @@ import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedRemoval;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.IUndoableAction;
@@ -162,14 +163,16 @@ public class CarpentersBench {
     private static class RemoveAction implements IUndoableAction {
 
         private final ArrayList<ICarpenterRecipe> recipes;
+        private final TweakedRemoval removal;
 
         private RemoveAction(ArrayList<ICarpenterRecipe> recipes) {
             this.recipes = recipes;
+            this.removal = new TweakedRemoval(CraftingManagerCarpenter.getInstance().recipes, recipes);
         }
 
         @Override
         public void apply() {
-            CraftingManagerCarpenter.getInstance().recipes.removeAll(recipes);
+            removal.apply();
         }
 
         @Override
@@ -179,7 +182,7 @@ public class CarpentersBench {
 
         @Override
         public void undo() {
-            CraftingManagerCarpenter.getInstance().recipes.addAll(recipes);
+            removal.undo();
         }
 
         @Override

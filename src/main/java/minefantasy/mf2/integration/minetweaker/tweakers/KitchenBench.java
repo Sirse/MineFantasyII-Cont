@@ -9,6 +9,7 @@ import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedRemoval;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.IUndoableAction;
@@ -150,14 +151,16 @@ public class KitchenBench {
     private static class RemoveAction implements IUndoableAction {
 
         private final ArrayList<ICarpenterRecipe> recipes;
+        private final TweakedRemoval removal;
 
         private RemoveAction(ArrayList<ICarpenterRecipe> recipes) {
             this.recipes = recipes;
+            this.removal = new TweakedRemoval(targetRecipes(), recipes);
         }
 
         @Override
         public void apply() {
-            targetRecipes().removeAll(recipes);
+            removal.apply();
         }
 
         @Override
@@ -167,7 +170,7 @@ public class KitchenBench {
 
         @Override
         public void undo() {
-            targetRecipes().addAll(recipes);
+            removal.undo();
         }
 
         @Override

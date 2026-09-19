@@ -11,6 +11,7 @@ import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
 import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedRemoval;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedAnvilRecipe;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessAnvilRecipe;
 import minetweaker.IUndoableAction;
@@ -243,14 +244,16 @@ public class Anvil {
     private static class RemoveAction implements IUndoableAction {
 
         private final ArrayList<IAnvilRecipe> recipes;
+        private final TweakedRemoval removal;
 
         private RemoveAction(ArrayList<IAnvilRecipe> recipes) {
             this.recipes = recipes;
+            this.removal = new TweakedRemoval(CraftingManagerAnvil.getInstance().getRecipeList(), recipes);
         }
 
         @Override
         public void apply() {
-            CraftingManagerAnvil.getInstance().getRecipeList().removeAll(recipes);
+            removal.apply();
             CraftingManagerAnvil.getInstance().sortRecipes();
         }
 
@@ -261,7 +264,7 @@ public class Anvil {
 
         @Override
         public void undo() {
-            CraftingManagerAnvil.getInstance().getRecipeList().addAll(recipes);
+            removal.undo();
             CraftingManagerAnvil.getInstance().sortRecipes();
         }
 
