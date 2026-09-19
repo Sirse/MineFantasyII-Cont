@@ -10,7 +10,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.RoadPacket;
 
 public class TileEntityRoad extends TileEntity {
 
@@ -52,17 +51,7 @@ public class TileEntityRoad extends TileEntity {
     public void sendPacketToClients() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new RoadPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new RoadPacket(this).generatePacket()); }
-         */
+        NetworkUtils.sendToWatchers(getDescriptionPacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
     }
 
     public void writeToNBT(NBTTagCompound nbt) {

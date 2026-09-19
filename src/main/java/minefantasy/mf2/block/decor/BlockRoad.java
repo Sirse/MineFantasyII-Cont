@@ -98,12 +98,17 @@ public class BlockRoad extends BlockContainer {
     }
 
     /**
-     * Walking on a maintained road grants a short speed boost, refreshed every step.
+     * Walking on a maintained road grants a short speed boost, refreshed only when the previous one is about to expire,
+     * so effect sync packets aren't spammed every step.
      */
     @Override
     public void onEntityWalking(World world, int x, int y, int z, Entity entity) {
         if (!world.isRemote && entity instanceof EntityLivingBase) {
-            ((EntityLivingBase) entity).addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 0));
+            EntityLivingBase living = (EntityLivingBase) entity;
+            PotionEffect speed = living.getActivePotionEffect(Potion.moveSpeed);
+            if (speed == null || speed.getDuration() <= 10) {
+                living.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 0));
+            }
         }
     }
 

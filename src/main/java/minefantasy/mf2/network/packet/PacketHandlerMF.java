@@ -42,7 +42,6 @@ public class PacketHandlerMF {
         packetList.put(BellowsPacket.packetName, new BellowsPacket());
         packetList.put(QuernPacket.packetName, new QuernPacket());
         packetList.put(BombPressPacket.packetName, new BombPressPacket());
-        packetList.put(RoadPacket.packetName, new RoadPacket());
         packetList.put(BloomeryPacket.packetName, new BloomeryPacket());
         packetList.put(CrossbowBenchPacket.packetName, new CrossbowBenchPacket());
         packetList.put(TileInventoryPacket.packetName, new TileInventoryPacket());
