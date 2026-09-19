@@ -35,6 +35,9 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     private ItemStack[] inv = new ItemStack[6];
     private Random rand = new Random();
     private int ticksExisted;
+    private float lastSyncedProgress = Float.NaN;
+    private float lastSyncedMaxProgress = Float.NaN;
+    private boolean lastSyncedRecipe;
 
     public static boolean isMatch(ItemStack item, String type) {
         String component = getComponentType(item);
@@ -58,7 +61,17 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     @Override
     public void updateEntity() {
         ++ticksExisted;
-        if (!worldObj.isRemote && (hasRecipe || ticksExisted % 100 == 0)) {
+        if (worldObj.isRemote) {
+            return;
+        }
+        // hasRecipe stays true until the next craft attempt, so keying the broadcast on it alone resent an
+        // unchanged state every tick. The periodic resend stays for players who start watching the chunk later.
+        boolean changed = progress != lastSyncedProgress || maxProgress != lastSyncedMaxProgress
+                || hasRecipe != lastSyncedRecipe;
+        if (changed || ticksExisted % 100 == 0) {
+            lastSyncedProgress = progress;
+            lastSyncedMaxProgress = maxProgress;
+            lastSyncedRecipe = hasRecipe;
             syncData();
         }
     }
