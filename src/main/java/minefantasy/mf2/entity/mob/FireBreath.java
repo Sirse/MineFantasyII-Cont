@@ -49,13 +49,12 @@ public class FireBreath extends DragonBreath {
     public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {
         Block hit = world.getBlock(x, y, z);
         if (!world.isRemote && (impact || instance.rand.nextInt(20) == 0)) {
+            if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
             if (!world.isRemote && world.isAirBlock(x, y + 1, z)) {
                 if (ConfigMobs.dragonGriefFire && hit.isSideSolid(world, x, y, z, ForgeDirection.UP)
                         && hit.isFlammable(world, x, y + 1, z, ForgeDirection.UP)) {
                     world.setBlock(x, y + 1, z, Blocks.fire);
                 }
-                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
-
                 if (ConfigMobs.dragonGriefGeneral && hit == Blocks.ice) {
                     world.setBlock(x, y, z, Blocks.water);
                 }

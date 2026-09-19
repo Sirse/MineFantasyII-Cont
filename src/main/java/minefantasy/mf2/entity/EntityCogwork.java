@@ -22,6 +22,7 @@ import net.minecraftforge.common.ForgeHooks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.IPowerArmour;
 import minefantasy.mf2.api.helpers.*;
@@ -31,6 +32,7 @@ import minefantasy.mf2.config.ConfigArmour;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.ClientProxyMF;
 import minefantasy.mf2.network.packet.CogworkControlPacket;
+import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
 
@@ -189,7 +191,9 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                             0.5D,
                             (this.rand.nextFloat() - 0.5D) * 4.0D);
                 }
-                if (!worldObj.isRemote && ConfigArmour.cogworkGrief) {
+                if (!worldObj.isRemote && ConfigArmour.cogworkGrief
+                        && worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing")
+                        && !isProtectedBlock(i, j, k)) {
                     damageBlock(block, i, j, k, worldObj.getBlockMetadata(i, j, k));
                     block = this.worldObj.getBlock(i, j + 1, k);
                     damageSurface(block, i, j + 1, k, worldObj.getBlockMetadata(i, j, k));
@@ -218,6 +222,16 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     private float getFuelCost() {
         float mass = this.getWeight();
         return mass / 200F;
+    }
+
+    /**
+     * Bukkit protection plugins may forbid the rider from breaking blocks under the suit
+     */
+    private boolean isProtectedBlock(int x, int y, int z) {
+        if (!MineFantasyII.isBukkitServer() || !(riddenByEntity instanceof EntityPlayer)) {
+            return false;
+        }
+        return BukkitUtils.cantBreakBlock((EntityPlayer) riddenByEntity, x, y, z);
     }
 
     /**

@@ -54,12 +54,12 @@ public class FrostBreath extends DragonBreath {
     public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {
         Block hit = world.getBlock(x, y, z);
         if (!world.isRemote && (impact || instance.rand.nextInt(20) == 0)) {
+            if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
             if (ConfigMobs.dragonGriefGeneral && world.isAirBlock(x, y + 1, z)) {
                 if (hit.isSideSolid(world, x, y, z, ForgeDirection.UP)) {
                     world.setBlock(x, y + 1, z, Blocks.snow_layer);
                 }
 
-                if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
                 if (hit == Blocks.water || hit == Blocks.flowing_water) {
                     world.setBlock(x, y, z, Blocks.ice);
                 }

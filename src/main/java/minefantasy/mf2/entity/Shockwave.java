@@ -13,6 +13,9 @@ import net.minecraft.util.*;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.util.BukkitUtils;
+
 public class Shockwave {// Explosion
 
     /**
@@ -118,6 +121,11 @@ public class Shockwave {// Explosion
             double d4 = entity.getDistance(this.explosionX, this.explosionY, this.explosionZ) / this.explosionSize;
 
             if (d4 <= 1.0D && !(entity instanceof EntityItem)) {
+                // Bukkit protection plugins decide whether the exploder may damage this entity
+                if (this.exploder != null && MineFantasyII.isBukkitServer()
+                        && BukkitUtils.cantDamage(this.exploder, entity)) {
+                    continue;
+                }
                 d5 = entity.posX - this.explosionX;
                 d6 = entity.posY + entity.getEyeHeight() - this.explosionY;
                 d7 = entity.posZ - this.explosionZ;
@@ -209,7 +217,7 @@ public class Shockwave {// Explosion
                     this.worldObj.spawnParticle("smoke", d0, d1, d2, d3, d4, d5);
                 }
 
-                if (isGriefing && block.getMaterial() == Material.glass) {
+                if (isGriefing && allowsBlockDamage() && block.getMaterial() == Material.glass) {
                     this.worldObj.setBlockToAir(i, j, k);
                     this.worldObj
                             .playSoundEffect(i, j, k, "break.glass", 1.0F, 0.75F + (explosionRNG.nextFloat() * 0.5F));
@@ -217,7 +225,7 @@ public class Shockwave {// Explosion
             }
         }
 
-        if (this.isFlaming) {
+        if (this.isFlaming && allowsBlockDamage()) {
             iterator = this.affectedBlockPositions.iterator();
 
             while (iterator.hasNext()) {
@@ -238,6 +246,14 @@ public class Shockwave {// Explosion
 
     public Map func_77277_b() {
         return this.field_77288_k;
+    }
+
+    /**
+     * Block damage from the wave is allowed for players and, for other causes, only while mobGriefing permits it
+     */
+    private boolean allowsBlockDamage() {
+        return this.exploder instanceof EntityPlayer
+                || this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
     }
 
     public DamageSource getExplosionSource() {

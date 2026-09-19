@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -178,7 +177,7 @@ public class BlockBedMF extends BlockDirectional {
                     d1 = (d1 + z + 0.5D) / 2.0D;
                 }
 
-                world.newExplosion((Entity) null, x + 0.5F, y + 0.5F, z + 0.5F, 5.0F, true, true);
+                world.newExplosion(user, x + 0.5F, y + 0.5F, z + 0.5F, 5.0F, true, true);
                 return true;
             }
         }
