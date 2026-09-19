@@ -187,7 +187,8 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         }
         // onInventoryChanged already refreshes the recipe; this is only a fallback poll, so skip it while the
         // grid is empty and nothing is cached. Idle benches otherwise rescanned the whole recipe list forever.
-        if (!worldObj.isRemote && ticksExisted % 20 == 0 && (hasInputs() || recipe != null || activeRecipe != null)) {
+        if (!worldObj.isRemote && ticksExisted % 20 == 0
+                && (hasInputs() || recipe != null || activeRecipe != null || progress > 0)) {
             updateCraftingData();
         }
         resetRecipe = false;
@@ -430,6 +431,12 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
             int consumed = item == null ? 0 : Math.min(take, item.stackSize);
             decrStackSize(slot, take);
             for (int made = 0; made < consumed && container != null; made++) {
+                // Keep the old placement: the first container goes back into the slot it emptied, the rest take
+                // the return slots and only then the floor
+                if (made == 0 && getStackInSlot(slot) == null) {
+                    setInventorySlotContents(slot, container.copy());
+                    continue;
+                }
                 ItemStack surplus = processSurplus(container.copy());
                 if (surplus != null) {
                     dropItem(surplus);
