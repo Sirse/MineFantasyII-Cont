@@ -848,6 +848,9 @@ public class CombatMechanics {
 
         tickParryCooldown(living);
         tickPostHitCooldown(living);
+        if (living instanceof EntityPlayer && !living.worldObj.isRemote) {
+            armDodge((EntityPlayer) living);
+        }
         if (living instanceof EntityLiving) {
             EntityLiving mob = (EntityLiving) living;
             ItemStack held = mob.getHeldItem();
@@ -942,6 +945,28 @@ public class CombatMechanics {
      */
     public static boolean canDodge(EntityPlayer user) {
         return user != null && user.isBlocking();
+    }
+
+    private static final String DODGE_ARMED_NBT = "MF2_DodgeArmed";
+
+    /**
+     * Re-arms a single dodge while the player stands on the ground. Arming on landing rather than on take-off means a
+     * legitimate command, which the client sends from LivingJumpEvent before the server has seen the player leave the
+     * ground, is never rejected, while an airborne player cannot earn a second impulse until they land again.
+     */
+    public static void armDodge(EntityPlayer user) {
+        if (user != null && user.onGround) {
+            user.getEntityData().setBoolean(DODGE_ARMED_NBT, true);
+        }
+    }
+
+    /** Spends the armed dodge. Returns false when this jump has already used one. */
+    public static boolean consumeDodge(EntityPlayer user) {
+        if (user == null || !user.getEntityData().getBoolean(DODGE_ARMED_NBT)) {
+            return false;
+        }
+        user.getEntityData().setBoolean(DODGE_ARMED_NBT, false);
+        return true;
     }
 
     private void tryDodge(EntityPlayer user) {

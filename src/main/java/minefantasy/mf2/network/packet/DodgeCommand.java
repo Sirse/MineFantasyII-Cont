@@ -10,9 +10,8 @@ public class DodgeCommand extends PacketMF {
 
     public static final String packetName = "MF2_Command_Dodge";
     private static final String LAST_DODGE_CMD_TICK_NBT = "MF2_LastDodgeCmd";
-    // A dodge only ever comes from a jump, and a jump cannot repeat faster than the vanilla ten tick jumpTicks
-    // timer, so this also keeps one command per jump without relying on client reported ground state
-    private static final long DODGE_COOLDOWN_TICKS = 10L;
+    // Pure anti-flood; one impulse per jump is enforced by the armed dodge in CombatMechanics
+    private static final long DODGE_COOLDOWN_TICKS = 2L;
     private int ID;
 
     public DodgeCommand(EntityPlayer user, int id) {
@@ -40,6 +39,9 @@ public class DodgeCommand extends PacketMF {
             return;
         }
         player.getEntityData().setLong(LAST_DODGE_CMD_TICK_NBT, now);
+        if (!CombatMechanics.canDodge(player) || !CombatMechanics.consumeDodge(player)) {
+            return;
+        }
         CombatMechanics.initDodge(player, dodgeId);
     }
 
