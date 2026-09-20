@@ -3,7 +3,9 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      # Release tags carry the bare version, as every tag in this repository does: 2.8.14.6, 2.8.14.5u, 2.8.15.
+      # The previous 'v*' pattern matched none of them, so this workflow had never run.
+      - '[0-9]*'
 
 jobs:
   build-and-release:
