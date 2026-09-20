@@ -414,11 +414,11 @@ public class KnowledgeListMF {
 
         kitchen_bench = (new InformationBase(
                 "kitchen_bench",
-                10,
+                -2,
                 0,
-                1,
+                0,
                 BlockListMF.kitchenBench,
-                (InformationBase) null)).registerStat().setPage(provisioning).addSkill(SkillList.provisioning, 0);
+                (InformationBase) null)).registerStat().setPage(provisioning).setUnlocked();
 
         repair_basic = (new InformationBase("repair_basic", 8, 0, 2, BlockListMF.repair_basic, (InformationBase) null))
                 .registerStat().setPage(artisanry).addSkill(SkillList.artisanry, 10);

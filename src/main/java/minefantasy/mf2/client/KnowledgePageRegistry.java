@@ -697,7 +697,8 @@ public class KnowledgePageRegistry {
 
         KnowledgeListMF.kitchen_bench.addPages(
                 new EntryPageText("knowledge.kitchen_bench.1"),
-                new EntryPageRecipeCarpenter(KnowledgeListMF.kitchenBenchRecipe));
+                new EntryPageRecipeCarpenter(KnowledgeListMF.kitchenBenchRecipe),
+                new EntryPageText("knowledge.kitchen_bench.2"));
         KnowledgeListMF.refined_planks.addPages(
                 new EntryPageText("knowledge.refined_planks.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.nailPlanksR),
