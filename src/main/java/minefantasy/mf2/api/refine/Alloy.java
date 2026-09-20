@@ -73,6 +73,14 @@ public class Alloy {
         return checkRecipe.isEmpty();
     }
 
+    /**
+     * Items to take from each grid slot, or null when every filled slot gives up exactly one. Native alloys list one
+     * entry per slot, so they always need one; script recipes can demand a count from a single slot.
+     */
+    public int[] getRequiredAmounts(ItemStack[] inventory) {
+        return null;
+    }
+
     private boolean areMaterialsEqual(ItemStack itemstack, ItemStack checkItem) {
         CustomMaterial material1 = CustomToolHelper.getCustomPrimaryMaterial(itemstack);
         CustomMaterial material2 = CustomToolHelper.getCustomPrimaryMaterial(checkItem);

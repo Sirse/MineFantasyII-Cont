@@ -46,6 +46,8 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private ItemStack[] inventory = new ItemStack[INVENTORY_SIZE];
     private final Random rand = new Random();
     private ItemStack cachedRecipeOutput;
+    private int[] cachedRequiredAmounts;
+    private int cachedRecipeVersion = -1;
     /**
      * Set whenever the contents change before a world is available (NBT load); cleared on the next server tick
      */
@@ -141,7 +143,7 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
         for (int i = 0; i < GRID_SLOT_COUNT; i++) {
             if (inventory[i] != null) {
-                inventory[i].stackSize--;
+                inventory[i].stackSize -= getRequiredAmount(i);
                 if (inventory[i].stackSize <= 0) {
                     inventory[i] = null;
                 }
@@ -163,8 +165,14 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     }
 
     private boolean canSmelt() {
+        ensureRecipeIsCurrent();
         if (this.temperature <= 0 || this.cachedRecipeOutput == null) {
             return false;
+        }
+        for (int i = 0; i < GRID_SLOT_COUNT; i++) {
+            if (inventory[i] != null && inventory[i].stackSize < getRequiredAmount(i)) {
+                return false;
+            }
         }
 
         ItemStack result = this.cachedRecipeOutput;
@@ -188,9 +196,29 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         Alloy alloy = AlloyRecipes.getResult(inputs);
         if (alloy != null && alloy.getLevel() <= getTier()) {
             this.cachedRecipeOutput = alloy.getRecipeOutput();
+            this.cachedRequiredAmounts = alloy.getRequiredAmounts(inputs);
         } else {
             this.cachedRecipeOutput = null;
+            this.cachedRequiredAmounts = null;
         }
+        this.cachedRecipeVersion = AlloyRecipes.getVersion();
+    }
+
+    /**
+     * The cache only refreshes on inventory changes, so a script reload could leave a loaded crucible smelting a recipe
+     * that no longer exists. Comparing a registry stamp costs one int per tick instead of a full rescan.
+     */
+    private void ensureRecipeIsCurrent() {
+        if (cachedRecipeVersion != AlloyRecipes.getVersion()) {
+            updateCachedRecipe();
+        }
+    }
+
+    private int getRequiredAmount(int slot) {
+        if (cachedRequiredAmounts != null && slot >= 0 && slot < cachedRequiredAmounts.length) {
+            return Math.max(1, cachedRequiredAmounts[slot]);
+        }
+        return 1;
     }
 
     @Override

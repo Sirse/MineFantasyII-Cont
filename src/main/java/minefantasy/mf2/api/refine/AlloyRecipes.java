@@ -11,9 +11,25 @@ public class AlloyRecipes {
 
     public static List<Alloy> alloys = new ArrayList<Alloy>();
 
+    /**
+     * Bumped whenever the alloy list changes. Consumers such as the crucible cache a matched recipe and would otherwise
+     * keep smelting one that a script reload has already taken away.
+     */
+    private static int version;
+
+    public static int getVersion() {
+        return version;
+    }
+
+    /** Call after mutating {@link #alloys} directly, as the CraftTweaker undo paths do. */
+    public static void registryChanged() {
+        version++;
+    }
+
     public static Alloy addAlloy(ItemStack out, int level, List in) {
         Alloy alloy = new Alloy(out, level, in);
         alloys.add(alloy);
+        registryChanged();
         return alloy;
     }
 
@@ -23,6 +39,7 @@ public class AlloyRecipes {
 
     public static void addAlloy(Alloy alloy) {
         alloys.add(alloy);
+        registryChanged();
     }
 
     public static Alloy getResult(ItemStack[] inv) {

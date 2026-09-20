@@ -30,10 +30,28 @@ public class TweakedAlloyRecipe extends Alloy {
 
     @Override
     public boolean matches(ItemStack[] inv) {
+        return assign(inv, null);
+    }
+
+    @Override
+    public int[] getRequiredAmounts(ItemStack[] inventory) {
+        int[] amounts = new int[inventory.length];
+        java.util.Arrays.fill(amounts, 1);
+        assign(inventory, amounts);
+        return amounts;
+    }
+
+    /**
+     * Runs the ingredient to slot assignment once. Passing an amounts array records how many items each slot owes, so
+     * matching and consuming always agree: an ingredient written as {@code * 4} matched on four items but the crucible
+     * only ever took one.
+     */
+    private boolean assign(ItemStack[] inv, int[] amounts) {
         // One list of outstanding requirements: search and removal must happen in the same list, otherwise an
         // already-satisfied ingredient stays a candidate for the next stack and the recipe accepts extra items.
         ArrayList<IIngredient> remaining = new ArrayList<IIngredient>(recipeItems);
-        for (ItemStack stack : inv) {
+        for (int slot = 0; slot < inv.length; slot++) {
+            ItemStack stack = inv[slot];
             if (stack != null) {
                 IIngredient matched = null;
                 for (IIngredient ingred : remaining) {
@@ -44,6 +62,9 @@ public class TweakedAlloyRecipe extends Alloy {
                 }
                 if (matched == null) {
                     return false;
+                }
+                if (amounts != null && slot < amounts.length) {
+                    amounts[slot] = Math.max(1, matched.getAmount());
                 }
                 remaining.remove(matched);
             }

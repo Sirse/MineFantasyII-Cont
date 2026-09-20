@@ -104,6 +104,7 @@ public class Crucible {
                     break;
                 }
             }
+            AlloyRecipes.registryChanged();
         }
 
         @Override
@@ -136,6 +137,7 @@ public class Crucible {
         @Override
         public void apply() {
             removal.apply();
+            AlloyRecipes.registryChanged();
         }
 
         @Override
@@ -146,6 +148,7 @@ public class Crucible {
         @Override
         public void undo() {
             removal.undo();
+            AlloyRecipes.registryChanged();
         }
 
         @Override
