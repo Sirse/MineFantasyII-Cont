@@ -22,9 +22,11 @@ public class NEILayout {
 
     public static final Slot SALVAGE_INPUT = new Slot(31, 42);
     public static final Slot SALVAGE_STATION = new Slot(31, 78);
+    // Twelve outputs as three columns by four rows: the upright block sits better beside the input and station
+    // column than the wide four by three one did.
     public static final Slot[] SALVAGE_OUTPUTS = new Slot[] { new Slot(75, 24), new Slot(93, 24), new Slot(111, 24),
-            new Slot(129, 24), new Slot(75, 42), new Slot(93, 42), new Slot(111, 42), new Slot(129, 42),
-            new Slot(75, 60), new Slot(93, 60), new Slot(111, 60), new Slot(129, 60) };
+            new Slot(75, 42), new Slot(93, 42), new Slot(111, 42), new Slot(75, 60), new Slot(93, 60),
+            new Slot(111, 60), new Slot(75, 78), new Slot(93, 78), new Slot(111, 78) };
 
     private NEILayout() {}
 
