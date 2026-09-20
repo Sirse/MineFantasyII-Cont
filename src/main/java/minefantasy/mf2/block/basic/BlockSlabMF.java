@@ -9,7 +9,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemSlab;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 
@@ -17,6 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.item.ItemSlabMF;
 
 /**
  * Self-registering slab pair (half + double) with a single shared texture and a 3-into-6 crafting recipe, mirroring how
@@ -56,7 +56,7 @@ public class BlockSlabMF extends BlockSlab {
             }
         }
 
-        GameRegistry.registerBlock(half, ItemSlab.class, name, half, half, full, false);
+        GameRegistry.registerBlock(half, ItemSlabMF.class, name);
         GameRegistry.registerBlock(full, name + "_double");
         GameRegistry.addRecipe(new ItemStack(half, 6), new Object[] { "XXX", 'X', source });
 
@@ -64,6 +64,11 @@ public class BlockSlabMF extends BlockSlab {
     }
 
     private BlockSlabMF full;
+
+    /** The double slab of this pair; read by ItemSlabMF, which Forge constructs with the half slab alone. */
+    public BlockSlabMF getDoubleSlab() {
+        return full;
+    }
 
     private BlockSlabMF(String name, String texture, Material material, boolean isDouble) {
         super(isDouble, material);
