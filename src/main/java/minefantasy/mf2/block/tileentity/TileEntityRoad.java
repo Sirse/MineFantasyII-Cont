@@ -64,9 +64,10 @@ public class TileEntityRoad extends TileEntity {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        // getIntArray returns an empty array for a missing or wrongly typed tag, and the renderer and
-        // getBaseBlock both index surface[0]/surface[1] unchecked
-        int[] saved = nbt.getIntArray("surface");
+        // The renderer and getBaseBlock index surface[0]/surface[1] unchecked. getIntArray returns an empty array
+        // for a missing key, but a wrongly typed tag makes it throw a ReportedException, so check the type first
+        // (11 is TAG_Int_Array).
+        int[] saved = nbt.hasKey("surface", 11) ? nbt.getIntArray("surface") : new int[0];
         surface = new int[] { saved.length > 0 ? saved[0] : 0, saved.length > 1 ? saved[1] : 0 };
         isLocked = nbt.getBoolean("isLocked");
     }
