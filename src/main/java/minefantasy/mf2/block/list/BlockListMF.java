@@ -405,11 +405,6 @@ public class BlockListMF {
             CreativeTabs.tabBlock,
             new ItemStack(limestone, 1, 2));
 
-    public static Block bars_bronze = new BlockPaneMF("bronze_bars", "decor/bronze_bars", 0.4F, 10F);
-    public static Block bars_steel = new BlockPaneMF("steel_bars", "decor/steel_bars", 0.5F, 12F);
-    public static Block bars_black_steel = new BlockPaneMF("black_steel_bars", "decor/black_steel_bars", 0.6F, 14F);
-    public static Block bars_red_steel = new BlockPaneMF("red_steel_bars", "decor/red_steel_bars", 0.7F, 16F);
-    public static Block bars_blue_steel = new BlockPaneMF("blue_steel_bars", "decor/blue_steel_bars", 0.7F, 16F);
     // END 1.12 parity content
 
     public static Block schematic_general = new BlockSchematic("schematic_general");

@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPane;
 import net.minecraft.block.material.Material;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.DamageSource;
@@ -28,6 +29,8 @@ public class BlockMetalBarsMF extends BlockPane {
         GameRegistry.registerBlock(this, name);
         setBlockName(name);
 
+        // The 1.12 parity pass wanted metal bars reachable in creative; these already carry the names and textures
+        this.setCreativeTab(CreativeTabs.tabBlock);
         this.setHarvestLevel("pickaxe", material.harvestLevel);
         this.setStepSound(Block.soundTypeMetal);
         this.setHardness(material.hardness + 1 / 2F);
