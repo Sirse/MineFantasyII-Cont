@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "minefantasy.mf2.minefantasy2"
-version = "2.8.14.7"
+version = "2.8.15"
 
 val mcVersion = "1.7.10"
 val versionNEI = "2.7.72-GTNH"
