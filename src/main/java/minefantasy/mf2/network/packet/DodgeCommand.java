@@ -39,10 +39,7 @@ public class DodgeCommand extends PacketMF {
             return;
         }
         player.getEntityData().setLong(LAST_DODGE_CMD_TICK_NBT, now);
-        if (!CombatMechanics.canDodge(player) || !CombatMechanics.consumeDodge(player)) {
-            return;
-        }
-        CombatMechanics.initDodge(player, dodgeId);
+        CombatMechanics.requestDodge(player, dodgeId);
     }
 
     @Override

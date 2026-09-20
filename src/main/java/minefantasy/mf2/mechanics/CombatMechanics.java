@@ -15,6 +15,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -849,7 +850,7 @@ public class CombatMechanics {
         tickParryCooldown(living);
         tickPostHitCooldown(living);
         if (living instanceof EntityPlayer && !living.worldObj.isRemote) {
-            armDodge((EntityPlayer) living);
+            trackDodgeWindow((EntityPlayer) living);
         }
         if (living instanceof EntityLiving) {
             EntityLiving mob = (EntityLiving) living;
@@ -947,25 +948,81 @@ public class CombatMechanics {
         return user != null && user.isBlocking();
     }
 
-    private static final String DODGE_ARMED_NBT = "MF2_DodgeArmed";
+    private static final String DODGE_GROUND_NBT = "MF2_DodgeGround";
+    private static final String DODGE_JUMP_NBT = "MF2_DodgeJump";
+    private static final String DODGE_SPENT_NBT = "MF2_DodgeSpent";
+    private static final String DODGE_WANT_DIR_NBT = "MF2_DodgeWantDir";
+    private static final String DODGE_WANT_TICK_NBT = "MF2_DodgeWantTick";
+    /** How long a request waits for the server to see the player leave the ground. */
+    private static final long DODGE_PENDING_TICKS = 3L;
+    /** How long after leaving the ground a dodge is still part of that jump. */
+    private static final long DODGE_JUMP_TICKS = 10L;
 
     /**
-     * Re-arms a single dodge while the player stands on the ground. Arming on landing rather than on take-off means a
-     * legitimate command, which the client sends from LivingJumpEvent before the server has seen the player leave the
-     * ground, is never rejected, while an airborne player cannot earn a second impulse until they land again.
+     * Watches for the ground to air transition, which is the server's own evidence that a jump happened:
+     * NetHandlerPlayServer writes onGround from every position packet. The transition both opens the window and
+     * releases a request that arrived before the server had seen it.
      */
-    public static void armDodge(EntityPlayer user) {
-        if (user != null && user.onGround) {
-            user.getEntityData().setBoolean(DODGE_ARMED_NBT, true);
+    public static void trackDodgeWindow(EntityPlayer user) {
+        if (user == null) {
+            return;
+        }
+        NBTTagCompound data = user.getEntityData();
+        long now = user.worldObj.getTotalWorldTime();
+        if (data.getBoolean(DODGE_GROUND_NBT) && !user.onGround) {
+            data.setLong(DODGE_JUMP_NBT, now);
+            long wanted = data.getLong(DODGE_WANT_TICK_NBT);
+            if (isFresh(wanted, now, DODGE_PENDING_TICKS)) {
+                data.setLong(DODGE_WANT_TICK_NBT, 0L);
+                spendJump(user, data.getInteger(DODGE_WANT_DIR_NBT), now);
+            }
+        }
+        data.setBoolean(DODGE_GROUND_NBT, user.onGround);
+
+        long wanted = data.getLong(DODGE_WANT_TICK_NBT);
+        if (wanted > 0L && !isFresh(wanted, now, DODGE_PENDING_TICKS)) {
+            data.setLong(DODGE_WANT_TICK_NBT, 0L);
         }
     }
 
-    /** Spends the armed dodge. Returns false when this jump has already used one. */
-    public static boolean consumeDodge(EntityPlayer user) {
-        if (user == null || !user.getEntityData().getBoolean(DODGE_ARMED_NBT)) {
+    /**
+     * These stamps live in the player's persistent data, so a restored save can hand back a tick from the future. Treat
+     * anything that is not inside the window, in either direction, as expired.
+     */
+    private static boolean isFresh(long stamp, long now, long window) {
+        return stamp > 0L && now >= stamp && now - stamp <= window;
+    }
+
+    /**
+     * Serverbound entry point for DodgeCommand. Dodges only on a jump the server itself observed, once per jump. A
+     * request that beats the position packet is held briefly rather than rejected, because the client fires from
+     * LivingJumpEvent at the moment of the jump and the server can still believe the player is standing.
+     */
+    public static void requestDodge(EntityPlayer user, int type) {
+        if (!canDodge(user)) {
+            return;
+        }
+        long now = user.worldObj.getTotalWorldTime();
+        if (spendJump(user, type, now)) {
+            return;
+        }
+        NBTTagCompound data = user.getEntityData();
+        data.setInteger(DODGE_WANT_DIR_NBT, type);
+        data.setLong(DODGE_WANT_TICK_NBT, now);
+    }
+
+    /** Uses up the current jump, if there is a recent one that has not paid for a dodge yet. */
+    private static boolean spendJump(EntityPlayer user, int type, long now) {
+        if (!canDodge(user)) {
             return false;
         }
-        user.getEntityData().setBoolean(DODGE_ARMED_NBT, false);
+        NBTTagCompound data = user.getEntityData();
+        long jump = data.getLong(DODGE_JUMP_NBT);
+        if (!isFresh(jump, now, DODGE_JUMP_TICKS) || data.getLong(DODGE_SPENT_NBT) == jump) {
+            return false;
+        }
+        data.setLong(DODGE_SPENT_NBT, jump);
+        initDodge(user, type);
         return true;
     }
 
