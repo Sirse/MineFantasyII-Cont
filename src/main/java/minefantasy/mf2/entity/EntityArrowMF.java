@@ -40,6 +40,11 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
     private final int texture_dw = 18;
     /**
+     * Shown until the real name arrives over the DataWatcher. The per-material arrow textures were dropped in A_1.8.1,
+     * so this has to name one of the standard ones that still ship.
+     */
+    private static final String DEFAULT_ARROW_TEX = "standard_arrow";
+    /**
      * 1 if the player can pick up the arrow
      */
     public int canBePickedUp;
@@ -179,7 +184,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     @Override
     protected void entityInit() {
         this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));// Critical
-        this.dataWatcher.addObject(texture_dw, "steel_arrow");
+        this.dataWatcher.addObject(texture_dw, DEFAULT_ARROW_TEX);
     }
 
     /**
@@ -821,7 +826,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
             return dataWatcher.getWatchableObjectString(texture_dw);
         } catch (Exception e) {
             MFLogUtil.logWarn("Arrow Failed To Load Texture");
-            return "steel_arrow";
+            return DEFAULT_ARROW_TEX;
         }
     }
 

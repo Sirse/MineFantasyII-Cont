@@ -29,7 +29,9 @@ public class ArrowFireFlint implements IArrowHandler {
         }
 
         EntityArrowMF entArrow = new EntityArrowMF(world, user, firepower * 2.0F);
-        entArrow.setArrow(new ItemStack(Items.arrow));
+        // Vanilla arrows have no ItemArrowMF to name a texture, so say which one this fires as; every
+        // other spawn site gets it from getFiredArrow.
+        entArrow.setArrow(new ItemStack(Items.arrow)).setArrowTex("standard_arrow");
 
         int powerLvl = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, bow);
         if (powerLvl > 0) {
