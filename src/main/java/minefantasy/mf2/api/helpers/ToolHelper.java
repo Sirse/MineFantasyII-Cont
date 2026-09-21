@@ -104,11 +104,13 @@ public class ToolHelper {
         }
 
         if (quality > 100) {
-            dura += ((dura) / 100F * (quality - 100));// This means 100+ adds to 2x durability at level 200
+            // This means 100+ adds to 2x durability at level 200. Cast spelled out: the compound assignment was
+            // already truncating the result, so the value is unchanged.
+            dura = (int) (dura + dura / 100F * (quality - 100));
         }
         if (quality < 100) {
-            dura -= ((dura * 0.75) / 100 * (100F - quality));// This means 100- takes upto 75% from it's max durability
-            // lvl0 is 25%dura
+            // This means 100- takes upto 75% from it's max durability, lvl0 is 25%dura
+            dura = (int) (dura - (dura * 0.75) / 100 * (100F - quality));
         }
         return dura;
     }

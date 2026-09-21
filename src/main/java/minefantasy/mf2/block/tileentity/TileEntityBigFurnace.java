@@ -212,7 +212,9 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         }
 
         if (canSmelt) {
-            progress += heat;
+            // Whole degrees only: heat is clamped to zero or above, so this drops the same fraction the compound
+            // assignment used to drop silently, and says so.
+            progress += (int) heat;
         }
         if (!canSmelt || smelted) {
             progress = 0;
