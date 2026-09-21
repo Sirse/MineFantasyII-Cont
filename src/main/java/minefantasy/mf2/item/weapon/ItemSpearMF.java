@@ -10,16 +10,18 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
+import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.api.helpers.TacticalManager;
+import minefantasy.mf2.api.weapon.IExtendedReach;
 import minefantasy.mf2.api.weapon.WeaponClass;
 import minefantasy.mf2.config.ConfigWeapon;
-import mods.battlegear2.api.shield.IShield;
 import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 /**
  * @author Anonymous Productions
  */
-public class ItemSpearMF extends ItemWeaponMF implements IExtendedReachWeapon {
+@Optional.Interface(iface = "mods.battlegear2.api.weapons.IExtendedReachWeapon", modid = "battlegear2")
+public class ItemSpearMF extends ItemWeaponMF implements IExtendedReach, IExtendedReachWeapon {
 
     /**
      * The spear is for the defensive player, it has a long reach, knockback and can be thrown. Spears are good for
@@ -33,7 +35,7 @@ public class ItemSpearMF extends ItemWeaponMF implements IExtendedReachWeapon {
 
     @Override
     public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return offhand == null || offhand.getItem() instanceof IShield;
+        return offhand == null || isBattlegearShield(offhand);
     }
 
     @Override

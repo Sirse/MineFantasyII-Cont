@@ -5,9 +5,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
+import cpw.mods.fml.common.Optional;
+import minefantasy.mf2.api.weapon.IExtendedReach;
 import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
-public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtendedReachWeapon {
+@Optional.Interface(iface = "mods.battlegear2.api.weapons.IExtendedReachWeapon", modid = "battlegear2")
+public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtendedReach, IExtendedReachWeapon {
 
     /**
      * Heavy weapons are larger varients of their own counterparts(sword, waraxe, mace and spear). These have 2x the

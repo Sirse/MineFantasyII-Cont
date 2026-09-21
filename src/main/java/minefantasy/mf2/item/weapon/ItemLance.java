@@ -10,7 +10,6 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.stamina.StaminaBar;
-import mods.battlegear2.api.shield.IShield;
 
 /**
  * @author Anonymous Productions
@@ -37,7 +36,7 @@ public class ItemLance extends ItemSpearMF {
 
     @Override
     public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return offhand == null || offhand.getItem() instanceof IShield;
+        return offhand == null || isBattlegearShield(offhand);
     }
 
     @Override

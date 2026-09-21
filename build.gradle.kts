@@ -17,6 +17,7 @@ val versionNEI = "2.7.72-GTNH"
 val versionNotEnoughIds = "2.1.10"
 val versionWaila = "1.8.12"
 val versionCraftTweaker = "3.4.2"
+val versionBattlegear = "1.6.8-backhand"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
@@ -90,6 +91,12 @@ dependencies {
   compileOnly(files("lib/bukkit-1.7.10.jar"))
 
   compileOnly("com.github.GTNewHorizons:CraftTweaker:${versionCraftTweaker}:dev") {
+    isTransitive = false
+  }
+
+  // Soft dependency: every call into Battlegear is guarded by Loader.isModLoaded("battlegear2"), and the
+  // interfaces the items expose to it are stripped by @Optional.Interface when the mod is absent.
+  compileOnly("com.github.GTNewHorizons:Battlegear2-for-Backhand:${versionBattlegear}:dev") {
     isTransitive = false
   }
 

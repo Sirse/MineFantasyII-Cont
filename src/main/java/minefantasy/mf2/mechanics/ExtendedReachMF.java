@@ -17,8 +17,8 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.weapon.IExtendedReach;
 import minefantasy.mf2.network.packet.ExtendedReachPacket;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 @SideOnly(Side.CLIENT)
 public class ExtendedReachMF {
@@ -49,8 +49,8 @@ public class ExtendedReachMF {
         }
 
         ItemStack mainhand = entityPlayer.getCurrentEquippedItem();
-        if (mainhand != null && mainhand.getItem() instanceof IExtendedReachWeapon) {
-            float extendedReach = ((IExtendedReachWeapon) mainhand.getItem()).getReachModifierInBlocks(mainhand);
+        if (mainhand != null && mainhand.getItem() instanceof IExtendedReach) {
+            float extendedReach = ((IExtendedReach) mainhand.getItem()).getReachModifierInBlocks(mainhand);
             if (extendedReach <= 0F) {
                 return;
             }

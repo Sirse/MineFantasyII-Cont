@@ -54,14 +54,12 @@ import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.tool.crafting.ItemKnifeMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.util.MFLogUtil;
-import mods.battlegear2.api.weapons.IBackStabbable;
+import mods.battlegear2.api.shield.IShield;
 import mods.battlegear2.api.weapons.IBattlegearWeapon;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
-import mods.battlegear2.api.weapons.IHitTimeModifier;
-import mods.battlegear2.api.weapons.IPenetrateWeapon;
 import mods.battlegear2.api.weapons.WeaponRegistry;
 
 // Made this extend the sword class (allows them to be enchanted)
+@Optional.Interface(iface = "mods.battlegear2.api.weapons.IBattlegearWeapon", modid = "battlegear2")
 public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, IPowerAttack, IDamageType,
         IKnockbackWeapon, IWeaponSpeed, IHeldStaminaItem, IStaminaWeapon, IBattlegearWeapon, IToolMaterial,
         IWeightedWeapon, IParryable, ISpecialEffect, IDamageModifier, IWeaponClass, IRackItem {
@@ -290,62 +288,24 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
             CustomToolHelper.addInformation(weapon, list);
         }
 
-        if (this instanceof IExtendedReachWeapon || this instanceof IPenetrateWeapon
-                || this instanceof IHitTimeModifier) {
+        if (this instanceof IExtendedReach) {
+            float reach = ((IExtendedReach) this).getReachModifierInBlocks(weapon);
             list.add("");
 
-            if (this instanceof IPenetrateWeapon) {
+            if (reach > 0) {
                 list.add(
                         EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                                "attribute.modifier.plus." + 1,
-                                decimal_format.format(getAPDamText()),
-                                StatCollector.translateToLocal("attribute.weapon.penetrateArmor")));
-            }
-
-            if (this instanceof IExtendedReachWeapon) {
-                float reach = ((IExtendedReachWeapon) this).getReachModifierInBlocks(weapon);
-
-                if (reach > 0) {
-                    list.add(
-                            EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                                    "attribute.modifier.plus." + 0,
-                                    decimal_format.format(reach),
-                                    StatCollector.translateToLocal("attribute.weapon.extendedReach")));
-                } else {
-                    list.add(
-                            EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
-                                    "attribute.modifier.take." + 0,
-                                    decimal_format.format(-1 * reach),
-                                    StatCollector.translateToLocal("attribute.weapon.extendedReach")));
-                }
-            }
-
-            if (this instanceof IHitTimeModifier) {
-                int hitMod = ((IHitTimeModifier) this).getHitTime(weapon, null);
-                if (hitMod > 0) {
-                    list.add(
-                            EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
-                                    "attribute.modifier.take." + 1,
-                                    decimal_format.format(hitMod / 10F * 100),
-                                    StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
-                } else {
-                    list.add(
-                            EnumChatFormatting.DARK_GREEN + StatCollector.translateToLocalFormatted(
-                                    "attribute.modifier.plus." + 1,
-                                    decimal_format.format(-(float) hitMod / 10F * 100),
-                                    StatCollector.translateToLocal("attribute.weapon.attackSpeed")));
-                }
-            }
-
-            if (this instanceof IBackStabbable) {
-                list.add(EnumChatFormatting.GOLD + StatCollector.translateToLocal("attribute.weapon.backstab"));
-
+                                "attribute.modifier.plus." + 0,
+                                decimal_format.format(reach),
+                                StatCollector.translateToLocal("attribute.weapon.extendedReach")));
+            } else {
+                list.add(
+                        EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
+                                "attribute.modifier.take." + 0,
+                                decimal_format.format(-1 * reach),
+                                StatCollector.translateToLocal("attribute.weapon.extendedReach")));
             }
         }
-    }
-
-    protected float getAPDamText() {
-        return 0F;
     }
 
     @Override
@@ -385,6 +345,19 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     @Override
     public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
         return offhand != null;
+    }
+
+    /**
+     * True when the offhand holds a Battlegear shield. The interface only exists while that mod is installed, so the
+     * instanceof has to stay behind the Loader check or it would throw when the class is absent.
+     */
+    @Optional.Method(modid = "battlegear2")
+    private static boolean isBattlegearShieldUnchecked(ItemStack offhand) {
+        return offhand.getItem() instanceof IShield;
+    }
+
+    protected static boolean isBattlegearShield(ItemStack offhand) {
+        return offhand != null && Loader.isModLoaded("battlegear2") && isBattlegearShieldUnchecked(offhand);
     }
 
     protected void addXp(EntityLivingBase user, int chance) {

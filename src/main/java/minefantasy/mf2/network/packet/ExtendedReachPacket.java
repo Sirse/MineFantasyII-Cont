@@ -9,8 +9,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.weapon.IExtendedReach;
 import minefantasy.mf2.network.NetworkUtils;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
 public class ExtendedReachPacket extends PacketMF {
 
@@ -69,10 +69,10 @@ public class ExtendedReachPacket extends PacketMF {
             return false;
         }
         ItemStack mainhand = player.getCurrentEquippedItem();
-        if (mainhand == null || !(mainhand.getItem() instanceof IExtendedReachWeapon)) {
+        if (mainhand == null || !(mainhand.getItem() instanceof IExtendedReach)) {
             return false;
         }
-        float extendedReach = ((IExtendedReachWeapon) mainhand.getItem()).getReachModifierInBlocks(mainhand);
+        float extendedReach = ((IExtendedReach) mainhand.getItem()).getReachModifierInBlocks(mainhand);
         if (extendedReach <= 0F) {
             return false;
         }
