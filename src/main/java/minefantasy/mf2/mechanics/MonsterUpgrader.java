@@ -179,6 +179,14 @@ public class MonsterUpgrader {
         }
         EntityLivingBase living = (EntityLivingBase) event.entity;
 
+        // The server fills in difficultySetting only once its worlds exist, so mobs that structure generation
+        // spawns while the spawn point is still being chosen arrive with it null and upgradeMob dereferences it.
+        // Leave them unmarked: World.addLoadedEntities fires this event again when their chunk next loads, by
+        // which point the difficulty is known.
+        if (living.worldObj == null || living.worldObj.difficultySetting == null) {
+            return;
+        }
+
         if (!living.getEntityData().getBoolean(upgradedNbt) && !living.getEntityData().getBoolean(legacyUpgradedNbt)) {
             living.getEntityData().setBoolean(upgradedNbt, true);
             upgradeMob(living);
