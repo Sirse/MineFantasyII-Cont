@@ -92,7 +92,10 @@ public class ItemCrossbow extends Item
         if (action.equalsIgnoreCase("reload")) {
             return EnumAction.block;
         }
-        return EnumAction.bow;
+        if (action.equalsIgnoreCase("fire")) {
+            return EnumAction.bow;
+        }
+        return EnumAction.none;
     }
 
     @Override
@@ -103,12 +106,16 @@ public class ItemCrossbow extends Item
             return item;
         }
         ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(item);
+        boolean full = loaded != null && loaded.stackSize >= getAmmoCapacity(item);
         if (loaded == null || user.isSwingInProgress)// RELOAD
         {
-            startUse(user, item, "reload");
+            // onEaten swings the arm, so isSwingInProgress is still set on the tick after a reload finishes and a
+            // held button comes straight back here. Reloading again loads nothing at capacity yet holds the block
+            // animation for the whole reload time, so idle instead: the hold shows no animation and fires nothing
+            // when released, which keeps reloading without shooting possible while costing a fresh click to aim.
+            startUse(user, item, full ? "idle" : "reload");
             return item;
-        } else // FIRE
-        {}
+        }
         startUse(user, item, "fire");
         return item;
     }
