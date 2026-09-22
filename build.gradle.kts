@@ -98,6 +98,9 @@ dependencies {
   compileOnly("com.github.GTNewHorizons:Battlegear2-for-Backhand:${versionBattlegear}:dev") {
     isTransitive = false
   }
+  // Present in runClient and runServer so the integration can actually be exercised, but kept off the published
+  // metadata because the mod stays optional. Transitive here: it needs Backhand to load at all.
+  runtimeOnlyNonPublishable("com.github.GTNewHorizons:Battlegear2-for-Backhand:${versionBattlegear}:dev")
 
   constraints {
     implementation("org.apache.logging.log4j:log4j-api") {
