@@ -63,6 +63,31 @@ public class CustomArmourEntry {
     }
 
     /**
+     * Registers a piece by the weight it should have once worn (Kg), rather than by a suit weight.
+     * <p>
+     * {@link ArmourCalculator#getPieceWeight} multiplies a stored entry by the share of the slot it sits in, so a worn
+     * weight is divided by that share first or it would be cut twice. The bulk is a suit value and is shared out the
+     * same way the ArmourDesign path does it.
+     *
+     * @param piece      the armour item
+     * @param wornWeight the weight the piece should have on the body (Kg)
+     * @param suitBulk   the bulk of a full suit
+     * @return false when the item is not armour and nothing was registered
+     */
+    public static boolean registerWornPiece(Item piece, float wornWeight, float suitBulk, String AC) {
+        if (!(piece instanceof ItemArmor)) {
+            return false;
+        }
+        int slot = ((ItemArmor) piece).armorType;
+        if (slot < 0 || slot >= ArmourCalculator.sizes.length) {
+            return false;
+        }
+        float share = ArmourCalculator.sizes[slot];
+        registerItem(piece, wornWeight / share, suitBulk * share, AC);
+        return true;
+    }
+
+    /**
      * Registeres a piece (called by code or config)
      *
      * @param piece  the item to list

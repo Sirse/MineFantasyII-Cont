@@ -1,12 +1,10 @@
 package minefantasy.mf2.integration.thaumcraft;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.CustomArmourEntry;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
 import minefantasy.mf2.util.MFLogUtil;
 import thaumcraft.api.ItemApi;
 
@@ -58,10 +56,6 @@ public class TCArmour {
         MFLogUtil.log("Thaumcraft armour weighted: " + written + " pieces");
     }
 
-    /**
-     * Takes the weight the piece should actually have when worn. ArmourCalculator multiplies a stored entry by the slot
-     * share, so the value is divided by that share first or the weight would be cut twice.
-     */
     private static int add(String field, String armourClass, ArmourDesign design, float wornWeight) {
         ItemStack stack = ItemApi.getItem(field, 0);
         if (stack == null || stack.getItem() == null) {
@@ -74,16 +68,10 @@ public class TCArmour {
             MFLogUtil.logDebug("Armour entry for " + field + " already set, leaving it alone");
             return 0;
         }
-        if (!(item instanceof ItemArmor)) {
+        if (!CustomArmourEntry.registerWornPiece(item, wornWeight, design.getBulk(), armourClass)) {
             MFLogUtil.logWarn("Thaumcraft item " + field + " is not armour; no weight registered for it");
             return 0;
         }
-        int slot = ((ItemArmor) item).armorType;
-        if (slot < 0 || slot >= ArmourCalculator.sizes.length) {
-            return 0;
-        }
-        float share = ArmourCalculator.sizes[slot];
-        CustomArmourEntry.registerItem(item, wornWeight / share, design.getBulk() * share, armourClass);
         return 1;
     }
 }
