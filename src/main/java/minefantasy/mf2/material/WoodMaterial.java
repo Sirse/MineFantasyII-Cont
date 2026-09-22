@@ -64,8 +64,8 @@ public class WoodMaterial extends CustomMaterial {
 
         getOrAddWood("EbonyWood", 3, 1.30F, 4.00F, 1.60F, 80F, 1.0F, 50, 46, 40).setCrafterTiers(3).setRarity(2);
 
-        getOrAddWood("SilverwoodWood", 2, 1.00F, 3.50F, 1.50F, 75F, 0.8F, 224, 220, 208).setCrafterTiers(2);
-        getOrAddWood("GreatwoodWood", 2, 1.20F, 1.50F, 1.30F, 50F, 1.5F, 37, 25, 23).setCrafterTiers(2);
+        getOrAddWood("SilverwoodWood", 2, 1.00F, 3.00F, 1.40F, 70F, 0.9F, 224, 220, 208).setCrafterTiers(2);
+        getOrAddWood("GreatwoodWood", 2, 1.20F, 2.00F, 1.30F, 50F, 1.0F, 37, 25, 23).setCrafterTiers(2);
         /*
          * //OTHERS. playing around with, mainly forestry getOrAddWood("PineWood", 0, 1, 1, 1, 1, 1, 1, 189, 147, 63);
          * getOrAddWood("CherryWood", 0, 1, 1, 1, 1, 1, 1, 162, 116, 47); getOrAddWood("PapayaWood", 0, 1, 1, 1, 1, 1,
