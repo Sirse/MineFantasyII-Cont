@@ -6,7 +6,11 @@ import net.minecraft.item.Item;
 
 public class CustomDamageRatioEntry {
 
-    public static HashMap<Integer, CustomDamageRatioEntry> entries = new HashMap<Integer, CustomDamageRatioEntry>();
+    /**
+     * Keyed by the item itself, not by its id: Forge renumbers modded ids when a world is loaded, and an entry filed
+     * under the old number would never be found again.
+     */
+    public static HashMap<Item, CustomDamageRatioEntry> entries = new HashMap<Item, CustomDamageRatioEntry>();
     public static HashMap<String, CustomDamageRatioEntry> entriesProj = new HashMap<String, CustomDamageRatioEntry>();
 
     public float[] vars;
@@ -22,17 +26,20 @@ public class CustomDamageRatioEntry {
      * @param vars the damage type ratio cutting:blunt
      */
     public static void registerItem(Item item, float[] vars) {
-        registerItem(Item.getIdFromItem(item), vars);
+        entries.put(item, new CustomDamageRatioEntry(vars));
     }
 
     /**
      * Register a weapon to give variables
      *
-     * @param id   the item id
+     * @param id   the item id, resolved to the item it stands for right away
      * @param vars the damage type ratio cutting:blunt
      */
     public static void registerItem(int id, float[] vars) {
-        entries.put(id, new CustomDamageRatioEntry(vars));
+        Item item = Item.getItemById(id);
+        if (item != null) {
+            registerItem(item, vars);
+        }
     }
 
     /**
@@ -49,14 +56,15 @@ public class CustomDamageRatioEntry {
      * Gets the ratio for an item, null if it's not found
      */
     public static float[] getTraits(Item item) {
-        return getTraits(Item.getIdFromItem(item));
+        CustomDamageRatioEntry entry = item == null ? null : entries.get(item);
+        return entry != null ? entry.vars : null;
     }
 
     /**
      * Gets the ratio for an item, null if it's not found
      */
     public static float[] getTraits(int id) {
-        return entries.get(id) != null ? entries.get(id).vars : null;
+        return getTraits(Item.getItemById(id));
     }
 
     /**

@@ -9,15 +9,19 @@ import minefantasy.mf2.api.MineFantasyAPI;
 
 public class CustomHoeEntry {
 
-    public static HashMap<Integer, CustomHoeEntry> entries = new HashMap<Integer, CustomHoeEntry>();
-    public int itemID;
+    /**
+     * Keyed by the item itself, not by its id: Forge renumbers modded ids when a world is loaded, and an entry filed
+     * under the old number would never be found again.
+     */
+    public static HashMap<Item, CustomHoeEntry> entries = new HashMap<Item, CustomHoeEntry>();
+    public Item item;
     /**
      * The Efficiency(same variable as dig speed)
      */
     public float efficiency;
 
-    private CustomHoeEntry(int id, float efficiency) {
-        this.itemID = id;
+    private CustomHoeEntry(Item item, float efficiency) {
+        this.item = item;
         this.efficiency = efficiency;
     }
 
@@ -30,10 +34,8 @@ public class CustomHoeEntry {
      * @param alterSpeed if the armour's weight slows you down
      */
     public static void registerItem(Item piece, float efficiency) {
-        int id = Item.getIdFromItem(piece);
-
         MineFantasyAPI.debugMsg("Added Custom hoe: " + piece.getUnlocalizedName() + " Efficiency = " + efficiency);
-        entries.put(id, new CustomHoeEntry(id, efficiency));
+        entries.put(piece, new CustomHoeEntry(piece, efficiency));
     }
 
     /**
@@ -65,10 +67,7 @@ public class CustomHoeEntry {
      */
     public static CustomHoeEntry getEntry(Item piece) {
         if (piece != null) {
-            int id = Item.getIdFromItem(piece);
-            if (entries.containsKey(id)) {
-                return entries.get(id);
-            }
+            return entries.get(piece);
         }
         return null;
     }
