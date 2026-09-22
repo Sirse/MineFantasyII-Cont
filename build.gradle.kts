@@ -81,7 +81,6 @@ repositories {
       includeGroupByRegex("com\\.github\\..+")
     }
   }
-  flatDir { dirs("lib") }
 }
 
 dependencies {
