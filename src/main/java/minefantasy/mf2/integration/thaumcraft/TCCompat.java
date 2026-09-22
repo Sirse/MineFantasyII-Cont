@@ -60,6 +60,8 @@ public class TCCompat {
             MFLogUtil.logWarn(
                     "Thaumcraft is loaded but does not register the expected ingots; the matching MF materials will have no forging cycle.");
         }
+
+        TCArmour.registerAll();
     }
 
     /** Runs after the MF recipes, so every item the tables name already exists. */
