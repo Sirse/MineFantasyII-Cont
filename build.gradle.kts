@@ -17,6 +17,8 @@ val versionNEI = "2.8.102-GTNH"
 val versionWaila = "1.19.32"
 val versionCraftTweaker = "3.4.8"
 val versionBattlegear = "1.6.8-backhand"
+val versionThaumcraft = "1.7.10-4.2.3.5"
+val versionBaubles = "1.0.1.10"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
@@ -103,6 +105,21 @@ dependencies {
   // Present in runClient and runServer so the integration can actually be exercised, but kept off the published
   // metadata because the mod stays optional. Transitive here: it needs Backhand to load at all.
   runtimeOnlyNonPublishable("com.github.GTNewHorizons:Battlegear2-for-Backhand:${versionBattlegear}:dev")
+
+  // Soft dependency, compile only: the API classes must not end up in the published jar, and every call is
+  // guarded by Loader.isModLoaded("Thaumcraft"). Not transitive: the dev jar lists the whole Thaumcraft
+  // runtime, none of which this build needs to compile against.
+  compileOnly("thaumcraft:Thaumcraft:${versionThaumcraft}:dev") {
+    isTransitive = false
+  }
+  // Development and testing only, never published: without the full mod in runClient and runServer the guarded
+  // branches of TCCompat cannot be exercised at all. Baubles is Thaumcraft's own required dependency.
+  runtimeOnlyNonPublishable("thaumcraft:Thaumcraft:${versionThaumcraft}:dev") {
+    isTransitive = false
+  }
+  runtimeOnlyNonPublishable("com.azanor.baubles:Baubles:${versionBaubles}:deobf") {
+    isTransitive = false
+  }
 
   constraints {
     implementation("org.apache.logging.log4j:log4j-api") {

@@ -14,6 +14,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.oredict.OreDictionary;
 
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
@@ -21,15 +22,39 @@ import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.integration.thaumcraft.MFTCData;
+import minefantasy.mf2.integration.thaumcraft.TCCompat;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.CustomArmourListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.mechanics.CombatMechanics;
 import minefantasy.mf2.util.MFLogUtil;
+import thaumcraft.api.IGoggles;
+import thaumcraft.api.nodes.IRevealer;
 
-public class ItemCustomArmour extends ItemArmourMF {
+@Optional.InterfaceList({ @Optional.Interface(iface = "thaumcraft.api.IGoggles", modid = "Thaumcraft"),
+        @Optional.Interface(iface = "thaumcraft.api.nodes.IRevealer", modid = "Thaumcraft") })
+public class ItemCustomArmour extends ItemArmourMF implements IGoggles, IRevealer {
 
     private String specialDesign = "standard";
+
+    /** Off when the integration is disabled: a saved helmet keeps its NBT but stops working. */
+    private boolean isRevealing(ItemStack item) {
+        return armorType == 0 && TCCompat.isActive() && MFTCData.hasEffect(item, MFTCData.EFFECT_REVEALING);
+    }
+
+    @Override
+    @Optional.Method(modid = "Thaumcraft")
+    public boolean showIngamePopups(ItemStack item, EntityLivingBase wearer) {
+        return isRevealing(item);
+    }
+
+    @Override
+    @Optional.Method(modid = "Thaumcraft")
+    public boolean showNodes(ItemStack item, EntityLivingBase wearer) {
+        return isRevealing(item);
+    }
+
     private float ratingModifier = 1.0F;
     private IIcon plateIcon, detailIcon;
 

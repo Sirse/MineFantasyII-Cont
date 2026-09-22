@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.thaumcraft.TCRepairRules;
 
 /**
  * @author AnonymousProductions
@@ -158,6 +159,9 @@ public class CraftingManagerAnvil {
         ItemStack repaired = new ItemStack(item, 1, damage);
         if (nbtSource.hasTagCompound()) {
             repaired.setTagCompound((NBTTagCompound) nbtSource.getTagCompound().copy());
+        }
+        if (!TCRepairRules.mergeForRepair(repaired, first, second)) {
+            return null;
         }
         return repaired;
     }

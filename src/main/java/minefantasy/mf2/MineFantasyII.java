@@ -25,6 +25,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.commands.CommandMF;
 import minefantasy.mf2.config.*;
 import minefantasy.mf2.integration.minetweaker.MTCompat;
+import minefantasy.mf2.integration.thaumcraft.TCCompat;
 import minefantasy.mf2.item.gadget.ItemLootSack;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -52,7 +53,8 @@ import minefantasy.mf2.util.MFLogUtil;
                 + "after:MineTweaker3;"
                 + "after:BuildCraft|Core;"
                 + "after:CoFHCore;"
-                + "after:battlegear2",
+                + "after:battlegear2;"
+                + "after:Thaumcraft",
         version = MineFantasyII.VERSION)
 public class MineFantasyII {
 
@@ -137,6 +139,8 @@ public class MineFantasyII {
         proxy.registerMain();
         GameRegistry.registerWorldGenerator(worldGenManager, 0);
 
+        TCCompat.registerGolemCrops();
+
         packetHandler = new PacketHandlerMF();
         FMLEventChannel eventChannel;
         for (String channel : packetHandler.packetList.keySet()) {
@@ -170,12 +174,14 @@ public class MineFantasyII {
         }
         KnowledgeListMF.init();
         ArtefactListMF.init();
+        TCCompat.beforeRecipes();
         BasicRecipesMF.init();
         TransformationRecipes.init();
         ItemLootSack.addItems();
         proxy.postInit();
         proxy.registerTickHandlers();
         MetalMaterial.addHeatables();
+        TCCompat.afterRecipes();
     }
 
     @EventHandler

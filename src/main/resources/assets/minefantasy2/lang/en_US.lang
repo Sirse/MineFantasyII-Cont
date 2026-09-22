@@ -2326,3 +2326,12 @@ item.chestplateGold.name=Crude Golden Chestplate
 item.leggingsGold.name=Crude Golden Leggings
 item.bootsGold.name=Crude Golden Boots
 item.bow.name=Crude Bow
+
+# Thaumcraft integration
+tc.research_category.MF2=MineFantasy II
+tc.research_name.MF2_THAUMIC_FORGING=Thaumic Forging
+tc.research_text.MF2_THAUMIC_FORGING=Where the anvil ends
+tc.research_page.MF2_THAUMIC_FORGING.1=Magic cannot forge a helmet for you. The shape, the quality and the skill behind them are the smith's work, and infusion changes none of it.<BR>What infusion can do is add a property the metal never had. Forge the piece first, in thaumium, the way you would forge any other. Only then bring it to the matrix.<BR>The helmet you get back is the one you made: same material, same quality, same name, same wear.
+tc.research_name.MF2_REVEALING_HELM=Revealing Helmet
+tc.research_text.MF2_REVEALING_HELM=Sight through worked metal
+tc.research_page.MF2_REVEALING_HELM.1=A thaumium helmet holds an aura well enough to carry sight into it. Bound this way, it reveals nodes and shows aspects in the world, as a pair of goggles would, without giving up the protection a forged helmet is worth.<BR>Any forged helmet of thaumium will serve. A helmet that already carries an infusion will not: the binding has nowhere to go.
