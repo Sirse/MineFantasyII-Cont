@@ -22,6 +22,10 @@ import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 public class RenderLance implements IItemRenderer {
 
+    private static final float SCALE = 3F;
+    /** The grip corner of the icon, (1, 0) in model space, once the scale is applied. */
+    private static final float GRIP_X = SCALE;
+
     private Minecraft mc;
     private RenderItem itemRenderer;
 
@@ -58,13 +62,16 @@ public class RenderLance implements IItemRenderer {
                     r = 45F;
                 }
             }
-            // The pivot used to straddle the scale: translating by 0.8 outside it and -0.8 inside left the lance
-            // swinging about a point three times too far out, which in first person threw it over a unit sideways
-            // and read as a flip rather than a tilt. -1.6 and -0.4 are what the old calls worked out to at r = 0,
-            // so the resting pose is unchanged and the rotation now turns the lance about its own grip.
+            // The UVs go to renderItemIn2D swapped, which puts the tip of the icon at the (0, 1) corner of the quad
+            // and the grip at (1, 0). Turning about the origin therefore swung both ends at once and landed the tip
+            // where the grip had been, so a swing read as the lance pointing back to front. Turn about the grip
+            // instead. The offsets are what the original pair of translates worked out to at r = 0, so the resting
+            // pose is unchanged.
             GL11.glTranslatef(-1.6F, -0.4F, 0F);
+            GL11.glTranslatef(GRIP_X, 0F, 0F);
             GL11.glRotatef(r, 0, 0, -1);
-            GL11.glScalef(3F, 3F, 1F);
+            GL11.glTranslatef(-GRIP_X, 0F, 0F);
+            GL11.glScalef(SCALE, SCALE, 1F);
 
             GL11.glPushMatrix();
 
