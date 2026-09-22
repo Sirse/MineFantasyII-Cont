@@ -5,7 +5,7 @@ plugins {
   id("java-library")
   id("org.jetbrains.gradle.plugin.idea-ext") version "1.4.1"
   id("eclipse")
-  id("com.gtnewhorizons.retrofuturagradle") version "2.0.3"
+  id("com.gtnewhorizons.retrofuturagradle") version "2.0.4"
   id("com.diffplug.spotless") version "6.25.0"
 }
 
@@ -13,10 +13,9 @@ group = "minefantasy.mf2.minefantasy2"
 version = "2.8.15"
 
 val mcVersion = "1.7.10"
-val versionNEI = "2.7.72-GTNH"
-val versionNotEnoughIds = "2.1.10"
-val versionWaila = "1.8.12"
-val versionCraftTweaker = "3.4.2"
+val versionNEI = "2.8.102-GTNH"
+val versionWaila = "1.19.32"
+val versionCraftTweaker = "3.4.8"
 val versionBattlegear = "1.6.8-backhand"
 java {
   toolchain {
@@ -85,8 +84,11 @@ repositories {
 
 dependencies {
   api("com.github.GTNewHorizons:NotEnoughItems:${versionNEI}:dev")
-  api("com.github.GTNewHorizons:NotEnoughIds:${versionNotEnoughIds}:dev")
-  api("com.github.GTNewHorizons:waila:${versionWaila}:dev")
+  // Kept for the Waila support still to be written; nothing references it yet. Not transitive: it drags in
+  // cofh-core from the CurseForge repository, which this build does not declare, and its own older NEI.
+  api("com.github.GTNewHorizons:waila:${versionWaila}:dev") {
+    isTransitive = false
+  }
   compileOnly(files("lib/bukkit-1.7.10.jar"))
 
   compileOnly("com.github.GTNewHorizons:CraftTweaker:${versionCraftTweaker}:dev") {
