@@ -59,6 +59,10 @@ public class ItemCrossbow extends Item
     }
 
     public static void setUseAction(ItemStack item, String action) {
+        // Every write here resyncs the held slot, so do not spend one restating what the crossbow already says.
+        if (getUseAction(item).equals(action)) {
+            return;
+        }
         AmmoMechanicsMF.getNBT(item).setString(useTypeNBT, action);
     }
 

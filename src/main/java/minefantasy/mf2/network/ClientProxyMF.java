@@ -23,6 +23,7 @@ import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.client.ItemUseSyncMF;
 import minefantasy.mf2.client.KnowledgePageRegistry;
 import minefantasy.mf2.client.gui.*;
 import minefantasy.mf2.client.render.*;
@@ -79,6 +80,7 @@ public class ClientProxyMF extends CommonProxyMF {
         MinecraftForge.EVENT_BUS.register(new ExtendedReachMF());
         MinecraftForge.EVENT_BUS.register(new HudHandlerMF());
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
+        FMLCommonHandler.instance().bus().register(new ItemUseSyncMF());
 
         RenderingRegistry.registerBlockHandler(new RenderAnvilMF());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAnvilMF.class, new TileEntityAnvilMFRenderer());
