@@ -97,7 +97,7 @@ public class RenderBow implements IItemRenderer {
             bow = (ItemBowMF) item.getItem();
         }
 
-        ItemStack arrowStack = AmmoMechanicsMF.getArrowOnBow(item);
+        ItemStack arrowStack = AmmoMechanicsMF.getAmmo(item);
 
         int drawAmount = -2;
 
@@ -176,6 +176,12 @@ public class RenderBow implements IItemRenderer {
             arrowStack = new ItemStack(Items.arrow);
         }
         if (arrowStack != null && entityLivingBase != null) {
+            // The arrow slab overlaps the bow's, so where the shaft crosses the string the two sets of edge quads
+            // hold the same depth and flicker. Bias the arrow's depth towards the viewer rather than moving it,
+            // the way vanilla draws the block breaking overlay, so it still sits on the string.
+            GL11.glPolygonOffset(-3.0F, -3.0F);
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+
             int x = -3;
             int y = -20;
 
@@ -194,10 +200,10 @@ public class RenderBow implements IItemRenderer {
 
                 GL11.glColor4f(red, green, blue, 1.0F);
 
-                GL11.glTranslatef(
-                        -(x + drawAmount) / 16F,
-                        -(y + drawAmount) / 16F,
-                        firstPerson ? -0.5F / 16F : 0.5F / 16F);
+                // No depth offset: renderItemIn2D spans the same z range for both, so this lays the arrow flush
+                // in the bow's own slab instead of standing it half a slab proud of the face. The polygon offset
+                // above is what keeps it drawn over the string.
+                GL11.glTranslatef(-(x + drawAmount) / 16F, -(y + drawAmount) / 16F, 0F);
                 GL11.glRotatef(-90, 0, 0, 1);
                 ItemRenderer.renderItemIn2D(
                         tessellator,
@@ -211,6 +217,9 @@ public class RenderBow implements IItemRenderer {
                 GL11.glColor3f(1F, 1F, 1F);
                 GL11.glPopMatrix();
             }
+
+            GL11.glPolygonOffset(0.0F, 0.0F);
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
         }
 
         if (item.isItemEnchanted()) {

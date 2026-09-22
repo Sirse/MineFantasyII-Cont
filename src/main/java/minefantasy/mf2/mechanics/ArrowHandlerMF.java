@@ -5,7 +5,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
@@ -18,34 +17,6 @@ import minefantasy.mf2.config.ConfigStamina;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class ArrowHandlerMF {
-
-    /**
-     * This method adds arrows to the bow
-     */
-    public static void loadArrow(EntityPlayer player, ItemStack bow, ItemStack arrow) {
-        if (player.worldObj.isRemote) {
-            return;
-        }
-        NBTTagCompound nbt = getOrApplyNBT(bow);
-
-        if (arrow == null) {
-            nbt.removeTag("loadedArrow");
-        } else {
-            NBTTagCompound loaded = new NBTTagCompound();
-            arrow.writeToNBT(loaded);
-            nbt.setTag("loadedArrow", loaded);
-        }
-    }
-
-    /**
-     * Gets the NBT, if there is none, it creates it
-     */
-    private static NBTTagCompound getOrApplyNBT(ItemStack bow) {
-        if (!bow.hasTagCompound()) {
-            bow.setTagCompound(new NBTTagCompound());
-        }
-        return bow.getTagCompound();
-    }
 
     /**
      * When the arrow is pulled back it initiates
@@ -71,8 +42,10 @@ public class ArrowHandlerMF {
          */
         ItemStack arrowToFire = AmmoMechanicsMF.reloadBow(bow);
         if (arrowToFire != null) {
+            // Only start the pullback. Writing the nocked arrow into the bow's NBT here used to resync the held
+            // slot, and EntityPlayer.onUpdate compares itemInUse by reference, so the replacement stack cleared
+            // the draw and the client started it over.
             user.setItemInUse(bow, bow.getMaxItemUseDuration());// Starts pullback
-            loadArrow(user, bow, arrowToFire);// adds the arrow to NBT for rendering and later use
             event.setCanceled(true);
             return;
         } else {
@@ -82,12 +55,6 @@ public class ArrowHandlerMF {
                 return;
             }
         }
-        /*
-         * for(int a = 0; a < AmmoMechanicsMF.arrows.size(); a ++) { ItemStack arrow = AmmoMechanicsMF.arrows.get(a);
-         * if(user.inventory.hasItemStack(arrow)) { user.setItemInUse(bow, bow.getMaxItemUseDuration());//Starts
-         * pullback loadArrow(user, bow, arrow);//adds the arrow to NBT for rendering and later use
-         * event.setCanceled(true); return; } }
-         */
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -129,7 +96,7 @@ public class ArrowHandlerMF {
         }
 
         // Determine arrow to fire: must be loaded on the bow unless infinite
-        ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(bow);
+        ItemStack loaded = AmmoMechanicsMF.getAmmo(bow);
         boolean infinite = getIsInfinite(user, bow);
         if (loaded == null && !infinite) {
             // No loaded arrow and not infinite: do not allow firing (prevents ammo bypass)
@@ -156,7 +123,6 @@ public class ArrowHandlerMF {
                             "minefantasy2:weapon.bowFire",
                             0.5F,
                             1.0F / (world.rand.nextFloat() * 0.4F + 1.2F) + charge * 0.5F);
-                    loadArrow(user, bow, null);
                     // Only consume ammo when not infinite; handlers may also account for this
                     if (!infinite) {
                         AmmoMechanicsMF.consumeAmmo(user, bow);
