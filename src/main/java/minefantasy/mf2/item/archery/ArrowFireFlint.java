@@ -28,7 +28,15 @@ public class ArrowFireFlint implements IArrowHandler {
             firepower = 1.0F;
         }
 
-        EntityArrowMF entArrow = new EntityArrowMF(world, user, firepower * 2.0F);
+        // Same bow stats ArrowFirerMF applies: without them an infinite or creative shot ignores the bow's
+        // velocity and accuracy, so a longbow fired this way was slower and wider than one with ammo loaded.
+        float spread = 1.0F;
+        if (bow != null && bow.getItem() instanceof ISpecialBow) {
+            firepower *= ((ISpecialBow) bow.getItem()).getRange(bow);
+            spread = ((ISpecialBow) bow.getItem()).getSpread(bow);
+        }
+
+        EntityArrowMF entArrow = new EntityArrowMF(world, user, spread, firepower * 2.0F);
         // Vanilla arrows have no ItemArrowMF to name a texture, so say which one this fires as; every
         // other spawn site gets it from getFiredArrow.
         entArrow.setArrow(new ItemStack(Items.arrow)).setArrowTex("standard_arrow");
