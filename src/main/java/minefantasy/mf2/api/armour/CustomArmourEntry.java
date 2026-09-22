@@ -11,9 +11,13 @@ import minefantasy.mf2.api.helpers.ArmourCalculator;
 
 public class CustomArmourEntry {
 
-    public static HashMap<Integer, CustomArmourEntry> entries = new HashMap<Integer, CustomArmourEntry>();
+    /**
+     * Keyed by the item itself, not by its id: Forge renumbers modded ids when a world is loaded, and an entry filed
+     * under the old number would never be found again.
+     */
+    public static HashMap<Item, CustomArmourEntry> entries = new HashMap<Item, CustomArmourEntry>();
     public boolean alterSpeed;
-    public int itemID;
+    public Item item;
     /**
      * The Weight of the piece(not suit)
      */
@@ -27,9 +31,9 @@ public class CustomArmourEntry {
      */
     public String AC;
 
-    private CustomArmourEntry(int id, float weight, float bulk, boolean alterSpeed, String AC) {
+    private CustomArmourEntry(Item item, float weight, float bulk, boolean alterSpeed, String AC) {
         this.alterSpeed = alterSpeed;
-        this.itemID = id;
+        this.item = item;
         this.weight = weight;
         this.bulkiness = bulk;
         this.AC = AC;
@@ -107,21 +111,19 @@ public class CustomArmourEntry {
      * @param alterSpeed if the armour's weight slows you down
      */
     public static void registerItem(Item piece, float weight, float bulk, boolean alterSpeed, String AC) {
-        int id = Item.getIdFromItem(piece);
-
         MineFantasyAPI.debugMsg(
                 "Added Custom " + AC
                         + " armour: "
                         + piece.getUnlocalizedName()
                         + "("
-                        + id
+                        + Item.getIdFromItem(piece)
                         + ") Traits = "
                         + weight
                         + ","
                         + bulk
                         + " alter speed = "
                         + alterSpeed);
-        entries.put(id, new CustomArmourEntry(id, weight, bulk, alterSpeed, AC));
+        entries.put(piece, new CustomArmourEntry(piece, weight, bulk, alterSpeed, AC));
     }
 
     /**
@@ -181,10 +183,7 @@ public class CustomArmourEntry {
      */
     public static CustomArmourEntry getEntry(Item piece) {
         if (piece != null) {
-            int id = Item.getIdFromItem(piece);
-            if (entries.containsKey(id)) {
-                return entries.get(id);
-            }
+            return entries.get(piece);
         }
         return null;
     }
