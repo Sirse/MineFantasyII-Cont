@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.client.IItemRenderer;
@@ -99,6 +98,11 @@ public class RenderLance implements IItemRenderer {
         GL11.glPopMatrix();
     }
 
+    /**
+     * Couches the lance for the charge and the swing, and for nothing else. Holding right click used to count too,
+     * which stacked this rotation on top of the vanilla block pose that every MF2 weapon already gets from ItemSword
+     * and turned the lance across the player. A lance neither blocks nor parries, so that hold means nothing to it.
+     */
     private boolean getRotationFor(Object... data) {
         for (int a = 0; a < data.length; a++) {
             if (data[a] instanceof EntityLivingBase) {
@@ -116,13 +120,6 @@ public class RenderLance implements IItemRenderer {
                     }
                 }
 
-            }
-
-            if (data[a] instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) data[a];
-                if (player.isUsingItem()) {
-                    return true;
-                }
             }
         }
         return false;
