@@ -213,6 +213,11 @@ public class RenderCrossbow implements IItemRenderer {
             ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(item);
 
             if (loaded != null) {
+                // The bolt lands in exactly the string's depth slab, so their faces are coplanar and fight.
+                // Bias the bolt towards the viewer, as the bow does for its nocked arrow, so it reads as lying
+                // in the groove in front of the string.
+                GL11.glPolygonOffset(-3.0F, -3.0F);
+                GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
                 mc.renderEngine.bindTexture(TextureMap.locationItemsTexture);
                 for (int layer = 0; layer < loaded.getItem().getRenderPasses(loaded.getItemDamage()); layer++) {
                     GL11.glPushMatrix();
@@ -228,6 +233,9 @@ public class RenderCrossbow implements IItemRenderer {
                     renderIcon(mc, item, tessellator, bolt, ammoSize, false);
                     GL11.glPopMatrix();
                 }
+
+                GL11.glPolygonOffset(0.0F, 0.0F);
+                GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
             }
             GL11.glPopMatrix();
         }
