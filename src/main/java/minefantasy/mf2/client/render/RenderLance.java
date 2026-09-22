@@ -50,8 +50,6 @@ public class RenderLance implements IItemRenderer {
         Tessellator tessellator = Tessellator.instance;
 
         if (type == ItemRenderType.EQUIPPED_FIRST_PERSON || type == ItemRenderType.EQUIPPED) {
-            GL11.glTranslatef(0.8F, 0.2F, 0);
-
             GL11.glPushMatrix();
             float r = 0F;
             if (getRotationFor(data)) {
@@ -61,11 +59,15 @@ public class RenderLance implements IItemRenderer {
                     r = 45F;
                 }
             }
+            // The pivot used to straddle the scale: translating by 0.8 outside it and -0.8 inside left the lance
+            // swinging about a point three times too far out, which in first person threw it over a unit sideways
+            // and read as a flip rather than a tilt. -1.6 and -0.4 are what the old calls worked out to at r = 0,
+            // so the resting pose is unchanged and the rotation now turns the lance about its own grip.
+            GL11.glTranslatef(-1.6F, -0.4F, 0F);
             GL11.glRotatef(r, 0, 0, -1);
             GL11.glScalef(3F, 3F, 1F);
 
             GL11.glPushMatrix();
-            GL11.glTranslatef(-0.8F, -0.2F, 0F);
 
             for (int layer = 0; layer < item.getItem().getRenderPasses(item.getItemDamage()); layer++) {
                 int colour = item.getItem().getColorFromItemStack(item, layer);
