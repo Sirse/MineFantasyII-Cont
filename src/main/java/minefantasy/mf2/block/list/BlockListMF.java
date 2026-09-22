@@ -461,16 +461,5 @@ public class BlockListMF {
         OreDictionary.registerOre("planksIronbarkWood", ironbark_planks);
         OreDictionary.registerOre("planksEbonyWood", ebony_planks);
         OreDictionary.registerOre("planksYewWood", yew_planks);
-
-        for (ItemStack plank : OreDictionary.getOres("plankWood")) {
-            if (plank.getItem().getClass().getName().contains("BlockWoodenDevice")) {
-                if (plank.getUnlocalizedName().equalsIgnoreCase("tile.blockWoodenDevice.6")) {
-                    OreDictionary.registerOre("planksGreatwoodWood", plank);
-                }
-                if (plank.getUnlocalizedName().equalsIgnoreCase("tile.blockWoodenDevice.7")) {
-                    OreDictionary.registerOre("planksSilverwoodWood", plank);
-                }
-            }
-        }
     }
 }

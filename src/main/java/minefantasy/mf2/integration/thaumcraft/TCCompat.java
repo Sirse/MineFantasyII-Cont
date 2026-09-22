@@ -61,6 +61,7 @@ public class TCCompat {
                     "Thaumcraft is loaded but does not register the expected ingots; the matching MF materials will have no forging cycle.");
         }
 
+        TCWood.registerAll();
         TCArmour.registerAll();
     }
 
