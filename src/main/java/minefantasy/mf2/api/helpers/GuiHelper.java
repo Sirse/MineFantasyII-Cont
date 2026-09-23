@@ -2,12 +2,52 @@ package minefantasy.mf2.api.helpers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import minefantasy.mf2.container.ContainerMF.SlotOutput;
 
 public class GuiHelper {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
+
+    private static final RenderItem ghostRender = new RenderItem();
+
+    /**
+     * Shows the pending result, dimmed, in a station's empty output slot. Call from drawGuiContainerForegroundLayer;
+     * nothing is placed in the slot, so it stays unclickable.
+     */
+    public static void renderGhostResult(GuiContainer gui, ItemStack result) {
+        if (result == null || result.getItem() == null) {
+            return;
+        }
+        for (Object object : gui.inventorySlots.inventorySlots) {
+            Slot slot = (Slot) object;
+            if (!(slot instanceof SlotOutput) || slot.getHasStack()) {
+                continue;
+            }
+            int x = slot.xDisplayPosition;
+            int y = slot.yDisplayPosition;
+            GL11.glPushMatrix();
+            RenderHelper.enableGUIStandardItemLighting();
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            ghostRender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.getTextureManager(), result, x, y);
+            ghostRender.renderItemOverlayIntoGUI(mc.fontRenderer, mc.getTextureManager(), result, x, y);
+            RenderHelper.disableStandardItemLighting();
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            // Wash it out with the slot colour so it reads as a preview, not a real stack
+            Gui.drawRect(x, y, x + 16, y + 16, 0xA08B8B8B);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glColor4f(1F, 1F, 1F, 1F);
+            GL11.glPopMatrix();
+        }
+    }
 
     public static void renderToolIcon(Gui screen, String toolType, int tier, int x, int y, boolean available) {
         renderToolIcon(screen, toolType, tier, x, y, false, available);

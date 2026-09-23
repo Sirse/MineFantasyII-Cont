@@ -35,6 +35,9 @@ public class GuiCarpenterMF extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {
         boolean knowsCraft = tile.doesPlayerKnowCraft(mc.thePlayer);
+        if (knowsCraft && tile.hasProject()) {
+            GuiHelper.renderGhostResult(this, tile.getShownResult());
+        }
         String resultName = tile.getResultName();
         String s = MineFantasyII.isDebug() ? "Carpenter Bench Crafting"
                 : knowsCraft ? (resultName.startsWith("gui.") ? StatCollector.translateToLocal(resultName) : resultName)
