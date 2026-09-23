@@ -84,7 +84,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
     @Override
     public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
             EntityLivingBase user) {
-        if (user instanceof EntityPlayer && canAcceptCost(user)) {
+        if (!world.isRemote && user instanceof EntityPlayer && canAcceptCost(user)) {
             breakChain(world, x, y, z, item, block, user, 32, block, world.getBlockMetadata(x, y, z));
         }
         return super.onBlockDestroyed(item, world, block, x, y, z, user);
