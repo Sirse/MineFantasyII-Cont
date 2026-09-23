@@ -701,7 +701,7 @@ public class CombatMechanics {
         if (properHit && source.isFireDamage() && dam > 0) {
             for (int a = 0; a < 4; a++) {
                 ItemStack armour = user.getEquipmentInSlot(a + 1);
-                if (armour != null) {
+                if (armour != null && armour.isItemStackDamageable()) {
                     int dura = (int) (dam) + 1;
                     if (!user.worldObj.isRemote && !isArmourFireImmune(armour, source)) {
                         MFLogUtil.logDebug("Armour Flame Damage: " + dura);
