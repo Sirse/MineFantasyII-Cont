@@ -43,7 +43,7 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return "minefantasy2:textures/gui/knowledge/carpenterGrid.png";
+        return "minefantasy2:textures/gui/kitchen.png";
     }
 
     @Override
@@ -103,7 +103,7 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GuiDraw.changeTexture(getGuiTexture());
-        GuiDraw.drawTexturedModalRect(0, 0, 5, 33, 166, 171);
+        NEILayout.drawBenchBackground();
         GL11.glDisable(GL11.GL_BLEND);
     }
 
@@ -188,7 +188,11 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
                     List<ItemStack> stacks = resolveIngredient(row[x]);
                     if (stacks.isEmpty()) continue;
 
-                    MFPositionedStack stack = NEIHelper.mfPositionedStack(stacks, 41 + x * 23, 47 + y * 23, false);
+                    MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                            stacks,
+                            NEILayout.BENCH_GRID_X + x * NEILayout.BENCH_CELL,
+                            NEILayout.BENCH_GRID_Y + y * NEILayout.BENCH_CELL,
+                            false);
                     if (stack == null) {
                         continue;
                     }
@@ -206,8 +210,11 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
                 List<ItemStack> stacks = resolveIngredient(ingredient);
                 if (stacks.isEmpty()) continue;
 
-                MFPositionedStack stack = NEIHelper
-                        .mfPositionedStack(stacks, 41 + stackorder[slot][0] * 23, 47 + stackorder[slot][1] * 23, false);
+                MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                        stacks,
+                        NEILayout.BENCH_GRID_X + stackorder[slot][0] * NEILayout.BENCH_CELL,
+                        NEILayout.BENCH_GRID_Y + stackorder[slot][1] * NEILayout.BENCH_CELL,
+                        false);
                 if (stack == null) {
                     continue;
                 }
@@ -222,8 +229,11 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
                 for (int y = 0; y < height; y++) {
                     if (items[y * width + x] == null) continue;
 
-                    MFPositionedStack stack = NEIHelper
-                            .mfPositionedStack(items[y * width + x], 41 + x * 23, 47 + y * 23, false);
+                    MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                            items[y * width + x],
+                            NEILayout.BENCH_GRID_X + x * NEILayout.BENCH_CELL,
+                            NEILayout.BENCH_GRID_Y + y * NEILayout.BENCH_CELL,
+                            false);
                     if (stack == null) {
                         continue;
                     }
@@ -251,8 +261,10 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
                 if (item == null) {
                     continue;
                 }
-                MFPositionedStack stack = NEIHelper
-                        .mfPositionedStack(item, 41 + stackorder[ingred][0] * 23, 47 + stackorder[ingred][1] * 23);
+                MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                        item,
+                        NEILayout.BENCH_GRID_X + stackorder[ingred][0] * NEILayout.BENCH_CELL,
+                        NEILayout.BENCH_GRID_Y + stackorder[ingred][1] * NEILayout.BENCH_CELL);
                 if (stack == null) {
                     continue;
                 }

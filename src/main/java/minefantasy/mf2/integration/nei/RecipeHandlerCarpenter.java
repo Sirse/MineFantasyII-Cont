@@ -35,16 +35,6 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
 
     private static final int GRID_SIZE = 4;
 
-    /**
-     * The page reuses the bench GUI's table, so its cells keep the GUI's 18px pitch and sit at a fixed offset from the
-     * container slots (ContainerCarpenterMF puts the first cell at 44,54). NEI's stock overlay handler relies on that.
-     */
-    public static final int GRID_X = 48;
-    public static final int GRID_Y = 52;
-    private static final int CELL = 18;
-    public static final int OVERLAY_OFFSET_X = 44 - GRID_X;
-    public static final int OVERLAY_OFFSET_Y = 54 - GRID_Y;
-
     private static final int TOOL_ICON_X = 10;
     private static final int STATION_ICON_X = 32;
     private static final int ICON_Y = 6;
@@ -122,9 +112,7 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GuiDraw.changeTexture(getGuiTexture());
-        // The table with its grid, and below the tool icons the output box, both cut from the bench GUI
-        GuiDraw.drawTexturedModalRect(GRID_X - 22, GRID_Y - 22, 22, 32, 114, 115);
-        GuiDraw.drawTexturedModalRect(71, 3, 170, 75, 25, 27);
+        NEILayout.drawBenchBackground();
         GL11.glDisable(GL11.GL_BLEND);
     }
 
@@ -218,7 +206,10 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                     List<ItemStack> stacks = resolveIngredient(row[x]);
                     if (stacks.isEmpty()) continue;
 
-                    addIngredient(stacks, GRID_X + x * CELL, GRID_Y + y * CELL);
+                    addIngredient(
+                            stacks,
+                            NEILayout.BENCH_GRID_X + x * NEILayout.BENCH_CELL,
+                            NEILayout.BENCH_GRID_Y + y * NEILayout.BENCH_CELL);
                 }
             }
         }
@@ -231,7 +222,10 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 List<ItemStack> stacks = resolveIngredient(ingredient);
                 if (stacks.isEmpty()) continue;
 
-                addIngredient(stacks, GRID_X + stackorder[slot][0] * CELL, GRID_Y + stackorder[slot][1] * CELL);
+                addIngredient(
+                        stacks,
+                        NEILayout.BENCH_GRID_X + stackorder[slot][0] * NEILayout.BENCH_CELL,
+                        NEILayout.BENCH_GRID_Y + stackorder[slot][1] * NEILayout.BENCH_CELL);
                 slot++;
             }
         }
@@ -256,15 +250,20 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 for (int y = 0; y < height; y++) {
                     if (items[y * width + x] == null) continue;
 
-                    MFPositionedStack stack = NEIHelper
-                            .mfPositionedStack(items[y * width + x], GRID_X + x * CELL, GRID_Y + y * CELL, false);
+                    MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                            items[y * width + x],
+                            NEILayout.BENCH_GRID_X + x * NEILayout.BENCH_CELL,
+                            NEILayout.BENCH_GRID_Y + y * NEILayout.BENCH_CELL,
+                            false);
                     if (stack == null) {
                         continue;
                     }
                     stack.setMaxSize(1);
                     ingredients.add(stack);
                     if (minefantasy.mf2.api.heating.Heatable.canHeatItem((ItemStack) items[y * width + x])) {
-                        hotSlots.add(new int[] { GRID_X + x * CELL, GRID_Y + y * CELL });
+                        hotSlots.add(
+                                new int[] { NEILayout.BENCH_GRID_X + x * NEILayout.BENCH_CELL,
+                                        NEILayout.BENCH_GRID_Y + y * NEILayout.BENCH_CELL });
                     }
                 }
             }
@@ -290,8 +289,8 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 }
                 MFPositionedStack stack = NEIHelper.mfPositionedStack(
                         item,
-                        GRID_X + stackorder[ingred][0] * CELL,
-                        GRID_Y + stackorder[ingred][1] * CELL);
+                        NEILayout.BENCH_GRID_X + stackorder[ingred][0] * NEILayout.BENCH_CELL,
+                        NEILayout.BENCH_GRID_Y + stackorder[ingred][1] * NEILayout.BENCH_CELL);
                 if (stack == null) {
                     continue;
                 }
@@ -299,7 +298,8 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 ingredients.add(stack);
                 if (minefantasy.mf2.api.heating.Heatable.canHeatItem((ItemStack) item)) {
                     hotSlots.add(
-                            new int[] { GRID_X + stackorder[ingred][0] * CELL, GRID_Y + stackorder[ingred][1] * CELL });
+                            new int[] { NEILayout.BENCH_GRID_X + stackorder[ingred][0] * NEILayout.BENCH_CELL,
+                                    NEILayout.BENCH_GRID_Y + stackorder[ingred][1] * NEILayout.BENCH_CELL });
                 }
             }
         }

@@ -2,6 +2,7 @@ package minefantasy.mf2.integration.nei;
 
 import net.minecraft.item.ItemStack;
 
+import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 
 public class NEILayout {
@@ -26,6 +27,23 @@ public class NEILayout {
     public static final Slot[] SALVAGE_OUTPUTS = new Slot[] { new Slot(52, 3), new Slot(70, 3), new Slot(88, 3),
             new Slot(106, 3), new Slot(124, 3), new Slot(142, 3), new Slot(52, 21), new Slot(70, 21), new Slot(88, 21),
             new Slot(106, 21), new Slot(124, 21), new Slot(142, 21) };
+
+    /**
+     * Carpenter and kitchen bench pages reuse their GUI's table, so the grid keeps the GUI's 18px pitch and sits at a
+     * fixed offset from the container slots (the first cell is at 44,54 there). NEI's stock overlay handler relies on
+     * that offset.
+     */
+    public static final int BENCH_GRID_X = 48;
+    public static final int BENCH_GRID_Y = 52;
+    public static final int BENCH_CELL = 18;
+    public static final int BENCH_OVERLAY_X = 44 - BENCH_GRID_X;
+    public static final int BENCH_OVERLAY_Y = 54 - BENCH_GRID_Y;
+
+    /** Draws the bench table with its grid and the output box, cut from a bench GUI texture already bound */
+    public static void drawBenchBackground() {
+        GuiDraw.drawTexturedModalRect(BENCH_GRID_X - 22, BENCH_GRID_Y - 22, 22, 32, 114, 115);
+        GuiDraw.drawTexturedModalRect(70, 3, 169, 75, 26, 26);
+    }
 
     private NEILayout() {}
 

@@ -16,6 +16,7 @@ import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.client.gui.GuiCarpenterMF;
+import minefantasy.mf2.client.gui.GuiKitchenBench;
 import minefantasy.mf2.config.ConfigIntegration;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -42,19 +43,26 @@ public class NEIConfig implements IConfigureNEI {
             API.registerGuiOverlay(
                     GuiCarpenterMF.class,
                     "minefantasy2.carpenter",
-                    RecipeHandlerCarpenter.OVERLAY_OFFSET_X,
-                    RecipeHandlerCarpenter.OVERLAY_OFFSET_Y);
+                    NEILayout.BENCH_OVERLAY_X,
+                    NEILayout.BENCH_OVERLAY_Y);
             API.registerGuiOverlayHandler(
                     GuiCarpenterMF.class,
-                    new DefaultOverlayHandler(
-                            RecipeHandlerCarpenter.OVERLAY_OFFSET_X,
-                            RecipeHandlerCarpenter.OVERLAY_OFFSET_Y),
+                    new DefaultOverlayHandler(NEILayout.BENCH_OVERLAY_X, NEILayout.BENCH_OVERLAY_Y),
                     "minefantasy2.carpenter");
 
             if (ConfigKitchen.enableBench) {
                 RecipeHandlerKitchen handlerKitchen = new RecipeHandlerKitchen();
                 API.registerRecipeHandler(handlerKitchen);
                 API.registerUsageHandler(handlerKitchen);
+                API.registerGuiOverlay(
+                        GuiKitchenBench.class,
+                        "minefantasy2.kitchen",
+                        NEILayout.BENCH_OVERLAY_X,
+                        NEILayout.BENCH_OVERLAY_Y);
+                API.registerGuiOverlayHandler(
+                        GuiKitchenBench.class,
+                        new DefaultOverlayHandler(NEILayout.BENCH_OVERLAY_X, NEILayout.BENCH_OVERLAY_Y),
+                        "minefantasy2.kitchen");
             }
 
             RecipeHandlerAnvil handlerAnvil = new RecipeHandlerAnvil();
@@ -168,7 +176,8 @@ public class NEIConfig implements IConfigureNEI {
                     event,
                     "minefantasy2.kitchen",
                     builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setHeight(145)
-                            .setMaxRecipesPerPage(1));
+                            .setMaxRecipesPerPage(1))
+                    .setShowOverlayButton(true);
         }
         register(
                 event,
