@@ -11,6 +11,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
@@ -781,6 +784,45 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
+    }
+
+    /**
+     * Sent by the game when a player starts watching this chunk. syncData only fires when something changes, so without
+     * this a returning player saw "No Project Set" over a laid-out recipe until the next hit or grid change.
+     */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setFloat("Progress", progress);
+        nbt.setFloat("ProgressMax", progressMax);
+        nbt.setFloat("QualityBalance", qualityBalance);
+        nbt.setFloat("ThresholdPosition", thresholdPosition);
+        nbt.setFloat("LeftHit", leftHit);
+        nbt.setFloat("RightHit", rightHit);
+        nbt.setInteger("HammerTier", hammerTierRequired);
+        nbt.setInteger("AnvilTier", anvilTierRequired);
+        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
+        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
+        if (recipe != null) {
+            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
+        }
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        NBTTagCompound nbt = packet.func_148857_g();
+        progress = nbt.getFloat("Progress");
+        progressMax = nbt.getFloat("ProgressMax");
+        qualityBalance = nbt.getFloat("QualityBalance");
+        thresholdPosition = nbt.getFloat("ThresholdPosition");
+        leftHit = nbt.getFloat("LeftHit");
+        rightHit = nbt.getFloat("RightHit");
+        hammerTierRequired = nbt.getInteger("HammerTier");
+        anvilTierRequired = nbt.getInteger("AnvilTier");
+        toolTypeRequired = nbt.getString("ToolNeeded");
+        researchRequired = nbt.getString("Research");
+        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
     }
 
     public boolean canCraft() {

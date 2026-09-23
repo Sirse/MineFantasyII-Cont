@@ -8,6 +8,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldServer;
@@ -578,6 +581,37 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
                 (WorldServer) worldObj,
                 this.xCoord,
                 this.zCoord);
+    }
+
+    /**
+     * Sent by the game when a player starts watching this chunk. syncData only fires when the recipe is recomputed,
+     * which an idle bench never does, so without this a dirty empty bench looked clean after the chunk reloaded.
+     */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setFloat("Progress", progress);
+        nbt.setFloat("ProgressMax", progressMax);
+        nbt.setFloat("DirtyProgress", dirtyProgress);
+        nbt.setFloat("DirtyMax", dirtyMax);
+        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
+        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
+        if (recipe != null) {
+            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
+        }
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        NBTTagCompound nbt = packet.func_148857_g();
+        progress = nbt.getFloat("Progress");
+        progressMax = nbt.getFloat("ProgressMax");
+        dirtyProgress = nbt.getFloat("DirtyProgress");
+        dirtyMax = nbt.getFloat("DirtyMax");
+        toolTypeRequired = nbt.getString("ToolNeeded");
+        researchRequired = nbt.getString("Research");
+        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
     }
 
     public boolean canCraft() {

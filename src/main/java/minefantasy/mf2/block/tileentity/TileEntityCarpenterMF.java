@@ -9,6 +9,9 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.WorldServer;
@@ -596,6 +599,37 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
+    }
+
+    /**
+     * Sent by the game when a player starts watching this chunk. syncData only fires when something changes, so without
+     * this a returning player saw "No Project Set" over a laid-out recipe until the next hit or grid change.
+     */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setFloat("Progress", progress);
+        nbt.setFloat("ProgressMax", progressMax);
+        nbt.setInteger("HammerTier", hammerTierRequired);
+        nbt.setInteger("CarpenterTier", CarpenterTierRequired);
+        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
+        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
+        if (recipe != null) {
+            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
+        }
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        NBTTagCompound nbt = packet.func_148857_g();
+        progress = nbt.getFloat("Progress");
+        progressMax = nbt.getFloat("ProgressMax");
+        hammerTierRequired = nbt.getInteger("HammerTier");
+        CarpenterTierRequired = nbt.getInteger("CarpenterTier");
+        toolTypeRequired = nbt.getString("ToolNeeded");
+        researchRequired = nbt.getString("Research");
+        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
     }
 
     public boolean canCraft() {
