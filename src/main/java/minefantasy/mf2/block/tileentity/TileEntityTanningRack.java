@@ -9,6 +9,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
@@ -62,7 +65,17 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
         }
     }
 
+    /**
+     * Both sides run the interaction so the clicking player sees it at once, but only the server's result is real: it
+     * is pushed to every watcher afterwards, which also corrects a client that guessed wrong.
+     */
     public boolean interact(EntityPlayer player, boolean leftClick, boolean leverPull) {
+        boolean handled = applyInteraction(player, leftClick, leverPull);
+        sendState();
+        return handled;
+    }
+
+    private boolean applyInteraction(EntityPlayer player, boolean leftClick, boolean leverPull) {
         if (leverPull && acTime > 0) {
             return true;
         }
@@ -268,7 +281,36 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     }
 
     // INVENTORY
-    public void onInventoryChanged() {}
+    public void onInventoryChanged() {
+        sendState();
+    }
+
+    /** Re-sends the description packet below to everyone watching */
+    private void sendState() {
+        if (worldObj != null && !worldObj.isRemote) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
+    }
+
+    /** The saved state, so a player who starts watching the rack sees what is on it */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        writeToNBT(nbt);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        // readFromNBT only fills the slots it finds, so clear first or a removed hide would linger. The lever
+        // animation comes with TannerPacket and keeps its own timing.
+        float animation = acTime;
+        float prevAnimation = prevAcTime;
+        items = new ItemStack[items.length];
+        readFromNBT(packet.func_148857_g());
+        acTime = animation;
+        prevAcTime = prevAnimation;
+    }
 
     @Override
     public int getSizeInventory() {
