@@ -1,6 +1,8 @@
 package minefantasy.mf2.mechanics;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -29,7 +31,11 @@ import minefantasy.mf2.util.BukkitUtils;
  */
 public class TransformationHandler {
 
+    /** Ticks after a transformation during which the same block ignores the player, so a held click does not chain */
+    private static final int REPEAT_DELAY = 10;
+
     private Random rand = new Random();
+    private final Map<EntityPlayer, long[]> lastTransform = new WeakHashMap<EntityPlayer, long[]>();
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent event) {
@@ -60,6 +66,16 @@ public class TransformationHandler {
         int toolTier = ToolHelper.getCrafterTier(held);
 
         TransformationRecipe recipe = TransformationRecipes.findRecipe(block, meta, toolType, toolTier);
+        if (recipe == null && held != null && "nothing".equalsIgnoreCase(toolType)) {
+            // Plain tools such as axes are not crafting tools, so fall back to their harvest classes
+            for (String toolClass : held.getItem().getToolClasses(held)) {
+                recipe = TransformationRecipes
+                        .findRecipe(block, meta, toolClass, held.getItem().getHarvestLevel(held, toolClass));
+                if (recipe != null) {
+                    break;
+                }
+            }
+        }
         if (recipe == null) {
             return;
         }
@@ -69,6 +85,12 @@ public class TransformationHandler {
         }
 
         event.setCanceled(true);
+
+        long[] last = lastTransform.get(player);
+        long now = world.getTotalWorldTime();
+        if (last != null && last[0] == x && last[1] == y && last[2] == z && now - last[3] < REPEAT_DELAY) {
+            return;
+        }
 
         if (recipe.research != null && !recipe.research.isEmpty()
                 && !ResearchLogic.hasInfoUnlocked(player, recipe.research)) {
@@ -106,6 +128,8 @@ public class TransformationHandler {
                 world.setBlockMetadataWithNotify(x, y, z, meta + 1, 3);
             }
         }
+
+        lastTransform.put(player, new long[] { x, y, z, now });
 
         if (finalHit) {
             int outMeta = recipe.getOutputMeta(meta);

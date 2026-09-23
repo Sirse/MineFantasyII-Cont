@@ -118,6 +118,26 @@ public class TransformationRecipes {
                     1,
                     3);
         }
+        if (ConfigCrafting.transformationLogChopping) {
+            // Acacia and dark oak logs follow the four vanilla species in the planks meta
+            addRecipe(
+                    Blocks.log2,
+                    -1,
+                    Blocks.planks,
+                    4,
+                    true,
+                    "axe",
+                    -1,
+                    1,
+                    null,
+                    null,
+                    "dig.wood",
+                    null,
+                    0,
+                    null,
+                    1,
+                    1);
+        }
         if (ConfigCrafting.transformationPlankSawing) {
             // Any plank saws into two slabs of the same species
             addRecipe(

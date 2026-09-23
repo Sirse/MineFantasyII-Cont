@@ -117,12 +117,13 @@ public class TransformationRecipe {
     }
 
     /**
-     * Output metadata for a final hit: either the recipe's fixed meta or the input meta (optionally masked)
+     * Output metadata for a final hit: either the recipe's fixed meta or the input meta (optionally masked), offset by
+     * the recipe's output meta
      */
     public int getOutputMeta(int inputBlockMeta) {
         if (!copyMeta) {
             return outputMeta;
         }
-        return copyMetaMask >= 0 ? inputBlockMeta & copyMetaMask : inputBlockMeta;
+        return outputMeta + (copyMetaMask >= 0 ? inputBlockMeta & copyMetaMask : inputBlockMeta);
     }
 }
