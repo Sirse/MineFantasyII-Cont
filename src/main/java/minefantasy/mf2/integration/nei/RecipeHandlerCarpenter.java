@@ -33,8 +33,17 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
     public int[][] stackorder = new int[][] { { 0, 0 }, { 1, 0 }, { 0, 1 }, { 1, 1 }, { 0, 2 }, { 1, 2 }, { 2, 0 },
             { 2, 1 }, { 2, 2 }, { 3, 0 }, { 3, 1 }, { 3, 2 }, { 0, 3 }, { 1, 3 }, { 2, 3 }, { 3, 3 } };
 
-    /** The bench matrix is 4x4, and the NEI background already draws all sixteen cells at a 23 pixel pitch. */
     private static final int GRID_SIZE = 4;
+
+    /**
+     * The page reuses the bench GUI's table, so its cells keep the GUI's 18px pitch and sit at a fixed offset from the
+     * container slots (ContainerCarpenterMF puts the first cell at 44,54). NEI's stock overlay handler relies on that.
+     */
+    public static final int GRID_X = 48;
+    public static final int GRID_Y = 52;
+    private static final int CELL = 18;
+    public static final int OVERLAY_OFFSET_X = 44 - GRID_X;
+    public static final int OVERLAY_OFFSET_Y = 54 - GRID_Y;
 
     private static final int TOOL_ICON_X = 10;
     private static final int STATION_ICON_X = 32;
@@ -51,7 +60,7 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return "minefantasy2:textures/gui/knowledge/carpenterGrid.png";
+        return "minefantasy2:textures/gui/carpenter.png";
     }
 
     @Override
@@ -113,7 +122,9 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
         GL11.glEnable(GL11.GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GuiDraw.changeTexture(getGuiTexture());
-        GuiDraw.drawTexturedModalRect(0, 0, 5, 33, 166, 171);
+        // The table with its grid, and below the tool icons the output box, both cut from the bench GUI
+        GuiDraw.drawTexturedModalRect(GRID_X - 22, GRID_Y - 22, 22, 32, 114, 115);
+        GuiDraw.drawTexturedModalRect(71, 3, 170, 75, 25, 27);
         GL11.glDisable(GL11.GL_BLEND);
     }
 
@@ -207,7 +218,7 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                     List<ItemStack> stacks = resolveIngredient(row[x]);
                     if (stacks.isEmpty()) continue;
 
-                    addIngredient(stacks, 41 + x * 23, 47 + y * 23);
+                    addIngredient(stacks, GRID_X + x * CELL, GRID_Y + y * CELL);
                 }
             }
         }
@@ -220,7 +231,7 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 List<ItemStack> stacks = resolveIngredient(ingredient);
                 if (stacks.isEmpty()) continue;
 
-                addIngredient(stacks, 41 + stackorder[slot][0] * 23, 47 + stackorder[slot][1] * 23);
+                addIngredient(stacks, GRID_X + stackorder[slot][0] * CELL, GRID_Y + stackorder[slot][1] * CELL);
                 slot++;
             }
         }
@@ -246,14 +257,14 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                     if (items[y * width + x] == null) continue;
 
                     MFPositionedStack stack = NEIHelper
-                            .mfPositionedStack(items[y * width + x], 41 + x * 23, 47 + y * 23, false);
+                            .mfPositionedStack(items[y * width + x], GRID_X + x * CELL, GRID_Y + y * CELL, false);
                     if (stack == null) {
                         continue;
                     }
                     stack.setMaxSize(1);
                     ingredients.add(stack);
                     if (minefantasy.mf2.api.heating.Heatable.canHeatItem((ItemStack) items[y * width + x])) {
-                        hotSlots.add(new int[] { 41 + x * 23, 47 + y * 23 });
+                        hotSlots.add(new int[] { GRID_X + x * CELL, GRID_Y + y * CELL });
                     }
                 }
             }
@@ -277,15 +288,18 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
                 if (item == null) {
                     continue;
                 }
-                MFPositionedStack stack = NEIHelper
-                        .mfPositionedStack(item, 41 + stackorder[ingred][0] * 23, 47 + stackorder[ingred][1] * 23);
+                MFPositionedStack stack = NEIHelper.mfPositionedStack(
+                        item,
+                        GRID_X + stackorder[ingred][0] * CELL,
+                        GRID_Y + stackorder[ingred][1] * CELL);
                 if (stack == null) {
                     continue;
                 }
                 stack.setMaxSize(1);
                 ingredients.add(stack);
                 if (minefantasy.mf2.api.heating.Heatable.canHeatItem((ItemStack) item)) {
-                    hotSlots.add(new int[] { 41 + stackorder[ingred][0] * 23, 47 + stackorder[ingred][1] * 23 });
+                    hotSlots.add(
+                            new int[] { GRID_X + stackorder[ingred][0] * CELL, GRID_Y + stackorder[ingred][1] * CELL });
                 }
             }
         }

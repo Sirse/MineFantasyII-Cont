@@ -10,10 +10,12 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.event.NEIRegisterHandlerInfosEvent;
+import codechicken.nei.recipe.DefaultOverlayHandler;
 import codechicken.nei.recipe.HandlerInfo;
 import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.client.gui.GuiCarpenterMF;
 import minefantasy.mf2.config.ConfigIntegration;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -37,6 +39,17 @@ public class NEIConfig implements IConfigureNEI {
             RecipeHandlerCarpenter handlerCarpenter = new RecipeHandlerCarpenter();
             API.registerRecipeHandler(handlerCarpenter);
             API.registerUsageHandler(handlerCarpenter);
+            API.registerGuiOverlay(
+                    GuiCarpenterMF.class,
+                    "minefantasy2.carpenter",
+                    RecipeHandlerCarpenter.OVERLAY_OFFSET_X,
+                    RecipeHandlerCarpenter.OVERLAY_OFFSET_Y);
+            API.registerGuiOverlayHandler(
+                    GuiCarpenterMF.class,
+                    new DefaultOverlayHandler(
+                            RecipeHandlerCarpenter.OVERLAY_OFFSET_X,
+                            RecipeHandlerCarpenter.OVERLAY_OFFSET_Y),
+                    "minefantasy2.carpenter");
 
             if (ConfigKitchen.enableBench) {
                 RecipeHandlerKitchen handlerKitchen = new RecipeHandlerKitchen();
@@ -148,8 +161,8 @@ public class NEIConfig implements IConfigureNEI {
         register(
                 event,
                 "minefantasy2.carpenter",
-                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(145)
-                        .setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(145).setMaxRecipesPerPage(1))
+                .setShowOverlayButton(true);
         if (ConfigKitchen.enableBench) {
             register(
                     event,
@@ -218,8 +231,8 @@ public class NEIConfig implements IConfigureNEI {
     }
 
     /**
-     * Registers a handler's layout. No MineFantasy handler has an overlay handler to move a recipe into a GUI (the
-     * stations are worked by hand), so the overlay button would do nothing and is hidden everywhere.
+     * Registers a handler's layout. The overlay button is hidden by default: it only works for a station with an
+     * overlay handler registered for its GUI, which re-enables it.
      */
     private static HandlerInfo register(NEIRegisterHandlerInfosEvent event, String handlerId,
             Consumer<HandlerInfo.Builder> layout) {
