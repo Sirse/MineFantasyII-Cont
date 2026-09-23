@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import codechicken.nei.api.API;
 import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.event.NEIRegisterHandlerInfosEvent;
+import codechicken.nei.recipe.HandlerInfo;
 import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -182,12 +183,12 @@ public class NEIConfig implements IConfigureNEI {
                 MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.firepit)).setWidth(RecipeHandlerCooking.WIDTH)
                         .setHeight(RecipeHandlerCooking.HEIGHT).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
-                "minefantasy2.salvage",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(100)
-                        .setMaxRecipesPerPage(1));
+        // Salvaging happens on a block with no crafting grid, so there is nothing for the overlay button to fill
+        HandlerInfo salvage = new HandlerInfo.Builder("minefantasy2.salvage", MineFantasyII.MODID, MineFantasyII.NAME)
+                .setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(40).setShiftY(5).setMaxRecipesPerPage(5)
+                .build();
+        salvage.setShowOverlayButton(false);
+        event.registerHandlerInfo(salvage);
         event.registerHandlerInfo(
                 "minefantasy2.paint_oil",
                 MineFantasyII.MODID,

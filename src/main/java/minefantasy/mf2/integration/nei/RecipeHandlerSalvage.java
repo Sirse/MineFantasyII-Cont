@@ -16,7 +16,6 @@ import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.Salvage.SalvageRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
-import minefantasy.mf2.block.list.BlockListMF;
 
 public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
 
@@ -36,14 +35,13 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
 
     @Override
     public int recipiesPerPage() {
-        return 1;
+        return 2;
     }
 
     @Override
     public void drawBackground(int recipe) {
         GL11.glColor4f(1, 1, 1, 1);
         drawSlotFrame(NEILayout.SALVAGE_INPUT);
-        drawSlotFrame(NEILayout.SALVAGE_STATION);
         for (NEILayout.Slot slot : NEILayout.SALVAGE_OUTPUTS) {
             drawSlotFrame(slot);
         }
@@ -61,12 +59,12 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         GL11.glColor4f(0.65F, 0.65F, 0.65F, 0.9F);
         GL11.glLineWidth(2F);
         GL11.glBegin(GL11.GL_LINES);
-        GL11.glVertex2f(52, 51);
-        GL11.glVertex2f(68, 51);
-        GL11.glVertex2f(64, 47);
-        GL11.glVertex2f(68, 51);
-        GL11.glVertex2f(64, 55);
-        GL11.glVertex2f(68, 51);
+        GL11.glVertex2f(30, 20);
+        GL11.glVertex2f(46, 20);
+        GL11.glVertex2f(42, 16);
+        GL11.glVertex2f(46, 20);
+        GL11.glVertex2f(42, 24);
+        GL11.glVertex2f(46, 20);
         GL11.glEnd();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glColor4f(1F, 1F, 1F, 1F);
@@ -147,13 +145,11 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
     private class CachedSalvageRecipe extends CachedRecipe {
 
         private final PositionedStack input;
-        private final PositionedStack station;
         private final ArrayList<PositionedStack> outputs = new ArrayList<PositionedStack>();
 
         private CachedSalvageRecipe(SalvageRecipe recipe, ItemStack source) {
             ItemStack shown = source != null ? source : recipe.input;
             input = NEILayout.stack(normalizeForDisplay(shown), NEILayout.SALVAGE_INPUT);
-            station = NEILayout.stack(new ItemStack(BlockListMF.salvage_basic), NEILayout.SALVAGE_STATION);
             for (Object output : recipe.outputs) {
                 addOutput(output, source);
             }
@@ -221,9 +217,6 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         @Override
         public List<PositionedStack> getOtherStacks() {
             ArrayList<PositionedStack> otherStacks = new ArrayList<PositionedStack>();
-            if (station != null) {
-                otherStacks.add(station);
-            }
             for (int i = 1; i < outputs.size(); i++) {
                 otherStacks.add(outputs.get(i));
             }

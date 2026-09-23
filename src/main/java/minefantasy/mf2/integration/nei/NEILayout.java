@@ -20,13 +20,12 @@ public class NEILayout {
     public static final Slot BOMB_BENCH_FUSE = new Slot(84, 23);
     public static final Slot BOMB_BENCH_OUTPUT = new Slot(129, 48);
 
-    public static final Slot SALVAGE_INPUT = new Slot(31, 42);
-    public static final Slot SALVAGE_STATION = new Slot(31, 78);
-    // Twelve outputs as three columns by four rows: the upright block sits better beside the input and station
-    // column than the wide four by three one did.
-    public static final Slot[] SALVAGE_OUTPUTS = new Slot[] { new Slot(75, 24), new Slot(93, 24), new Slot(111, 24),
-            new Slot(75, 42), new Slot(93, 42), new Slot(111, 42), new Slot(75, 60), new Slot(93, 60),
-            new Slot(111, 60), new Slot(75, 78), new Slot(93, 78), new Slot(111, 78) };
+    // Compact strip so several salvage recipes fit on one page: input on the left, twelve outputs as six columns by
+    // two rows. The station is left to the catalyst tab.
+    public static final Slot SALVAGE_INPUT = new Slot(8, 12);
+    public static final Slot[] SALVAGE_OUTPUTS = new Slot[] { new Slot(52, 3), new Slot(70, 3), new Slot(88, 3),
+            new Slot(106, 3), new Slot(124, 3), new Slot(142, 3), new Slot(52, 21), new Slot(70, 21), new Slot(88, 21),
+            new Slot(106, 21), new Slot(124, 21), new Slot(142, 21) };
 
     private NEILayout() {}
 
