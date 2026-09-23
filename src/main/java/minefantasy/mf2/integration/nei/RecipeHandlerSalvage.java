@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
+import minefantasy.mf2.api.crafting.ITieredComponent;
 import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.Salvage.SalvageRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
@@ -88,7 +89,9 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
                 arecipes.add(cachedRecipe);
                 continue;
             }
-            if (material == null || recipe == null || !NEIHelper.isValidStack(recipe.input)) {
+            if (material == null || recipe == null
+                    || !NEIHelper.isValidStack(recipe.input)
+                    || !takesMaterialFromInput(recipe, material)) {
                 continue;
             }
             // Salvaged parts take the material of the item they came from, so try the input made of the wanted
@@ -103,6 +106,28 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
                 }
             }
         }
+    }
+
+    /**
+     * Only a recipe registered with material-less parts of the material's kind inherits the salvaged item's material. A
+     * plain item (a flint and steel, say) lists parts of fixed materials, and dressing it up in the looked-up metal
+     * would show an item that does not exist.
+     */
+    private boolean takesMaterialFromInput(SalvageRecipe recipe, CustomMaterial material) {
+        if (recipe.outputs == null) {
+            return false;
+        }
+        for (Object output : recipe.outputs) {
+            if (!(output instanceof ItemStack)) {
+                continue;
+            }
+            ItemStack stack = (ItemStack) output;
+            if (stack.getItem() instanceof ITieredComponent && !CustomToolHelper.hasAnyMaterial(stack)
+                    && material.type.equalsIgnoreCase(((ITieredComponent) stack.getItem()).getMaterialType(stack))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
