@@ -280,7 +280,7 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
             int[] icon = minefantasy.mf2.api.helpers.GuiHelper.getToolTypeIcon(type);
             GuiDraw.drawTexturedModalRect(x, y, 20, 0, 20, 20);
             GuiDraw.drawTexturedModalRect(x, y, icon[0], icon[1] + 20, 20, 20);
-            if (tier > -1) {
+            if (tier > 0) { // Tier 0 accepts anything, so only a real requirement is shown
                 GuiDraw.drawString("" + tier, x + 4, y + 10, -1, true);
             }
             GL11.glPopMatrix();
