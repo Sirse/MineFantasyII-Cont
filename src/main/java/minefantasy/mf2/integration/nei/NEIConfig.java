@@ -165,7 +165,7 @@ public class NEIConfig implements IConfigureNEI {
                 "minefantasy2.bloomery",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.bloomery)).setHeight(89).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.bloomery)).setHeight(88).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.quern",
                 MineFantasyII.MODID,

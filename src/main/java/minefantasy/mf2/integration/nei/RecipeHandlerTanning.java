@@ -5,6 +5,8 @@ import java.util.Arrays;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
 
+import org.lwjgl.opengl.GL11;
+
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.NEIServerUtils;
 import codechicken.nei.PositionedStack;
@@ -23,7 +25,30 @@ public class RecipeHandlerTanning extends MFNEIRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return "minefantasy2:textures/gui/quern.png"; // need to draw texture
+        return "minefantasy2:textures/gui/icons.png";
+    }
+
+    @Override
+    public void drawBackground(int recipe) {
+        // The rack has no GUI of its own, so draw bare slot frames with an arrow between them
+        GL11.glColor4f(1F, 1F, 1F, 1F);
+        GuiDraw.changeTexture(getGuiTexture());
+        GuiDraw.drawTexturedModalRect(48, 18, 20, 0, 20, 20);
+        GuiDraw.drawTexturedModalRect(98, 18, 20, 0, 20, 20);
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(0.65F, 0.65F, 0.65F, 0.9F);
+        GL11.glLineWidth(2F);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex2f(72, 28);
+        GL11.glVertex2f(92, 28);
+        GL11.glVertex2f(88, 24);
+        GL11.glVertex2f(92, 28);
+        GL11.glVertex2f(88, 32);
+        GL11.glVertex2f(92, 28);
+        GL11.glEnd();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(1F, 1F, 1F, 1F);
     }
 
     @Override

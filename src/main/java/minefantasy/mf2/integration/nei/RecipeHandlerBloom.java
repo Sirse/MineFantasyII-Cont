@@ -68,8 +68,10 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
     public void drawBackground(int recipe) {
         GL11.glColor4f(1, 1, 1, 1);
         GuiDraw.changeTexture(getGuiTexture());
-        GuiDraw.drawTexturedModalRect(0, 0, 0, 11, 176, 89);
-        drawSlotFrame(120, 27);
+        // Only the furnace shape (u 53-123, v 20-98) is drawn, centred in the recipe area; the container's slots
+        // (80,30 and 80,68) move by the same offset
+        GuiDraw.drawTexturedModalRect(48, 5, 53, 20, 70, 78);
+        drawSlotFrame(134, 34);
     }
 
     private void drawSlotFrame(int x, int y) {
@@ -111,7 +113,7 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
         private PositionedStack stack;
 
         private FuelPair(ItemStack fuel) {
-            this.stack = NEIHelper.positionedStack(fuel, 75, 46, false);
+            this.stack = NEIHelper.positionedStack(fuel, 75, 53, false);
         }
     }
 
@@ -121,8 +123,8 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
         private PositionedStack result;
 
         private SmeltingPair(ItemStack ingred, ItemStack result) {
-            this.ingred = NEIHelper.positionedStack(ingred, 75, 8);
-            this.result = NEIHelper.positionedStack(result, 120, 27);
+            this.ingred = NEIHelper.positionedStack(ingred, 75, 15);
+            this.result = NEIHelper.positionedStack(result, 134, 34);
         }
 
         @Override
