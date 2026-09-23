@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -123,6 +124,23 @@ public final class NEIStationSlots {
             stack.setTagCompound(tag);
         }
         found.add(stack);
+    }
+
+    /**
+     * Tints an anvil slot red while it shows an anvil below the recipe's tier. Call from drawExtras, which runs after
+     * the items are drawn.
+     */
+    public static void drawPenaltyTint(PositionedStack slot, int requiredTier) {
+        if (slot == null || slot.item == null || slot.item.getItem() == null) {
+            return;
+        }
+        Block block = Block.getBlockFromItem(slot.item.getItem());
+        if (block instanceof BlockAnvilMF && ((BlockAnvilMF) block).getTier() < requiredTier) {
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            Gui.drawRect(slot.relx, slot.rely, slot.relx + 16, slot.rely + 16, 0x60FF2020);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glColor4f(1F, 1F, 1F, 1F);
+        }
     }
 
     /** The carpenter bench, or nothing when the recipe asks for a tier no bench has (scripts can) */

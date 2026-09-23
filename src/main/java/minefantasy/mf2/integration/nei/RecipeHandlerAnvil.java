@@ -72,6 +72,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
     public void drawExtras(int recipe) {
         CachedAnvilRecipe cachedRecipe = (CachedAnvilRecipe) arecipes.get(recipe);
         cachedRecipe.drawHotOverlays(this);
+        NEIStationSlots.drawPenaltyTint(cachedRecipe.stationSlot, cachedRecipe.anvilTier);
     }
 
     @Override
