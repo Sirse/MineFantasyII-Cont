@@ -31,6 +31,9 @@ public class GuiKitchenBench extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int x, int y) {
         boolean knowsCraft = tile.doesPlayerKnowCraft(mc.thePlayer);
+        if (knowsCraft && tile.hasProject()) {
+            GuiHelper.renderGhostResult(this, tile.getShownResult());
+        }
         String resultName = tile.getResultName();
         String title = MineFantasyII.isDebug() ? "Kitchen Bench"
                 : knowsCraft ? (resultName.startsWith("gui.") ? StatCollector.translateToLocal(resultName) : resultName)

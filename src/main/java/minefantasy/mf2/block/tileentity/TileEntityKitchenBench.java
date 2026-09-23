@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -25,6 +26,8 @@ import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.container.ContainerKitchenBench;
+import minefantasy.mf2.network.NetworkUtils;
+import minefantasy.mf2.network.packet.KitchenBenchPacket;
 
 public class TileEntityKitchenBench extends TileEntity implements IInventory, IKitchen {
 
@@ -408,14 +411,28 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         }
     }
 
+    /** Result as the server last sent it; clients never run the recipe lookup themselves */
+    private ItemStack clientResult;
+
+    /** The recipe result, or on the client the copy the server synced for display */
+    public ItemStack getShownResult() {
+        return worldObj != null && worldObj.isRemote ? clientResult : recipe;
+    }
+
+    public void setClientResult(ItemStack result) {
+        clientResult = result;
+    }
+
     /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
     public boolean hasProject() {
-        return recipe != null && recipe.getItem() != null;
+        ItemStack result = getShownResult();
+        return result != null && result.getItem() != null;
     }
 
     public String getResultName() {
-        if (recipe != null && recipe.getItem() != null && recipe.getDisplayName() != null) {
-            return recipe.getDisplayName();
+        ItemStack result = getShownResult();
+        if (hasProject() && result.getDisplayName() != null) {
+            return result.getDisplayName();
         }
         return StatCollector.translateToLocal("gui.noproject");
     }
@@ -549,7 +566,18 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
                 progress = 0;
             }
             if (progress > progressMax) progress = progressMax - 1;
+            syncData();
         }
+    }
+
+    /** Sends the recipe details the GUI shows; progress and dirt go through the container */
+    public void syncData() {
+        if (worldObj.isRemote) return;
+        NetworkUtils.sendToWatchers(
+                new KitchenBenchPacket(this).generatePacket(),
+                (WorldServer) worldObj,
+                this.xCoord,
+                this.zCoord);
     }
 
     public boolean canCraft() {
