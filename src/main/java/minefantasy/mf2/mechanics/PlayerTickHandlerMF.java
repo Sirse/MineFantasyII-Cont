@@ -397,7 +397,7 @@ public class PlayerTickHandlerMF {
         MFLogUtil.logDebug("Sync data");
         ResearchLogic.syncData(player);
 
-        if (!persist.hasKey("MF_HasBook")) {
+        if (ConfigHardcore.giveStarterBook && !persist.hasKey("MF_HasBook")) {
             if (player.capabilities.isCreativeMode) return;
             ItemStack book = new ItemStack(ToolListMF.researchBook);
             if (player.inventory.addItemStackToInventory(book)) {

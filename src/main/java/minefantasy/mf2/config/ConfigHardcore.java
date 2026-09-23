@@ -20,6 +20,7 @@ public class ConfigHardcore extends ConfigurationBaseMF {
     public static boolean HCCallowRocks = true;
     public static boolean HCCRemoveCraft = true;
     public static boolean HCCRemoveBooksCraft = false;
+    public static boolean giveStarterBook = true;
     public static boolean HCCRemoveTalismansCraft = false;
     public static boolean hunterKnife;
     public static boolean lessHunt;
@@ -87,6 +88,11 @@ public class ConfigHardcore extends ConfigurationBaseMF {
                 "Unlock entries",
                 false,
                 "If you don't want to research, this will unlock all entries.").getBoolean();
+        giveStarterBook = config.get(
+                CATEGORY_RESEARCH,
+                "Give Starter Book",
+                true,
+                "Give players the research book when they first join the world.").getBoolean();
         InformationBase.easyResearch = config.get(
                 CATEGORY_RESEARCH,
                 "Baby-Mode Research",
