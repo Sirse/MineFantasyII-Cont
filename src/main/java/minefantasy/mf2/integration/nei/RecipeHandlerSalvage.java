@@ -118,11 +118,12 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
             return false;
         }
         for (Object output : recipe.outputs) {
-            if (!(output instanceof ItemStack)) {
-                continue;
-            }
-            ItemStack stack = (ItemStack) output;
-            if (stack.getItem() instanceof ITieredComponent && !CustomToolHelper.hasAnyMaterial(stack)
+            // Parts are registered as stacks, items or blocks alike (needles list a bare bar item)
+            ItemStack stack = output instanceof ItemStack ? (ItemStack) output
+                    : output instanceof Item ? new ItemStack((Item) output)
+                            : output instanceof Block ? new ItemStack((Block) output) : null;
+            if (stack != null && stack.getItem() instanceof ITieredComponent
+                    && !CustomToolHelper.hasAnyMaterial(stack)
                     && material.type.equalsIgnoreCase(((ITieredComponent) stack.getItem()).getMaterialType(stack))) {
                 return true;
             }
