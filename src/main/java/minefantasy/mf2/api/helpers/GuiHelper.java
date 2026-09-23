@@ -15,7 +15,11 @@ public class GuiHelper {
 
     public static void renderToolIcon(Gui screen, String toolType, int tier, int x, int y, boolean outline,
             boolean available) {
-        if (!available) {
+        // Set the tint either way: a caller that just drew text leaves the GL colour at the text colour (black on the
+        // HUD), which used to turn a usable tool's icon black
+        if (available) {
+            GL11.glColor3f(1.0F, 1.0F, 1.0F);
+        } else {
             GL11.glColor3f(1.0F, 0.3F, 0.3F);
         }
         mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/icons.png"));
