@@ -192,7 +192,7 @@ public class NEIConfig implements IConfigureNEI {
                 "minefantasy2.paint_oil",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(ComponentListMF.plant_oil)).setHeight(90)
+                builder -> builder.setDisplayStack(stack(ComponentListMF.plant_oil)).setHeight(66)
                         .setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.crucible",

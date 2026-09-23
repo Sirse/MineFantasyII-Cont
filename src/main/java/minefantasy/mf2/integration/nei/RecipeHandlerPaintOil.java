@@ -28,7 +28,7 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
 
     @Override
     public String getGuiTexture() {
-        return "minefantasy2:textures/gui/knowledge/carpenterGrid.png";
+        return "minefantasy2:textures/gui/icons.png";
     }
 
     @Override
@@ -38,9 +38,30 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
 
     @Override
     public void drawBackground(int recipe) {
-        GL11.glColor4f(1, 1, 1, 1);
+        // Oiling happens in hand, with no GUI to borrow, so draw bare slot frames with an arrow to the result
+        GL11.glColor4f(1F, 1F, 1F, 1F);
         GuiDraw.changeTexture(getGuiTexture());
-        GuiDraw.drawTexturedModalRect(0, 0, 5, 33, 166, 90);
+        drawSlotFrame(NEILayout.PAINT_OIL_INPUT);
+        drawSlotFrame(NEILayout.PAINT_OIL_OIL);
+        drawSlotFrame(NEILayout.PAINT_OIL_OUTPUT);
+
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(0.65F, 0.65F, 0.65F, 0.9F);
+        GL11.glLineWidth(2F);
+        GL11.glBegin(GL11.GL_LINES);
+        GL11.glVertex2f(74, 39);
+        GL11.glVertex2f(94, 39);
+        GL11.glVertex2f(90, 35);
+        GL11.glVertex2f(94, 39);
+        GL11.glVertex2f(90, 43);
+        GL11.glVertex2f(94, 39);
+        GL11.glEnd();
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glColor4f(1F, 1F, 1F, 1F);
+    }
+
+    private void drawSlotFrame(NEILayout.Slot slot) {
+        GuiDraw.drawTexturedModalRect(slot.x - 2, slot.y - 2, 20, 0, 20, 20);
     }
 
     @Override
