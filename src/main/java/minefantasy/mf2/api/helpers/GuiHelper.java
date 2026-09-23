@@ -22,7 +22,8 @@ public class GuiHelper {
         int[] icon = getToolTypeIcon(toolType);
         screen.drawTexturedModalRect(x, y, outline ? 20 : 0, 0, 20, 20);
         screen.drawTexturedModalRect(x, y, icon[0], icon[1] + 20, 20, 20);
-        if (tier > -1) mc.fontRenderer.drawStringWithShadow("" + tier, x + 4, y + 10, 16777215);
+        // Tier 0 accepts anything, so only a real requirement is shown (as on the NEI pages)
+        if (tier > 0) mc.fontRenderer.drawStringWithShadow("" + tier, x + 4, y + 10, 16777215);
         GL11.glColor3f(1F, 1F, 1F);
     }
 

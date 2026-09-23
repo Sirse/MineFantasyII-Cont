@@ -618,6 +618,11 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                 this.zCoord);
     }
 
+    /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
+    public boolean hasProject() {
+        return recipe != null && recipe.getItem() != null;
+    }
+
     public String getResultName() {
         if (recipe != null && recipe.getDisplayName() != null) {
             return recipe.getDisplayName();

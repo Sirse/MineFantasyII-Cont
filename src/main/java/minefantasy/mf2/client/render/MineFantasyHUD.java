@@ -403,9 +403,7 @@ public class MineFantasyHUD extends Gui {
                 : "????";
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
 
-        if (knowsCraft && tile.getResultName() != null
-                && !tile.getResultName().equalsIgnoreCase("")
-                && tile.getToolNeeded() != null) {
+        if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
             boolean hasTool = ToolHelper
                     .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
             GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);
@@ -447,9 +445,7 @@ public class MineFantasyHUD extends Gui {
         String s = knowsCraft ? tile.getResultName() : "????";
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
 
-        if (knowsCraft && tile.getResultName() != null
-                && !tile.getResultName().equalsIgnoreCase("")
-                && tile.getToolNeeded() != null) {
+        if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
             boolean hasTool = ToolHelper
                     .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
             GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);

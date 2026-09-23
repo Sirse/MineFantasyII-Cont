@@ -425,6 +425,11 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, ICa
          */
     }
 
+    /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
+    public boolean hasProject() {
+        return recipe != null && recipe.getItem() != null;
+    }
+
     public String getResultName() {
         if (recipe != null && recipe.getItem() != null && recipe.getDisplayName() != null) {
             return recipe.getDisplayName();

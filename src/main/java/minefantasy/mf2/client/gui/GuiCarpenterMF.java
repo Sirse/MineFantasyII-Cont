@@ -44,7 +44,7 @@ public class GuiCarpenterMF extends GuiContainer {
         int xPoint = (this.width - this.xSize) / 2;
         int yPoint = (this.height - this.ySize) / 2;
 
-        if (knowsCraft && tile.getResultName() != null && !tile.getResultName().equalsIgnoreCase("")) {
+        if (knowsCraft && tile.hasProject()) {
             if (tile.getToolNeeded() != null) {
                 if (x < xPoint && x > xPoint - 20 && y < yPoint + 20 && y > yPoint) {
                     String s2 = StatCollector.translateToLocal("tooltype." + tile.getToolNeeded()) + ", "
@@ -86,8 +86,7 @@ public class GuiCarpenterMF extends GuiContainer {
             int progressWidth = (int) (160F / tile.progressMax * tile.progress);
             this.drawTexturedModalRect(xPoint + 8, yPoint + 21, 0, 240, progressWidth, 3);
         }
-        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null
-                && !tile.getResultName().equalsIgnoreCase("")) {
+        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.hasProject()) {
             GuiHelper.renderToolIcon(
                     this,
                     "carpenter",

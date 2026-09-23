@@ -57,8 +57,7 @@ public class GuiKitchenBench extends GuiContainer {
         }
         drawDirtyBar(xPoint, yPoint);
 
-        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.getResultName() != null
-                && !tile.getResultName().equalsIgnoreCase("")) {
+        if (tile.doesPlayerKnowCraft(mc.thePlayer) && tile.hasProject()) {
             GuiHelper.renderToolIcon(
                     this,
                     "kitchenbench",
