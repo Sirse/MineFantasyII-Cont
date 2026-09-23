@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
+import minefantasy.mf2.api.crafting.anvil.CustomToolRecipe;
 import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
 import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
@@ -25,6 +26,7 @@ import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
@@ -283,6 +285,9 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             } else {
                 this.inputStack = NEIHelper.validCopy(recipe.getRecipeOutput());
             }
+            if (recipe instanceof CustomToolRecipe) {
+                applyMaterialTiers();
+            }
             addSpecialCatalyst(specialCatalyst);
             setShapedRecipeIngredients(recipe.recipeWidth, recipe.recipeHeight, recipe.recipeItems);
         }
@@ -295,6 +300,26 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             inputStack = NEIHelper.validCopy(recipe.getRecipeOutput());
             addSpecialCatalyst(specialCatalyst);
             setShapelessRecipeIngredients(recipe.recipeItems);
+        }
+
+        /**
+         * Custom tool recipes leave their tiers at -1 and the anvil takes them from the material at craft time
+         * (CustomToolRecipe.modifyTiers), so read them off the result shown here the same way.
+         */
+        private void applyMaterialTiers() {
+            CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(inputStack);
+            if (material == null) {
+                material = CustomToolHelper.getCustomSecondaryMaterial(inputStack);
+            }
+            if (material == null) {
+                return;
+            }
+            if (toolTier < 0) {
+                toolTier = material.crafterTier;
+            }
+            if (anvilTier < 0) {
+                anvilTier = material.crafterAnvilTier;
+            }
         }
 
         private void addSpecialCatalyst(ItemStack specialCatalyst) {
