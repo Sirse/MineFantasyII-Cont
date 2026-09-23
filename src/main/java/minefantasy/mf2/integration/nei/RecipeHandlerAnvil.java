@@ -58,6 +58,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GuiDraw.changeTexture(getGuiTexture());
         GuiDraw.drawTexturedModalRect(0, 0, 5, 22, 166, 147);
+        ((CachedAnvilRecipe) arecipes.get(recipe)).drawSlotFrames();
     }
 
     @Override
@@ -69,7 +70,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
     public void drawExtras(int recipe) {
         CachedAnvilRecipe cachedRecipe = (CachedAnvilRecipe) arecipes.get(recipe);
         cachedRecipe.drawHotOverlays(this);
-        cachedRecipe.drawToolIcon(this);
     }
 
     @Override
@@ -369,9 +369,37 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             return getCycledIngredients(cycleticks / 20, ingredients);
         }
 
+        private PositionedStack toolSlot;
+        private PositionedStack stationSlot;
+        private boolean slotsBuilt;
+
+        /** Built on first use: the tool list walks the item registry once per tool type and tier */
+        private void buildStationSlots() {
+            if (slotsBuilt) {
+                return;
+            }
+            slotsBuilt = true;
+            toolSlot = NEIStationSlots.slot(NEIStationSlots.tools(toolType, toolTier), TOOL_ICON_X, ICON_Y);
+            stationSlot = NEIStationSlots.slot(NEIStationSlots.anvils(anvilTier), STATION_ICON_X, ICON_Y);
+        }
+
         @Override
         public List<PositionedStack> getOtherStacks() {
-            return otherStacks;
+            buildStationSlots();
+            ArrayList<PositionedStack> stacks = new ArrayList<PositionedStack>(otherStacks);
+            for (PositionedStack slot : new PositionedStack[] { toolSlot, stationSlot }) {
+                if (slot != null) {
+                    NEIStationSlots.cycle(slot, cycleticks);
+                    stacks.add(slot);
+                }
+            }
+            return stacks;
+        }
+
+        private void drawSlotFrames() {
+            buildStationSlots();
+            NEIStationSlots.drawFrame(toolSlot);
+            NEIStationSlots.drawFrame(stationSlot);
         }
 
         private boolean hasSpecialCatalyst() {
@@ -403,26 +431,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             }
         }
 
-        private void drawToolIcon(RecipeHandlerAnvil handler) {
-            // On the output row (output at y=20), in the free space left of the grid.
-            if (toolType != null) {
-                handler.drawIcon(toolType, toolTier, TOOL_ICON_X, ICON_Y);
-            }
-            handler.drawIcon("anvil", anvilTier, STATION_ICON_X, ICON_Y);
-        }
-    }
-
-    private void drawIcon(String type, int tier, int x, int y) {
-        GL11.glPushMatrix();
-        GL11.glColor3f(1F, 1F, 1F);
-        GuiDraw.changeTexture("minefantasy2:textures/gui/icons.png");
-        int[] icon = minefantasy.mf2.api.helpers.GuiHelper.getToolTypeIcon(type);
-        GuiDraw.drawTexturedModalRect(x, y, 20, 0, 20, 20);
-        GuiDraw.drawTexturedModalRect(x, y, icon[0], icon[1] + 20, 20, 20);
-        if (tier > 0) { // Tier 0 accepts anything, so only a real requirement is shown
-            GuiDraw.drawString("" + tier, x + 4, y + 10, -1, true);
-        }
-        GL11.glPopMatrix();
     }
 
     private void drawHeatOverlay(int x, int y, boolean heatable) {

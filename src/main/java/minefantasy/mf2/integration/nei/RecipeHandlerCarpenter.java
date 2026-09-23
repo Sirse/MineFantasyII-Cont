@@ -17,6 +17,7 @@ import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
+import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.api.item.IIngredient;
@@ -121,13 +122,13 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
         GuiDraw.changeTexture(getGuiTexture());
         NEILayout.drawBenchBackground();
         GL11.glDisable(GL11.GL_BLEND);
+        ((CachedCarpenterRecipe) arecipes.get(recipe)).drawSlotFrames();
     }
 
     @Override
     public void drawExtras(int recipe) {
         CachedCarpenterRecipe cachedRecipe = (CachedCarpenterRecipe) arecipes.get(recipe);
         cachedRecipe.drawHotOverlays();
-        cachedRecipe.drawToolIcon();
     }
 
     private CachedCarpenterRecipe handleRecipe(ICarpenterRecipe irecipe) {
@@ -282,6 +283,39 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
             }
         }
 
+        private PositionedStack toolSlot;
+        private PositionedStack stationSlot;
+        private boolean slotsBuilt;
+
+        /** Built on first use: the tool list walks the item registry once per tool type and tier */
+        private void buildStationSlots() {
+            if (slotsBuilt) {
+                return;
+            }
+            slotsBuilt = true;
+            toolSlot = NEIStationSlots.slot(NEIStationSlots.tools(toolType, toolTier), TOOL_ICON_X, ICON_Y);
+            stationSlot = NEIStationSlots.slot(NEIStationSlots.single(BlockListMF.carpenter), STATION_ICON_X, ICON_Y);
+        }
+
+        @Override
+        public List<PositionedStack> getOtherStacks() {
+            buildStationSlots();
+            ArrayList<PositionedStack> stacks = new ArrayList<PositionedStack>();
+            for (PositionedStack slot : new PositionedStack[] { toolSlot, stationSlot }) {
+                if (slot != null) {
+                    NEIStationSlots.cycle(slot, cycleticks);
+                    stacks.add(slot);
+                }
+            }
+            return stacks;
+        }
+
+        private void drawSlotFrames() {
+            buildStationSlots();
+            NEIStationSlots.drawFrame(toolSlot);
+            NEIStationSlots.drawFrame(stationSlot);
+        }
+
         @Override
         public List<PositionedStack> getIngredients() {
             return getCycledIngredients(cycleticks / 20, ingredients);
@@ -323,27 +357,6 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
             for (int[] hotSlot : hotSlots) {
                 drawHeatOverlay(hotSlot[0], hotSlot[1]);
             }
-        }
-
-        private void drawToolIcon() {
-            // On the output row (output at y=8), in the free space left of the grid.
-            if (toolType != null) {
-                drawIcon(toolType, toolTier, TOOL_ICON_X, ICON_Y);
-            }
-            drawIcon("carpenter", benchTier, STATION_ICON_X, ICON_Y);
-        }
-
-        private void drawIcon(String type, int tier, int x, int y) {
-            GL11.glPushMatrix();
-            GL11.glColor3f(1F, 1F, 1F);
-            GuiDraw.changeTexture("minefantasy2:textures/gui/icons.png");
-            int[] icon = minefantasy.mf2.api.helpers.GuiHelper.getToolTypeIcon(type);
-            GuiDraw.drawTexturedModalRect(x, y, 20, 0, 20, 20);
-            GuiDraw.drawTexturedModalRect(x, y, icon[0], icon[1] + 20, 20, 20);
-            if (tier > 0) { // Tier 0 accepts anything, so only a real requirement is shown
-                GuiDraw.drawString("" + tier, x + 4, y + 10, -1, true);
-            }
-            GL11.glPopMatrix();
         }
 
         private void drawHeatOverlay(int x, int y) {
