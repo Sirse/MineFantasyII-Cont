@@ -15,6 +15,7 @@ import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.Salvage.SalvageRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.list.BlockListMF;
 
 public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
@@ -76,10 +77,26 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(result)) {
             return;
         }
+        CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(result);
         for (SalvageRecipe recipe : Salvage.displayList) {
-            CachedSalvageRecipe cachedRecipe = createRecipe(recipe);
+            CachedSalvageRecipe cachedRecipe = createRecipe(recipe, null);
             if (cachedRecipe != null && cachedRecipe.hasOutput(result)) {
                 arecipes.add(cachedRecipe);
+                continue;
+            }
+            if (material == null || recipe == null || !NEIHelper.isValidStack(recipe.input)) {
+                continue;
+            }
+            // Salvaged parts take the material of the item they came from, so try the input made of the wanted
+            // material, as its head and then as its haft
+            for (String slot : new String[] { CustomToolHelper.slot_main, CustomToolHelper.slot_haft }) {
+                ItemStack input = recipe.input.copy();
+                CustomMaterial.addMaterial(input, slot, material.name);
+                cachedRecipe = createRecipe(recipe, input);
+                if (cachedRecipe != null && cachedRecipe.hasOutput(result)) {
+                    arecipes.add(cachedRecipe);
+                    break;
+                }
             }
         }
     }
@@ -91,7 +108,13 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         }
         for (SalvageRecipe recipe : Salvage.displayList) {
             if (recipe != null && NEIHelper.matchesCrafting(recipe.input, ingredient)) {
-                CachedSalvageRecipe cachedRecipe = createRecipe(recipe);
+                // A looked-up item with materials shows the parts it would actually give back
+                ItemStack input = null;
+                if (CustomToolHelper.hasAnyMaterial(ingredient)) {
+                    input = ingredient.copy();
+                    input.stackSize = recipe.input.stackSize;
+                }
+                CachedSalvageRecipe cachedRecipe = createRecipe(recipe, input);
                 if (cachedRecipe != null) {
                     cachedRecipe.setIngredientPermutation(cachedRecipe.getIngredients(), ingredient);
                     arecipes.add(cachedRecipe);
@@ -109,11 +132,15 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         return currenttip;
     }
 
-    private CachedSalvageRecipe createRecipe(SalvageRecipe recipe) {
+    /**
+     * @param input the item being salvaged, when it carries materials the parts should inherit; null shows the
+     *              registered recipe as is
+     */
+    private CachedSalvageRecipe createRecipe(SalvageRecipe recipe, ItemStack input) {
         if (recipe == null || !NEIHelper.isValidStack(recipe.input) || recipe.outputs == null) {
             return null;
         }
-        CachedSalvageRecipe cachedRecipe = new CachedSalvageRecipe(recipe);
+        CachedSalvageRecipe cachedRecipe = new CachedSalvageRecipe(recipe, input);
         return cachedRecipe.outputs.isEmpty() ? null : cachedRecipe;
     }
 
@@ -123,16 +150,21 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         private final PositionedStack station;
         private final ArrayList<PositionedStack> outputs = new ArrayList<PositionedStack>();
 
-        private CachedSalvageRecipe(SalvageRecipe recipe) {
-            input = NEILayout.stack(normalizeForDisplay(recipe.input), NEILayout.SALVAGE_INPUT);
+        private CachedSalvageRecipe(SalvageRecipe recipe, ItemStack source) {
+            ItemStack shown = source != null ? source : recipe.input;
+            input = NEILayout.stack(normalizeForDisplay(shown), NEILayout.SALVAGE_INPUT);
             station = NEILayout.stack(new ItemStack(BlockListMF.salvage_basic), NEILayout.SALVAGE_STATION);
             for (Object output : recipe.outputs) {
-                addOutput(output);
+                addOutput(output, source);
             }
         }
 
-        private void addOutput(Object output) {
+        private void addOutput(Object output, ItemStack source) {
             ItemStack stack = toStack(output);
+            if (stack != null && source != null) {
+                // Same hand-off as Salvage.dropItemStack, which also overrides a material the part already has
+                stack = CustomToolHelper.tryDeconstruct(stack.copy(), source);
+            }
             if (!NEIHelper.isValidStack(stack) || outputs.size() >= NEILayout.SALVAGE_OUTPUTS.length) {
                 return;
             }
@@ -164,6 +196,11 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         private boolean hasOutput(ItemStack stack) {
             for (PositionedStack output : outputs) {
                 for (ItemStack outputStack : output.items) {
+                    // A material-less output stands for "whatever the input was made of"; it should not answer a
+                    // lookup for one specific material, or every custom tool would list under every metal
+                    if (CustomToolHelper.hasAnyMaterial(stack) && !CustomToolHelper.hasAnyMaterial(outputStack)) {
+                        continue;
+                    }
                     if (CustomToolHelper.areEqual(outputStack, stack)) {
                         return true;
                     }
