@@ -28,6 +28,7 @@ import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 import minefantasy.mf2.block.tileentity.TileEntityCarpenterMF;
+import minefantasy.mf2.block.tileentity.TileEntityKitchenBench;
 import minefantasy.mf2.block.tileentity.TileEntityRoad;
 import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 import minefantasy.mf2.config.ConfigClient;
@@ -147,6 +148,9 @@ public class MineFantasyHUD extends Gui {
         }
         if (tile instanceof TileEntityCarpenterMF) {
             renderCarpenterMetre(player, (TileEntityCarpenterMF) tile, screenWidth, screenHeight);
+        }
+        if (tile instanceof TileEntityKitchenBench) {
+            renderKitchenMetre(player, (TileEntityKitchenBench) tile, screenWidth, screenHeight);
         }
         if (tile instanceof TileEntityTanningRack) {
             renderTanningRackMetre(player, (TileEntityTanningRack) tile, screenWidth, screenHeight);
@@ -444,6 +448,48 @@ public class MineFantasyHUD extends Gui {
         boolean knowsCraft = tile.doesPlayerKnowCraft(player);
         String s = knowsCraft ? tile.getResultName() : "????";
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
+
+        if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
+            boolean hasTool = ToolHelper
+                    .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
+            GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);
+        }
+        GL11.glPopMatrix();
+    }
+
+    private void renderKitchenMetre(EntityPlayer player, TileEntityKitchenBench tile, int width, int height) {
+        GL11.glPushMatrix();
+        mc.renderEngine.bindTexture(HUD_TEXTURE);
+        int xPos = width / 2 - 86;
+        int yPos = height - 69;
+
+        this.drawTexturedModalRect(
+                xPos,
+                yPos,
+                CRAFT_METER_BG_U,
+                CRAFT_METER_BG_V,
+                CRAFT_METER_WIDTH,
+                CRAFT_METER_HEIGHT);
+        this.drawTexturedModalRect(
+                xPos + 6,
+                yPos + 12,
+                CRAFT_METER_FG_U,
+                CRAFT_METER_FG_V,
+                tile.getProgressBar(CRAFT_METER_FG_WIDTH),
+                CRAFT_METER_FG_HEIGHT);
+
+        boolean knowsCraft = tile.doesPlayerKnowCraft(player);
+        String s = knowsCraft ? tile.getResultName() : "????";
+        mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
+        if (tile.isDirty()) {
+            // A dirty bench refuses to work, so say why above the meter
+            String dirty = StatCollector.translateToLocal("gui.kitchenbench.dirty");
+            mc.fontRenderer.drawStringWithShadow(
+                    dirty,
+                    xPos + 86 - (mc.fontRenderer.getStringWidth(dirty) / 2),
+                    yPos - 10,
+                    16733525);
+        }
 
         if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
             boolean hasTool = ToolHelper

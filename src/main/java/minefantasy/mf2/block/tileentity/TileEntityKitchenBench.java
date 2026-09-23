@@ -570,7 +570,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         }
     }
 
-    /** Sends the recipe details the GUI shows; progress and dirt go through the container */
+    /** Sends what the GUI and the in-world HUD show */
     public void syncData() {
         if (worldObj.isRemote) return;
         NetworkUtils.sendToWatchers(

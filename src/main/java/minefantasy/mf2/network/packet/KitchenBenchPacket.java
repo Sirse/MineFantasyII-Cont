@@ -10,8 +10,8 @@ import minefantasy.mf2.block.tileentity.TileEntityKitchenBench;
 import minefantasy.mf2.network.NetworkUtils;
 
 /**
- * Recipe details the kitchen bench GUI shows. Progress and dirt already travel through the container, so only what the
- * server's recipe lookup decides is sent here.
+ * Kitchen bench state for the GUI and the in-world HUD. The container also tracks progress and dirt, but only while the
+ * GUI is open, and the HUD needs them without it.
  */
 public class KitchenBenchPacket extends PacketMF {
 
@@ -20,12 +20,14 @@ public class KitchenBenchPacket extends PacketMF {
     private String toolNeeded;
     private String research;
     private ItemStack result;
+    private float[] floats = new float[4];
 
     public KitchenBenchPacket(TileEntityKitchenBench tile) {
         coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         toolNeeded = tile.getToolNeeded();
         research = tile.getResearchNeeded();
         result = tile.getShownResult();
+        floats = new float[] { tile.progress, tile.progressMax, tile.dirtyProgress, tile.getDirtyMax() };
     }
 
     public KitchenBenchPacket() {}
@@ -43,6 +45,9 @@ public class KitchenBenchPacket extends PacketMF {
             toolNeeded = ByteBufUtils.readUTF8String(packet);
             research = ByteBufUtils.readUTF8String(packet);
             result = ByteBufUtils.readItemStack(packet);
+            for (int i = 0; i < floats.length; i++) {
+                floats[i] = packet.readFloat();
+            }
             if (toolNeeded == null) toolNeeded = "";
             if (research == null) research = "";
 
@@ -50,6 +55,10 @@ public class KitchenBenchPacket extends PacketMF {
             bench.setToolType(toolNeeded);
             bench.setResearch(research);
             bench.setClientResult(result);
+            bench.progress = floats[0];
+            bench.progressMax = Math.max(0F, floats[1]);
+            bench.dirtyProgress = floats[2];
+            bench.setDirtyMax(floats[3]);
         }
     }
 
@@ -64,5 +73,8 @@ public class KitchenBenchPacket extends PacketMF {
         ByteBufUtils.writeUTF8String(packet, toolNeeded == null ? "" : toolNeeded);
         ByteBufUtils.writeUTF8String(packet, research == null ? "" : research);
         ByteBufUtils.writeItemStack(packet, result);
+        for (float value : floats) {
+            packet.writeFloat(value);
+        }
     }
 }
