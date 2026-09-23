@@ -15,19 +15,21 @@ public class MFLogUtil {
 
     public static final String PREFIX = "[MineFantasyII]: ";
 
+    // FMLLog formats its first argument, so a message is always passed as an argument: text with a % in it (a chance,
+    // a progress figure) otherwise throws from String.format
     public static void log(String mes) {
-        FMLLog.info(PREFIX + mes);
+        FMLLog.info("%s", PREFIX + mes);
         // MF_LOGGER.log(Level.INFO, PREFIX + mes);
     }
 
     public static void logWarn(String mes) {
-        FMLLog.warning(PREFIX + "(warning) " + mes);
+        FMLLog.warning("%s", PREFIX + "(warning) " + mes);
         // MF_LOGGER.log(Level.WARN, PREFIX + mes);
     }
 
     public static void logDebug(String mes) {
         if (MineFantasyII.isDebug()) {
-            FMLLog.info(PREFIX + "(debug) " + mes);
+            FMLLog.info("%s", PREFIX + "(debug) " + mes);
             // MF_LOGGER.debug(PREFIX + mes);
         }
     }
