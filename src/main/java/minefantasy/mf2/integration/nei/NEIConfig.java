@@ -146,34 +146,36 @@ public class NEIConfig implements IConfigureNEI {
                 "minefantasy2.carpenter",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(145)
+                        .setMaxRecipesPerPage(1));
         if (ConfigKitchen.enableBench) {
             event.registerHandlerInfo(
                     "minefantasy2.kitchen",
                     MineFantasyII.MODID,
                     MineFantasyII.NAME,
-                    builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setMaxRecipesPerPage(1));
+                    builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setHeight(145)
+                            .setMaxRecipesPerPage(1));
         }
         event.registerHandlerInfo(
                 "minefantasy2.anvil",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(getAnvilBlock())).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(getAnvilBlock())).setHeight(136).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.bloomery",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.bloomery)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.bloomery)).setHeight(89).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.quern",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.quern)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.quern)).setHeight(80).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.tanning",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.tanner)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.tanner)).setHeight(95).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.cooking",
                 MineFantasyII.MODID,
@@ -184,27 +186,31 @@ public class NEIConfig implements IConfigureNEI {
                 "minefantasy2.salvage",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.salvage_basic)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(100)
+                        .setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.paint_oil",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(ComponentListMF.plant_oil)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(ComponentListMF.plant_oil)).setHeight(90)
+                        .setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.crucible",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.crucible)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.crucible)).setHeight(94).setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.big_furnace",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.furnace_stone)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.furnace_stone)).setHeight(63)
+                        .setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.blast_furnace",
                 MineFantasyII.MODID,
                 MineFantasyII.NAME,
-                builder -> builder.setDisplayStack(stack(BlockListMF.blast_chamber)).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(BlockListMF.blast_chamber)).setHeight(112)
+                        .setMaxRecipesPerPage(1));
         event.registerHandlerInfo(
                 "minefantasy2.bomb_bench",
                 MineFantasyII.MODID,

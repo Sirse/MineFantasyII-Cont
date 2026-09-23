@@ -4,7 +4,6 @@ import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
-
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.minecraft.MineTweakerMC;
 
