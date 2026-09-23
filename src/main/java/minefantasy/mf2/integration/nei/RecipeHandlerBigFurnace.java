@@ -11,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.ItemList;
 import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 
 public class RecipeHandlerBigFurnace extends MFNEIRecipeHandler {
@@ -92,14 +91,22 @@ public class RecipeHandlerBigFurnace extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         if (recipeList == null) {
             fillRecipeList();
         }
         for (RecipePair recipePair : recipeList) {
-            if (recipePair != null && CustomToolHelper.areEqual(recipePair.outputStack, result)) {
+            if (recipePair != null && matchesOutput(recipePair.outputStack, result)) {
                 BigFurnaceRecipe cachedRecipe = new BigFurnaceRecipe(recipePair.inputStack, recipePair.outputStack);
                 arecipes.add(cachedRecipe);
             }

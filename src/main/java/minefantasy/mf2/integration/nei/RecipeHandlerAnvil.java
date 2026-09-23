@@ -134,6 +134,21 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void loadAllRecipes() {
+        for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+            if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())
+                    || !NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
+                continue;
+            }
+            CachedAnvilRecipe recipe = handleRecipe(irecipe, null, null);
+            if (recipe != null) {
+                arecipes.add(recipe);
+            }
+        }
+    }
+
     private ItemStack getSpecialResultFor(ItemStack baseOutput, ItemStack requestedOutput) {
         String design = CustomToolHelper.getCustomStyle(requestedOutput);
         if (design == null) {

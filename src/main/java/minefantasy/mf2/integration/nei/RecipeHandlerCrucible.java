@@ -39,12 +39,20 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         for (Alloy alloy : AlloyRecipes.alloys) {
             if (alloy != null && NEIHelper.isValidStack(alloy.recipeOutput)
-                    && CustomToolHelper.areEqual(alloy.recipeOutput, result)) {
+                    && matchesOutput(alloy.recipeOutput, result)) {
                 CachedAlloyRecipe recipe = new CachedAlloyRecipe(alloy);
                 arecipes.add(recipe);
             }

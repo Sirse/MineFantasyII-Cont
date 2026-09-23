@@ -10,7 +10,6 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
@@ -44,15 +43,23 @@ public class RecipeHandlerBlastFurnace extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.blastfurn)) {
             for (Entry<ItemStack, ItemStack> entry : BlastFurnaceRecipes.smelting().getSmeltingList().entrySet()) {
                 if (entry != null && NEIHelper.isValidStack(entry.getKey())
                         && NEIHelper.isValidStack(entry.getValue())
-                        && CustomToolHelper.areEqual(entry.getValue(), result)) {
-                    CachedBlastFurnaceRecipe recipe = new CachedBlastFurnaceRecipe(entry.getKey(), result);
+                        && matchesOutput(entry.getValue(), result)) {
+                    CachedBlastFurnaceRecipe recipe = new CachedBlastFurnaceRecipe(entry.getKey(), entry.getValue());
                     arecipes.add(recipe);
                 }
             }

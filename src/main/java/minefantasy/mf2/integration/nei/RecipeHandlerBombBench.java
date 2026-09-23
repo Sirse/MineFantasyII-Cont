@@ -79,14 +79,22 @@ public class RecipeHandlerBombBench extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         for (ItemStack caseStack : CASES) {
             ArrayList<Combo> combos = buildCombosForCase(caseStack);
             ArrayList<Combo> matching = new ArrayList<Combo>();
             for (Combo combo : combos) {
-                if (combo != null && matchesBombOutput(combo.output, result)) {
+                if (combo != null && (result == null || matchesBombOutput(combo.output, result))) {
                     matching.add(combo);
                 }
             }

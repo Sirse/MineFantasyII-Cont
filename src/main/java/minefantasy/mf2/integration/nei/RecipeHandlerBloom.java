@@ -17,7 +17,6 @@ import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 
 public class RecipeHandlerBloom extends MFNEIRecipeHandler {
@@ -82,14 +81,22 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         Map<ItemStack, ItemStack> recipes = BloomRecipe.recipeList;
         for (Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
             if (recipe != null && NEIHelper.isValidStack(recipe.getKey())
                     && NEIHelper.isValidStack(recipe.getValue())
-                    && CustomToolHelper.areEqual(recipe.getValue(), result)) {
+                    && matchesOutput(recipe.getValue(), result)) {
                 arecipes.add(new SmeltingPair(recipe.getKey(), recipe.getValue()));
             }
         }

@@ -81,14 +81,22 @@ public class RecipeHandlerCrossbowBench extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         for (ItemStack stock : STOCKS) {
             ArrayList<Combo> combos = buildCombos(stock);
             ArrayList<Combo> matching = new ArrayList<Combo>();
             for (Combo combo : combos) {
-                if (combo != null && NEIHelper.matchesCrafting(combo.output, result)) {
+                if (combo != null && (result == null || NEIHelper.matchesCrafting(combo.output, result))) {
                     matching.add(combo);
                 }
             }

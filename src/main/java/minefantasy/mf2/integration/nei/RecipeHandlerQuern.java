@@ -8,7 +8,6 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 public class RecipeHandlerQuern extends MFNEIRecipeHandler {
@@ -41,11 +40,19 @@ public class RecipeHandlerQuern extends MFNEIRecipeHandler {
 
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         for (QuernRecipes recipe : QuernRecipes.recipeList) {
-            if (isValidRecipe(recipe) && CustomToolHelper.areEqual(recipe.result, result)) {
+            if (isValidRecipe(recipe) && matchesOutput(recipe.result, result)) {
                 CachedQuernRecipe cachedRecipe = new CachedQuernRecipe(recipe);
                 arecipes.add(cachedRecipe);
             }

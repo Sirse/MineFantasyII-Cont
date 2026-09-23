@@ -1,8 +1,11 @@
 package minefantasy.mf2.integration.nei;
 
+import java.awt.Rectangle;
+import java.util.Collections;
 import java.util.function.Consumer;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -12,10 +15,15 @@ import codechicken.nei.api.IConfigureNEI;
 import codechicken.nei.event.NEIRegisterHandlerInfosEvent;
 import codechicken.nei.recipe.DefaultOverlayHandler;
 import codechicken.nei.recipe.HandlerInfo;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRect;
+import codechicken.nei.recipe.TemplateRecipeHandler.RecipeTransferRectHandler;
 import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.client.gui.GuiAnvilMF;
+import minefantasy.mf2.client.gui.GuiBigFurnace;
 import minefantasy.mf2.client.gui.GuiCarpenterMF;
+import minefantasy.mf2.client.gui.GuiCrucible;
 import minefantasy.mf2.client.gui.GuiKitchenBench;
 import minefantasy.mf2.config.ConfigIntegration;
 import minefantasy.mf2.config.ConfigKitchen;
@@ -114,9 +122,32 @@ public class NEIConfig implements IConfigureNEI {
             API.registerUsageHandler(handlerCrossbowBench);
 
             registerRecipeCatalysts();
+            registerStationClickAreas();
 
             registerHandlerInfos(new NEIRegisterHandlerInfosEvent());
         }
+    }
+
+    /**
+     * Clicking a station's progress bar (or the big furnace's arrow) opens every recipe of that station, like the arrow
+     * in a vanilla furnace. Areas are given in GUI coordinates, so each GUI's recipe offset is set to zero.
+     */
+    private void registerStationClickAreas() {
+        addClickArea(GuiCarpenterMF.class, "minefantasy2.carpenter", 8, 19, 160, 7);
+        if (ConfigKitchen.enableBench) {
+            addClickArea(GuiKitchenBench.class, "minefantasy2.kitchen", 8, 19, 160, 7);
+        }
+        addClickArea(GuiAnvilMF.class, "minefantasy2.anvil", 36, 19, 160, 7);
+        addClickArea(GuiCrucible.class, "minefantasy2.crucible", 61, 67, 54, 8);
+        addClickArea(GuiBigFurnace.class, "minefantasy2.big_furnace", 76, 34, 24, 16);
+    }
+
+    private static void addClickArea(Class<? extends GuiContainer> gui, String handlerId, int x, int y, int width,
+            int height) {
+        API.setGuiOffset(gui, 0, 0);
+        RecipeTransferRectHandler.registerRectsToGuis(
+                Collections.<Class<? extends GuiContainer>>singletonList(gui),
+                Collections.singletonList(new RecipeTransferRect(new Rectangle(x, y, width, height), handlerId)));
     }
 
     private void registerRecipeCatalysts() {

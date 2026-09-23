@@ -16,7 +16,6 @@ import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.api.item.IIngredient;
@@ -54,12 +53,20 @@ public class RecipeHandlerKitchen extends MFNEIRecipeHandler {
     @SuppressWarnings("unchecked")
     @Override
     public void loadCraftingRecipes(ItemStack result) {
-        if (!NEIHelper.isValidStack(result)) {
-            return;
+        if (NEIHelper.isValidStack(result)) {
+            loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        loadRecipesFor(null);
+    }
+
+    private void loadRecipesFor(ItemStack result) {
         for (ICarpenterRecipe irecipe : (List<ICarpenterRecipe>) CraftingManagerKitchen.getInstance().getRecipeList()) {
             if (irecipe != null && NEIHelper.isValidStack(irecipe.getRecipeOutput())
-                    && CustomToolHelper.areEqual(irecipe.getRecipeOutput(), result)
+                    && matchesOutput(irecipe.getRecipeOutput(), result)
                     && NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                 CachedKitchenRecipe recipe = handleRecipe(irecipe);
 
