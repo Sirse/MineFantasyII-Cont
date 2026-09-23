@@ -131,7 +131,8 @@ public class ConstructionBlockMF extends Block {
                 return m_icons[3];
 
             default:
-                return blockIcon;
+                // Wildcard stacks (the ore dictionary entry, as NEI shows it) carry meta 32767
+                return m_icons[0];
         }
     }
 
