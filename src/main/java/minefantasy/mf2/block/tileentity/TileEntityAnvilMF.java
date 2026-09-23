@@ -343,6 +343,16 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     }
 
     private void craftItem(EntityPlayer lastHit) {
+        // Re-read the grid before paying out: inventory changes after the first one only refresh the recipe on a
+        // timer, so the cached recipe may no longer match what is actually on the anvil
+        // One recipe object can yield different results for different materials, so the result must match as well
+        IAnvilRecipe crafting = activeRecipe;
+        ItemStack expected = recipe;
+        updateCraftingData();
+        if (activeRecipe != crafting || !ItemStack.areItemStacksEqual(expected, recipe)) {
+            progress = 0;
+            return;
+        }
         if (this.canCraft()) {
             ItemStack result = modifySpecials(recipe);
             if (result == null) {

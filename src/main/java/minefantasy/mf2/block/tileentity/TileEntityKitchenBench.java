@@ -301,6 +301,16 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     }
 
     private void craftItem(EntityPlayer user) {
+        // Re-read the grid before paying out: inventory changes after the first one do not refresh the recipe, so the
+        // cached recipe may no longer match what is actually on the bench
+        // One recipe object can yield different results for different materials, so the result must match as well
+        IKitchenRecipe crafting = activeRecipe;
+        ItemStack expected = recipe;
+        updateCraftingData();
+        if (activeRecipe != crafting || !ItemStack.areItemStacksEqual(expected, recipe)) {
+            progress = 0;
+            return;
+        }
         if (this.canCraft() && !isDirty()) {
             addXP(user);
             addDirtyProgress(user);
