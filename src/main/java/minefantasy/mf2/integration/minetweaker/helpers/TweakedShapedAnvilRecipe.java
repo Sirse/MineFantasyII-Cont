@@ -97,7 +97,7 @@ public class TweakedShapedAnvilRecipe implements IAnvilRecipe, IStackedAnvilReci
                 if (inputItem == null || ingredient == null) {
                     return false;
                 }
-                if (!TweakedIngredients.matches(ingredient, inputItem)) {
+                if (!TweakedIngredients.matchesAnvil(ingredient, inputItem)) {
                     return false;
                 }
             }

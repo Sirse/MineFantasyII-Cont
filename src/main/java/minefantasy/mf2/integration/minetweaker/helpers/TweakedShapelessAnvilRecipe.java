@@ -109,7 +109,7 @@ public class TweakedShapelessAnvilRecipe implements IAnvilRecipe, IStackedAnvilR
                     ItemStack stack = inv.getStackInRowAndColumn(x, y);
                     if (stack == null || items[x][y]) continue;
                     // Ask the ingredient itself so NBT conditions and wildcard damage are honoured
-                    if (TweakedIngredients.matches(i, stack)) {
+                    if (TweakedIngredients.matchesAnvil(i, stack)) {
                         matches[a] = true;
                         items[x][y] = true;
                         found = true;
