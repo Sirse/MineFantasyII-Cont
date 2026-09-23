@@ -10,6 +10,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 
@@ -168,6 +171,24 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
             return recipe.output.getDisplayName();
         }
         return "";
+    }
+
+    /**
+     * The saved state, sent when a player starts watching the spit. The inventory packet only goes out on changes, so a
+     * returning player otherwise saw an empty spit until the food next changed.
+     */
+    @Override
+    public Packet getDescriptionPacket() {
+        NBTTagCompound nbt = new NBTTagCompound();
+        writeToNBT(nbt);
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+        // readFromNBT only fills the slots it finds, so clear first or taken food would linger
+        items = new ItemStack[items.length];
+        readFromNBT(packet.func_148857_g());
     }
 
     @Override
