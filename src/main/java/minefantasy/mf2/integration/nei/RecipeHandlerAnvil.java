@@ -301,7 +301,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                         continue;
                     }
 
-                    ItemStack cachedStack = NEIHelper.validCopy((ItemStack) items[y * width + x]);
+                    ItemStack cachedStack = NEIHelper.displayCopy((ItemStack) items[y * width + x]);
                     if (cachedStack == null) {
                         continue;
                     }
@@ -326,7 +326,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                     continue;
                 }
 
-                ItemStack cachedStack = NEIHelper.validCopy((ItemStack) item);
+                ItemStack cachedStack = NEIHelper.displayCopy((ItemStack) item);
                 if (cachedStack == null) {
                     continue;
                 }

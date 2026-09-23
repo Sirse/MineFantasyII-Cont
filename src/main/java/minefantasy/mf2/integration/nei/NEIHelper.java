@@ -100,6 +100,18 @@ public class NEIHelper {
         return isValidStack(stack) ? stack.copy() : null;
     }
 
+    /**
+     * Copies a recipe stack for display. Recipes built from a bare item carry the wildcard meta, which NEI would show
+     * and look up literally, so items without subtypes fall back to their only meta.
+     */
+    public static ItemStack displayCopy(ItemStack stack) {
+        ItemStack copy = validCopy(stack);
+        if (copy != null && copy.getItemDamage() == OreDictionary.WILDCARD_VALUE && !copy.getHasSubtypes()) {
+            copy.setItemDamage(0);
+        }
+        return copy;
+    }
+
     public static boolean canViewResearch(net.minecraft.entity.player.EntityPlayer player, String research) {
         if (research == null || research.isEmpty()) {
             return true;
