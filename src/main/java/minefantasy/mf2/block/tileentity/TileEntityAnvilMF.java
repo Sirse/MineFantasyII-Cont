@@ -70,6 +70,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private int[] requiredAmounts;
     private int hammerTierRequired;
     private int anvilTierRequired;
+    /** How wide the hit window stays on an anvil below the recipe's tier; a lower anvil still works, only harder */
+    public static final float LOW_TIER_HIT_WINDOW = 0.25F;
 
     public TileEntityAnvilMF() {
         this(0, "Iron");
@@ -983,7 +985,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
     private void updateThreshold() {
         float modifier = 1.0F;
         if (tier < anvilTierRequired) {
-            modifier *= 0.25F;
+            modifier *= LOW_TIER_HIT_WINDOW;
         }
 
         float baseThreshold = worldObj.difficultySetting.getDifficultyId() >= 2 ? 7.5F : 10F;

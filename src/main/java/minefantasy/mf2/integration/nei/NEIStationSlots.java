@@ -9,6 +9,11 @@ import java.util.Map;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
+import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
@@ -17,7 +22,9 @@ import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.CustomCrafterEntry;
 import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.block.crafting.BlockAnvilMF;
+import minefantasy.mf2.block.crafting.BlockCarpenter;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 import minefantasy.mf2.util.MFLogUtil;
 
 /**
@@ -76,26 +83,52 @@ public final class NEIStationSlots {
         return found;
     }
 
-    /** Every anvil at or above the tier */
-    public static List<ItemStack> anvils(int tier) {
-        List<ItemStack> found = ANVILS.get(tier);
+    /**
+     * Every anvil for a recipe of this tier. A lower anvil still works, only with a far narrower hit window, so none is
+     * left out; the lower ones carry a tooltip line with the penalty instead. The line rides in the stack's own lore so
+     * it shows however NEI builds the tooltip.
+     */
+    public static List<ItemStack> anvils(int requiredTier) {
+        List<ItemStack> found = ANVILS.get(requiredTier);
         if (found == null) {
             found = new ArrayList<ItemStack>();
-            addAnvil(found, BlockListMF.anvilStone, tier);
+            addAnvil(found, BlockListMF.anvilStone, requiredTier);
             if (BlockListMF.anvil != null) {
                 for (Block anvil : BlockListMF.anvil) {
-                    addAnvil(found, anvil, tier);
+                    addAnvil(found, anvil, requiredTier);
                 }
             }
-            ANVILS.put(tier, found);
+            ANVILS.put(requiredTier, found);
         }
         return found;
     }
 
-    private static void addAnvil(List<ItemStack> found, Block block, int tier) {
-        if (block instanceof BlockAnvilMF && ((BlockAnvilMF) block).getTier() >= tier) {
-            found.add(new ItemStack(block));
+    private static void addAnvil(List<ItemStack> found, Block block, int requiredTier) {
+        if (!(block instanceof BlockAnvilMF)) {
+            return;
         }
+        ItemStack stack = new ItemStack(block);
+        if (((BlockAnvilMF) block).getTier() < requiredTier) {
+            NBTTagList lore = new NBTTagList();
+            lore.appendTag(
+                    new NBTTagString(
+                            EnumChatFormatting.RED + StatCollector.translateToLocalFormatted(
+                                    "nei.minefantasy2.anvil.low_tier",
+                                    requiredTier,
+                                    Math.round(TileEntityAnvilMF.LOW_TIER_HIT_WINDOW * 100))));
+            NBTTagCompound display = new NBTTagCompound();
+            display.setTag("Lore", lore);
+            NBTTagCompound tag = new NBTTagCompound();
+            tag.setTag("display", display);
+            stack.setTagCompound(tag);
+        }
+        found.add(stack);
+    }
+
+    /** The carpenter bench, or nothing when the recipe asks for a tier no bench has (scripts can) */
+    public static List<ItemStack> carpenters(int tier) {
+        BlockCarpenter bench = BlockListMF.carpenter;
+        return bench != null && bench.getTier() >= tier ? single(bench) : Collections.<ItemStack>emptyList();
     }
 
     public static List<ItemStack> single(Block block) {

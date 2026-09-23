@@ -2275,6 +2275,7 @@ knowledge.doctor.desc=Duty to benefit
 knowledge.doctor.1=Your constant use of aiding your fellow humans has yielded you experience in medicine.^Bandages heal 50% more damage.
 
 nei.minefantasy2.special_output=Requires %s in output slot
+nei.minefantasy2.anvil.low_tier=Below tier %1$s: hit window only %2$s%% as wide
 nei.minefantasy2.tool=Tool: %s
 nei.minefantasy2.station=Station: %s
 nei.minefantasy2.tier=Tier: %s

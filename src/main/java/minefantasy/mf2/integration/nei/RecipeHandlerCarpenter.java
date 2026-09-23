@@ -17,7 +17,6 @@ import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
 import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
 import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
-import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapedCBRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedShapelessCBRecipes;
 import minetweaker.api.item.IIngredient;
@@ -294,7 +293,7 @@ public class RecipeHandlerCarpenter extends MFNEIRecipeHandler {
             }
             slotsBuilt = true;
             toolSlot = NEIStationSlots.slot(NEIStationSlots.tools(toolType, toolTier), TOOL_ICON_X, ICON_Y);
-            stationSlot = NEIStationSlots.slot(NEIStationSlots.single(BlockListMF.carpenter), STATION_ICON_X, ICON_Y);
+            stationSlot = NEIStationSlots.slot(NEIStationSlots.carpenters(benchTier), STATION_ICON_X, ICON_Y);
         }
 
         @Override

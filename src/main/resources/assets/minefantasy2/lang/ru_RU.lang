@@ -2279,6 +2279,7 @@ knowledge.doctor.desc=Спасая жизни
 knowledge.doctor.1=Постоянная врачебная практика помогла Вам увеличить эффективность использования повязок. Теперь вы излечиваете ими на 50% лучше.
 
 nei.minefantasy2.special_output=Требует %s в выходном слоте
+nei.minefantasy2.anvil.low_tier=Ниже уровня %1$s: окно попадания всего %2$s%%
 nei.minefantasy2.tool=Инструмент: %s
 nei.minefantasy2.station=Станция: %s
 nei.minefantasy2.tier=Уровень: %s

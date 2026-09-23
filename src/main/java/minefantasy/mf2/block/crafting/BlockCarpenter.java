@@ -34,6 +34,11 @@ public class BlockCarpenter extends BlockContainer {
     private int tier = 0;
     private Random rand = new Random();
 
+    /** The bench tier recipes are checked against (TileEntityCarpenterMF gets it at creation) */
+    public int getTier() {
+        return tier;
+    }
+
     public BlockCarpenter() {
         super(Material.wood);
 
