@@ -539,6 +539,8 @@ public class MineFantasyHUD extends Gui {
         if (!tile.shouldShowMetre()) return;
 
         GL11.glPushMatrix();
+        // A station meter drawn just before leaves the GL colour at its black title text
+        GL11.glColor4f(1F, 1F, 1F, 1F);
         mc.renderEngine.bindTexture(HUD_TEXTURE);
         int xPos = width / 2 - 86;
         int yPos = height - 69;
@@ -567,6 +569,8 @@ public class MineFantasyHUD extends Gui {
         if (!tile.shouldShowMetre()) return;
 
         GL11.glPushMatrix();
+        // A station meter drawn just before leaves the GL colour at its black title text
+        GL11.glColor4f(1F, 1F, 1F, 1F);
         mc.renderEngine.bindTexture(HUD_TEXTURE);
 
         int xPos = width / 2 - 86;

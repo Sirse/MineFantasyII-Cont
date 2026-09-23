@@ -909,7 +909,8 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
 
     @Override
     public boolean shouldShowMetre() {
-        return true;
+        // Hit quality only means something while there is a project to hit
+        return hasProject();
     }
 
     @Override
