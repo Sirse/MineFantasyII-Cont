@@ -1,6 +1,7 @@
 package minefantasy.mf2.network.packet;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -14,6 +15,7 @@ public class AnvilPacket extends PacketMF {
     private int[] coords = new int[3];
     private String toolNeeded;
     private String research;
+    private ItemStack result;
     private float[] floats = new float[6];
     private int[] tiers = new int[2];
 
@@ -21,6 +23,7 @@ public class AnvilPacket extends PacketMF {
         coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
         toolNeeded = tile.getToolNeeded();
         research = tile.getResearchNeeded();
+        result = tile.getShownResult();
         floats = new float[] { tile.progress, tile.progressMax, tile.qualityBalance, tile.thresholdPosition,
                 tile.leftHit, tile.rightHit };
         tiers = new int[] { tile.getToolTierNeeded(), tile.getAnvilTierNeeded() };
@@ -54,6 +57,7 @@ public class AnvilPacket extends PacketMF {
             research = ByteBufUtils.readUTF8String(packet);
             if (toolNeeded == null) toolNeeded = "";
             if (research == null) research = "";
+            result = ByteBufUtils.readItemStack(packet);
 
             TileEntityAnvilMF anvil = (TileEntityAnvilMF) entity;
             anvil.setToolType(toolNeeded);
@@ -66,6 +70,7 @@ public class AnvilPacket extends PacketMF {
             anvil.setHammerUsed(tiers[0]);
             anvil.setRequiredAnvil(tiers[1]);
             anvil.setResearch(research);
+            anvil.setClientResult(result);
         }
     }
 
@@ -84,5 +89,6 @@ public class AnvilPacket extends PacketMF {
         packet.writeInt(tiers[1]);
         ByteBufUtils.writeUTF8String(packet, toolNeeded);
         ByteBufUtils.writeUTF8String(packet, research);
+        ByteBufUtils.writeItemStack(packet, result);
     }
 }

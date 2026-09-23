@@ -1,6 +1,7 @@
 package minefantasy.mf2.network.packet;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
@@ -16,6 +17,7 @@ public class CarpenterPacket extends PacketMF {
     private float[] progress = new float[2];
     private int[] tiers = new int[2];
     private String research;
+    private ItemStack result;
 
     public CarpenterPacket(TileEntityCarpenterMF tile) {
         coords = new int[] { tile.xCoord, tile.yCoord, tile.zCoord };
@@ -26,6 +28,7 @@ public class CarpenterPacket extends PacketMF {
             progress[1] = 0;
         }
         research = tile.getResearchNeeded();
+        result = tile.getShownResult();
     }
 
     public CarpenterPacket() {}
@@ -48,10 +51,12 @@ public class CarpenterPacket extends PacketMF {
             research = ByteBufUtils.readUTF8String(packet);
             if (toolNeeded == null) toolNeeded = "";
             if (research == null) research = "";
+            result = ByteBufUtils.readItemStack(packet);
 
             TileEntityCarpenterMF carpenter = (TileEntityCarpenterMF) entity;
             carpenter.setToolType(toolNeeded);
             carpenter.setResearch(research);
+            carpenter.setClientResult(result);
             carpenter.progress = progress[0];
             carpenter.progressMax = Math.max(0F, progress[1]);
             carpenter.setToolTier(tiers[0]);
@@ -73,5 +78,6 @@ public class CarpenterPacket extends PacketMF {
         packet.writeInt(tiers[1]);
         ByteBufUtils.writeUTF8String(packet, toolNeeded);
         ByteBufUtils.writeUTF8String(packet, research);
+        ByteBufUtils.writeItemStack(packet, result);
     }
 }

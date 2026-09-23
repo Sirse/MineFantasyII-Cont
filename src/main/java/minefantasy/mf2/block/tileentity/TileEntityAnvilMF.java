@@ -618,14 +618,28 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IAnvil,
                 this.zCoord);
     }
 
+    /** Result as the server last sent it; clients never run the recipe lookup themselves */
+    private ItemStack clientResult;
+
+    /** The recipe result, or on the client the copy the server synced for display */
+    public ItemStack getShownResult() {
+        return worldObj != null && worldObj.isRemote ? clientResult : recipe;
+    }
+
+    public void setClientResult(ItemStack result) {
+        clientResult = result;
+    }
+
     /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
     public boolean hasProject() {
-        return recipe != null && recipe.getItem() != null;
+        ItemStack result = getShownResult();
+        return result != null && result.getItem() != null;
     }
 
     public String getResultName() {
-        if (recipe != null && recipe.getDisplayName() != null) {
-            return recipe.getDisplayName();
+        ItemStack result = getShownResult();
+        if (hasProject() && result.getDisplayName() != null) {
+            return result.getDisplayName();
         }
         return "gui.noproject";
     }
