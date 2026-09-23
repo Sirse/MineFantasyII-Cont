@@ -204,7 +204,7 @@ public class NEIConfig implements IConfigureNEI {
                 event,
                 "minefantasy2.salvage",
                 builder -> builder.setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(40).setShiftY(5)
-                        .setMaxRecipesPerPage(5));
+                        .setMaxRecipesPerPage(RecipeHandlerSalvage.RECIPES_PER_PAGE));
         salvage.setShowFavoritesButton(false);
         register(
                 event,
