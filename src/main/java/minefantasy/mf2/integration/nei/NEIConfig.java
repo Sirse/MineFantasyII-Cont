@@ -1,5 +1,7 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.function.Consumer;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -143,89 +145,90 @@ public class NEIConfig implements IConfigureNEI {
     // this plugin loads, and a live subscription would register everything a second time ("Replaced handler info"
     // log noise). registerHandlerInfo writes into a static map, so the event object is only used as a carrier.
     private void registerHandlerInfos(NEIRegisterHandlerInfosEvent event) {
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.carpenter",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(145)
                         .setMaxRecipesPerPage(1));
         if (ConfigKitchen.enableBench) {
-            event.registerHandlerInfo(
+            register(
+                    event,
                     "minefantasy2.kitchen",
-                    MineFantasyII.MODID,
-                    MineFantasyII.NAME,
                     builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setHeight(145)
                             .setMaxRecipesPerPage(1));
         }
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.anvil",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(getAnvilBlock())).setHeight(136).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.bloomery",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.bloomery)).setHeight(88).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.quern",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.quern)).setHeight(80).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.tanning",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.tanner)).setHeight(95).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.cooking",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.firepit)).setWidth(RecipeHandlerCooking.WIDTH)
                         .setHeight(RecipeHandlerCooking.HEIGHT).setMaxRecipesPerPage(1));
-        // Salvaging happens on a block with no crafting grid, so there is nothing for the overlay button to fill
-        HandlerInfo salvage = new HandlerInfo.Builder("minefantasy2.salvage", MineFantasyII.MODID, MineFantasyII.NAME)
-                .setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(40).setShiftY(5).setMaxRecipesPerPage(5)
-                .build();
-        salvage.setShowOverlayButton(false);
-        event.registerHandlerInfo(salvage);
-        event.registerHandlerInfo(
+        HandlerInfo salvage = register(
+                event,
+                "minefantasy2.salvage",
+                builder -> builder.setDisplayStack(stack(BlockListMF.salvage_basic)).setHeight(40).setShiftY(5)
+                        .setMaxRecipesPerPage(5));
+        salvage.setShowFavoritesButton(false);
+        register(
+                event,
                 "minefantasy2.paint_oil",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(ComponentListMF.plant_oil)).setHeight(66)
                         .setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.crucible",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.crucible)).setHeight(94).setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.big_furnace",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.furnace_stone)).setHeight(63)
                         .setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.blast_furnace",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.blast_chamber)).setHeight(112)
                         .setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.bomb_bench",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.bombBench))
                         .setWidth(RecipeHandlerBombBench.getWidth()).setHeight(RecipeHandlerBombBench.getHeight())
                         .setMaxRecipesPerPage(1));
-        event.registerHandlerInfo(
+        register(
+                event,
                 "minefantasy2.crossbow_bench",
-                MineFantasyII.MODID,
-                MineFantasyII.NAME,
                 builder -> builder.setDisplayStack(stack(BlockListMF.crossbowBench))
                         .setWidth(RecipeHandlerCrossbowBench.getWidth())
                         .setHeight(RecipeHandlerCrossbowBench.getHeight()).setMaxRecipesPerPage(1));
+    }
+
+    /**
+     * Registers a handler's layout. No MineFantasy handler has an overlay handler to move a recipe into a GUI (the
+     * stations are worked by hand), so the overlay button would do nothing and is hidden everywhere.
+     */
+    private static HandlerInfo register(NEIRegisterHandlerInfosEvent event, String handlerId,
+            Consumer<HandlerInfo.Builder> layout) {
+        HandlerInfo.Builder builder = new HandlerInfo.Builder(handlerId, MineFantasyII.MODID, MineFantasyII.NAME);
+        layout.accept(builder);
+        HandlerInfo info = builder.build();
+        info.setShowOverlayButton(false);
+        event.registerHandlerInfo(info);
+        return info;
     }
 
     private static Block getAnvilBlock() {
