@@ -1,49 +1,26 @@
 package minefantasy.mf2.api.refine;
 
-import java.util.HashMap;
-
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeMetadata;
 
-public class BigFurnaceRecipes {
+/** Native big furnace recipes; see {@link MFRecipes#BIG_FURNACE}. */
+public final class BigFurnaceRecipes {
 
-    public static HashMap<String, BigFurnaceRecipes> recipeList = new HashMap<String, BigFurnaceRecipes>();
-    public final ItemStack input, result;
-    public final int tier;
+    private BigFurnaceRecipes() {}
 
-    public BigFurnaceRecipes(ItemStack input, ItemStack output, int tier) {
-        this.input = input;
-        this.result = output;
-        this.tier = tier;
+    /** The input may be an item, block, stack (its main material counts) or ore name. */
+    public static RecipeEntry<ProcessRecipe> addRecipe(Object input, ItemStack output, int tier) {
+        return NativeRecipes.addNative(MFRecipes.BIG_FURNACE, input, recipe(input, output, tier));
     }
 
-    public static BigFurnaceRecipes addRecipe(Block input, ItemStack output, int tier) {
-        return addRecipe(new ItemStack(input, 1, OreDictionary.WILDCARD_VALUE), output, tier);
-    }
-
-    public static BigFurnaceRecipes addRecipe(Item input, ItemStack output, int tier) {
-        return addRecipe(new ItemStack(input, 1, OreDictionary.WILDCARD_VALUE), output, tier);
-    }
-
-    public static BigFurnaceRecipes addRecipe(ItemStack input, ItemStack output, int tier) {
-        if (input == null || output == null) {
-            return null;
-        }
-        BigFurnaceRecipes recipe = new BigFurnaceRecipes(input, output, tier);
-        recipeList.put(CustomToolHelper.getReferenceName(input), recipe);
-        return recipe;
-    }
-
-    public static BigFurnaceRecipes getResult(ItemStack input) {
-        if (input == null) return null;
-
-        BigFurnaceRecipes specific = recipeList.get(CustomToolHelper.getReferenceName(input));
-        if (specific != null) return specific;
-
-        return recipeList.get(CustomToolHelper.getReferenceName(input, "any"));
+    public static ProcessRecipe recipe(Object input, ItemStack output, int tier) {
+        return ProcessRecipe
+                .of(NativeRecipes.input(input), output, RecipeMetadata.builder().put(MFRecipeKeys.TIER, tier).build());
     }
 }

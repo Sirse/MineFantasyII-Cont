@@ -9,22 +9,37 @@ import net.minecraftforge.oredict.OreDictionary;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.recipe.RecipeChecks;
 
-public class Alloy {
+public class Alloy implements RecipeChecks.Validated {
 
-    public final List recipeItems;
-    public final ItemStack recipeOutput;
+    @Override
+    public void validate() {
+        RecipeChecks.output("output", recipeOutput);
+        RecipeChecks.notNegative("crucible level", level);
+        RecipeChecks.grid(0, 0, recipeItems.size(), 3, 3);
+        for (int i = 0; i < recipeItems.size(); i++) {
+            if (recipeItems.get(i) instanceof ItemStack) {
+                RecipeChecks.ingredient("ingredient " + (i + 1), (ItemStack) recipeItems.get(i));
+            }
+        }
+    }
+
+    /** Stacks, copied; script alloys keep their ingredients, which do not change. */
+    private final List<Object> recipeItems;
+    private final ItemStack recipeOutput;
     public final int level;
     private Map props = new HashMap();
 
     public Alloy(ItemStack output, int requiredLevel, List items) {
-        recipeItems = items;
-        recipeOutput = output;
+        recipeItems = entries(items);
+        recipeOutput = output == null ? null : output.copy();
         level = requiredLevel;
     }
 
     public ItemStack getRecipeOutput() {
-        return this.recipeOutput;
+        // A copy: the recipe is shared by every bench and must not change with a caller's stack
+        return this.recipeOutput == null ? null : this.recipeOutput.copy();
     }
 
     public Alloy addProperty(String id, Object prop) {
@@ -120,4 +135,16 @@ public class Alloy {
         return level;
     }
 
+    /** Copies of the ingredients: stacks, or a script alloy's ingredients. */
+    public List<Object> getIngredients() {
+        return entries(recipeItems);
+    }
+
+    private static List<Object> entries(List<?> items) {
+        List<Object> copy = new ArrayList<>();
+        for (Object item : items) {
+            copy.add(item instanceof ItemStack ? ((ItemStack) item).copy() : item);
+        }
+        return Collections.unmodifiableList(copy);
+    }
 }

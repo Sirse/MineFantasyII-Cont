@@ -1,10 +1,10 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.GridMatch;
 import minefantasy.mf2.api.refine.Alloy;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
@@ -42,34 +42,39 @@ public class TweakedAlloyRecipe extends Alloy {
     }
 
     /**
-     * Runs the ingredient to slot assignment once. Passing an amounts array records how many items each slot owes, so
-     * matching and consuming always agree: an ingredient written as {@code * 4} matched on four items but the crucible
-     * only ever took one.
+     * Pairs ingredients with slots once, trying other pairings when the first fit leaves an ingredient without a slot.
+     * Passing an amounts array records how many items each slot owes, so matching and consuming always agree.
      */
     private boolean assign(ItemStack[] inv, int[] amounts) {
-        // One list of outstanding requirements: search and removal must happen in the same list, otherwise an
-        // already-satisfied ingredient stays a candidate for the next stack and the recipe accepts extra items.
-        ArrayList<IIngredient> remaining = new ArrayList<IIngredient>(recipeItems);
-        for (int slot = 0; slot < inv.length; slot++) {
-            ItemStack stack = inv[slot];
-            if (stack != null) {
-                IIngredient matched = null;
-                for (IIngredient ingred : remaining) {
-                    if (TweakedIngredients.matches(ingred, stack) || matchesCarbon(ingred, stack)) {
-                        matched = ingred;
-                        break;
-                    }
-                }
-                if (matched == null) {
-                    return false;
-                }
-                if (amounts != null && slot < amounts.length) {
-                    amounts[slot] = Math.max(1, matched.getAmount());
-                }
-                remaining.remove(matched);
+        List<Object> ingredients = getIngredients();
+        int occupied = 0;
+        for (ItemStack stack : inv) {
+            if (stack != null) occupied++;
+        }
+        if (occupied != getIngredients().size()) {
+            return false;
+        }
+        boolean[][] fits = new boolean[getIngredients().size()][inv.length];
+        for (int i = 0; i < fits.length; i++) {
+            IIngredient ingred = (IIngredient) ingredients.get(i);
+            for (int slot = 0; slot < inv.length; slot++) {
+                ItemStack stack = inv[slot];
+                fits[i][slot] = stack != null
+                        && (TweakedIngredients.matches(ingred, stack) || matchesCarbon(ingred, stack));
             }
         }
-        return remaining.isEmpty();
+        int[] owner = GridMatch.pairAll(fits, inv.length);
+        if (owner == null) {
+            return false;
+        }
+        if (amounts != null) {
+            for (int slot = 0; slot < owner.length && slot < amounts.length; slot++) {
+                if (owner[slot] >= 0) {
+                    amounts[slot] = Math.max(1, ((IIngredient) ingredients.get(owner[slot])).getAmount());
+                }
+            }
+        }
+        return true;
     }
 
 }

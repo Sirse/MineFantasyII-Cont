@@ -8,11 +8,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -241,18 +239,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         nbt.setFloat("fuel", fuel);
         nbt.setFloat("maxFuel", maxFuel);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
     }
 
     @Override
@@ -265,17 +252,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         fuel = nbt.getFloat("fuel");
         maxFuel = nbt.getFloat("maxFuel");
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
     }
 
     @Override
@@ -291,35 +268,12 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.inv[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inv[slot].stackSize <= num) {
-                itemstack = this.inv[slot];
-                this.inv[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inv[slot].splitStack(num);
-
-                if (this.inv[slot].stackSize == 0) {
-                    this.inv[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(inv, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack = this.inv[slot];
-            this.inv[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inv, slot);
     }
 
     @Override
@@ -501,11 +455,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
 
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new ForgePacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new ForgePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
 
         /*
          * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();

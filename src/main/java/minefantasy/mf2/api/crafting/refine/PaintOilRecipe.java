@@ -1,55 +1,49 @@
 package minefantasy.mf2.api.crafting.refine;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class PaintOilRecipe {// FurnaceRecipes
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeRecipes;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 
-    public static HashMap<ItemStack, ItemStack> recipeList = new HashMap();
+/**
+ * Native paint oil recipes; see {@link MFRecipes#PAINT_OIL}. Blocks are stored as their items; an output with the
+ * wildcard metadata keeps the painted block's metadata.
+ */
+public final class PaintOilRecipe {
 
-    /**
-     * Turn one specific meta block to another
-     */
-    public static void addRecipe(Block input, int inMeta, Block output, int outMeta) {
-        recipeList.put(new ItemStack(input, 1, inMeta), new ItemStack(output, 1, outMeta));
+    private PaintOilRecipe() {}
+
+    /** Turn one specific meta block to another. */
+    public static RecipeEntry<ProcessRecipe> addRecipe(Block input, int inMeta, Block output, int outMeta) {
+        ItemStack in = new ItemStack(Item.getItemFromBlock(input), 1, inMeta);
+        return NativeRecipes.addNative(MFRecipes.PAINT_OIL, in, recipe(input, inMeta, output, outMeta));
     }
 
-    /**
-     * Turn a block to a specific meta
-     */
-    public static void addRecipe(Block input, Block output, int meta) {
-        addRecipe(input, OreDictionary.WILDCARD_VALUE, output, meta);
+    /** Turn a block to a specific meta. */
+    public static RecipeEntry<ProcessRecipe> addRecipe(Block input, Block output, int meta) {
+        return addRecipe(input, OreDictionary.WILDCARD_VALUE, output, meta);
     }
 
-    /**
-     * Turn a block to a block without a meta change
-     */
-    public static void addRecipe(Block input, Block output) {
-        addRecipe(input, OreDictionary.WILDCARD_VALUE, output, OreDictionary.WILDCARD_VALUE);
+    /** Turn a block to a block without a meta change. */
+    public static RecipeEntry<ProcessRecipe> addRecipe(Block input, Block output) {
+        return addRecipe(input, OreDictionary.WILDCARD_VALUE, output, OreDictionary.WILDCARD_VALUE);
     }
 
-    public static ItemStack getPaintResult(ItemStack item) {
-        Iterator iterator = recipeList.entrySet().iterator();
-        Entry entry;
-
-        do {
-            if (!iterator.hasNext()) {
-                return null;
-            }
-
-            entry = (Entry) iterator.next();
-        } while (!doesMatch(item, (ItemStack) entry.getKey()));
-
-        return (ItemStack) entry.getValue();
+    public static ProcessRecipe recipe(Block input, int inMeta, Block output, int outMeta) {
+        return ProcessRecipe.of(
+                Input.of(Item.getItemFromBlock(input), inMeta),
+                new ItemStack(Item.getItemFromBlock(output), 1, outMeta));
     }
 
-    private static boolean doesMatch(ItemStack item1, ItemStack item2) {
-        return item2.getItem() == item1.getItem() && (item2.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                || item2.getItemDamage() == item1.getItemDamage());
+    /** The painted form of a block (as an item stack), or null. */
+    public static ItemStack getPaintResult(ItemStack block) {
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.PAINT_OIL, block);
+        return entry == null ? null : entry.getRecipe().getOutput();
     }
 }

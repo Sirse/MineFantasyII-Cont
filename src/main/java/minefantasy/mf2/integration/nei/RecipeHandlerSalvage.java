@@ -83,21 +83,21 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
             return;
         }
         CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(result);
-        for (SalvageRecipe recipe : Salvage.displayList) {
+        for (SalvageRecipe recipe : Salvage.displayRecipes()) {
             CachedSalvageRecipe cachedRecipe = createRecipe(recipe, null);
             if (cachedRecipe != null && cachedRecipe.hasOutput(result)) {
                 arecipes.add(cachedRecipe);
                 continue;
             }
             if (material == null || recipe == null
-                    || !NEIHelper.isValidStack(recipe.input)
+                    || !NEIHelper.isValidStack(recipe.getDisplayInput())
                     || !takesMaterialFromInput(recipe, material)) {
                 continue;
             }
             // Salvaged parts take the material of the item they came from, so try the input made of the wanted
             // material, as its head and then as its haft
             for (String slot : new String[] { CustomToolHelper.slot_main, CustomToolHelper.slot_haft }) {
-                ItemStack input = recipe.input.copy();
+                ItemStack input = recipe.getDisplayInput();
                 CustomMaterial.addMaterial(input, slot, material.name);
                 cachedRecipe = createRecipe(recipe, input);
                 if (cachedRecipe != null && cachedRecipe.hasOutput(result)) {
@@ -114,10 +114,10 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
      * would show an item that does not exist.
      */
     private boolean takesMaterialFromInput(SalvageRecipe recipe, CustomMaterial material) {
-        if (recipe.outputs == null) {
+        if (recipe.getParts().isEmpty()) {
             return false;
         }
-        for (Object output : recipe.outputs) {
+        for (Object output : recipe.getParts()) {
             // Parts are registered as stacks, items or blocks alike (needles list a bare bar item)
             ItemStack stack = output instanceof ItemStack ? (ItemStack) output
                     : output instanceof Item ? new ItemStack((Item) output)
@@ -136,13 +136,13 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(ingredient)) {
             return;
         }
-        for (SalvageRecipe recipe : Salvage.displayList) {
-            if (recipe != null && NEIHelper.matchesCrafting(recipe.input, ingredient)) {
+        for (SalvageRecipe recipe : Salvage.displayRecipes()) {
+            if (recipe != null && NEIHelper.matchesCrafting(recipe.getDisplayInput(), ingredient)) {
                 // A looked-up item with materials shows the parts it would actually give back
                 ItemStack input = null;
                 if (CustomToolHelper.hasAnyMaterial(ingredient)) {
                     input = ingredient.copy();
-                    input.stackSize = recipe.input.stackSize;
+                    input.stackSize = 1;
                 }
                 CachedSalvageRecipe cachedRecipe = createRecipe(recipe, input);
                 if (cachedRecipe != null) {
@@ -167,7 +167,7 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
      *              registered recipe as is
      */
     private CachedSalvageRecipe createRecipe(SalvageRecipe recipe, ItemStack input) {
-        if (recipe == null || !NEIHelper.isValidStack(recipe.input) || recipe.outputs == null) {
+        if (recipe == null || !NEIHelper.isValidStack(recipe.getDisplayInput()) || recipe.getParts().isEmpty()) {
             return null;
         }
         CachedSalvageRecipe cachedRecipe = new CachedSalvageRecipe(recipe, input);
@@ -180,9 +180,9 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         private final ArrayList<PositionedStack> outputs = new ArrayList<PositionedStack>();
 
         private CachedSalvageRecipe(SalvageRecipe recipe, ItemStack source) {
-            ItemStack shown = source != null ? source : recipe.input;
+            ItemStack shown = source != null ? source : recipe.getDisplayInput();
             input = NEILayout.stack(normalizeForDisplay(shown), NEILayout.SALVAGE_INPUT);
-            for (Object output : recipe.outputs) {
+            for (Object output : recipe.getParts()) {
                 addOutput(output, source);
             }
         }

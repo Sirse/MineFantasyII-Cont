@@ -41,6 +41,20 @@ jobs:
       - name: Build
         run: ./gradlew build --stacktrace -S
 
+      # The game tests (Horizon-QA) run on a development server; its reports are kept even when they fail
+      - name: Game tests
+        run: |
+          mkdir -p run
+          echo "eula=true" > run/eula.txt
+          ./gradlew runServer -PgameTests --stacktrace -S
+
+      - name: Upload game test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: horizonqa-reports
+          path: build/horizonqa/
+
       - name: Upload JARs
         if: success()
         uses: actions/upload-artifact@v7

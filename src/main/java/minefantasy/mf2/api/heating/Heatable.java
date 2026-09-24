@@ -1,15 +1,30 @@
 package minefantasy.mf2.api.heating;
 
-import java.util.HashMap;
+import java.util.Set;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeChecks;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 
-public class Heatable {
+/**
+ * How an item behaves in the forge: the temperatures at which it becomes workable, unstable and ruined. Profiles live
+ * in {@link MFRecipes#HEATING}; stacks without one cannot be heated.
+ */
+public final class Heatable implements RecipeChecks.Validated {
+
+    @Override
+    public void validate() {
+        RecipeChecks.input("input", input);
+        RecipeChecks.temperatures(minTemperature, unstableTemperature, maxTemperature);
+    }
 
     public static final int forgeMaximumMetalHeat = 5000;
     public static final String NBT_Item = "MFHeatable_ItemSave";
@@ -21,7 +36,6 @@ public class Heatable {
     public static final String NBT_UnstableTemp = "MFHeatable_UnstableTemp";
     public static final String NBT_MaxTemp = "MFHeatable_MaxTemp";
     public static boolean requiresHeating = true;
-    public static HashMap<String, Heatable> registerList = new HashMap<String, Heatable>();
     /**
      * Hardcore Crafting: Should quencing in inproper sources damage items
      */
@@ -38,46 +52,59 @@ public class Heatable {
      * The max heat until the ingot is destroyed mesured in celcius
      */
     private final int maxTemperature;
-    /**
-     * The item that's used
-     */
-    protected ItemStack object;
+    private final Input input;
 
-    public Heatable(ItemStack item, int min, int unstable, int max) {
-        this.object = item;
+    private Heatable(Input input, int min, int unstable, int max) {
+        this.input = input;
         this.minTemperature = min;
         this.unstableTemperature = unstable;
         this.maxTemperature = max;
     }
 
+    /** A heat profile; -1 for a temperature takes it from the stack's main material. */
+    public static Heatable of(Input input, int min, int unstable, int max) {
+        if (input == null) {
+            throw new IllegalArgumentException("A heat profile needs an input");
+        }
+        return new Heatable(input.amount(1), min, unstable, max);
+    }
+
+    /**
+     * Registers the native heat profile of an item; registering the same item and metadata again replaces it. A profile
+     * for one metadata goes before the item's any-metadata profile.
+     */
     public static void addItem(ItemStack item, int min, int unstable, int max) {
-        if (item == null) {
+        if (item == null || item.getItem() == null) {
             return;
         }
-        registerList.put(getRegistrationForItem(item), new Heatable(item, min, unstable, max));
+        Heatable profile = of(Input.of(item.getItem(), item.getItemDamage()), min, unstable, max);
+        int priority = item.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 0 : 1;
+        NativeRecipes.setNative(MFRecipes.HEATING, item, profile, priority);
     }
 
     public static boolean canHeatItem(ItemStack item) {
         return loadStats(item) != null;
     }
 
+    /** The profile the stack heats by, in lookup order, or null. */
     public static Heatable loadStats(ItemStack item) {
-        if (item == null) return null;
-
-        if (registerList.isEmpty()) return null;
-
-        Heatable stats = findRegister(item);
-        if (stats != null) {
-            if (stats.object.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-                if (stats.object.getItem() == item.getItem()) {
-                    return stats;
-                }
-            } else if (stats.object.isItemEqual(item)) {
-                return stats;
+        if (item == null || item.getItem() == null) {
+            return null;
+        }
+        for (RecipeEntry<Heatable> entry : MFRecipes.HEATING.published().candidates(Input.lookupKeys(item))) {
+            if (entry.getRecipe().input.matches(item)) {
+                return entry.getRecipe();
             }
         }
-
         return null;
+    }
+
+    public Input getInput() {
+        return input;
+    }
+
+    public Set<Object> indexKeys() {
+        return input.indexKeys();
     }
 
     /**
@@ -187,26 +214,6 @@ public class Heatable {
             return getHeatableStage(inputItem) == 1;
         }
         return true;
-    }
-
-    private static Heatable findRegister(ItemStack item) {
-        Heatable specific = registerList.get(item.getItem().getUnlocalizedName() + "_" + item.getItemDamage());// Try
-        // Specific
-        // first
-        if (specific != null) {
-            return specific;
-        }
-        return registerList.get(item.getItem().getUnlocalizedName() + "_any");// Try Any;
-    }
-
-    public static String getRegistrationForItem(ItemStack item) {
-        String s;
-        if (item.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-            s = item.getItem().getUnlocalizedName() + "_any";
-        } else {
-            s = item.getItem().getUnlocalizedName() + "_" + item.getItemDamage();
-        }
-        return s;
     }
 
     public int getWorkableStat(ItemStack item) {

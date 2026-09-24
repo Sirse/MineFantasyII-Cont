@@ -1,204 +1,115 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.cooking.CookRecipe;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minetweaker.IUndoableAction;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/**
+ * Cooking recipes. One that can burn also gets its burn stage, {@code <id>_burnt}, turning the output into burnt food;
+ * add, replace and remove handle both together.
+ */
 @ZenClass("mods.minefantasy.Cooking")
 public class Cooking {
 
-    @ZenMethod
-    public static void addRecipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime,
-            boolean requireBaking, @Optional boolean canBurn) {
-        MineTweakerAPI
-                .apply(new AddRecipeAction(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn));
-    }
+    private static final String STATION = "cooking";
 
     @ZenMethod
-    public static void remove(@NotNull IIngredient output, IIngredient input) {
-        ArrayList<String> keysToRemove = new ArrayList<String>();
-        ArrayList<CookRecipe> recipesToRemove = new ArrayList<CookRecipe>();
-        for (Map.Entry<String, CookRecipe> entry : CookRecipe.recipeList.entrySet()) {
-            if (entry.getValue() != null && entry.getValue().output != null
-                    && output.matches(new MCItemStack(entry.getValue().output))
-                    && (input == null || matchesInputKey(entry.getKey(), input))) {
-                keysToRemove.add(entry.getKey());
-                recipesToRemove.add(entry.getValue());
+    public static void add(@NotNull String name, @NotNull IItemStack output, @NotNull IIngredient input, int minTemp,
+            int maxTemp, int time, int burnTime, boolean requireBaking, @Optional boolean canBurn,
+            @Optional int priority) {
+        RecipeId id = ScriptRecipes.scriptId(STATION, name);
+        ScriptRecipes.apply(
+                "Adding cooking recipe " + id,
+                tx -> recipe(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn)
+                        .addTo(tx, id, priority));
+    }
+
+    /** Replaces a recipe; its old burn stage goes, and the new one comes if the new recipe can burn. */
+    @ZenMethod
+    public static void replace(@NotNull String id, @NotNull IItemStack output, @NotNull IIngredient input, int minTemp,
+            int maxTemp, int time, int burnTime, boolean requireBaking, @Optional boolean canBurn,
+            @Optional int priority) {
+        RecipeId recipeId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply("Replacing cooking recipe " + recipeId, tx -> {
+            CookRecipe recipe = recipe(output, input, minTemp, maxTemp, time, burnTime, requireBaking, canBurn);
+            RecipeId burnt = CookRecipe.burntId(recipeId);
+            tx.replace(MFRecipes.COOKING, recipeId, recipe, priority);
+            if (MFRecipes.COOKING.containsWorking(burnt)) {
+                tx.remove(MFRecipes.COOKING, burnt);
             }
-        }
-        if (keysToRemove.isEmpty()) {
-            MineTweakerAPI.logWarning("No Cooking recipes for " + output.toString());
-            return;
-        }
-        MineTweakerAPI.apply(new RemoveAction(keysToRemove, recipesToRemove));
+            CookRecipe burnStage = recipe.burnStage();
+            if (burnStage != null) {
+                tx.add(MFRecipes.COOKING, burnt, burnStage, priority);
+            }
+        });
     }
 
-    private static boolean matchesInputKey(String key, IIngredient input) {
-        for (IItemStack stack : input.getItems()) {
-            ItemStack mcInput = MineTweakerMC.getItemStack(stack);
-            if (mcInput != null && key.equals(CustomToolHelper.getReferenceName(mcInput))) {
+    @ZenMethod
+    public static void remove(@NotNull String id) {
+        RecipeId recipeId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply("Removing cooking recipe " + recipeId, tx -> CookRecipe.removeFrom(tx, recipeId));
+    }
+
+    /** Removes the recipes making the output (with a matching input, if given) and their burn stages. */
+    @ZenMethod
+    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
+        ScriptRecipes.apply("Removing cooking recipes for " + output, tx -> {
+            List<RecipeId> removed = tx.removeWhere(
+                    MFRecipes.COOKING,
+                    entry -> !entry.getId().getPath().endsWith(CookRecipe.BURNT_SUFFIX)
+                            && output.matches(MineTweakerMC.getIItemStack(entry.getRecipe().getOutput()))
+                            && inputMatches(entry.getRecipe(), input));
+            for (RecipeId id : removed) {
+                RecipeId burnt = CookRecipe.burntId(id);
+                if (MFRecipes.COOKING.containsWorking(burnt)) {
+                    tx.remove(MFRecipes.COOKING, burnt);
+                }
+            }
+            if (removed.isEmpty()) {
+                MineTweakerAPI.logWarning("No cooking recipes for " + output);
+            } else {
+                MineTweakerAPI.logInfo("Removed cooking recipes " + removed);
+            }
+        });
+    }
+
+    private static boolean inputMatches(CookRecipe recipe, IIngredient input) {
+        if (input == null) {
+            return true;
+        }
+        for (ItemStack example : recipe.getInput().examples()) {
+            if (input.matches(MineTweakerMC.getIItemStack(example))) {
                 return true;
             }
         }
         return false;
     }
 
-    private static class AddRecipeAction implements IUndoableAction {
-
-        private final IItemStack output;
-        private final IIngredient input;
-        private final int minTemp, maxTemp, time, burnTime;
-        private final boolean requireBaking, canBurn;
-        private final List<CookRecipe> addedRecipes = new ArrayList<CookRecipe>();
-
-        public AddRecipeAction(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time, int burnTime,
-                boolean requireBaking, boolean canBurn) {
-            this.output = output;
-            this.input = input;
-            this.minTemp = minTemp;
-            this.maxTemp = maxTemp;
-            this.time = time;
-            this.burnTime = burnTime;
-            this.requireBaking = requireBaking;
-            this.canBurn = canBurn;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            if (mcOutput == null) {
-                MineTweakerAPI.logWarning("Skipping cooking recipe with invalid output " + output);
-                return;
-            }
-            for (IIngredient ingredient : input.getItems()) {
-                ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
-                if (mcInput == null) {
-                    MineTweakerAPI.logWarning("Skipping cooking recipe input " + ingredient + " -> " + output);
-                    continue;
-                }
-                CookRecipe recipe = CookRecipe.addRecipe(
-                        mcInput,
-                        mcOutput,
-                        new ItemStack(CookRecipe.burnt_food),
-                        minTemp,
-                        maxTemp,
-                        time,
-                        burnTime,
-                        requireBaking,
-                        canBurn);
-                if (recipe != null) {
-                    addedRecipes.add(recipe);
-                }
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            java.util.Iterator<Map.Entry<String, CookRecipe>> it = CookRecipe.recipeList.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, CookRecipe> recipeEntry = it.next();
-                for (CookRecipe recipe : addedRecipes) {
-                    if (recipeEntry.getValue().equals(recipe)) {
-                        it.remove();
-                        break;
-                    }
-                }
-            }
-            addedRecipes.clear();
-        }
-
-        @Override
-        public String describe() {
-            return "Adding cooking recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Removing cooking recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    private static CookRecipe recipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time,
+            int burnTime, boolean requireBaking, boolean canBurn) {
+        return CookRecipe.of(
+                ScriptInputs.toInput(input),
+                ScriptInputs.toOutput(output),
+                new ItemStack(CookRecipe.burnt_food),
+                minTemp,
+                maxTemp,
+                time,
+                burnTime,
+                requireBaking,
+                canBurn);
     }
-
-    private static class RemoveAction implements IUndoableAction {
-
-        private final ArrayList<RemovedRecipeState> removed = new ArrayList<RemovedRecipeState>();
-
-        private RemoveAction(ArrayList<String> keys, ArrayList<CookRecipe> recipes) {
-            if (keys != null && recipes != null) {
-                for (int i = 0; i < keys.size() && i < recipes.size(); i++) {
-                    this.removed.add(new RemovedRecipeState(keys.get(i), recipes.get(i)));
-                }
-            }
-        }
-
-        @Override
-        public void apply() {
-            for (RemovedRecipeState state : removed) {
-                CookRecipe.recipeList.remove(state.key);
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            for (RemovedRecipeState state : removed) {
-                CookRecipe.recipeList.put(state.key, state.recipe);
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Removing " + removed.size() + " Cooking recipes";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Restoring " + removed.size() + " Cooking recipes";
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
-    }
-
-    private static class RemovedRecipeState {
-
-        private final String key;
-        private final CookRecipe recipe;
-
-        private RemovedRecipeState(String key, CookRecipe recipe) {
-            this.key = key;
-            this.recipe = recipe;
-        }
-    }
-
 }

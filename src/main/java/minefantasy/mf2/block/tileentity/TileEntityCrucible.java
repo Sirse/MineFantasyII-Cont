@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -11,11 +13,15 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.api.refine.SmokeMechanics;
@@ -46,8 +52,9 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     private ItemStack[] inventory = new ItemStack[INVENTORY_SIZE];
     private final Random rand = new Random();
     private ItemStack cachedRecipeOutput;
+    private RecipeId cachedRecipeId;
     private int[] cachedRequiredAmounts;
-    private int cachedRecipeVersion = -1;
+    private long cachedRecipeVersion = -1;
     /**
      * Set whenever the contents change before a world is available (NBT load); cleared on the next server tick
      */
@@ -132,22 +139,13 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             return;
         }
 
-        ItemStack result = this.cachedRecipeOutput.copy();
-        ItemStack outputSlot = inventory[OUTPUT_SLOT];
-
-        if (outputSlot == null) {
-            inventory[OUTPUT_SLOT] = result;
-        } else if (CustomToolHelper.areEqual(outputSlot, result)) {
-            outputSlot.stackSize += result.stackSize;
-        }
-
-        for (int i = 0; i < GRID_SLOT_COUNT; i++) {
-            if (inventory[i] != null) {
-                inventory[i].stackSize -= getRequiredAmount(i);
-                if (inventory[i].stackSize <= 0) {
-                    inventory[i] = null;
-                }
-            }
+        // The grid pays what the alloy owes per slot; containers go back to their slot or drop off the crucible
+        CraftPlan.Builder plan = CraftPlan
+                .builder(cachedRecipeId, MFRecipes.ALLOY.published().getGeneration(), OUTPUT_SLOT);
+        GridProject.addGrid(plan, this, GRID_SLOT_COUNT, cachedRequiredAmounts, false);
+        List<ItemStack> spill = new ArrayList<>();
+        if (plan.output(this.cachedRecipeOutput).build().apply(CraftInventory.of(this), spill)) {
+            GridProject.drop(this, spill);
         }
         onInventoryChanged(); // Update recipe after consuming ingredients
     }
@@ -193,8 +191,10 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
             inputs[i] = inventory[i];
         }
 
-        Alloy alloy = AlloyRecipes.getResult(inputs);
+        RecipeEntry<Alloy> entry = AlloyRecipes.find(inputs);
+        Alloy alloy = entry == null ? null : entry.getRecipe();
         if (alloy != null && alloy.getLevel() <= getTier()) {
+            this.cachedRecipeId = entry.getId();
             this.cachedRecipeOutput = alloy.getRecipeOutput();
             this.cachedRequiredAmounts = alloy.getRequiredAmounts(inputs);
         } else {
@@ -317,16 +317,7 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         nbt.setFloat("progress", progress);
         nbt.setFloat("progressMax", progressMax);
 
-        NBTTagList savedItems = new NBTTagList();
-        for (int i = 0; i < this.inventory.length; ++i) {
-            if (this.inventory[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inventory[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inventory);
     }
 
     @Override
@@ -335,15 +326,7 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         progress = nbt.getFloat("progress");
         progressMax = nbt.getFloat("progressMax");
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inventory = new ItemStack[this.getSizeInventory()];
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-            if (slotNum >= 0 && slotNum < this.inventory.length) {
-                this.inventory[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inventory = InventorySlots.read(nbt, "Items", inventory.length);
         // The world is assigned after readFromNBT, so the recipe cannot be resolved yet: just mark the cache
         // stale and let the first server tick rebuild it.
         recipeCacheDirty = true;
@@ -361,31 +344,14 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        if (this.inventory[slot] == null) {
-            return null;
-        }
-        ItemStack itemstack;
-        if (this.inventory[slot].stackSize <= num) {
-            itemstack = this.inventory[slot];
-            this.inventory[slot] = null;
-        } else {
-            itemstack = this.inventory[slot].splitStack(num);
-            if (this.inventory[slot].stackSize == 0) {
-                this.inventory[slot] = null;
-            }
-        }
+        ItemStack taken = InventorySlots.take(inventory, slot, num);
         onInventoryChanged();
-        return itemstack;
+        return taken;
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inventory[slot] != null) {
-            ItemStack itemstack = this.inventory[slot];
-            this.inventory[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inventory, slot);
     }
 
     @Override

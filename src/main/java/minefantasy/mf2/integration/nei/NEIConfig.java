@@ -76,6 +76,15 @@ public class NEIConfig implements IConfigureNEI {
             RecipeHandlerAnvil handlerAnvil = new RecipeHandlerAnvil();
             API.registerRecipeHandler(handlerAnvil);
             API.registerUsageHandler(handlerAnvil);
+            API.registerGuiOverlay(
+                    GuiAnvilMF.class,
+                    "minefantasy2.anvil",
+                    NEILayout.ANVIL_OVERLAY_X,
+                    NEILayout.ANVIL_OVERLAY_Y);
+            API.registerGuiOverlayHandler(
+                    GuiAnvilMF.class,
+                    new DefaultOverlayHandler(NEILayout.ANVIL_OVERLAY_X, NEILayout.ANVIL_OVERLAY_Y),
+                    "minefantasy2.anvil");
 
             RecipeHandlerBloom handlerBloom = new RecipeHandlerBloom();
             API.registerRecipeHandler(handlerBloom);
@@ -200,20 +209,22 @@ public class NEIConfig implements IConfigureNEI {
         register(
                 event,
                 "minefantasy2.carpenter",
-                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(145).setMaxRecipesPerPage(1))
+                builder -> builder.setDisplayStack(stack(BlockListMF.carpenter)).setHeight(NEILayout.BENCH_HEIGHT)
+                        .setMaxRecipesPerPage(1))
                 .setShowOverlayButton(true);
         if (ConfigKitchen.enableBench) {
             register(
                     event,
                     "minefantasy2.kitchen",
-                    builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench)).setHeight(145)
-                            .setMaxRecipesPerPage(1))
+                    builder -> builder.setDisplayStack(stack(BlockListMF.kitchenBench))
+                            .setHeight(NEILayout.BENCH_HEIGHT).setMaxRecipesPerPage(1))
                     .setShowOverlayButton(true);
         }
         register(
                 event,
                 "minefantasy2.anvil",
-                builder -> builder.setDisplayStack(stack(getAnvilBlock())).setHeight(136).setMaxRecipesPerPage(1));
+                builder -> builder.setDisplayStack(stack(getAnvilBlock())).setHeight(136).setMaxRecipesPerPage(1))
+                .setShowOverlayButton(true);
         register(
                 event,
                 "minefantasy2.bloomery",
@@ -250,7 +261,7 @@ public class NEIConfig implements IConfigureNEI {
                 event,
                 "minefantasy2.big_furnace",
                 builder -> builder.setDisplayStack(stack(BlockListMF.furnace_stone)).setHeight(63)
-                        .setMaxRecipesPerPage(1));
+                        .setMaxRecipesPerPage(RecipeHandlerBigFurnace.RECIPES_PER_PAGE));
         register(
                 event,
                 "minefantasy2.blast_furnace",

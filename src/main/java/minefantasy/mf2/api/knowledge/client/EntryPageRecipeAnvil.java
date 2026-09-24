@@ -14,9 +14,8 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
-import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
-import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
+import minefantasy.mf2.api.crafting.GridRecipe;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
@@ -24,19 +23,19 @@ import minefantasy.mf2.api.helpers.TextureHelperMF;
 public class EntryPageRecipeAnvil extends EntryPage {
 
     private Minecraft mc = Minecraft.getMinecraft();
-    private IAnvilRecipe[] recipes;
+    private GridRecipe[] recipes;
     private int recipeID;
     private ItemStack tooltipStack;
 
-    public EntryPageRecipeAnvil(List<IAnvilRecipe> recipes) {
-        IAnvilRecipe[] array = new IAnvilRecipe[recipes.size()];
+    public EntryPageRecipeAnvil(List<GridRecipe> recipes) {
+        GridRecipe[] array = new GridRecipe[recipes.size()];
         for (int a = 0; a < recipes.size(); a++) {
             array[a] = recipes.get(a);
         }
         this.recipes = array;
     }
 
-    public EntryPageRecipeAnvil(IAnvilRecipe... recipes) {
+    public EntryPageRecipeAnvil(GridRecipe... recipes) {
         this.recipes = recipes;
     }
 
@@ -50,7 +49,9 @@ public class EntryPageRecipeAnvil extends EntryPage {
         this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/anvilGrid.png"));
         parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
 
-        IAnvilRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : recipes[recipeID];
+        // The page holds the recipe registered by the mod; a script may have replaced or removed it since
+        GridRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null
+                : MFRecipes.ANVIL.current(recipes[recipeID]);
         String cft = "<" + StatCollector.translateToLocal("method.anvil") + ">";
         mc.fontRenderer.drawSplitString(
                 cft,
@@ -77,7 +78,7 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
     }
 
-    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, IAnvilRecipe recipe) {
+    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, GridRecipe recipe) {
         if (recipe == null) return;
 
         GL11.glColor3f(255, 255, 255);
@@ -91,47 +92,9 @@ public class EntryPageRecipeAnvil extends EntryPage {
                 true);
         GuiHelper.renderToolIcon(parent, "anvil", recipe.getAnvil(), posX + 124, posY + 51, true, true);
 
-        if (recipe instanceof ShapedAnvilRecipes) {
-            ShapedAnvilRecipes shaped = (ShapedAnvilRecipes) recipe;
-
-            for (int y = 0; y < shaped.recipeHeight; y++) {
-                for (int x = 0; x < shaped.recipeWidth; x++) {
-                    renderItemAtGridPos(
-                            parent,
-                            1 + x,
-                            1 + y,
-                            shaped.recipeItems[y * shaped.recipeWidth + x],
-                            true,
-                            posX,
-                            posY,
-                            mx,
-                            my);
-                }
-            }
-        } else if (recipe instanceof ShapelessAnvilRecipes) {
-            ShapelessAnvilRecipes shapeless = (ShapelessAnvilRecipes) recipe;
-
-            drawGrid: {
-                for (int y = 0; y < 6; y++) {
-                    for (int x = 0; x < 4; x++) {
-                        int index = y * 6 + x;
-
-                        if (index >= shapeless.recipeItems.size()) break drawGrid;
-
-                        renderItemAtGridPos(
-                                parent,
-                                1 + x,
-                                1 + y,
-                                (ItemStack) shapeless.recipeItems.get(index),
-                                true,
-                                posX,
-                                posY,
-                                mx,
-                                my);
-                    }
-                }
-            }
-        }
+        GridPages.forEachEntry(
+                recipe,
+                (x, y, stack) -> renderItemAtGridPos(parent, 1 + x, 1 + y, stack, true, posX, posY, mx, my));
         renderResult(parent, recipe.getRecipeOutput(), false, posX, posY, mx, my, recipe.outputHot());
     }
 

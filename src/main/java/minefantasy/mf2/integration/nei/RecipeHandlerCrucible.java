@@ -50,9 +50,9 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
     }
 
     private void loadRecipesFor(ItemStack result) {
-        for (Alloy alloy : AlloyRecipes.alloys) {
-            if (alloy != null && NEIHelper.isValidStack(alloy.recipeOutput)
-                    && matchesOutput(alloy.recipeOutput, result)) {
+        for (Alloy alloy : AlloyRecipes.alloys()) {
+            if (alloy != null && NEIHelper.isValidStack(alloy.getRecipeOutput())
+                    && matchesOutput(alloy.getRecipeOutput(), result)) {
                 CachedAlloyRecipe recipe = new CachedAlloyRecipe(alloy);
                 arecipes.add(recipe);
             }
@@ -64,12 +64,12 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(ingredient)) {
             return;
         }
-        for (Alloy alloy : AlloyRecipes.alloys) {
-            if (alloy == null || !NEIHelper.isValidStack(alloy.recipeOutput)) {
+        for (Alloy alloy : AlloyRecipes.alloys()) {
+            if (alloy == null || !NEIHelper.isValidStack(alloy.getRecipeOutput())) {
                 continue;
             }
             boolean used = false;
-            for (Object object : alloy.recipeItems) {
+            for (Object object : alloy.getIngredients()) {
                 for (ItemStack recipeIngredient : NEIHelper.resolveEntry(object)) {
                     if (NEIHelper.isValidStack(recipeIngredient)
                             && CustomToolHelper.areEqual(recipeIngredient, ingredient)) {
@@ -113,8 +113,8 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
 
         @SuppressWarnings("unchecked")
         private CachedAlloyRecipe(Alloy alloy) {
-            setIngridients(alloy.recipeItems);
-            output = NEIHelper.positionedStack(alloy.recipeOutput, 124, 32);
+            setIngridients(alloy.getIngredients());
+            output = NEIHelper.positionedStack(alloy.getRecipeOutput(), 124, 32);
             tier = alloy.level;
         }
 

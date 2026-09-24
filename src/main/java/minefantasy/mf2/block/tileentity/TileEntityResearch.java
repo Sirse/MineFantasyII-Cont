@@ -8,13 +8,11 @@ import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.knowledge.IArtefact;
@@ -210,11 +208,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         lastSyncedProgress = progress;
         lastSyncedMaxProgress = maxProgress;
 
-        NetworkUtils.sendToWatchers(
-                new ResearchTablePacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new ResearchTablePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     @Override
@@ -225,18 +219,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setFloat("progress", progress);
         nbt.setFloat("maxProgress", maxProgress);
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.items.length; ++i) {
-            if (this.items[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.items[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", items);
     }
 
     /**
@@ -263,17 +246,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         researchID = nbt.getInteger("researchID");
         progress = nbt.getFloat("progress");
         maxProgress = nbt.getFloat("maxProgress");
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.items = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.items.length) {
-                this.items[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        items = InventorySlots.read(nbt, "Items", items.length);
     }
 
     @Override
@@ -288,35 +261,12 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        if (this.items[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.items[slot].stackSize <= num) {
-                itemstack = this.items[slot];
-                this.items[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.items[slot].splitStack(num);
-
-                if (this.items[slot].stackSize == 0) {
-                    this.items[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(items, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.items[slot] != null) {
-            ItemStack itemstack = this.items[slot];
-            this.items[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(items, slot);
     }
 
     @Override

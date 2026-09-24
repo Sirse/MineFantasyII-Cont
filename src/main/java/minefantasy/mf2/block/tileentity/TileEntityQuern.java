@@ -1,22 +1,31 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.crafting.refine.QuernRecipes;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.Diagnosis;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.QuernPacket;
 
-public class TileEntityQuern extends TileEntity implements IInventory, ISidedInventory {
+public class TileEntityQuern extends TileEntity implements IInventory, ISidedInventory, Diagnosis.Source {
 
     public int turnAngle;
     private ItemStack[] inv = new ItemStack[3]; // 0 input, 1 pot, 2 output
@@ -27,11 +36,63 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     }
 
     public static boolean isInput(ItemStack input) {
-        return getResult(input) != null;
+        return MFRecipes.accepts(MFRecipes.QUERN, input);
     }
 
-    private static QuernRecipes getResult(ItemStack input) {
-        return QuernRecipes.getResult(input);
+    /**
+     * The grind the current contents allow: one input (and the pot, if the recipe uses it up) into the output slot.
+     */
+    public CheckResult check() {
+        ItemStack input = inv[0];
+        ItemStack pot = inv[1];
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.QUERN, input, recipe -> {
+            boolean consumePot = recipe.get(MFRecipeKeys.CONSUME_POT, true);
+            return (!consumePot || pot != null) && recipe.get(MFRecipeKeys.TIER, 0) <= getTier();
+        });
+        if (entry == null) {
+            return CheckResult.failure(CheckResult.Reason.NO_RECIPE);
+        }
+        ProcessRecipe recipe = entry.getRecipe();
+        CraftPlan.Builder plan = CraftPlan.builder(entry.getId(), MFRecipes.QUERN.published().getGeneration(), 2)
+                .use(0, recipe.getInput(), input).output(recipe.getOutput());
+        if (recipe.get(MFRecipeKeys.CONSUME_POT, true)) {
+            plan.use(1, Input.of(pot).amount(1), pot);
+        }
+        CraftPlan built = plan.build();
+        return built.canApply(CraftInventory.of(this)) ? CheckResult.success(built)
+                : CheckResult.failure(CheckResult.Reason.OUTPUT_FULL);
+    }
+
+    /** Every recipe the input could use, in lookup order, and why each is or is not the grind. */
+    @Override
+    public Diagnosis diagnose(EntityPlayer player) {
+        ItemStack input = inv[0];
+        ItemStack pot = inv[1];
+        if (input == null) {
+            return Diagnosis.problem("quern", CheckResult.Reason.MISSING_INPUT);
+        }
+        List<Diagnosis.Candidate> candidates = new ArrayList<>();
+        boolean chosen = false;
+        for (RecipeEntry<ProcessRecipe> entry : MFRecipes.QUERN.published().candidates(Input.lookupKeys(input))) {
+            ProcessRecipe recipe = entry.getRecipe();
+            CheckResult.Reason reason = recipe.getInput().explain(input);
+            if (reason == null && recipe.get(MFRecipeKeys.CONSUME_POT, true) && pot == null) {
+                reason = CheckResult.Reason.of("pot");
+            }
+            if (reason == null && recipe.get(MFRecipeKeys.TIER, 0) > getTier()) {
+                reason = CheckResult.Reason.tier("quern", getTier(), recipe.get(MFRecipeKeys.TIER, 0));
+            }
+            if (reason == null && chosen) {
+                reason = CheckResult.Reason.of("shadowed");
+            }
+            if (reason == null) {
+                CheckResult result = check();
+                reason = result.isSuccess() ? null : result.getReason();
+                chosen = true;
+            }
+            candidates.add(Diagnosis.candidate(entry, reason));
+        }
+        return Diagnosis.of("quern", candidates);
     }
 
     public static boolean isPot(ItemStack item) {
@@ -80,59 +141,24 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     private void syncAnimation() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new QuernPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
+        NetworkUtils.sendToWatchers(new QuernPacket(this).generatePacket(), worldObj, xCoord, zCoord);
     }
 
     public boolean onRevolutionComplete() {
-        QuernRecipes result = this.getResult(inv[0]);
-        if (result != null && (!result.consumePot || inv[1] != null) && result.tier <= getTier()) {
-            ItemStack craft = result.result;
-            if (canFitResult(craft)) {
-                if (!worldObj.isRemote) {
-                    return tryCraft(craft, result.consumePot);
-                } else {
-                    worldObj.spawnParticle("smoke", xCoord + 0.5F, yCoord + 1F, zCoord + 0.5F, 0F, 0.2F, 0F);
-                    return true;
-                }
-            }
+        CheckResult result = check();
+        if (!result.isSuccess()) {
+            return false;
         }
-
-        return false;
+        if (worldObj.isRemote) {
+            worldObj.spawnParticle("smoke", xCoord + 0.5F, yCoord + 1F, zCoord + 0.5F, 0F, 0.2F, 0F);
+            return true;
+        }
+        worldObj.playSoundEffect(xCoord, yCoord, zCoord, "minefantasy2:block.craftprimitive", 0.5F, 1.2F);
+        return result.getPlan().apply(CraftInventory.of(this));
     }
 
     private int getTier() {
         return 0;
-    }
-
-    private boolean canFitResult(ItemStack result) {
-        ItemStack out = inv[2];
-        if (out == null) return true;
-
-        if (!out.isItemEqual(result)) return false;
-        if (out.stackSize + result.stackSize > result.getMaxStackSize()) return false;
-
-        return true;
-    }
-
-    private boolean tryCraft(ItemStack result, boolean consumePot) {
-        worldObj.playSoundEffect(xCoord, yCoord, zCoord, "minefantasy2:block.craftprimitive", 0.5F, 1.2F);
-        /*
-         * if(rand.nextFloat() > 0.20F)//20% success rate { worldObj.playSoundEffect(xCoord, yCoord, zCoord,
-         * "dig.gravel", 1.0F, 0.5F); return false; } else
-         */
-
-        this.decrStackSize(0, 1);
-        if (consumePot) {
-            this.decrStackSize(1, 1);
-        }
-        ItemStack out = inv[2];
-        if (out == null) {
-            this.setInventorySlotContents(2, result.copy());
-        } else {
-            out.stackSize += result.stackSize;
-        }
-        return true;
-
     }
 
     @Override
@@ -147,35 +173,12 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inv[slot].stackSize <= num) {
-                itemstack = this.inv[slot];
-                this.inv[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inv[slot].splitStack(num);
-
-                if (this.inv[slot].stackSize == 0) {
-                    this.inv[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(inv, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack = this.inv[slot];
-            this.inv[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inv, slot);
     }
 
     @Override
@@ -211,7 +214,7 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
-        if (item != null && getResult(item) != null) {
+        if (isInput(item)) {
             return slot == 0;
         }
         if (item != null && item.getItem() == ComponentListMF.clay_pot) {
@@ -223,35 +226,14 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
     }
 
     @SideOnly(Side.CLIENT)

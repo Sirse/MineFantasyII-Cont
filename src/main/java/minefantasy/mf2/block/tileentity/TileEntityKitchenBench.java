@@ -1,30 +1,36 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fluids.FluidContainerRegistry;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
-import minefantasy.mf2.api.crafting.carpenter.CarpenterCraftMatrix;
-import minefantasy.mf2.api.crafting.carpenter.IStackedCarpenterRecipe;
+import minefantasy.mf2.api.crafting.GridRecipe;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
-import minefantasy.mf2.api.crafting.kitchen.IKitchen;
-import minefantasy.mf2.api.crafting.kitchen.IKitchenRecipe;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.Diagnosis;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
@@ -32,7 +38,7 @@ import minefantasy.mf2.container.ContainerKitchenBench;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.KitchenBenchPacket;
 
-public class TileEntityKitchenBench extends TileEntity implements IInventory, IKitchen {
+public class TileEntityKitchenBench extends TileEntity implements IInventory, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -45,7 +51,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     private Random rand = new Random();
     private int ticksExisted;
     private ContainerKitchenBench syncBench;
-    private CarpenterCraftMatrix craftMatrix;
+    private InventoryCrafting craftMatrix;
     private String lastPlayerHit = "";
     private String toolTypeRequired = "hands";
     private String craftSound = "step.wood";
@@ -53,8 +59,13 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     private Skill skillUsed;
     private boolean resetRecipe = false;
     private ItemStack recipe;
-    private IKitchenRecipe activeRecipe;
-    private int[] requiredAmounts;
+    private GridRecipe activeRecipe;
+    /** The project read from the save, checked on the first recipe update after loading. */
+    /** The craft the grid holds, worked out in full; the HUD, the save and finishing all read it. */
+    private CraftPlan project;
+    /** The project the progress belongs to, kept across saves. */
+    private final RunningCraft running = new RunningCraft();
+    private static final RecipeId UNLISTED = RecipeId.of("minefantasy2", "kitchen/unlisted");
 
     public TileEntityKitchenBench() {
         inventory = new ItemStack[width * height + 5];
@@ -64,18 +75,9 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
+        running.read(nbt);
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inventory = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inventory.length) {
-                this.inventory[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inventory = InventorySlots.read(nbt, "Items", inventory.length);
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
         dirtyProgress = nbt.getFloat("DirtyProgress");
@@ -87,17 +89,9 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
+        running.write(nbt);
 
-        NBTTagList savedItems = new NBTTagList();
-        for (int i = 0; i < this.inventory.length; ++i) {
-            if (this.inventory[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inventory[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inventory);
 
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
@@ -120,32 +114,12 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.inventory[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inventory[slot].stackSize <= num) {
-                itemstack = this.inventory[slot];
-                this.inventory[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inventory[slot].splitStack(num);
-                if (this.inventory[slot].stackSize == 0) {
-                    this.inventory[slot] = null;
-                }
-                return itemstack;
-            }
-        }
-        return null;
+        return InventorySlots.take(inventory, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inventory[slot] != null) {
-            ItemStack itemstack = this.inventory[slot];
-            this.inventory[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inventory, slot);
     }
 
     @Override
@@ -308,19 +282,23 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
 
     private void craftItem(EntityPlayer user) {
         // Re-read the grid before paying out: inventory changes after the first one do not refresh the recipe, so the
-        // cached recipe may no longer match what is actually on the bench
-        // One recipe object can yield different results for different materials, so the result must match as well
-        IKitchenRecipe crafting = activeRecipe;
-        ItemStack expected = recipe;
+        // project may no longer match what is actually on the bench
+        CraftPlan crafting = project;
         updateCraftingData();
-        if (activeRecipe != crafting || !ItemStack.areItemStacksEqual(expected, recipe)) {
+        if (crafting == null || !crafting.sameAs(project)) {
             progress = 0;
             return;
         }
         if (this.canCraft() && !isDirty()) {
             addXP(user);
             addDirtyProgress(user);
-            ItemStack result = recipe.copy();
+            ItemStack result = project.getProduct();
+            // The grid pays first: nothing is produced if it no longer holds what the project takes
+            if (!payGrid()) {
+                onInventoryChanged();
+                progress = 0;
+                return;
+            }
             int output = getOutputSlotNum();
 
             if (this.inventory[output] == null) {
@@ -342,7 +320,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
                     } else {
                         dropItem(result);
                     }
-            consumeResources();
         }
         onInventoryChanged();
         progress = 0;
@@ -378,13 +355,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
             }
         }
         return false;
-    }
-
-    private int getRequiredAmount(int slot) {
-        if (requiredAmounts != null && slot >= 0 && slot < requiredAmounts.length) {
-            return Math.max(1, requiredAmounts[slot]);
-        }
-        return 1;
     }
 
     private NBTTagCompound getNBT(ItemStack item) {
@@ -456,69 +426,20 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         return -1;
     }
 
-    public void consumeResources() {
+    /** Takes what the project owes from the grid; containers go back to their slot, the return slots, the floor. */
+    private boolean payGrid() {
+        if (project == null) {
+            return false;
+        }
+        List<ItemStack> spill = new ArrayList<>();
         resetRecipe = true;
-        for (int slot = 0; slot < getOutputSlotNum(); slot++) {
-            ItemStack item = getStackInSlot(slot);
-            int take = getRequiredAmount(slot);
-            // One container comes back per unit actually consumed, not one per slot
-            ItemStack container = getSingleContainer(item);
-            int consumed = item == null ? 0 : Math.min(take, item.stackSize);
-            decrStackSize(slot, take);
-            for (int made = 0; made < consumed && container != null; made++) {
-                // Keep the old placement: the first container goes back into the slot it emptied, the rest take
-                // the return slots and only then the floor
-                if (made == 0 && getStackInSlot(slot) == null) {
-                    setInventorySlotContents(slot, container.copy());
-                    continue;
-                }
-                ItemStack surplus = processSurplus(container.copy());
-                if (surplus != null) {
-                    dropItem(surplus);
-                }
-            }
-        }
+        boolean paid = GridProject.pay(project, this, spill);
         resetRecipe = false;
+        for (ItemStack stack : spill) {
+            dropItem(stack);
+        }
         onInventoryChanged();
-    }
-
-    /**
-     * Container left by consuming a single unit of the stack, queried against a stack of one so the count is right.
-     */
-    private ItemStack getSingleContainer(ItemStack item) {
-        if (item == null || item.getItem() == null) {
-            return null;
-        }
-        ItemStack single = item.copy();
-        single.stackSize = 1;
-        ItemStack container = single.getItem().getContainerItem(single);
-        return container == null ? null : container.copy();
-    }
-
-    private ItemStack processSurplus(ItemStack item) {
-        for (int a = 0; a < 4; a++) {
-            if (item == null) {
-                return null;
-            }
-            int s = getSizeInventory() - 4 + a;
-            ItemStack slot = inventory[s];
-            if (slot == null) {
-                setInventorySlotContents(s, item);
-                return null;
-            } else {
-                if (slot.isItemEqual(item) && ItemStack.areItemStackTagsEqual(slot, item)
-                        && slot.stackSize < slot.getMaxStackSize()) {
-                    int roomLeft = slot.getMaxStackSize() - slot.stackSize;
-                    int toMove = Math.min(roomLeft, item.stackSize);
-                    slot.stackSize += toMove;
-                    item.stackSize -= toMove;
-                    if (item.stackSize <= 0) {
-                        return null;
-                    }
-                }
-            }
-        }
-        return item;
+        return paid;
     }
 
     private boolean canFitResult(ItemStack result) {
@@ -544,30 +465,121 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         for (int a = 0; a < getOutputSlotNum(); a++) {
             craftMatrix.setInventorySlotContents(a, inventory[a]);
         }
-        return CraftingManagerKitchen.getInstance().findMatchingRecipe(this, craftMatrix);
+        GridRecipe.Match match = CraftingManagerKitchen.getInstance().match(craftMatrix);
+        return match == null ? null : match.getResult();
+    }
+
+    /** Works out the project for the grid as it is now; null when it makes nothing. */
+    private CraftPlan buildProject(GridRecipe.Match match) {
+        if (recipe == null) {
+            return null;
+        }
+        RecipeId id = MFRecipes.KITCHEN.published().idOf(activeRecipe);
+        int returns = getSizeInventory() - 4;
+        CraftPlan.Builder plan = CraftPlan.builder(
+                id == null ? UNLISTED : id,
+                MFRecipes.KITCHEN.published().getGeneration(),
+                returns,
+                returns + 1,
+                returns + 2,
+                returns + 3);
+        GridProject.addGrid(plan, this, getOutputSlotNum(), match == null ? null : match.getAmounts(), false);
+        if (match == null) {
+            GridProject.requireRepair(plan, "hands");
+        } else {
+            GridProject.require(plan, match);
+        }
+        return plan.product(recipe).build();
+    }
+
+    /** Shows the project on the station: the HUD and the work checks read these. */
+    private void show(CraftPlan plan) {
+        if (plan == null) {
+            return;
+        }
+        progressMax = plan.require(MFRecipeKeys.TIME, 0F);
+        toolTypeRequired = plan.require(MFRecipeKeys.TOOL, "hands");
+        researchRequired = plan.require(MFRecipeKeys.RESEARCH, "");
+    }
+
+    /**
+     * Every recipe matching the grid, in lookup order: the first is crafted unless the player or the bench stops it,
+     * the rest are shadowed by it.
+     */
+    @Override
+    public Diagnosis diagnose(EntityPlayer player) {
+        updateCraftingData();
+        List<RecipeEntry<GridRecipe>> matched = new ArrayList<>();
+        if (craftMatrix != null) {
+            for (RecipeEntry<GridRecipe> entry : MFRecipes.KITCHEN.published().all()) {
+                if (entry.getRecipe().matches(craftMatrix)) {
+                    matched.add(entry);
+                }
+            }
+        }
+        List<Diagnosis.Candidate> candidates = new ArrayList<>();
+        for (int i = 0; i < matched.size(); i++) {
+            candidates.add(
+                    Diagnosis.candidate(
+                            matched.get(i),
+                            i == 0 ? requirementProblem(player) : CheckResult.Reason.of("shadowed")));
+        }
+        if (candidates.isEmpty()) {
+            return Diagnosis.problem("kitchen", CheckResult.Reason.of("no_match"));
+        }
+        return Diagnosis.of("kitchen", candidates);
+    }
+
+    /** What stops the player crafting the project, or null; a soft reason means it only works harder. */
+    private CheckResult.Reason requirementProblem(EntityPlayer player) {
+        if (project == null) {
+            return CheckResult.Reason.NO_RECIPE;
+        }
+        ItemStack held = player.getHeldItem();
+        String tool = ToolHelper.getCrafterTool(held);
+        int toolTier = ToolHelper.getCrafterTier(held);
+        String needTool = project.require(MFRecipeKeys.TOOL, "");
+        int needToolTier = project.require(MFRecipeKeys.TOOL_TIER, 0);
+        int needStation = project.require(MFRecipeKeys.TIER, 0);
+        String research = project.require(MFRecipeKeys.RESEARCH, "");
+        if (isDirty()) {
+            return CheckResult.Reason.DIRTY;
+        }
+        if (!recipeRequiresHands() && !needTool.equalsIgnoreCase(tool)) {
+            return CheckResult.Reason.of("tool", needTool, tool);
+        }
+        if (!research.isEmpty() && !ResearchLogic.hasInfoUnlocked(player, research)) {
+            return CheckResult.Reason.of("research", research);
+        }
+        if (!canCraft()) {
+            return CheckResult.Reason.OUTPUT_FULL;
+        }
+        return null;
     }
 
     public void updateCraftingData() {
         if (!worldObj.isRemote) {
-            ItemStack oldRecipe = recipe;
             if (craftMatrix != null) {
                 for (int a = 0; a < getOutputSlotNum(); a++) {
                     craftMatrix.setInventorySlotContents(a, inventory[a]);
                 }
             }
-            activeRecipe = craftMatrix == null ? null
-                    : CraftingManagerKitchen.getInstance().getMatchingRecipe(this, craftMatrix);
-            requiredAmounts = activeRecipe instanceof IStackedCarpenterRecipe
-                    ? ((IStackedCarpenterRecipe) activeRecipe).getRequiredAmounts(craftMatrix)
-                    : null;
-            recipe = activeRecipe == null ? null : activeRecipe.getCraftingResult(craftMatrix);
+            GridRecipe.Match match = craftMatrix == null ? null
+                    : CraftingManagerKitchen.getInstance().match(craftMatrix);
+            activeRecipe = match == null ? null : match.getRecipe();
+            recipe = match == null ? null : match.getResult();
+            skillUsed = activeRecipe == null ? null : activeRecipe.getSkill();
+            craftSound = activeRecipe == null ? craftSound : activeRecipe.getSound();
+            pendingDirtyAmount = activeRecipe == null ? 0F : activeRecipe.getDirtyAmount();
 
-            if ((!canCraft() || isDirty()) && progress > 0) {
+            project = buildProject(match);
+            show(project);
+
+            // Progress belongs to one project: another recipe, material, requirement or input starts over
+            if (progress > 0 && (!canCraft() || isDirty() || !running.holds(project))) {
                 progress = 0;
             }
-            if (recipe != null && oldRecipe != null && !recipe.isItemEqual(oldRecipe)) {
-                progress = 0;
-            }
+            running.start(project);
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
@@ -576,11 +588,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
     /** Sends what the GUI and the in-world HUD show */
     public void syncData() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(
-                new KitchenBenchPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new KitchenBenchPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     /**
@@ -640,43 +648,8 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
         return (int) Math.ceil((i * dirtyProgress) / max);
     }
 
-    @Override
-    public void setForgeTime(int i) {
-        progressMax = i;
-    }
-
-    @Override
-    public void setToolTier(int i) {}
-
-    @Override
-    public void setRequiredCarpenter(int i) {}
-
-    @Override
-    public void setHotOutput(boolean hot) {}
-
-    @Override
-    public void setToolType(String toolType) {
-        this.toolTypeRequired = toolType;
-    }
-
-    @Override
     public void setCraftingSound(String sound) {
         this.craftSound = sound;
-    }
-
-    @Override
-    public void setResearch(String research) {
-        this.researchRequired = research;
-    }
-
-    @Override
-    public void setSkill(Skill skill) {
-        skillUsed = skill;
-    }
-
-    @Override
-    public void setDirtyAmount(float amount) {
-        pendingDirtyAmount = amount;
     }
 
     public String getResearchNeeded() {
@@ -692,13 +665,25 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, IK
 
     private void addXP(EntityPlayer smith) {
         if (skillUsed != null) {
-            float baseXP = this.progressMax / 10F;
+            float baseXP = project.require(MFRecipeKeys.TIME, 0F) / 10F;
             skillUsed.addXP(smith, (int) baseXP + 1);
         }
     }
 
     public void setContainer(ContainerKitchenBench container) {
         syncBench = container;
-        craftMatrix = new CarpenterCraftMatrix(this, syncBench, width, height);
+        craftMatrix = new InventoryCrafting(syncBench, width, height);
     }
+
+    // region client sync: the server shows the project; its packets and container fill these on the client
+
+    public void setToolType(String toolType) {
+        toolTypeRequired = toolType;
+    }
+
+    public void setResearch(String research) {
+        researchRequired = research;
+    }
+
+    // endregion
 }

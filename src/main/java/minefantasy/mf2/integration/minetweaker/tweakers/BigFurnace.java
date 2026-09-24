@@ -1,151 +1,48 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.ArrayList;
-import java.util.Map;
-
-import net.minecraft.item.ItemStack;
-
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.BigFurnaceRecipes;
-import minefantasy.mf2.integration.minetweaker.helpers.TweakedMapEdit;
-import minetweaker.IUndoableAction;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeMetadata;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/** Big furnace recipes with the furnace tier they need. */
 @ZenClass("mods.minefantasy.BigFurnace")
 public class BigFurnace {
 
     @ZenMethod
-    public static void addRecipe(IItemStack output, IIngredient input, @Optional int tier) {
-        MineTweakerAPI.apply(new AddRecipeAction(output, input, tier));
+    public static void add(@NotNull String name, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional int tier, @Optional int priority) {
+        ScriptProcess.add(MFRecipes.BIG_FURNACE, name, () -> recipe(output, input, tier), priority);
     }
 
     @ZenMethod
-    public static void remove(@NotNull IIngredient output, IIngredient input) {
-        ArrayList<BigFurnaceRecipes> toRemove = new ArrayList<BigFurnaceRecipes>();
-        for (Map.Entry<String, BigFurnaceRecipes> entry : BigFurnaceRecipes.recipeList.entrySet()) {
-            BigFurnaceRecipes recipe = entry.getValue();
-            if (recipe != null && recipe.input != null
-                    && recipe.result != null
-                    && output.matches(new MCItemStack(recipe.result))
-                    && (input == null || input.matches(new MCItemStack(recipe.input)))) {
-                toRemove.add(recipe);
-            }
-        }
-        if (toRemove.isEmpty()) {
-            MineTweakerAPI.logWarning("No Big Furnace recipes for " + output.toString());
-            return;
-        }
-        MineTweakerAPI.apply(new RemoveAction(toRemove));
+    public static void replace(@NotNull String id, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional int tier, @Optional int priority) {
+        ScriptProcess.replace(MFRecipes.BIG_FURNACE, id, () -> recipe(output, input, tier), priority);
     }
 
-    private static class AddRecipeAction implements IUndoableAction {
-
-        private final IItemStack output;
-        private final IIngredient input;
-        private final int tier;
-        private final TweakedMapEdit<BigFurnaceRecipes> edit = new TweakedMapEdit<BigFurnaceRecipes>(
-                BigFurnaceRecipes.recipeList);
-
-        public AddRecipeAction(IItemStack output, IIngredient input, int tier) {
-            this.output = output;
-            this.input = input;
-            this.tier = tier;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            if (mcOutput == null) {
-                MineTweakerAPI.logWarning("Skipping big furnace recipe with invalid output " + output);
-                return;
-            }
-            for (IIngredient ingredient : input.getItems()) {
-                ItemStack mcInput = MineTweakerMC.getItemStack(ingredient);
-                if (mcInput == null) {
-                    MineTweakerAPI.logWarning("Skipping big furnace recipe input " + ingredient + " -> " + output);
-                    continue;
-                }
-                // addRecipe replaces whatever answered for this key, so go through the edit log rather than
-                // letting it write straight into the map
-                edit.put(CustomToolHelper.getReferenceName(mcInput), new BigFurnaceRecipes(mcInput, mcOutput, tier));
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            edit.undo();
-        }
-
-        @Override
-        public String describe() {
-            return "Adding big furnace recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Removing big furnace recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    @ZenMethod
+    public static void remove(@NotNull String id) {
+        ScriptProcess.remove(MFRecipes.BIG_FURNACE, id);
     }
 
-    private static class RemoveAction implements IUndoableAction {
-
-        private final ArrayList<BigFurnaceRecipes> recipes;
-
-        private RemoveAction(ArrayList<BigFurnaceRecipes> recipes) {
-            this.recipes = recipes;
-        }
-
-        @Override
-        public void apply() {
-            for (BigFurnaceRecipes recipe : recipes) {
-                BigFurnaceRecipes.recipeList.remove(CustomToolHelper.getReferenceName(recipe.input));
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            for (BigFurnaceRecipes recipe : recipes) {
-                BigFurnaceRecipes.recipeList.put(CustomToolHelper.getReferenceName(recipe.input), recipe);
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Removing " + recipes.size() + " Big Furnace recipes";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Restoring " + recipes.size() + " Big Furnace recipes";
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    @ZenMethod
+    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
+        ScriptProcess.removeByOutput(MFRecipes.BIG_FURNACE, output, input);
     }
 
+    private static ProcessRecipe recipe(IItemStack output, IIngredient input, int tier) {
+        return ProcessRecipe.of(
+                ScriptInputs.toInput(input),
+                ScriptInputs.toOutput(output),
+                RecipeMetadata.builder().put(MFRecipeKeys.TIER, tier).build());
+    }
 }

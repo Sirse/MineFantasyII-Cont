@@ -19,6 +19,7 @@ val versionCraftTweaker = "3.4.8"
 val versionBattlegear = "1.6.8-backhand"
 val versionThaumcraft = "1.7.10-4.2.3.5"
 val versionBaubles = "1.0.1.10"
+val versionHorizonQA = "0.15.0"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
@@ -58,10 +59,20 @@ val runtimeOnlyNonPublishable: Configuration by configurations.creating {
   isCanBeConsumed = false
   isCanBeResolved = false
 }
-listOf(configurations.runtimeClasspath, configurations.testRuntimeClasspath).forEach {
+listOf(configurations.runtimeClasspath).forEach {
   it.configure {
     extendsFrom(runtimeOnlyNonPublishable)
   }
+}
+
+// Game tests (Horizon-QA): their own source set, never in the mod jar, loaded by runServer alongside the mod
+val gameTestMods: Configuration by configurations.creating {
+  description = "Mods the game tests need on the development server, never published"
+  isCanBeConsumed = false
+}
+val gameTest: SourceSet = sourceSets.create("gameTest") {
+  compileClasspath += sourceSets.main.get().output + sourceSets.main.get().compileClasspath + gameTestMods
+  runtimeClasspath += output + compileClasspath
 }
 
 repositories {
@@ -94,6 +105,13 @@ dependencies {
   compileOnly(files("lib/bukkit-1.7.10.jar"))
 
   compileOnly("com.github.GTNewHorizons:CraftTweaker:${versionCraftTweaker}:dev") {
+    isTransitive = false
+  }
+  // Game tests run on the development server only: Horizon-QA, and CraftTweaker for the script adapters
+  gameTestMods("com.github.GTNewHorizons:Horizon-QA:${versionHorizonQA}:dev") {
+    isTransitive = false
+  }
+  gameTestMods("com.github.GTNewHorizons:CraftTweaker:${versionCraftTweaker}:dev") {
     isTransitive = false
   }
 
@@ -233,4 +251,30 @@ tasks.named("check").configure {
 tasks.findByName("extractNatives2")?.let { extractTask ->
   tasks.named("spotlessGradle").configure { mustRunAfter(extractTask) }
   tasks.named("spotlessGradleCheck").configure { mustRunAfter(extractTask) }
+}
+
+// runServer loads the game tests; with -PgameTests it runs them all in CI mode, reports to build/horizonqa and
+// exits with their status
+tasks.named<JavaExec>("runServer").configure {
+  dependsOn(tasks.named("gameTestClasses"))
+  classpath(gameTest.output, gameTestMods)
+  // -PupdateRecipeIds: the native recipe id snapshot is rewritten from what the mod registers, instead of checked
+  if (project.hasProperty("updateRecipeIds")) {
+    jvmArgs(
+      "-Dminefantasy2tests.updateRecipeIds=" +
+        file("src/gameTest/resources/minefantasy2tests/native_recipe_ids.txt").absolutePath,
+    )
+  }
+  if (project.hasProperty("gameTests")) {
+    // A world of their own, new for every run: Horizon-QA's void world only applies to a new save, the cells must
+    // not dig into the development world, and nothing a previous run left behind may carry over
+    val world = layout.projectDirectory.dir("run/horizonqa").asFile
+    doFirst { world.deleteRecursively() }
+    args("--world", "horizonqa")
+    jvmArgs(
+      "-Dhorizonqa.mode=ci",
+      "-Dhorizonqa.tests=minefantasy2",
+      "-Dhorizonqa.reportDir=" + layout.buildDirectory.dir("horizonqa").get().asFile.absolutePath,
+    )
+  }
 }

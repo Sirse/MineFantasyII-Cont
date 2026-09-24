@@ -10,10 +10,8 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.engineer.IBombComponent;
@@ -188,11 +186,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     public void syncData() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new BombBenchPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new BombBenchPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
 
         /*
          * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
@@ -306,35 +300,12 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.inv[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inv[slot].stackSize <= num) {
-                itemstack = this.inv[slot];
-                this.inv[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inv[slot].splitStack(num);
-
-                if (this.inv[slot].stackSize == 0) {
-                    this.inv[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(inv, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack = this.inv[slot];
-            this.inv[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inv, slot);
     }
 
     @Override
@@ -392,17 +363,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
         progress = nbt.getFloat("progress");
         maxProgress = nbt.getFloat("maxProgress");
         hasRecipe = nbt.getBoolean("hasRecipe");
@@ -412,18 +373,7 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
         nbt.setFloat("progress", progress);
         nbt.setFloat("maxProgress", maxProgress);
         nbt.setBoolean("hasRecipe", hasRecipe);

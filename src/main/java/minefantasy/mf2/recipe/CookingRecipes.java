@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -66,7 +67,7 @@ public class CookingRecipes {
     /**
      * Cook in for out on anything (100C-200C, for ~15s)
      */
-    private static CookRecipe cookMeat(Item in, Item out) {
+    private static RecipeEntry<CookRecipe> cookMeat(Item in, Item out) {
         return MineFantasyAPI.addCookingRecipe(new ItemStack(in), new ItemStack(out), 100, 200, 15, false);
     }
 
@@ -77,7 +78,8 @@ public class CookingRecipes {
      * @param offset the room for error +/-
      * @param time   how much time roughly
      */
-    private static CookRecipe bake(Item in, Item out, int mint, int maxt, int time, int burn_time, boolean burn) {
+    private static RecipeEntry<CookRecipe> bake(Item in, Item out, int mint, int maxt, int time, int burn_time,
+            boolean burn) {
         return MineFantasyAPI.addCookingRecipe(
                 new ItemStack(in),
                 new ItemStack(out),
@@ -97,7 +99,8 @@ public class CookingRecipes {
      * @param offset the room for error +/-
      * @param time   how much time roughly
      */
-    private static CookRecipe bake(Item in, Item out, int mint, int maxt, int time, int burn_time, Item burn) {
+    private static RecipeEntry<CookRecipe> bake(Item in, Item out, int mint, int maxt, int time, int burn_time,
+            Item burn) {
         return MineFantasyAPI.addCookingRecipe(
                 new ItemStack(in),
                 new ItemStack(out),
@@ -140,7 +143,7 @@ public class CookingRecipes {
         bakeCeramic(ComponentListMF.fireclay_brick, ComponentListMF.strong_brick, 1500, 5);
     }
 
-    private static CookRecipe bakeCeramic(Item clay, Item ceramic, int temp, int time) {
+    private static RecipeEntry<CookRecipe> bakeCeramic(Item clay, Item ceramic, int temp, int time) {
         if (!ConfigHardcore.preventCook) {
             GameRegistry.addSmelting(clay, new ItemStack(ceramic), 0F);
         }

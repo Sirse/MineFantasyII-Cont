@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.item.food.FoodListMF;
@@ -119,11 +118,7 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
     public void syncData() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new TroughPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new TroughPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
         super.sendPacketToClient();
     }
 

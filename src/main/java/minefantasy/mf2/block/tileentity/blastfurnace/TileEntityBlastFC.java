@@ -8,15 +8,17 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.refine.ISmokeCarrier;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedInventory, ISmokeCarrier {
@@ -42,14 +44,12 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     }
 
     public static boolean isInput(ItemStack item) {
-        return getResult(item) != null;
+        return MFRecipes.accepts(MFRecipes.BLAST_FURNACE, item);
     }
 
     protected static ItemStack getResult(ItemStack input) {
-        if (BlastFurnaceRecipes.smelting().getSmeltingResult(input) != null) {
-            return BlastFurnaceRecipes.smelting().getSmeltingResult(input).copy();
-        }
-        return null;
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.BLAST_FURNACE, input);
+        return entry == null ? null : entry.getRecipe().getOutput();
     }
 
     @Override
@@ -155,18 +155,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
         nbt.setBoolean("isBuilt", isBuilt);
         nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setInteger("StoredSmoke", smokeStorage);
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.items.length; ++i) {
-            if (this.items[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.items[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", items);
     }
 
     @Override
@@ -179,17 +168,7 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
         isBuilt = nbt.getBoolean("isBuilt");
         ticksExisted = nbt.getInteger("ticksExisted");
         smokeStorage = nbt.getInteger("StoredSmoke");
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.items = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.items.length) {
-                this.items[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        items = InventorySlots.read(nbt, "Items", items.length);
     }
 
     // INVENTORY
@@ -208,35 +187,12 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.items[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.items[slot].stackSize <= num) {
-                itemstack = this.items[slot];
-                this.items[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.items[slot].splitStack(num);
-
-                if (this.items[slot].stackSize == 0) {
-                    this.items[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(items, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.items[slot] != null) {
-            ItemStack itemstack = this.items[slot];
-            this.items[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(items, slot);
     }
 
     @Override

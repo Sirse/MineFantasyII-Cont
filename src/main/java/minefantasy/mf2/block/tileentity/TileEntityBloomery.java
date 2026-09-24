@@ -1,38 +1,44 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.Diagnosis;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeLookup;
+import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.item.heatable.ItemHeated;
-import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.BloomeryPacket;
-import minefantasy.mf2.util.MFLogUtil;
 
-public class TileEntityBloomery extends TileEntity implements IInventory {
+public class TileEntityBloomery extends TileEntity implements IInventory, Diagnosis.Source {
 
     public float progress, progressMax;
     /**
@@ -46,37 +52,96 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
     private ItemStack[] inv = new ItemStack[3];
     private Random rand = new Random();
 
+    private static final int SLOT_INPUT = 0;
+    private static final int SLOT_CARBON = 1;
+    private static final int SLOT_BLOOM = 2;
+
+    private final RecipeLookup<BloomRecipe> lookup = new RecipeLookup<>(MFRecipes.BLOOMERY);
+    /** The smelt started by {@link #light}; it finishes only if the plan is still the same. */
+    private final RunningCraft project = new RunningCraft();
+
     public static boolean isInput(ItemStack input) {
-        return getResult(input) != null;
-    }
-
-    private static ItemStack getResult(ItemStack input) {
-        return BloomRecipe.getSmeltingResult(input);
-    }
-
-    public ItemStack getResult() {
-        ItemStack input = inv[0];
-        ItemStack coal = inv[1];
-
-        if (hasBloom()) return null;// Cannot smelt if a bloom exists
-        if (input == null || coal == null) return null;// Needs input
-
-        if (!hasEnoughCarbon(input, coal)) {
-            return null;
+        if (input == null) {
+            return false;
         }
-
-        return getResult(input);
-    }
-
-    private boolean hasEnoughCarbon(ItemStack input, ItemStack coal) {
-        int amount = input.stackSize;
-        int uses = MineFantasyFuels.getCarbon(coal);
-        if (uses > 0) {
-            int coalNeeded = (int) Math.ceil((float) amount / (float) uses);
-            MFLogUtil.logDebug("Required Coal: " + coalNeeded);
-            return coal.stackSize == coalNeeded;
+        for (RecipeEntry<BloomRecipe> entry : MFRecipes.BLOOMERY.published().candidates(Input.lookupKeys(input))) {
+            if (entry.getRecipe().getInput().matches(input)) {
+                return true;
+            }
         }
         return false;
+    }
+
+    /**
+     * Checks the current contents: the whole input stack smelts into a bloom of as many items, burning exactly the
+     * carbon it needs. Research is checked only for a player lighting it ({@code user} may be null).
+     */
+    public CheckResult check(EntityPlayer user) {
+        CheckResult.Reason problem = stationProblem();
+        if (problem != null) {
+            return CheckResult.failure(problem);
+        }
+        ItemStack input = inv[SLOT_INPUT];
+        return lookup.find(RecipeLookup.keysOf(input), entry -> checkEntry(entry, user));
+    }
+
+    /** What stops the bloomery before any recipe is looked at, or null. */
+    private CheckResult.Reason stationProblem() {
+        if (hasBloom()) {
+            return CheckResult.Reason.of("bloom_present");
+        }
+        if (inv[SLOT_INPUT] == null || inv[SLOT_CARBON] == null) {
+            return CheckResult.Reason.MISSING_INPUT;
+        }
+        if (MineFantasyFuels.getCarbon(inv[SLOT_CARBON]) <= 0) {
+            return CheckResult.Reason.of("carbon", 0, 1);
+        }
+        return null;
+    }
+
+    private CheckResult checkEntry(RecipeEntry<BloomRecipe> entry, EntityPlayer user) {
+        ItemStack input = inv[SLOT_INPUT];
+        ItemStack carbon = inv[SLOT_CARBON];
+        int carbonNeeded = (int) Math.ceil((float) input.stackSize / (float) MineFantasyFuels.getCarbon(carbon));
+        BloomRecipe recipe = entry.getRecipe();
+        ItemStack one = input.copy();
+        one.stackSize = 1;
+        CheckResult.Reason mismatch = recipe.getInput().explain(one);
+        if (mismatch != null) {
+            return CheckResult.failure(mismatch);
+        }
+        if (carbon.stackSize != carbonNeeded) {
+            return CheckResult.failure(CheckResult.Reason.of("carbon", carbon.stackSize, carbonNeeded));
+        }
+        if (user != null && recipe.getResearch() != null
+                && !ResearchLogic.hasInfoUnlocked(user, recipe.getResearch())) {
+            return CheckResult.failure(CheckResult.Reason.of("research", recipe.getResearch()));
+        }
+        ItemStack bloom = recipe.getOutput();
+        bloom.stackSize = input.stackSize;
+        return CheckResult.success(
+                CraftPlan.builder(entry.getId(), MFRecipes.BLOOMERY.published().getGeneration(), SLOT_BLOOM)
+                        .use(SLOT_INPUT, recipe.getInput().amount(input.stackSize), input)
+                        .use(SLOT_CARBON, Input.of(carbon).amount(carbonNeeded), carbon).output(bloom).build());
+    }
+
+    @Override
+    public Diagnosis diagnose(EntityPlayer player) {
+        CheckResult.Reason problem = stationProblem();
+        if (problem != null) {
+            return Diagnosis.problem("bloomery", problem);
+        }
+        List<Diagnosis.Candidate> candidates = new ArrayList<>();
+        boolean chosen = false;
+        for (RecipeEntry<BloomRecipe> entry : MFRecipes.BLOOMERY.published()
+                .candidates(Input.lookupKeys(inv[SLOT_INPUT]))) {
+            CheckResult result = checkEntry(entry, player);
+            CheckResult.Reason reason = result.isSuccess() ? (chosen ? CheckResult.Reason.of("shadowed") : null)
+                    : result.getReason();
+            chosen |= result.isSuccess();
+            candidates.add(Diagnosis.candidate(entry, reason));
+        }
+        return Diagnosis.of("bloomery", candidates);
     }
 
     @Override
@@ -88,6 +153,9 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
                 return;
             }
             if (!worldObj.isRemote) {
+                if (!projectStillValid()) {
+                    return;
+                }
                 ++progress;
                 if (progress >= progressMax) {
                     smeltItem();
@@ -131,11 +199,7 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
     public void syncData() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new BloomeryPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new BloomeryPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     /**
@@ -144,40 +208,50 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
      * @return true if it can smelt
      */
     public boolean light(EntityPlayer user) {
-        ItemStack res = getResult();
-        if (worldObj.canBlockSeeTheSky(xCoord, yCoord + 1, zCoord) && res != null && !isActive) {
-            if (!worldObj.isRemote) {
-                if (res.getItem() == Items.iron_ingot
-                        && !ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.smeltIron)) {
-                    return false;
-                }
-                isActive = true;
-                progressMax = inv[0].stackSize * getTime(inv[0]);// 15s per item
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "fire.ignite", 1.0F, 1.0F);
-            }
-
-            return true;
+        if (isActive || !worldObj.canBlockSeeTheSky(xCoord, yCoord + 1, zCoord)) {
+            return false;
         }
-        return false;
-    }
-
-    private int getTime(ItemStack itemStack) {
-        return 300;
+        CheckResult result = check(worldObj.isRemote ? null : user);
+        if (!result.isSuccess()) {
+            return false;
+        }
+        if (!worldObj.isRemote) {
+            isActive = true;
+            progress = 0;
+            progressMax = inv[SLOT_INPUT].stackSize * BloomRecipe.TICKS_PER_ITEM;
+            project.start(result.getPlan());
+            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "fire.ignite", 1.0F, 1.0F);
+        }
+        return true;
     }
 
     /**
-     * Consumes ALL input and sets output
+     * The running smelt stays valid while its plan is unchanged: same inputs, same recipe, same bloom. Anything else (a
+     * player took items out, a script replaced the recipe) puts the fire out; the items stay where they are.
      */
-    public void smeltItem() {
-        ItemStack result = getResult();
-        if (result != null) {
-            ItemStack res2 = result.copy();
-            res2.stackSize = inv[0].stackSize;
-            inv[0] = inv[1] = null;
-            inv[2] = res2;
+    private boolean projectStillValid() {
+        if (project.holds(check(null))) {
+            return true;
         }
+        extinguish();
+        return false;
+    }
+
+    private void extinguish() {
         isActive = false;
         progress = progressMax = 0;
+        project.clear();
+    }
+
+    /**
+     * Consumes all input and carbon and sets the bloom, if the plan still holds.
+     */
+    public void smeltItem() {
+        CheckResult result = check(null);
+        if (project.holds(result)) {
+            result.getPlan().apply(CraftInventory.of(this));
+        }
+        extinguish();
     }
 
     public boolean tryHammer(EntityPlayer user) {
@@ -260,35 +334,12 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
 
     @Override
     public ItemStack decrStackSize(int slot, int num) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.inv[slot].stackSize <= num) {
-                itemstack = this.inv[slot];
-                this.inv[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.inv[slot].splitStack(num);
-
-                if (this.inv[slot].stackSize == 0) {
-                    this.inv[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(inv, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.inv[slot] != null) {
-            ItemStack itemstack = this.inv[slot];
-            this.inv[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inv, slot);
     }
 
     @Override
@@ -327,8 +378,8 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
         if (item != null && TileEntityBlastFC.isCarbon(item)) {
             return slot == 1;
         }
-        if (item != null && getResult(item) != null) {
-            return slot == 0;
+        if (isInput(item)) {
+            return slot == SLOT_INPUT;
         }
         return false;
     }
@@ -336,44 +387,29 @@ public class TileEntityBloomery extends TileEntity implements IInventory {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
         hasBloom = nbt.getBoolean("hasBloom");
         isActive = nbt.getBoolean("isActive");
+        project.read(nbt);
+        if (isActive && !project.isRunning()) {
+            // A 2.x smelt: nothing proves which recipe it ran, so it restarts. The items stay in their slots.
+            extinguish();
+        }
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
 
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
         nbt.setBoolean("hasBloom", hasBloom());
         nbt.setBoolean("isActive", isActive);
+        project.write(nbt);
     }
 
     @SideOnly(Side.CLIENT)

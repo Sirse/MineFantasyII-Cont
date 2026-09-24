@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -9,18 +11,21 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.block.crafting.BlockRoast;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.network.NetworkUtils;
@@ -40,6 +45,8 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     private Random rand = new Random();
     private int ticksExisted;
     private CookRecipe recipe;
+    /** The cooking the progress belongs to, kept across saves: a changed recipe restarts it. */
+    private final RunningCraft running = new RunningCraft();
     private boolean isOvenTemp;
 
     public TileEntityRoast() {}
@@ -55,16 +62,8 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         int temp = getTemp();
         ++ticksExisted;
         if (ticksExisted % 20 == 0 && !worldObj.isRemote) {
-            if (recipe != null && temp > 0 && maxProgress > 0 && temp > recipe.minTemperature) {
-                if (enableOverheat && recipe.canBurn && temp > recipe.maxTemperature) {
-                    setInventorySlotContents(0, recipe.burnt.copy());
-                    updateRecipe();
-                }
-                progress += (temp / 100F);
-                if (progress >= maxProgress) {
-                    setInventorySlotContents(0, recipe.output.copy());
-                    updateRecipe();
-                }
+            if (temp > 0 && items[0] != null) {
+                cook(temp);
             }
         }
         if (temp > 0 && worldObj.isRemote && rand.nextInt(20) == 0) {
@@ -106,12 +105,14 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         ItemStack held = player.getHeldItem();
         ItemStack item = items[0];
         if (item == null) {
-            if (held != null && !(held.getItem() instanceof ItemBlock)
-                    && CookRecipe.getResult(held, isOven()) != null) {
+            CookRecipe.Found found = held == null || held.getItem() instanceof ItemBlock ? null
+                    : CookRecipe.find(held, isOven());
+            int amount = found == null ? 0 : found.recipe.getInput().getAmount();
+            if (found != null && held.stackSize >= amount) {
                 ItemStack item2 = held.copy();
-                item2.stackSize = 1;
+                item2.stackSize = amount;
                 setInventorySlotContents(0, item2);
-                tryDecrMainItem(player);
+                tryDecrMainItem(player, amount);
                 updateRecipe();
                 if (!isOven() && this.getTemp() > 0) {
                     worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.fizz", 1.0F, 1.0F);
@@ -129,18 +130,80 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         return false;
     }
 
-    private void tryDecrMainItem(EntityPlayer player) {
+    private void tryDecrMainItem(EntityPlayer player, int amount) {
         int held = player.inventory.currentItem;
         if (held >= 0 && held < 9) {
-            player.inventory.decrStackSize(held, 1);
+            player.inventory.decrStackSize(held, amount);
+        }
+    }
+
+    /**
+     * One step of cooking at the given heat. The recipe is looked up again first, before its temperatures are read: a
+     * reload may have removed or changed it since the food went on, and then the cooking starts over on what the food
+     * cooks by now instead of going on by the old recipe.
+     */
+    private void cook(int temp) {
+        CookRecipe.Found found = CookRecipe.find(items[0], isOven());
+        CraftPlan plan = plan(found, false);
+        if (plan == null && !running.isRunning()) {
+            // Nothing cooks the food, as before: burnt through or its recipe gone. Nothing to restart or resend
+            return;
+        }
+        if (!running.holds(plan)) {
+            updateRecipe();
+            return;
+        }
+        CookRecipe current = found.recipe;
+        if (temp <= current.getMinTemperature()) {
+            return;
+        }
+        if (enableOverheat && current.canBurn() && temp > current.getMaxTemperature()) {
+            finish(plan(found, true));
+            return;
+        }
+        progress += (temp / 100F);
+        if (progress >= maxProgress) {
+            finish(plan(found, false));
         }
     }
 
     private void cacheRecipe() {
-        recipe = CookRecipe.getResult(getStackInSlot(0), isOven());
+        CookRecipe.Found found = CookRecipe.find(getStackInSlot(0), isOven());
+        recipe = found == null ? null : found.recipe;
         if (recipe != null) {
-            maxProgress = recipe.time;
+            maxProgress = recipe.getTime();
         }
+    }
+
+    /**
+     * Cooking the food on the station, or burning it, as the found recipe asks: the result takes the food's place, and
+     * the cooking terms are part of the plan, so a reload changing them restarts the work.
+     */
+    private CraftPlan plan(CookRecipe.Found found, boolean burnt) {
+        if (found == null || items[0] == null) {
+            return null;
+        }
+        CookRecipe cooking = found.recipe;
+        return CraftPlan
+                .builder(
+                        burnt ? CookRecipe.burntId(found.id) : found.id,
+                        MFRecipes.COOKING.published().getGeneration(),
+                        0)
+                .use(0, cooking.getInput(), items[0]).output(burnt ? cooking.getBurnt() : cooking.getOutput())
+                .require(MFRecipeKeys.TIME, (float) cooking.getTime())
+                .require(MFRecipeKeys.MIN_TEMPERATURE, cooking.getMinTemperature())
+                .require(MFRecipeKeys.MAX_TEMPERATURE, cooking.getMaxTemperature())
+                .require(MFRecipeKeys.CAN_BURN, cooking.canBurn()).build();
+    }
+
+    /** Pays for the cooking and leaves the result; returned containers without room drop off. */
+    private void finish(CraftPlan plan) {
+        if (plan != null) {
+            List<ItemStack> spill = new ArrayList<>();
+            plan.apply(CraftInventory.of(this, 64), spill);
+            GridProject.drop(this, spill);
+        }
+        updateRecipe();
     }
 
     /**
@@ -149,6 +212,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     public void updateRecipe() {
         cacheRecipe();
         progress = 0;
+        running.start(plan(CookRecipe.find(items[0], isOven()), false));
         sendPacketToClients();
     }
 
@@ -168,7 +232,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
 
     public String getResultName() {
         if (recipe != null) {
-            return recipe.output.getDisplayName();
+            return recipe.getOutput().getDisplayName();
         }
         return "";
     }
@@ -195,38 +259,20 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         progress = nbt.getFloat("Progress");
+        running.read(nbt);
         maxProgress = nbt.getFloat("maxProgress");
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < items.length) {
-                items[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        items = InventorySlots.read(nbt, "Items", items.length);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setFloat("Progress", progress);
+        running.write(nbt);
         nbt.setFloat("maxProgress", maxProgress);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < items.length; ++i) {
-            if (items[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                items[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", items);
     }
 
     // INVENTORY
@@ -245,35 +291,12 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.items[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.items[slot].stackSize <= num) {
-                itemstack = this.items[slot];
-                this.items[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.items[slot].splitStack(num);
-
-                if (this.items[slot].stackSize == 0) {
-                    this.items[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(items, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.items[slot] != null) {
-            ItemStack itemstack = this.items[slot];
-            this.items[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(items, slot);
     }
 
     @Override
@@ -357,7 +380,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
 
         NetworkUtils.sendToWatchers(
                 new TileInventoryPacket(this, this).generatePacket(),
-                (WorldServer) worldObj,
+                worldObj,
                 this.xCoord,
                 this.zCoord);
 

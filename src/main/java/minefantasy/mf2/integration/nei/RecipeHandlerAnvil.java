@@ -16,11 +16,8 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
+import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
-import minefantasy.mf2.api.crafting.anvil.CustomToolRecipe;
-import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
-import minefantasy.mf2.api.crafting.anvil.ShapedAnvilRecipes;
-import minefantasy.mf2.api.crafting.anvil.ShapelessAnvilRecipes;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
@@ -106,14 +103,14 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         }
 
         if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.smeltDragonforge)) {
-            for (Map.Entry<Item, Item> entry : SpecialForging.dragonforgeCrafts.entrySet()) {
+            for (Map.Entry<Item, Item> entry : SpecialForging.dragonforgeCrafts().entrySet()) {
                 if (CustomToolHelper.areEqual(new ItemStack(entry.getValue()), inputStack)) {
                     hiddenStack = CustomToolHelper.tryDeconstruct(new ItemStack(entry.getKey()), inputStack);
                 }
             }
         }
 
-        for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+        for (GridRecipe irecipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
             if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())) {
                 continue;
             }
@@ -140,7 +137,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
     @SuppressWarnings("unchecked")
     @Override
     protected void loadAllRecipes() {
-        for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+        for (GridRecipe irecipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
             if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())
                     || !NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                 continue;
@@ -196,7 +193,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         }
 
         if (NEIHelper.matchesCrafting(new ItemStack(ComponentListMF.ornate_items), ingredient)) {
-            for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+            for (GridRecipe irecipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
                 if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())) {
                     continue;
                 }
@@ -218,7 +215,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             return;
         }
 
-        for (IAnvilRecipe irecipe : (List<IAnvilRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+        for (GridRecipe irecipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
             if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())) {
                 continue;
             }
@@ -236,7 +233,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         }
     }
 
-    private ItemStack getSpecialCatalyst(IAnvilRecipe recipe, ItemStack requestedOutput) {
+    private ItemStack getSpecialCatalyst(GridRecipe recipe, ItemStack requestedOutput) {
         String design = CustomToolHelper.getCustomStyle(requestedOutput);
         if (!"ornate".equals(design)) {
             return null;
@@ -250,15 +247,8 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         return new ItemStack(ComponentListMF.ornate_items);
     }
 
-    private CachedAnvilRecipe handleRecipe(IAnvilRecipe irecipe, ItemStack inputStack, ItemStack specialCatalyst) {
-        if (irecipe instanceof ShapedAnvilRecipes) {
-            return new CachedAnvilRecipe((ShapedAnvilRecipes) irecipe, inputStack, specialCatalyst);
-        }
-        if (irecipe instanceof ShapelessAnvilRecipes) {
-            return new CachedAnvilRecipe((ShapelessAnvilRecipes) irecipe, specialCatalyst);
-        }
-
-        return null;
+    private CachedAnvilRecipe handleRecipe(GridRecipe irecipe, ItemStack inputStack, ItemStack specialCatalyst) {
+        return new CachedAnvilRecipe(irecipe, inputStack, specialCatalyst);
     }
 
     // TODO: Implement wood permutations, add additional helper method for custom material support in crafting and usage
@@ -270,42 +260,90 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         private final ArrayList<int[]> hotSlots = new ArrayList<int[]>();
         private ItemStack inputStack;
         private ItemStack specialCatalyst;
-        private IAnvilRecipe iAnvilRecipe;
+        private GridRecipe iAnvilRecipe;
         private String toolType;
         private int toolTier;
         private int anvilTier;
 
-        private CachedAnvilRecipe(ShapedAnvilRecipes recipe, ItemStack inputStack, ItemStack specialCatalyst) {
+        /**
+         * @param inputStack the item looked up, when it carries materials the ingredients should show; null shows the
+         *                   registered recipe as is
+         */
+        private CachedAnvilRecipe(GridRecipe recipe, ItemStack inputStack, ItemStack specialCatalyst) {
             iAnvilRecipe = recipe;
             toolType = recipe.getToolType();
             toolTier = recipe.getRecipeHammer();
             anvilTier = recipe.getAnvil();
-            if (inputStack != null) {
+            if (inputStack != null && recipe.isShaped()) {
                 this.inputStack = inputStack.copy();
                 this.inputStack.stackSize = recipe.getRecipeOutput().stackSize;
             } else {
                 this.inputStack = NEIHelper.validCopy(recipe.getRecipeOutput());
             }
-            if (recipe instanceof CustomToolRecipe) {
+            if (recipe.getTiers() == GridRecipe.Tiers.MATERIAL) {
                 applyMaterialTiers();
             }
             addSpecialCatalyst(specialCatalyst);
-            setShapedRecipeIngredients(recipe.recipeWidth, recipe.recipeHeight, recipe.recipeItems);
+            List<Object> entries = recipe.getEntries();
+            int shapeless = 0;
+            for (int i = 0; i < entries.size(); i++) {
+                Object entry = entries.get(i);
+                if (entry == null) {
+                    continue;
+                }
+                int col;
+                int row;
+                if (recipe.isShaped()) {
+                    col = i % recipe.getWidth();
+                    row = i / recipe.getWidth();
+                } else {
+                    if (shapeless >= SHAPELESS_STACK_ORDER.length) {
+                        break;
+                    }
+                    col = SHAPELESS_STACK_ORDER[shapeless][0];
+                    row = SHAPELESS_STACK_ORDER[shapeless][1];
+                    shapeless++;
+                }
+                addIngredient(entry, NEILayout.ANVIL_GRID_X + col * 18, NEILayout.ANVIL_GRID_Y + row * 18);
+            }
         }
 
-        private CachedAnvilRecipe(ShapelessAnvilRecipes recipe, ItemStack specialCatalyst) {
-            iAnvilRecipe = recipe;
-            toolType = recipe.getToolType();
-            toolTier = recipe.getRecipeHammer();
-            anvilTier = recipe.getAnvil();
-            inputStack = NEIHelper.validCopy(recipe.getRecipeOutput());
-            addSpecialCatalyst(specialCatalyst);
-            setShapelessRecipeIngredients(recipe.recipeItems);
+        /** A stack shows the materials of the result looked up; a script ingredient shows every item it takes. */
+        private void addIngredient(Object entry, int x, int y) {
+            PositionedStack stack;
+            boolean heatable = false;
+            if (entry instanceof ItemStack) {
+                ItemStack cachedStack = NEIHelper.displayCopy((ItemStack) entry);
+                if (cachedStack == null) {
+                    return;
+                }
+                NEIHelper.fillMaterials(iAnvilRecipe, cachedStack, inputStack);
+                NEIHelper.settleWildcard(cachedStack);
+                stack = NEIHelper.positionedStack(cachedStack, x, y, NEIHelper.isWildcard(cachedStack));
+                heatable = Heatable.canHeatItem(cachedStack);
+            } else {
+                List<ItemStack> stacks = NEIHelper.resolveEntry(entry);
+                if (stacks.isEmpty()) {
+                    return;
+                }
+                stack = NEIHelper.positionedEntry(entry, x, y);
+                for (ItemStack item : stacks) {
+                    heatable |= Heatable.canHeatItem(item);
+                }
+            }
+            if (stack == null) {
+                return;
+            }
+            stack.setMaxSize(1);
+            ingredients.add(stack);
+            if (heatable) {
+                hotSlots.add(new int[] { x, y });
+            }
         }
 
         /**
-         * Custom tool recipes leave their tiers at -1 and the anvil takes them from the material at craft time
-         * (CustomToolRecipe.modifyTiers), so read them off the result shown here the same way.
+         * Material recipes leave their tiers at -1 and take them from the parts' material when matched
+         * ({@link GridRecipe#match}), so read them off the result shown here the same way.
          */
         private void applyMaterialTiers() {
             CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(inputStack);
@@ -329,68 +367,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             }
             // Shown cycling with the result in the output slot (see getResult), so no separate slot is needed.
             this.specialCatalyst = specialCatalyst.copy();
-        }
-
-        private void setShapedRecipeIngredients(int width, int height, Object[] items) {
-            for (int x = 0; x < width; x++) {
-                for (int y = 0; y < height; y++) {
-                    if (items[y * width + x] == null) {
-                        continue;
-                    }
-
-                    if (!(items[y * width + x] instanceof ItemStack)) {
-                        continue;
-                    }
-
-                    ItemStack cachedStack = NEIHelper.displayCopy((ItemStack) items[y * width + x]);
-                    if (cachedStack == null) {
-                        continue;
-                    }
-                    NEIHelper.fillMaterials(iAnvilRecipe, cachedStack, inputStack);
-                    NEIHelper.settleWildcard(cachedStack);
-                    PositionedStack stack = NEIHelper
-                            .positionedStack(cachedStack, 31 + x * 18, 54 + y * 18, NEIHelper.isWildcard(cachedStack));
-                    if (stack == null) {
-                        continue;
-                    }
-                    stack.setMaxSize(1);
-                    ingredients.add(stack);
-                    if (Heatable.canHeatItem(cachedStack)) {
-                        hotSlots.add(new int[] { 31 + x * 18, 54 + y * 18 });
-                    }
-                }
-            }
-        }
-
-        private void setShapelessRecipeIngredients(List<?> items) {
-            for (int ingred = 0; ingred < items.size() && ingred < SHAPELESS_STACK_ORDER.length; ingred++) {
-                Object item = items.get(ingred);
-                if (!(item instanceof ItemStack)) {
-                    continue;
-                }
-
-                ItemStack cachedStack = NEIHelper.displayCopy((ItemStack) item);
-                if (cachedStack == null) {
-                    continue;
-                }
-                NEIHelper.fillMaterials(iAnvilRecipe, cachedStack, inputStack);
-                NEIHelper.settleWildcard(cachedStack);
-                PositionedStack stack = NEIHelper.positionedStack(
-                        cachedStack,
-                        31 + SHAPELESS_STACK_ORDER[ingred][0] * 18,
-                        54 + SHAPELESS_STACK_ORDER[ingred][1] * 18,
-                        NEIHelper.isWildcard(cachedStack));
-                if (stack == null) {
-                    continue;
-                }
-                stack.setMaxSize(1);
-                ingredients.add(stack);
-                if (Heatable.canHeatItem(cachedStack)) {
-                    hotSlots.add(
-                            new int[] { 31 + SHAPELESS_STACK_ORDER[ingred][0] * 18,
-                                    54 + SHAPELESS_STACK_ORDER[ingred][1] * 18 });
-                }
-            }
         }
 
         @Override

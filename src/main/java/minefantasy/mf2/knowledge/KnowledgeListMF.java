@@ -6,8 +6,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 
-import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
-import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
+import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.InformationPage;
@@ -23,36 +22,36 @@ public class KnowledgeListMF {
 
     public static final ArrayList<IRecipe> plankRecipe = new ArrayList<IRecipe>();
     public static final ArrayList<IRecipe> stoneBricksR = new ArrayList<IRecipe>();
-    public static final ArrayList<IAnvilRecipe> barR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> baringotR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> talismanRecipe = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> barsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> mailRecipes = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> mailHelmetR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> mailChestR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> mailLegsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> mailBootsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> scaleRecipes = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> scaleHelmetR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> scaleChestR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> scaleLegsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> scaleBootsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> splintRecipes = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> splintHelmetR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> splintChestR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> splintLegsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> splintBootsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> plateRecipes = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> plateHelmetR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> plateChestR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> plateLegsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> plateBootsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> ornateWepsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<IAnvilRecipe> advOrnateWepsR = new ArrayList<IAnvilRecipe>();
-    public static final ArrayList<ICarpenterRecipe> arrowR = new ArrayList<ICarpenterRecipe>();
-    public static final ArrayList<ICarpenterRecipe> meatRecipes = new ArrayList<ICarpenterRecipe>();
-    public static final ArrayList<ICarpenterRecipe> easyPaintPlank = new ArrayList<ICarpenterRecipe>();
-    public static final ArrayList<ICarpenterRecipe> refinedPlankR = new ArrayList<ICarpenterRecipe>();
+    public static final ArrayList<GridRecipe> barR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> baringotR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> talismanRecipe = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> barsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> mailRecipes = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> mailHelmetR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> mailChestR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> mailLegsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> mailBootsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> scaleRecipes = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> scaleHelmetR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> scaleChestR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> scaleLegsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> scaleBootsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> splintRecipes = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> splintHelmetR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> splintChestR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> splintLegsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> splintBootsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> plateRecipes = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> plateHelmetR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> plateChestR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> plateLegsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> plateBootsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> ornateWepsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> advOrnateWepsR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> arrowR = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> meatRecipes = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> easyPaintPlank = new ArrayList<GridRecipe>();
+    public static final ArrayList<GridRecipe> refinedPlankR = new ArrayList<GridRecipe>();
     public static InformationPage artisanry = InformationList.artisanry;
     public static InformationPage construction = InformationList.construction;
     public static InformationPage engineering = InformationList.engineering;
@@ -82,69 +81,69 @@ public class KnowledgeListMF {
             bfcake, applepie, berrypie, cheese, cheeseroll, bandage, bandageadv;
     public static IRecipe firepitRecipe, cooktopRecipe, carpenterRecipe, waterJugR, milkJugR, plantOilR, sugarRecipe,
             stickRecipe, dryrocksR, meatpieOut, shepardOut, cheeseOut, berryOut, appleOut, pumpPieOut;
-    public static IAnvilRecipe hunkR, ingotR, bucketR, crestR;
-    public static ICarpenterRecipe artBookR, conBookR, proBookR, engBookR, comBookR, artBook2R, conBook2R, proBook2R,
+    public static GridRecipe hunkR, ingotR, bucketR, crestR;
+    public static GridRecipe artBookR, conBookR, proBookR, engBookR, comBookR, artBook2R, conBook2R, proBook2R,
             engBook2R, comBook2R;
-    public static IAnvilRecipe greatTalismanRecipe;
-    public static ICarpenterRecipe fireclayR, fireBrickR, fireBricksR, fireBrickStairR, refinedPlankBlockR, clayWallR,
+    public static GridRecipe greatTalismanRecipe;
+    public static GridRecipe fireclayR, fireBrickR, fireBricksR, fireBrickStairR, refinedPlankBlockR, clayWallR,
             bSalvageR, tannerRecipe, stoneAnvilRecipe, forgeRecipe, apronRecipe, woodTroughRecipe;
-    public static ICarpenterRecipe researchTableRecipe, framedGlassR, windowR, thatchR, thatchStairR;
-    public static IAnvilRecipe smokePipeR, framedStoneR, iframedStoneR, fluxR, nailR, rivetR;
-    public static IAnvilRecipe tinderboxR, flintAndSteelR;
-    public static ICarpenterRecipe dirtRockR, lStripsR, threadR1, threadR2, stringR, sharpRocksR, stonePickR, stoneAxeR,
+    public static GridRecipe researchTableRecipe, framedGlassR, windowR, thatchR, thatchStairR;
+    public static GridRecipe smokePipeR, framedStoneR, iframedStoneR, fluxR, nailR, rivetR;
+    public static GridRecipe tinderboxR, flintAndSteelR;
+    public static GridRecipe dirtRockR, lStripsR, threadR1, threadR2, stringR, sharpRocksR, stonePickR, stoneAxeR,
             stoneSpadeR, stoneHoeR, stoneSwordR, stoneWarR, stoneMaceR, stoneSpearR, stoneHammerR, stoneTongsR,
             boneNeedleR, stoneKnifeR, quernR, stoneovenRecipe;
-    public static ICarpenterRecipe kitchenBenchRecipe;
+    public static GridRecipe kitchenBenchRecipe;
     public static Alloy[] reStone, bronze, steel, obsidalloy, black, red, blue, mithril, adamantium, ignotumite,
             mithium, enderforge, wolframiteR;
-    public static IAnvilRecipe coalfluxR, encrustedR, steelR, obsidianHunkR, diamondR;
-    public static ICarpenterRecipe nailPlanksR, nailStairR, refinedStairR, strongRackR, bellowsRecipe, bloomeryR,
+    public static GridRecipe coalfluxR, encrustedR, steelR, obsidianHunkR, diamondR;
+    public static GridRecipe nailPlanksR, nailStairR, refinedStairR, strongRackR, bellowsRecipe, bloomeryR,
             crucibleRecipe, advCrucibleRecipe, trilogyRecipe, chimneyRecipe, wideChimneyRecipe, extractChimneyRecipe;
-    public static ICarpenterRecipe hideHelmR, hideChestR, hideLegsR, hideBootsR, roughHelmetR, roughChestR, roughLegsR,
+    public static GridRecipe hideHelmR, hideChestR, hideLegsR, hideBootsR, roughHelmetR, roughChestR, roughLegsR,
             roughBootsR, reHelmetR, reChestR, reLegsR, reBootsR;
-    public static IAnvilRecipe studHelmetR, studChestR, studLegsR, studBootsR;
-    public static IAnvilRecipe pickR, axeR, spadeR, hoeR, shearsR;
-    public static IAnvilRecipe daggerR, swordR, waraxeR, maceR, spearR, bowR, katanaR, gswordR, whammerR, battleaxeR,
+    public static GridRecipe studHelmetR, studChestR, studLegsR, studBootsR;
+    public static GridRecipe pickR, axeR, spadeR, hoeR, shearsR;
+    public static GridRecipe daggerR, swordR, waraxeR, maceR, spearR, bowR, katanaR, gswordR, whammerR, battleaxeR,
             halbeardR, lanceR;
-    public static IAnvilRecipe trowR, hvyPickR, hvyShovelR, handpickR, scytheR, mattockR, lumberR;
-    public static IAnvilRecipe hammerR, tongsR, hvyHammerR, needleR, sawsR, knifeR, spannerR;
-    public static IAnvilRecipe arrowheadR, bodkinheadR, broadheadR, crossBoltR;
-    public static ICarpenterRecipe fletchingR, fletchingR2, malletR, spoonR;
-    public static IAnvilRecipe ironPrepR, ironPrepR2, coalPrepR;
-    public static IAnvilRecipe blastChamR, blastHeatR, bigFurnR, bigHeatR;
-    public static ICarpenterRecipe padding[] = new ICarpenterRecipe[4];
-    public static ICarpenterRecipe repairBasicR, repairAdvancedR, repairOrnateR;
-    public static ICarpenterRecipe spyglassR, bombBenchCraft, bombPressCraft, advancedForgeR, engTannerR, autoCrucibleR;
-    public static ICarpenterRecipe crudeBombR, bombFuseR, longFuseR;
-    public static ICarpenterRecipe crossBenchCraft, crossStockWoodR, crossStockIronR, crossHandleWoodR, crossHeadLightR,
+    public static GridRecipe trowR, hvyPickR, hvyShovelR, handpickR, scytheR, mattockR, lumberR;
+    public static GridRecipe hammerR, tongsR, hvyHammerR, needleR, sawsR, knifeR, spannerR;
+    public static GridRecipe arrowheadR, bodkinheadR, broadheadR, crossBoltR;
+    public static GridRecipe fletchingR, fletchingR2, malletR, spoonR;
+    public static GridRecipe ironPrepR, ironPrepR2, coalPrepR;
+    public static GridRecipe blastChamR, blastHeatR, bigFurnR, bigHeatR;
+    public static GridRecipe padding[] = new GridRecipe[4];
+    public static GridRecipe repairBasicR, repairAdvancedR, repairOrnateR;
+    public static GridRecipe spyglassR, bombBenchCraft, bombPressCraft, advancedForgeR, engTannerR, autoCrucibleR;
+    public static GridRecipe crudeBombR, bombFuseR, longFuseR;
+    public static GridRecipe crossBenchCraft, crossStockWoodR, crossStockIronR, crossHandleWoodR, crossHeadLightR,
             crossHeadMediumR, crossHeadHeavyR, crossHeadAdvancedR, crossAmmoR, crossScopeR;
-    public static ICarpenterRecipe bombCaseCeramicR, mineCaseCeramicR, bombCaseCrystalR, mineCaseCrystalR;
-    public static IAnvilRecipe bombCaseIronR, mineCaseIronR, bombCaseObsidianR, mineCaseObsidianR, crossBayonetR;
-    public static ICarpenterRecipe meatStripR, meatHunkR, gutsRecipe;
-    public static IAnvilRecipe caketinRecipe;
-    public static ICarpenterRecipe breadSliceR, pastryRecipe, doughRecipe, breadRecipe, curdRecipe, oatsRecipe,
-            custardRecipe, icingRecipe, stewRecipe, saussageR, jerkyRecipe, meatPieRecipe, sandwitchRecipe,
-            sandwitchBigRecipe, shepardRecipe, sweetrollRecipe, iceSR, eclairDoughR, eclairIceR, eclairFillR;
-    public static ICarpenterRecipe pumpPieR, simpCakeR, simpCakeOut, berryR, appleR, cheeserollR, cakeR, carrotCakeR,
+    public static GridRecipe bombCaseCeramicR, mineCaseCeramicR, bombCaseCrystalR, mineCaseCrystalR;
+    public static GridRecipe bombCaseIronR, mineCaseIronR, bombCaseObsidianR, mineCaseObsidianR, crossBayonetR;
+    public static GridRecipe meatStripR, meatHunkR, gutsRecipe;
+    public static GridRecipe caketinRecipe;
+    public static GridRecipe breadSliceR, pastryRecipe, doughRecipe, breadRecipe, curdRecipe, oatsRecipe, custardRecipe,
+            icingRecipe, stewRecipe, saussageR, jerkyRecipe, meatPieRecipe, sandwitchRecipe, sandwitchBigRecipe,
+            shepardRecipe, sweetrollRecipe, iceSR, eclairDoughR, eclairIceR, eclairFillR;
+    public static GridRecipe pumpPieR, simpCakeR, simpCakeOut, berryR, appleR, cheeserollR, cakeR, carrotCakeR,
             chocoCakeR, bfCakeR, cakeI, carrotCakeI, chocoCakeI, bfCakeI;
 
-    public static ICarpenterRecipe syringeR, parachuteR, bandageR, badBandageR, goodBandageR, cogShaftR;
+    public static GridRecipe syringeR, parachuteR, bandageR, badBandageR, goodBandageR, cogShaftR;
 
-    public static IAnvilRecipe hingeRecipe, brushRecipe, climbPickbR, iframeR, boltR, istrutR, bgearR, tgearR, stubeR,
+    public static GridRecipe hingeRecipe, brushRecipe, climbPickbR, iframeR, boltR, istrutR, bgearR, tgearR, stubeR,
             eatoolsR, bombarrowR, bombBoltR, compPlateR;
-    public static ICarpenterRecipe mouldRecipe, jugRecipe, potRecipe, pieTrayRecipe, blackpowderRec, advblackpowderRec,
+    public static GridRecipe mouldRecipe, jugRecipe, potRecipe, pieTrayRecipe, blackpowderRec, advblackpowderRec,
             magmaRefinedR, chocoRecipe, bedrollR;
 
-    public static IAnvilRecipe frameBlockR, cogPulleyR, cogLegsR, cogChestR, cogHelmR;
-    public static ArrayList<IAnvilRecipe> hugePlateR = new ArrayList<IAnvilRecipe>();
-    public static ArrayList<IAnvilRecipe> cogPlateR = new ArrayList<IAnvilRecipe>();
-    public static ArrayList<ICarpenterRecipe> sawnPlankR = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> plankPaneR = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> rackRecipe = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> foodboxR = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> ammoboxR = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> bigboxR = new ArrayList<ICarpenterRecipe>();
-    public static ArrayList<ICarpenterRecipe> nailTroughR = new ArrayList<ICarpenterRecipe>();
+    public static GridRecipe frameBlockR, cogPulleyR, cogLegsR, cogChestR, cogHelmR;
+    public static ArrayList<GridRecipe> hugePlateR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> cogPlateR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> sawnPlankR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> plankPaneR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> rackRecipe = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> foodboxR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> ammoboxR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> bigboxR = new ArrayList<GridRecipe>();
+    public static ArrayList<GridRecipe> nailTroughR = new ArrayList<GridRecipe>();
 
     public static void init() {
         carpenter = (new InformationBase("carpenter", 0, -3, 0, BlockListMF.carpenter, (InformationBase) null))

@@ -29,20 +29,37 @@ public class NEILayout {
             new Slot(106, 21), new Slot(124, 21), new Slot(142, 21) };
 
     /**
-     * Carpenter and kitchen bench pages reuse their GUI's table, so the grid keeps the GUI's 18px pitch and sits at a
-     * fixed offset from the container slots (the first cell is at 44,54 there). NEI's stock overlay handler relies on
-     * that offset.
+     * Carpenter and kitchen bench pages: the GUI's table with its 4x4 grid on the left, and on the right a column with
+     * the tool above the output and the bench below it, level with the grid's first, middle and last rows. The grid
+     * keeps the GUI's 18px pitch, so NEI's stock overlay handler maps it onto the GUI (first cell at 44,54 there) by a
+     * fixed offset.
      */
-    public static final int BENCH_GRID_X = 48;
-    public static final int BENCH_GRID_Y = 52;
+    public static final int BENCH_GRID_X = 26;
+    public static final int BENCH_GRID_Y = 24;
     public static final int BENCH_CELL = 18;
     public static final int BENCH_OVERLAY_X = 44 - BENCH_GRID_X;
     public static final int BENCH_OVERLAY_Y = 54 - BENCH_GRID_Y;
+    /** The right column sits 4px past the table's edge; its three items share one x. */
+    private static final int BENCH_COLUMN_X = BENCH_GRID_X - 22 + 114 + 4 + 5;
+    public static final Slot BENCH_TOOL = new Slot(BENCH_COLUMN_X, BENCH_GRID_Y);
+    public static final Slot BENCH_OUTPUT = new Slot(BENCH_COLUMN_X, BENCH_GRID_Y + 2 * BENCH_CELL - 8);
+    public static final Slot BENCH_STATION = new Slot(BENCH_COLUMN_X, BENCH_GRID_Y + 3 * BENCH_CELL);
+    /** Page height: the table ends 93px below the first cell. */
+    public static final int BENCH_HEIGHT = BENCH_GRID_Y + 96;
+
+    /**
+     * The anvil page draws its 6x4 grid from ANVIL_GRID with the GUI's 18px pitch; the anvil GUI's first cell is at
+     * 44,39. NEI's stock overlay handler maps the page onto the GUI by this offset.
+     */
+    public static final int ANVIL_GRID_X = 31;
+    public static final int ANVIL_GRID_Y = 54;
+    public static final int ANVIL_OVERLAY_X = 44 - ANVIL_GRID_X;
+    public static final int ANVIL_OVERLAY_Y = 39 - ANVIL_GRID_Y;
 
     /** Draws the bench table with its grid and the output box, cut from a bench GUI texture already bound */
     public static void drawBenchBackground() {
         GuiDraw.drawTexturedModalRect(BENCH_GRID_X - 22, BENCH_GRID_Y - 22, 22, 32, 114, 115);
-        GuiDraw.drawTexturedModalRect(70, 3, 169, 75, 26, 26);
+        GuiDraw.drawTexturedModalRect(BENCH_OUTPUT.x - 5, BENCH_OUTPUT.y - 5, 169, 75, 26, 26);
     }
 
     private NEILayout() {}

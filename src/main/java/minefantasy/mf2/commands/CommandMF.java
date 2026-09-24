@@ -41,7 +41,7 @@ public class CommandMF implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
-        return "/minefantasy edit <material|quality|unbreakable> <value>";
+        return "/minefantasy edit <material|quality|unbreakable> <value> | recipes [station]";
     }
 
     @Override
@@ -58,6 +58,11 @@ public class CommandMF implements ICommand {
         boolean hasPerms = iCommandSender.canCommandSenderUseCommand(2, getCommandName());
         if (!hasPerms) {
             player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.mf.no_permission")));
+            return;
+        }
+
+        if (strings.length >= 1 && "recipes".equalsIgnoreCase(strings[0])) {
+            RecipeDiagnostics.run(player, strings.length >= 2 ? strings[1] : null);
             return;
         }
 
@@ -148,12 +153,12 @@ public class CommandMF implements ICommand {
 
     @Override
     public List<String> addTabCompletionOptions(ICommandSender iCommandSender, String[] strings) {
-        if (strings.length == 0) {
-            return Arrays.asList("edit");
+        if (strings.length <= 1) {
+            return Arrays.asList("edit", "recipes");
         }
 
-        if (strings.length == 1) {
-            return Arrays.asList("edit");
+        if (strings[0].equalsIgnoreCase("recipes") && strings.length == 2) {
+            return RecipeDiagnostics.stations();
         }
 
         if (strings[0].equalsIgnoreCase("edit")) {

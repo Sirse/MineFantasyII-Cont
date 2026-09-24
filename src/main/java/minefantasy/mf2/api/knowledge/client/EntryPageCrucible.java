@@ -85,7 +85,7 @@ public class EntryPageCrucible extends EntryPage {
                 for (int x = 0; x < 3; x++) {
                     int index = y * 3 + x;
 
-                    if (index >= recipe.recipeItems.size()) {
+                    if (index >= recipe.getIngredients().size()) {
                         break drawGrid;
                     }
 
@@ -93,7 +93,7 @@ public class EntryPageCrucible extends EntryPage {
                             parent,
                             1 + x,
                             (3 - y),
-                            (ItemStack) recipe.recipeItems.get(index),
+                            (ItemStack) recipe.getIngredients().get(index),
                             true,
                             posX,
                             posY,

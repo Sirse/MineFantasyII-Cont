@@ -8,8 +8,8 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import codechicken.nei.PositionedStack;
 import cpw.mods.fml.common.Loader;
+import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.ITieredComponent;
-import minefantasy.mf2.api.crafting.anvil.IAnvilRecipe;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -19,7 +19,7 @@ import minefantasy.mf2.util.MFLogUtil;
 
 public class NEIHelper {
 
-    public static ItemStack fillMaterials(IAnvilRecipe recipe, ItemStack componentStack, ItemStack outputStack) {
+    public static ItemStack fillMaterials(GridRecipe recipe, ItemStack componentStack, ItemStack outputStack) {
         if (!isValidStack(componentStack) || !isValidStack(outputStack)) {
             return componentStack;
         }
@@ -73,6 +73,32 @@ public class NEIHelper {
             }
         }
         return stacks;
+    }
+
+    /**
+     * A cycling positioned stack for a recipe input. Wildcard metadata expands into the item's variants; an input with
+     * no examples (an empty ore name) gives null.
+     */
+    public static PositionedStack positionedInput(minefantasy.mf2.api.recipe.Input input, int x, int y) {
+        List<ItemStack> stacks = new ArrayList<ItemStack>();
+        for (ItemStack example : input.examples()) {
+            ItemStack shown = displayCopy(example);
+            if (shown != null) {
+                stacks.add(shown);
+            }
+        }
+        if (stacks.isEmpty()) {
+            return null;
+        }
+        if (stacks.size() == 1) {
+            return positionedStack(stacks.get(0), x, y, isWildcard(stacks.get(0)));
+        }
+        try {
+            return new PositionedStack(stacks, x, y, true);
+        } catch (RuntimeException e) {
+            MFLogUtil.warnOnce("nei-positioned-input", "Failed to create NEI positioned stack at {},{}", x, y, e);
+            return null;
+        }
     }
 
     /** A cycling positioned stack for an entry that several items can satisfy. */

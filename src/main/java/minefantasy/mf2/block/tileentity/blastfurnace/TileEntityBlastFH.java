@@ -1,5 +1,8 @@
 package minefantasy.mf2.block.tileentity.blastfurnace;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -7,7 +10,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.block.refining.BlockBFH;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import minefantasy.mf2.config.ConfigHardcore;
@@ -167,13 +175,19 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             if (shaft.tempUses <= 0 && !isCarbon(shaft.getStackInSlot(0))) {
                 return null;
             }
-            if (input != null) {
-                ItemStack result = getResult(input);
-                if (result != null) {
-                    for (int a = 0; a < shaft.getSizeInventory(); a++) {
-                        if (a > 0 || shaft.shouldRemoveCarbon()) {
-                            shaft.decrStackSize(a, 1);
-                        }
+            RecipeEntry<ProcessRecipe> entry = input == null ? null : MFRecipes.find(MFRecipes.BLAST_FURNACE, input);
+            if (entry != null) {
+                ItemStack result = entry.getRecipe().getOutput();
+                CraftPlan plan = CraftPlan.builder(entry.getId(), MFRecipes.BLAST_FURNACE.published().getGeneration())
+                        .use(1, entry.getRecipe().getInput(), input).product(result).build();
+                List<ItemStack> spill = new ArrayList<>();
+                if (plan.apply(CraftInventory.of(shaft), spill)) {
+                    // Carbon keeps its own count of uses per item, so it is only spent once the input is
+                    if (shaft.shouldRemoveCarbon()) {
+                        shaft.decrStackSize(0, 1);
+                    }
+                    for (ItemStack returned : spill) {
+                        dropItem(returned);
                     }
                     return result;
                 }

@@ -4,7 +4,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.refine.IBellowsUseable;
@@ -60,7 +59,7 @@ public class TileEntityBellows extends TileEntity {
 
     private void sendPacketToClients() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new BellowsPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
+        NetworkUtils.sendToWatchers(new BellowsPacket(this).generatePacket(), worldObj, xCoord, zCoord);
     }
 
     public void readFromNBT(NBTTagCompound nbt) {

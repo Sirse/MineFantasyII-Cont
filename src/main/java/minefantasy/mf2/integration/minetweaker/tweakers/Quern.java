@@ -1,147 +1,49 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.ArrayList;
-
-import net.minecraft.item.ItemStack;
-
-import minefantasy.mf2.api.crafting.refine.QuernRecipes;
-import minetweaker.IUndoableAction;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeMetadata;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/** Quern recipes; the quern itself is tier 0. */
 @ZenClass("mods.minefantasy.Quern")
 public class Quern {
 
     @ZenMethod
-    public static void addRecipe(IItemStack output, IIngredient input, @Optional int tier,
-            @Optional boolean consumePot) {
-        MineTweakerAPI.apply(new AddRecipeAction(output, input, tier, consumePot));
+    public static void add(@NotNull String name, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional int tier, @Optional boolean consumePot, @Optional int priority) {
+        ScriptProcess.add(MFRecipes.QUERN, name, () -> recipe(output, input, tier, consumePot), priority);
     }
 
     @ZenMethod
-    public static void remove(@NotNull IIngredient output, @Optional IIngredient input) {
-        ArrayList<QuernRecipes> recipesToRemove = new ArrayList<QuernRecipes>();
-        for (QuernRecipes recipes : QuernRecipes.recipeList) {
-            if (output.matches(new MCItemStack(recipes.result))
-                    && (input == null || input.matches(new MCItemStack(recipes.input)))) {
-                recipesToRemove.add(recipes);
-            }
-        }
-
-        MineTweakerAPI.apply(new RemoveAction(recipesToRemove));
+    public static void replace(@NotNull String id, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional int tier, @Optional boolean consumePot, @Optional int priority) {
+        ScriptProcess.replace(MFRecipes.QUERN, id, () -> recipe(output, input, tier, consumePot), priority);
     }
 
-    private static class AddRecipeAction implements IUndoableAction {
-
-        private final IItemStack output;
-        private final IIngredient input;
-        private final int tier;
-        private final boolean consumePot;
-        private final ArrayList<QuernRecipes> recipesToRemove = new ArrayList<QuernRecipes>();
-
-        public AddRecipeAction(IItemStack result, IIngredient input, int tier, boolean consumePot) {
-            this.output = result;
-            this.input = input;
-            this.tier = tier;
-            this.consumePot = consumePot;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            if (mcOutput == null) {
-                MineTweakerAPI.logWarning("Skipping quern recipe with invalid output " + output);
-                return;
-            }
-            for (IItemStack stack : input.getItems()) {
-                ItemStack s = MineTweakerMC.getItemStack(stack);
-                if (s == null) {
-                    MineTweakerAPI.logWarning("Skipping quern recipe input " + stack + " -> " + output);
-                    continue;
-                }
-                QuernRecipes recipe = QuernRecipes.addRecipe(s, mcOutput, this.tier, consumePot);
-                if (recipe != null) {
-                    recipesToRemove.add(recipe);
-                }
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            for (QuernRecipes recipes : recipesToRemove) {
-                QuernRecipes.recipeList.remove(recipes);
-            }
-            recipesToRemove.clear();
-        }
-
-        @Override
-        public String describe() {
-            return "Adding quern recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Removing quern recipe for " + output.getDisplayName();
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    @ZenMethod
+    public static void remove(@NotNull String id) {
+        ScriptProcess.remove(MFRecipes.QUERN, id);
     }
 
-    private static class RemoveAction implements IUndoableAction {
+    @ZenMethod
+    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
+        ScriptProcess.removeByOutput(MFRecipes.QUERN, output, input);
+    }
 
-        private final ArrayList<QuernRecipes> recipesToRemove;
-
-        public RemoveAction(ArrayList<QuernRecipes> recipesToRemove) {
-            this.recipesToRemove = recipesToRemove;
-        }
-
-        @Override
-        public void apply() {
-            for (QuernRecipes recipe : recipesToRemove) {
-                QuernRecipes.recipeList.remove(recipe);
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            for (QuernRecipes recipe : recipesToRemove) {
-                QuernRecipes.recipeList.add(recipe);
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Removing " + recipesToRemove.size() + " quern recipes";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Restoring " + recipesToRemove.size() + " quern recipes";
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    private static ProcessRecipe recipe(IItemStack output, IIngredient input, int tier, boolean consumePot) {
+        return ProcessRecipe.of(
+                ScriptInputs.toInput(input),
+                ScriptInputs.toOutput(output),
+                RecipeMetadata.builder().put(MFRecipeKeys.TIER, tier).put(MFRecipeKeys.CONSUME_POT, consumePot)
+                        .build());
     }
 }

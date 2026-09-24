@@ -2,7 +2,6 @@ package minefantasy.mf2.integration.nei;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
@@ -12,7 +11,8 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.crafting.refine.PaintOilRecipe;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
@@ -69,14 +69,10 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(result)) {
             return;
         }
-        for (Entry<ItemStack, ItemStack> recipe : PaintOilRecipe.recipeList.entrySet()) {
-            if (isValidRecipe(recipe)
-                    && NEIHelper.matchesCrafting(materializeOutput(recipe.getValue(), result), result)) {
-                arecipes.add(
-                        new CachedPaintOilRecipe(
-                                recipe.getKey(),
-                                materializeOutput(recipe.getValue(), result),
-                                result));
+        for (ProcessRecipe recipe : recipesMaking(MFRecipes.PAINT_OIL, null)) {
+            ItemStack input = displayInput(recipe);
+            if (input != null && NEIHelper.matchesCrafting(materializeOutput(recipe.getOutput(), result), result)) {
+                arecipes.add(new CachedPaintOilRecipe(input, materializeOutput(recipe.getOutput(), result), result));
             }
         }
     }
@@ -87,30 +83,27 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
             return;
         }
         if (ingredient.getItem() == ComponentListMF.plant_oil) {
-            for (Entry<ItemStack, ItemStack> recipe : PaintOilRecipe.recipeList.entrySet()) {
-                if (isValidRecipe(recipe)) {
-                    arecipes.add(
-                            new CachedPaintOilRecipe(
-                                    recipe.getKey(),
-                                    materializeOutput(recipe.getValue(), recipe.getKey())));
+            for (ProcessRecipe recipe : recipesMaking(MFRecipes.PAINT_OIL, null)) {
+                ItemStack input = displayInput(recipe);
+                if (input != null) {
+                    arecipes.add(new CachedPaintOilRecipe(input, materializeOutput(recipe.getOutput(), input)));
                 }
             }
             return;
         }
-        for (Entry<ItemStack, ItemStack> recipe : PaintOilRecipe.recipeList.entrySet()) {
-            if (isValidRecipe(recipe) && NEIHelper.matchesCrafting(recipe.getKey(), ingredient)) {
-                CachedPaintOilRecipe cachedRecipe = new CachedPaintOilRecipe(
-                        recipe.getKey(),
-                        materializeOutput(recipe.getValue(), ingredient),
-                        ingredient);
-                cachedRecipe.setIngredientPermutation(cachedRecipe.getIngredients(), ingredient);
-                arecipes.add(cachedRecipe);
-            }
+        for (ProcessRecipe recipe : recipesUsing(MFRecipes.PAINT_OIL, ingredient)) {
+            CachedPaintOilRecipe cachedRecipe = new CachedPaintOilRecipe(
+                    ingredient,
+                    materializeOutput(recipe.getOutput(), ingredient),
+                    ingredient);
+            cachedRecipe.setIngredientPermutation(cachedRecipe.getIngredients(), ingredient);
+            arecipes.add(cachedRecipe);
         }
     }
 
-    private boolean isValidRecipe(Entry<ItemStack, ItemStack> recipe) {
-        return recipe != null && NEIHelper.isValidStack(recipe.getKey()) && NEIHelper.isValidStack(recipe.getValue());
+    private static ItemStack displayInput(ProcessRecipe recipe) {
+        List<ItemStack> examples = recipe.getInput().examples();
+        return examples.isEmpty() ? null : examples.get(0);
     }
 
     private ItemStack materializeOutput(ItemStack output, ItemStack source) {

@@ -2,7 +2,6 @@ package minefantasy.mf2.block.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.BombPressPacket;
@@ -40,6 +39,6 @@ public class TileEntityBombPress extends TileEntity {
 
     private void syncAnimation() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new BombPressPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
+        NetworkUtils.sendToWatchers(new BombPressPacket(this).generatePacket(), worldObj, xCoord, zCoord);
     }
 }

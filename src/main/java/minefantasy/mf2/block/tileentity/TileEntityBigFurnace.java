@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -12,19 +14,26 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.refine.BigFurnaceRecipes;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.Diagnosis;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.refine.IBellowsUseable;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -33,7 +42,11 @@ import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.BigFurnacePacket;
 
-public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable, IInventory, ISidedInventory {
+public class TileEntityBigFurnace extends TileEntity
+        implements IBellowsUseable, IInventory, ISidedInventory, Diagnosis.Source {
+
+    /** Smelting without a furnace recipe, by vanilla's furnace list. */
+    private static final RecipeId VANILLA = RecipeId.of("minefantasy2", "big_furnace/vanilla");
 
     // UNIVERSAL
     public int fuel;
@@ -201,11 +214,16 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
                 }
             }
         } else for (int a = 0; a < 4; a++) {
-            if (canSmelt(inv[a], inv[a + 4])) {
+            CraftPlan plan = planFor(a, a + 4);
+            if (plan != null) {
                 canSmelt = true;
 
                 if (progress >= getMaxTime()) {
-                    smeltItem(a, a + 4);
+                    List<ItemStack> spill = new ArrayList<>();
+                    plan.apply(CraftInventory.of(this), spill);
+                    for (ItemStack stack : spill) {
+                        dropItem(stack);
+                    }
                     smelted = true;
                 }
             }
@@ -287,43 +305,75 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         return (int) 1.0E+5;
     }
 
-    private void smeltItem(int input, int output) {
-        ItemStack res = getResult(inv[input]).copy();
-
-        if (inv[output] == null) {
-            setInventorySlotContents(output, res);
-        } else {
-            if (CustomToolHelper.areEqual(inv[output], res)) {
-                int max = inv[output].getMaxStackSize();
-                inv[output].stackSize = Math.min(max, inv[output].stackSize + res.stackSize);
+    /** Each filled input slot's candidates, in lookup order, and why each does or does not smelt there. */
+    @Override
+    public Diagnosis diagnose(EntityPlayer player) {
+        if (isHeater() || !built) {
+            return Diagnosis.problem("big_furnace", CheckResult.Reason.of("not_built"));
+        }
+        List<Diagnosis.Candidate> candidates = new ArrayList<>();
+        for (int slot = 0; slot < 4; slot++) {
+            ItemStack in = inv[slot];
+            if (in == null) {
+                continue;
+            }
+            boolean chosen = false;
+            for (RecipeEntry<ProcessRecipe> entry : MFRecipes.BIG_FURNACE.published()
+                    .candidates(Input.lookupKeys(in))) {
+                ProcessRecipe recipe = entry.getRecipe();
+                int need = recipe.get(MFRecipeKeys.TIER, 0);
+                CheckResult.Reason reason = recipe.getInput().explain(in);
+                if (reason == null && need > getTier()) {
+                    reason = CheckResult.Reason.tier("furnace", getTier(), need);
+                }
+                if (reason == null && chosen) {
+                    reason = CheckResult.Reason.of("shadowed");
+                }
+                if (reason == null) {
+                    chosen = true;
+                    if (planFor(slot, slot + 4) == null) {
+                        reason = CheckResult.Reason.OUTPUT_FULL;
+                    }
+                }
+                candidates.add(Diagnosis.candidate(entry, reason));
+            }
+            if (!chosen && vanillaResult(in) != null) {
+                candidates.add(
+                        new Diagnosis.Candidate(
+                                VANILLA,
+                                0,
+                                planFor(slot, slot + 4) == null ? CheckResult.Reason.OUTPUT_FULL : null));
             }
         }
-
-        decrStackSize(input, 1);
+        return Diagnosis.of("big_furnace", candidates);
     }
 
-    private boolean canSmelt(ItemStack in, ItemStack out) {
-        if (isHeater()) return false;
-
-        if (!built) return false;
-
-        ItemStack res = getResult(in);
-        if (res == null) {
-            return false;
+    /**
+     * The smelt of one input slot into its output slot: a furnace recipe with its own amount and usage, or else vanilla
+     * smelting one item. Null when nothing smelts or the output has no room.
+     */
+    private CraftPlan planFor(int input, int output) {
+        ItemStack in = inv[input];
+        if (isHeater() || !built || in == null) {
+            return null;
         }
-        if (out == null) {
-            return true;
-        }
-        if (CustomToolHelper.areEqual(out, res)) {
-            int max = res.getMaxStackSize();
-            if ((out.stackSize + res.stackSize) > max) {
-                return false;
-            }
+        long generation = MFRecipes.BIG_FURNACE.published().getGeneration();
+        CraftPlan plan;
+        RecipeEntry<ProcessRecipe> entry = MFRecipes
+                .find(MFRecipes.BIG_FURNACE, in, r -> r.get(MFRecipeKeys.TIER, 0) <= this.getTier());
+        if (entry != null) {
+            plan = CraftPlan.builder(entry.getId(), generation, output).use(input, entry.getRecipe().getInput(), in)
+                    .output(entry.getRecipe().getOutput()).build();
         } else {
-            return false;
+            ItemStack res = vanillaResult(in);
+            if (res == null) {
+                return null;
+            }
+            plan = CraftPlan.builder(VANILLA, generation, output).use(input, Input.of(in).amount(1), in).output(res)
+                    .build();
         }
-
-        return true;
+        // Returned containers without room are dropped, so only the product has to fit
+        return plan.canApplySpilling(CraftInventory.of(this)) ? plan : null;
     }
 
     private TileEntityBigFurnace getHeater() {
@@ -396,12 +446,18 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         if (item == null) return null;
 
         // SPECIAL SMELTING
-        BigFurnaceRecipes recipe = BigFurnaceRecipes.getResult(item);
-        if (recipe != null && recipe.tier <= this.getTier()) {
-            return recipe.result;
+        RecipeEntry<ProcessRecipe> recipe = MFRecipes
+                .find(MFRecipes.BIG_FURNACE, item, r -> r.get(MFRecipeKeys.TIER, 0) <= this.getTier());
+        if (recipe != null) {
+            return recipe.getRecipe().getOutput();
         }
 
-        ItemStack res = FurnaceRecipes.smelting().getSmeltingResult(item);// If no special: try vanilla
+        return vanillaResult(item);
+    }
+
+    /** Vanilla smelting, with food burning to a crisp in a furnace this hot. */
+    private static ItemStack vanillaResult(ItemStack item) {
+        ItemStack res = FurnaceRecipes.smelting().getSmeltingResult(item);
         if (res != null) {
             if (res.getItem() instanceof ItemFood || item.getItem() instanceof ItemFood) {
                 return new ItemStack(FoodListMF.burnt_food, 1, 1);
@@ -442,20 +498,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     }
 
     public ItemStack decrStackSize(int i, int j) {
-        if (inv[i] != null) {
-            if (inv[i].stackSize <= j) {
-                ItemStack itemstack = inv[i];
-                inv[i] = null;
-                return itemstack;
-            }
-            ItemStack itemstack1 = inv[i].splitStack(j);
-            if (inv[i].stackSize == 0) {
-                inv[i] = null;
-            }
-            return itemstack1;
-        } else {
-            return null;
-        }
+        return InventorySlots.take(inv, i, j);
     }
 
     @SideOnly(Side.CLIENT)
@@ -512,17 +555,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
 
         justShared = nbt.getInteger("Shared");
         built = nbt.getBoolean("Built");
@@ -556,18 +589,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
         nbt.setInteger("progress", progress);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
     }
 
     public int getInventoryStackLimit() {
@@ -647,12 +669,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
 
     @Override
     public ItemStack getStackInSlotOnClosing(int var1) {
-        if (inv[var1] != null) {
-            ItemStack itemstack = inv[var1];
-            inv[var1] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(inv, var1);
     }
 
     private void sendPacketToClients() {
@@ -673,11 +690,7 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         lastSyncedDoorAngle = doorAngle;
         lastSyncedBurn = burn;
 
-        NetworkUtils.sendToWatchers(
-                new BigFurnacePacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new BigFurnacePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     public int getBlockMetadata() {
@@ -718,7 +731,8 @@ public class TileEntityBigFurnace extends TileEntity implements IBellowsUseable,
         if (isHeater()) {
             return slot == 0 && isItemFuel(item);
         }
-        return slot < 4 && getResult(item) != null;
+        return slot < 4 && item != null
+                && (MFRecipes.accepts(MFRecipes.BIG_FURNACE, item) || vanillaResult(item) != null);
     }
 
     @Override

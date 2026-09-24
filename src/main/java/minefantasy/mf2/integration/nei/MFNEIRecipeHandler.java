@@ -1,9 +1,16 @@
 package minefantasy.mf2.integration.nei;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.item.ItemStack;
 
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeRegistry;
 
 public abstract class MFNEIRecipeHandler extends TemplateRecipeHandler {
 
@@ -39,5 +46,30 @@ public abstract class MFNEIRecipeHandler extends TemplateRecipeHandler {
     /** Output filter for recipe lookups, where a null wanted stack means "all of them" */
     protected static boolean matchesOutput(ItemStack output, ItemStack wanted) {
         return wanted == null || CustomToolHelper.areEqual(output, wanted);
+    }
+
+    /** Published one-input recipes producing the wanted stack (all of them for null), in lookup order. */
+    protected static List<ProcessRecipe> recipesMaking(RecipeRegistry<ProcessRecipe> registry, ItemStack wanted) {
+        List<ProcessRecipe> found = new ArrayList<ProcessRecipe>();
+        for (RecipeEntry<ProcessRecipe> entry : registry.published().all()) {
+            if (matchesOutput(entry.getRecipe().getOutput(), wanted)) {
+                found.add(entry.getRecipe());
+            }
+        }
+        return found;
+    }
+
+    /** Published one-input recipes whose input takes the stack, in lookup order. */
+    protected static List<ProcessRecipe> recipesUsing(RecipeRegistry<ProcessRecipe> registry, ItemStack ingredient) {
+        List<ProcessRecipe> found = new ArrayList<ProcessRecipe>();
+        if (!NEIHelper.isValidStack(ingredient)) {
+            return found;
+        }
+        for (RecipeEntry<ProcessRecipe> entry : registry.published().candidates(Input.lookupKeys(ingredient))) {
+            if (entry.getRecipe().getInput().matches(ingredient)) {
+                found.add(entry.getRecipe());
+            }
+        }
+        return found;
     }
 }

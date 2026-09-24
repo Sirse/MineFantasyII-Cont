@@ -5,7 +5,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.archery.IAmmo;
@@ -220,11 +219,7 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         // Validate current contents before sync
         setContentsValidated(ammo, stock);
 
-        NetworkUtils.sendToWatchers(
-                new AmmoBoxPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new AmmoBoxPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     /**

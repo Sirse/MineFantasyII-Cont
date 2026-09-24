@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
@@ -8,15 +10,22 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
-import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.Diagnosis;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.crafting.BlockEngineerTanner;
@@ -26,7 +35,7 @@ import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.TannerPacket;
 
-public class TileEntityTanningRack extends TileEntity implements IInventory {
+public class TileEntityTanningRack extends TileEntity implements IInventory, Diagnosis.Source {
 
     public final ContainerTanner container;
     public ItemStack[] items = new ItemStack[2];
@@ -35,6 +44,8 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     public String tex = "";
     public int tier = 0;
     public String toolType = "knife";
+    /** The work the progress belongs to, kept across saves: a changed recipe restarts it. */
+    private final RunningCraft running = new RunningCraft();
     public float prevAcTime;
     public float acTime;
     private int tempTicksExisted = 0;
@@ -122,16 +133,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
                 } else {
                     worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "dig.cloth", 1.0F, 1.0F);
                 }
-                if (progress >= maxProgress) {
+                CraftPlan plan = progress >= maxProgress ? currentPlan() : null;
+                if (plan != null && finish(plan)) {
                     if (RPGElements.isSystemActive) {
                         SkillList.artisanry.addXP(player, 1);
                     }
-                    progress = 0;
-                    int ss = items[0] != null ? items[0].stackSize : 1;
-                    ItemStack out = items[1].copy();
-                    out.stackSize *= ss;
-                    setInventorySlotContents(0, out);
-                    updateRecipe();
                     if (isShabbyRack() && rand.nextInt(10) == 0 && !worldObj.isRemote) {
                         for (int a = 0; a < rand.nextInt(10); a++) {
                             ItemStack plank = ComponentListMF.plank.construct("ScrapWood");
@@ -156,11 +162,14 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
             // Item placement
             ItemStack item = items[0];
             if (item == null) {
-                if (held != null && !(held.getItem() instanceof ItemBlock) && TanningRecipe.getRecipe(held) != null) {
+                RecipeEntry<ProcessRecipe> entry = held == null || held.getItem() instanceof ItemBlock ? null
+                        : MFRecipes.find(MFRecipes.TANNING, held);
+                if (entry != null) {
+                    int amount = entry.getRecipe().getInput().getAmount();
                     ItemStack item2 = held.copy();
-                    item2.stackSize = 1;
+                    item2.stackSize = amount;
                     setInventorySlotContents(0, item2);
-                    tryDecrMainItem(player);
+                    tryDecrMainItem(player, amount);
                     updateRecipe();
                     worldObj.playSoundEffect(
                             xCoord + 0.5D,
@@ -186,7 +195,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
 
     private void syncAnimation() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new TannerPacket(this).generatePacket(), (WorldServer) worldObj, xCoord, zCoord);
+        NetworkUtils.sendToWatchers(new TannerPacket(this).generatePacket(), worldObj, xCoord, zCoord);
     }
 
     public boolean isAutomated() {
@@ -196,25 +205,95 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
         return worldObj.getBlock(xCoord, yCoord, zCoord) instanceof BlockEngineerTanner;
     }
 
-    private void tryDecrMainItem(EntityPlayer player) {
+    private void tryDecrMainItem(EntityPlayer player, int amount) {
         int held = player.inventory.currentItem;
         if (held >= 0 && held < 9) {
-            player.inventory.decrStackSize(held, 1);
+            player.inventory.decrStackSize(held, amount);
         }
     }
 
+    /** The candidates for the item on the rack, in lookup order, checked against the tool the player holds. */
+    @Override
+    public Diagnosis diagnose(EntityPlayer player) {
+        if (items[0] == null) {
+            return Diagnosis.problem("tanning", CheckResult.Reason.MISSING_INPUT);
+        }
+        ItemStack held = player.getHeldItem();
+        String tool = ToolHelper.getCrafterTool(held);
+        int toolTier = ToolHelper.getCrafterTier(held);
+        List<Diagnosis.Candidate> candidates = new ArrayList<>();
+        boolean chosen = false;
+        for (RecipeEntry<ProcessRecipe> entry : MFRecipes.TANNING.published().candidates(Input.lookupKeys(items[0]))) {
+            ProcessRecipe recipe = entry.getRecipe();
+            CheckResult.Reason reason = recipe.getInput().explain(items[0]);
+            if (reason == null && chosen) {
+                reason = CheckResult.Reason.of("shadowed");
+            }
+            if (reason == null) {
+                chosen = true;
+                String needTool = recipe.get(MFRecipeKeys.TOOL, "knife");
+                int needTier = recipe.get(MFRecipeKeys.TIER, -1);
+                if (!isAutomated() && !needTool.equalsIgnoreCase(tool)) {
+                    reason = CheckResult.Reason.of("tool", needTool, tool);
+                } else if (!isAutomated() && toolTier < needTier) {
+                    reason = CheckResult.Reason.tier("tool", toolTier, needTier);
+                }
+            }
+            candidates.add(Diagnosis.candidate(entry, reason));
+        }
+        return Diagnosis.of("tanning", candidates);
+    }
+
     public void updateRecipe() {
-        TanningRecipe recipe = TanningRecipe.getRecipe(items[0]);
-        if (recipe == null) {
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.TANNING, items[0]);
+        if (entry == null) {
             setInventorySlotContents(1, null);
             progress = maxProgress = tier = 0;
         } else {
-            setInventorySlotContents(1, recipe.output);
-            tier = recipe.tier;
-            maxProgress = recipe.time;
-            toolType = recipe.toolType;
+            ProcessRecipe recipe = entry.getRecipe();
+            setInventorySlotContents(1, recipe.getOutput());
+            tier = recipe.get(MFRecipeKeys.TIER, -1);
+            maxProgress = recipe.get(MFRecipeKeys.TIME, 0F);
+            toolType = recipe.get(MFRecipeKeys.TOOL, "knife");
         }
         progress = 0;
+        running.start(plan(entry));
+    }
+
+    /** The work on the rack as the recipe asks for it now: what it takes from the rack and what it leaves there. */
+    private CraftPlan plan(RecipeEntry<ProcessRecipe> entry) {
+        if (entry == null || items[0] == null) {
+            return null;
+        }
+        ProcessRecipe recipe = entry.getRecipe();
+        return CraftPlan.builder(entry.getId(), MFRecipes.TANNING.published().getGeneration(), 0)
+                .use(0, recipe.getInput(), items[0]).output(recipe.getOutput())
+                .require(MFRecipeKeys.TIME, recipe.get(MFRecipeKeys.TIME, 0F))
+                .require(MFRecipeKeys.TOOL, recipe.get(MFRecipeKeys.TOOL, "knife"))
+                .require(MFRecipeKeys.TIER, recipe.get(MFRecipeKeys.TIER, -1)).build();
+    }
+
+    /**
+     * The work as the recipe asks for it now, if it is still the work the progress belongs to. A reload may have
+     * replaced or removed the recipe since the item went on the rack; then the work restarts instead of paying out the
+     * old result.
+     */
+    private CraftPlan currentPlan() {
+        CraftPlan plan = plan(MFRecipes.find(MFRecipes.TANNING, items[0]));
+        if (running.holds(plan)) {
+            return plan;
+        }
+        updateRecipe();
+        return null;
+    }
+
+    /** Pays for the work and leaves the product on the rack; returned containers without room drop off it. */
+    private boolean finish(CraftPlan plan) {
+        List<ItemStack> spill = new ArrayList<>();
+        boolean paid = plan.apply(CraftInventory.of(this, 64), spill);
+        GridProject.drop(this, spill);
+        updateRecipe();
+        return paid;
     }
 
     public boolean doesPlayerKnowCraft(EntityPlayer thePlayer) {
@@ -241,19 +320,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
         tex = nbt.getString("tex");
         tier = nbt.getInteger("tier");
         progress = nbt.getFloat("Progress");
+        running.read(nbt);
         maxProgress = nbt.getFloat("maxProgress");
         toolType = nbt.getString("toolType");
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < items.length) {
-                items[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        items = InventorySlots.read(nbt, "Items", items.length);
     }
 
     @Override
@@ -263,21 +334,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
         nbt.setString("tex", tex);
         nbt.setInteger("tier", tier);
         nbt.setFloat("Progress", progress);
+        running.write(nbt);
         nbt.setFloat("maxProgress", maxProgress);
         nbt.setString("toolType", toolType);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < items.length; ++i) {
-            if (items[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                items[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", items);
     }
 
     // INVENTORY
@@ -325,35 +386,12 @@ public class TileEntityTanningRack extends TileEntity implements IInventory {
     @Override
     public ItemStack decrStackSize(int slot, int num) {
         onInventoryChanged();
-        if (this.items[slot] != null) {
-            ItemStack itemstack;
-
-            if (this.items[slot].stackSize <= num) {
-                itemstack = this.items[slot];
-                this.items[slot] = null;
-                return itemstack;
-            } else {
-                itemstack = this.items[slot].splitStack(num);
-
-                if (this.items[slot].stackSize == 0) {
-                    this.items[slot] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return InventorySlots.take(items, slot, num);
     }
 
     @Override
     public ItemStack getStackInSlotOnClosing(int slot) {
-        if (this.items[slot] != null) {
-            ItemStack itemstack = this.items[slot];
-            this.items[slot] = null;
-            return itemstack;
-        }
-        return null;
+        return InventorySlots.takeAll(items, slot);
     }
 
     @Override

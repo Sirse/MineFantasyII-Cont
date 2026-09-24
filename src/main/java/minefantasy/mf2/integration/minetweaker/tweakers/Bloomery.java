@@ -1,150 +1,90 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
-import minetweaker.IUndoableAction;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/**
+ * <pre>
+ * mods.minefantasy.Bloomery.add("steel_scrap", &lt;minefantasy2:bar&gt;, &lt;ore:scrapSteel&gt;);
+ * mods.minefantasy.Bloomery.replace("minefantasy2:bloomery/minecraft.iron_ore", &lt;...&gt;, &lt;minecraft:iron_ore&gt;);
+ * mods.minefantasy.Bloomery.remove("minefantasy2:bloomery/minecraft.gold_ore");
+ * mods.minefantasy.Bloomery.removeByOutput(&lt;minefantasy2:bar&gt;);
+ * </pre>
+ */
 @ZenClass("mods.minefantasy.Bloomery")
 public class Bloomery {
 
+    private static final String STATION = "bloomery";
+
+    /** Adds {@code crafttweaker:bloomery/<name>}. */
     @ZenMethod
-    public static void addRecipe(@NotNull IItemStack result, @NotNull IIngredient input) {
-        MineTweakerAPI.apply(new AddRecipeAction(result, input));
+    public static void add(@NotNull String name, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional String research, @Optional int priority) {
+        RecipeId id = ScriptRecipes.scriptId(STATION, name);
+        ScriptRecipes.apply(
+                "Adding bloomery recipe " + id,
+                tx -> tx.add(MFRecipes.BLOOMERY, id, recipe(output, input, research), priority));
+    }
+
+    /** Replaces an existing recipe, keeping its position. */
+    @ZenMethod
+    public static void replace(@NotNull String id, @NotNull IItemStack output, @NotNull IIngredient input,
+            @Optional String research, @Optional int priority) {
+        RecipeId recipeId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply(
+                "Replacing bloomery recipe " + recipeId,
+                tx -> tx.replace(MFRecipes.BLOOMERY, recipeId, recipe(output, input, research), priority));
     }
 
     @ZenMethod
-    public static void remove(@NotNull IIngredient output, @Optional IIngredient input) {
-        HashMap<ItemStack, ItemStack> recipeList = BloomRecipe.recipeList;
-
-        List<ItemStack> toRemove = new ArrayList<ItemStack>();
-        List<ItemStack> toRemoveValues = new ArrayList<ItemStack>();
-        for (Map.Entry<ItemStack, ItemStack> entry : recipeList.entrySet()) {
-            if (output.matches(new MCItemStack(entry.getValue()))
-                    && (input == null || input.matches(new MCItemStack(entry.getKey())))) {
-                toRemove.add(entry.getKey());
-                toRemoveValues.add(entry.getValue());
-            }
-        }
-
-        if (!toRemove.isEmpty()) {
-            MineTweakerAPI.apply(new RemoveAction(toRemove, toRemoveValues));
-        } else {
-            MineTweakerAPI.logWarning("No bloomery recipes for " + output.toString());
-        }
+    public static void remove(@NotNull String id) {
+        RecipeId recipeId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply("Removing bloomery recipe " + recipeId, tx -> tx.remove(MFRecipes.BLOOMERY, recipeId));
     }
 
-    private static class AddRecipeAction implements IUndoableAction {
-
-        IItemStack result;
-        IIngredient input;
-
-        public AddRecipeAction(IItemStack result, IIngredient input) {
-            this.result = result;
-            this.input = input;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcResult = MineTweakerMC.getItemStack(result);
-            if (mcResult == null) {
-                MineTweakerAPI.logWarning("Skipping bloomery recipe with invalid output " + result);
-                return;
-            }
-            for (IItemStack stack : input.getItems()) {
-                ItemStack s = MineTweakerMC.getItemStack(stack);
-                if (s == null) {
-                    MineTweakerAPI.logWarning("Skipping bloomery recipe input " + stack + " -> " + result);
-                    continue;
+    /** Removes every recipe with a matching output (and input, if given), logging the ids removed. */
+    @ZenMethod
+    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
+        ScriptRecipes.apply("Removing bloomery recipes for " + output, tx -> {
+            List<RecipeId> removed = tx.removeWhere(MFRecipes.BLOOMERY, entry -> {
+                BloomRecipe recipe = entry.getRecipe();
+                if (!output.matches(MineTweakerMC.getIItemStack(recipe.getOutput()))) {
+                    return false;
                 }
-                BloomRecipe.addRecipe(s, mcResult);
+                if (input == null) {
+                    return true;
+                }
+                for (ItemStack example : recipe.getInput().examples()) {
+                    if (input.matches(MineTweakerMC.getIItemStack(example))) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+            if (removed.isEmpty()) {
+                MineTweakerAPI.logWarning("No bloomery recipes for " + output);
+            } else {
+                MineTweakerAPI.logInfo("Removed bloomery recipes " + removed);
             }
-        }
-
-        @Override
-        public String describe() {
-            return "Adding bloomery recipe for " + result.getDisplayName();
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Removing bloomery recipe for " + result.getDisplayName();
-        }
-
-        @Override
-        public void undo() {
-            BloomRecipe.recipeList.remove(input);
-        }
-
+        });
     }
 
-    private static class RemoveAction implements IUndoableAction {
-
-        private final List<ItemStack> items;
-        private final List<ItemStack> values;
-
-        public RemoveAction(List<ItemStack> items, List<ItemStack> values) {
-            this.items = items;
-            this.values = values;
-        }
-
-        @Override
-        public void apply() {
-            for (ItemStack item : items) {
-                BloomRecipe.recipeList.remove(item);
-            }
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public void undo() {
-            for (int i = 0; i < items.size(); i++) {
-                BloomRecipe.recipeList.put(items.get(i), values.get(i));
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Removing " + items.size() + " bloomery recipes";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Restoring " + items.size() + " bloomery recipes";
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    private static BloomRecipe recipe(IItemStack output, IIngredient input, String research) {
+        return BloomRecipe.of(ScriptInputs.toInput(input), ScriptInputs.toOutput(output), research);
     }
-
 }

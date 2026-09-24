@@ -1,74 +1,70 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import net.minecraft.item.ItemStack;
+import java.util.List;
 
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.heating.Heatable;
-import minefantasy.mf2.integration.minetweaker.helpers.TweakedMapEdit;
-import minetweaker.IUndoableAction;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
-import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
+import stanhebben.zenscript.annotations.NotNull;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/**
+ * Forge heat profiles: workable, unstable and ruin temperatures (-1 takes one from the stack's main material). A
+ * profile narrower than a native one (one material of a shared item) needs a higher priority to be checked first, or
+ * {@code replace} to change the native one itself.
+ */
 @ZenClass("mods.minefantasy.Forge")
 public class Forge {
 
+    private static final String STATION = "forge_heat";
+
     @ZenMethod
-    public static void addHeatableItem(IIngredient input, int min, int unstable, int max) {
-        MineTweakerAPI.apply(new AddHeatableAction(input, min, unstable, max));
+    public static void add(@NotNull String name, @NotNull IIngredient input, int min, int unstable, int max,
+            @Optional int priority) {
+        RecipeId id = ScriptRecipes.scriptId(STATION, name);
+        ScriptRecipes.apply(
+                "Adding heat profile " + id,
+                tx -> tx.add(MFRecipes.HEATING, id, profile(input, min, unstable, max), priority));
     }
 
-    private static class AddHeatableAction implements IUndoableAction {
+    @ZenMethod
+    public static void replace(@NotNull String id, @NotNull IIngredient input, int min, int unstable, int max,
+            @Optional int priority) {
+        RecipeId profileId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply(
+                "Replacing heat profile " + profileId,
+                tx -> tx.replace(MFRecipes.HEATING, profileId, profile(input, min, unstable, max), priority));
+    }
 
-        private final IIngredient input;
-        private final int min, unstable, max;
-        private final TweakedMapEdit<Heatable> edit = new TweakedMapEdit<Heatable>(Heatable.registerList);
+    @ZenMethod
+    public static void remove(@NotNull String id) {
+        RecipeId profileId = ScriptRecipes.parseId(STATION, id);
+        ScriptRecipes.apply("Removing heat profile " + profileId, tx -> tx.remove(MFRecipes.HEATING, profileId));
+    }
 
-        public AddHeatableAction(IIngredient input, int min, int unstable, int max) {
-            this.input = input;
-            this.min = min;
-            this.unstable = unstable;
-            this.max = max;
-        }
-
-        @Override
-        public void apply() {
-            for (IItemStack s : input.getItems()) {
-                ItemStack stack = MineTweakerMC.getItemStack(s);
-                if (stack == null) {
-                    MineTweakerAPI.logWarning("Skipping heatable registration for invalid item " + s);
-                    continue;
-                }
-                // addItem replaces on put, so record the previous profile for this key before overwriting it
-                edit.put(Heatable.getRegistrationForItem(stack), new Heatable(stack, min, unstable, max));
+    /** Removes every profile that takes an item the ingredient matches; logs the ids. */
+    @ZenMethod
+    public static void removeFor(@NotNull IIngredient input) {
+        ScriptRecipes.apply("Removing heat profiles for " + input, tx -> {
+            List<RecipeId> removed = tx.removeWhere(
+                    MFRecipes.HEATING,
+                    entry -> entry.getRecipe().getInput().examples().stream().anyMatch(
+                            example -> input.matches(minetweaker.api.minecraft.MineTweakerMC.getIItemStack(example))));
+            if (removed.isEmpty()) {
+                MineTweakerAPI.logWarning("No heat profiles for " + input);
+            } else {
+                MineTweakerAPI.logInfo("Removed heat profiles " + removed);
             }
-        }
+        });
+    }
 
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public String describe() {
-            return "Adding a heatable item";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Removing heatable item";
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
-
-        @Override
-        public void undo() {
-            edit.undo();
-        }
+    private static Heatable profile(IIngredient input, int min, int unstable, int max) {
+        return Heatable.of(ScriptInputs.toInput(input), min, unstable, max);
     }
 }

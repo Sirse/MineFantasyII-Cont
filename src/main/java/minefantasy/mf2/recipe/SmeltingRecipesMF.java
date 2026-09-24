@@ -5,10 +5,15 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeRecipes;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeSource;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigHardcore;
@@ -45,8 +50,8 @@ public class SmeltingRecipesMF {
                 new Object[] { Blocks.stone, Blocks.stone, Blocks.stone, Blocks.stone, ComponentListMF.fireclay, iron,
                         ComponentListMF.obsidian_rock });
         if (ConfigHardcore.HCCreduceIngots) {
-            BloomRecipe.addRecipe(new ItemStack(Blocks.iron_ore), iron);
-            BloomRecipe.addRecipe(new ItemStack(Blocks.gold_ore), gold);
+            addBloom(Item.getItemFromBlock(Blocks.iron_ore), 0, iron);
+            addBloom(Item.getItemFromBlock(Blocks.gold_ore), 0, gold);
 
             MineFantasyAPI.addFurnaceRecipe(new ItemStack(Blocks.iron_ore), iron, 0);
             MineFantasyAPI.addFurnaceRecipe(new ItemStack(Blocks.gold_ore), gold, 0);
@@ -100,13 +105,15 @@ public class SmeltingRecipesMF {
                 new Object[] { Items.coal, Items.coal, Items.coal, Items.coal, ComponentListMF.oreTungsten,
                         ComponentListMF.flux_strong, ComponentListMF.flux_strong, ComponentListMF.flux_strong,
                         ComponentListMF.flux_strong });
-        MineFantasyAPI.addRatioAlloy(
-                1,
-                tungsten,
-                1,
-                new Object[] { Items.coal, Items.coal, Items.coal, Items.coal, BlockListMF.oreTungsten,
-                        ComponentListMF.flux_strong, ComponentListMF.flux_strong, ComponentListMF.flux_strong,
-                        ComponentListMF.flux_strong });
+        try (NativeRecipes.Variant v = NativeRecipes.variant("ore_block")) {
+            MineFantasyAPI.addRatioAlloy(
+                    1,
+                    tungsten,
+                    1,
+                    new Object[] { Items.coal, Items.coal, Items.coal, Items.coal, BlockListMF.oreTungsten,
+                            ComponentListMF.flux_strong, ComponentListMF.flux_strong, ComponentListMF.flux_strong,
+                            ComponentListMF.flux_strong });
+        }
 
         if (!ConfigHardcore.HCCreduceIngots) {
             KnowledgeListMF.steel = MineFantasyAPI.addRatioAlloy(9, steel, 1, new Object[] { pigiron });
@@ -157,6 +164,13 @@ public class SmeltingRecipesMF {
         MineFantasyAPI.addBlastFurnaceRecipe(ComponentListMF.ingots[11], blue);
     }
 
+    private static void addBloom(Item ore, int meta, ItemStack bar) {
+        MFRecipes.BLOOMERY.add(
+                NativeRecipes.idFor("bloomery", ore),
+                BloomRecipe.of(Input.of(ore, meta), bar),
+                RecipeSource.NATIVE);
+    }
+
     private static void refineRawOre(Item ore, String mname) {
         refineRawOre(ore, mname, 0F);
     }
@@ -173,7 +187,7 @@ public class SmeltingRecipesMF {
         ItemStack bar = ComponentListMF.bar(mname);
         ItemStack ingot = ComponentListMF.ingot(mname);
         if (ConfigHardcore.HCCreduceIngots) {
-            BloomRecipe.addRecipe(ore, bar);
+            addBloom(ore, OreDictionary.WILDCARD_VALUE, bar);
             if (!ConfigHardcore.HCCRemoveCraft) {
                 GameRegistry.addSmelting(ore, ingot, xp);
             }

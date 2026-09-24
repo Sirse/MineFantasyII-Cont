@@ -1,59 +1,67 @@
 package minefantasy.mf2.api.crafting.refine;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Set;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
 
-public class BloomRecipe {// FurnaceRecipes
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeChecks;
 
-    public static HashMap<ItemStack, ItemStack> recipeList = new HashMap();
-    public ItemStack result;
-    public int time;
-    public String research;
+/**
+ * A bloomery recipe: every item of the input stack turns into one output item. Register through
+ * {@link minefantasy.mf2.api.crafting.MFRecipes#BLOOMERY}.
+ */
+public final class BloomRecipe implements RecipeChecks.Validated {
 
-    public BloomRecipe(ItemStack result, int time, String research) {
-        this.result = result;
-        this.time = time;
+    @Override
+    public void validate() {
+        RecipeChecks.input("input", input);
+        RecipeChecks.output("bloom", output);
+    }
+
+    /** Ticks of burning per input item. */
+    public static final int TICKS_PER_ITEM = 300;
+
+    private final Input input;
+    private final ItemStack output;
+    private final String research;
+
+    private BloomRecipe(Input input, ItemStack output, String research) {
+        this.input = input;
+        this.output = output;
         this.research = research;
     }
 
-    public static void addRecipe(ItemStack input, ItemStack output) {
-        if (input == null || output == null) {
-            return;
+    /** The input names one item: the bloomery smelts the whole stack in its input slot. */
+    public static BloomRecipe of(Input input, ItemStack output) {
+        return of(input, output, null);
+    }
+
+    /** With a research the player lighting the bloomery must have unlocked. */
+    public static BloomRecipe of(Input input, ItemStack output, String research) {
+        if (input == null || output == null || output.getItem() == null) {
+            throw new IllegalArgumentException("Bloomery recipe needs an input and an output");
         }
-        recipeList.put(input, output);
+        ItemStack single = output.copy();
+        single.stackSize = 1;
+        return new BloomRecipe(input, single, research == null || research.isEmpty() ? null : research);
     }
 
-    public static void addRecipe(Block input, ItemStack output) {
-        addRecipe(Item.getItemFromBlock(input), output);
+    public Input getInput() {
+        return input;
     }
 
-    public static void addRecipe(Item input, ItemStack output) {
-        addRecipe(new ItemStack(input, 1, OreDictionary.WILDCARD_VALUE), output);
+    /** One output item, as a copy. */
+    public ItemStack getOutput() {
+        return output.copy();
     }
 
-    public static ItemStack getSmeltingResult(ItemStack item) {
-        Iterator iterator = recipeList.entrySet().iterator();
-        Entry entry;
-
-        do {
-            if (!iterator.hasNext()) {
-                return null;
-            }
-
-            entry = (Entry) iterator.next();
-        } while (!doesMatch(item, (ItemStack) entry.getKey()));
-
-        return (ItemStack) entry.getValue();
+    /** Research required to light the bloomery, or null. */
+    public String getResearch() {
+        return research;
     }
 
-    private static boolean doesMatch(ItemStack item1, ItemStack item2) {
-        return item2.getItem() == item1.getItem() && (item2.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                || item2.getItemDamage() == item1.getItemDamage());
+    public Set<Object> indexKeys() {
+        return input.indexKeys();
     }
 }

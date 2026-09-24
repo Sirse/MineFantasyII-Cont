@@ -1,83 +1,55 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-import minefantasy.mf2.api.crafting.refine.PaintOilRecipe;
-import minetweaker.IUndoableAction;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
+import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/**
+ * Paint oil turns one block into another. Both sides must be blocks; an output with any metadata ({@code :*}) keeps the
+ * painted block's metadata.
+ */
 @ZenClass("mods.minefantasy.PaintOil")
 public class PaintOil {
 
     @ZenMethod
-    public static void addRecipe(@NotNull IItemStack input, @NotNull IItemStack output) {
-        MineTweakerAPI.apply(new AddRecipeAction(input, output));
+    public static void add(@NotNull String name, @NotNull IItemStack input, @NotNull IItemStack output,
+            @Optional int priority) {
+        ScriptProcess.add(MFRecipes.PAINT_OIL, name, () -> recipe(input, output), priority);
     }
 
-    private static class AddRecipeAction implements IUndoableAction {
+    @ZenMethod
+    public static void replace(@NotNull String id, @NotNull IItemStack input, @NotNull IItemStack output,
+            @Optional int priority) {
+        ScriptProcess.replace(MFRecipes.PAINT_OIL, id, () -> recipe(input, output), priority);
+    }
 
-        private final IItemStack input;
-        private final IItemStack output;
-        private ItemStack recipeKey;
-        private ItemStack previousValue;
+    @ZenMethod
+    public static void remove(@NotNull String id) {
+        ScriptProcess.remove(MFRecipes.PAINT_OIL, id);
+    }
 
-        private AddRecipeAction(IItemStack input, IItemStack output) {
-            this.input = input;
-            this.output = output;
+    @ZenMethod
+    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
+        ScriptProcess.removeByOutput(MFRecipes.PAINT_OIL, output, input);
+    }
+
+    private static ProcessRecipe recipe(IItemStack input, IItemStack output) {
+        ItemStack in = ScriptInputs.toOutput(input);
+        ItemStack out = ScriptInputs.toOutput(output);
+        if (!(in.getItem() instanceof ItemBlock) || !(out.getItem() instanceof ItemBlock)) {
+            throw new IllegalArgumentException("Paint oil recipes need blocks on both sides");
         }
-
-        @Override
-        public void apply() {
-            ItemStack mcInput = MineTweakerMC.getItemStack(input);
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            Block inputBlock = Block.getBlockFromItem(mcInput.getItem());
-            Block outputBlock = Block.getBlockFromItem(mcOutput.getItem());
-            if (inputBlock == null || outputBlock == null) {
-                MineTweakerAPI.logError("PaintOil recipes require block items.");
-                return;
-            }
-
-            recipeKey = new ItemStack(inputBlock, 1, mcInput.getItemDamage());
-            previousValue = PaintOilRecipe.recipeList.get(recipeKey);
-            PaintOilRecipe.recipeList.put(recipeKey, new ItemStack(outputBlock, 1, mcOutput.getItemDamage()));
-        }
-
-        @Override
-        public void undo() {
-            if (recipeKey == null) {
-                return;
-            }
-            if (previousValue == null) {
-                PaintOilRecipe.recipeList.remove(recipeKey);
-            } else {
-                PaintOilRecipe.recipeList.put(recipeKey, previousValue);
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Adding paint oil recipe";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Undoing paint oil recipe";
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+        return ProcessRecipe.of(Input.of(in.getItem(), in.getItemDamage()), out);
     }
 }

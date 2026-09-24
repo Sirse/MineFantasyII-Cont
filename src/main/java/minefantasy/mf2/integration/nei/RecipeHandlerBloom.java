@@ -3,8 +3,6 @@ package minefantasy.mf2.integration.nei;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
@@ -13,10 +11,13 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 
 public class RecipeHandlerBloom extends MFNEIRecipeHandler {
@@ -92,12 +93,9 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
     }
 
     private void loadRecipesFor(ItemStack result) {
-        Map<ItemStack, ItemStack> recipes = BloomRecipe.recipeList;
-        for (Entry<ItemStack, ItemStack> recipe : recipes.entrySet()) {
-            if (recipe != null && NEIHelper.isValidStack(recipe.getKey())
-                    && NEIHelper.isValidStack(recipe.getValue())
-                    && matchesOutput(recipe.getValue(), result)) {
-                arecipes.add(new SmeltingPair(recipe.getKey(), recipe.getValue()));
+        for (RecipeEntry<BloomRecipe> entry : MFRecipes.BLOOMERY.published().all()) {
+            if (matchesOutput(entry.getRecipe().getOutput(), result)) {
+                addRecipe(entry.getRecipe(), null);
             }
         }
     }
@@ -107,12 +105,22 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(ingredient)) {
             return;
         }
-        ItemStack result = BloomRecipe.getSmeltingResult(ingredient);
-        if (NEIHelper.isValidStack(result)) {
-            SmeltingPair arecipe = new SmeltingPair(ingredient, result);
-            arecipe.setIngredientPermutation(Arrays.asList(arecipe.ingred), ingredient);
-            arecipes.add(arecipe);
+        for (RecipeEntry<BloomRecipe> entry : MFRecipes.BLOOMERY.published().candidates(Input.lookupKeys(ingredient))) {
+            if (entry.getRecipe().getInput().matches(ingredient)) {
+                addRecipe(entry.getRecipe(), ingredient);
+            }
         }
+    }
+
+    private void addRecipe(BloomRecipe recipe, ItemStack shownInput) {
+        SmeltingPair pair = new SmeltingPair(recipe);
+        if (pair.ingred == null || pair.result == null) {
+            return;
+        }
+        if (shownInput != null) {
+            pair.setIngredientPermutation(Arrays.asList(pair.ingred), shownInput);
+        }
+        arecipes.add(pair);
     }
 
     private static class FuelPair {
@@ -129,9 +137,9 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
         private PositionedStack ingred;
         private PositionedStack result;
 
-        private SmeltingPair(ItemStack ingred, ItemStack result) {
-            this.ingred = NEIHelper.positionedStack(ingred, 75, 15);
-            this.result = NEIHelper.positionedStack(result, 134, 34);
+        private SmeltingPair(BloomRecipe recipe) {
+            this.ingred = NEIHelper.positionedInput(recipe.getInput(), 75, 15);
+            this.result = NEIHelper.positionedStack(recipe.getOutput(), 134, 34);
         }
 
         @Override

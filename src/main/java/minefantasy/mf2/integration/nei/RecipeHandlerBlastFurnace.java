@@ -1,7 +1,5 @@
 package minefantasy.mf2.integration.nei;
 
-import java.util.Map.Entry;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.StatCollector;
@@ -10,7 +8,8 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.refine.BlastFurnaceRecipes;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 public class RecipeHandlerBlastFurnace extends MFNEIRecipeHandler {
@@ -55,27 +54,17 @@ public class RecipeHandlerBlastFurnace extends MFNEIRecipeHandler {
 
     private void loadRecipesFor(ItemStack result) {
         if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.blastfurn)) {
-            for (Entry<ItemStack, ItemStack> entry : BlastFurnaceRecipes.smelting().getSmeltingList().entrySet()) {
-                if (entry != null && NEIHelper.isValidStack(entry.getKey())
-                        && NEIHelper.isValidStack(entry.getValue())
-                        && matchesOutput(entry.getValue(), result)) {
-                    CachedBlastFurnaceRecipe recipe = new CachedBlastFurnaceRecipe(entry.getKey(), entry.getValue());
-                    arecipes.add(recipe);
-                }
+            for (ProcessRecipe recipe : recipesMaking(MFRecipes.BLAST_FURNACE, result)) {
+                arecipes.add(new CachedBlastFurnaceRecipe(recipe));
             }
         }
     }
 
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
-        if (!NEIHelper.isValidStack(ingredient)) {
-            return;
-        }
         if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.blastfurn)) {
-            ItemStack result = BlastFurnaceRecipes.smelting().getSmeltingResult(ingredient);
-            if (NEIHelper.isValidStack(result)) {
-                CachedBlastFurnaceRecipe recipe = new CachedBlastFurnaceRecipe(ingredient, result);
-                arecipes.add(recipe);
+            for (ProcessRecipe recipe : recipesUsing(MFRecipes.BLAST_FURNACE, ingredient)) {
+                arecipes.add(new CachedBlastFurnaceRecipe(recipe));
             }
         }
     }
@@ -85,9 +74,9 @@ public class RecipeHandlerBlastFurnace extends MFNEIRecipeHandler {
         private PositionedStack input;
         private PositionedStack output;
 
-        private CachedBlastFurnaceRecipe(ItemStack inputStack, ItemStack outputStack) {
-            input = NEIHelper.positionedStack(inputStack, 75, 30);
-            output = NEIHelper.positionedStack(outputStack, 75, 68);
+        private CachedBlastFurnaceRecipe(ProcessRecipe recipe) {
+            input = NEIHelper.positionedInput(recipe.getInput(), 75, 30);
+            output = NEIHelper.positionedStack(recipe.getOutput(), 75, 68);
         }
 
         @Override

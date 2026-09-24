@@ -1,164 +1,73 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minetweaker.IUndoableAction;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.api.crafting.exotic.SpecialForging.SpecialCraft;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
+/**
+ * Special forging: with a design ("ornate") or dragon's heat ("dragonforge") the anvil turns a base result into the
+ * output. The output also salvages like the base. One craft per design and base item; setting it again replaces it.
+ */
 @ZenClass("mods.minefantasy.SpecialForging")
 public class SpecialForging {
 
     @ZenMethod
-    public static void addDragonforgeCraft(@NotNull IIngredient base, @NotNull IItemStack output) {
-        MineTweakerAPI.apply(new DragonforgeAction(base, output));
+    public static void set(@NotNull String design, @NotNull IIngredient base, @NotNull IItemStack output,
+            @Optional int priority) {
+        ScriptRecipes.apply("Setting " + design + " craft of " + base, tx -> {
+            Item outputItem = ScriptInputs.toOutput(output).getItem();
+            int count = 0;
+            for (Item baseItem : items(base)) {
+                minefantasy.mf2.api.crafting.exotic.SpecialForging
+                        .stage(tx, new SpecialCraft(design, baseItem, outputItem), priority);
+                count++;
+            }
+            if (count == 0) {
+                throw new IllegalArgumentException("Ingredient " + base + " lists no valid items");
+            }
+        });
     }
 
     @ZenMethod
-    public static void addOrnateCraft(@NotNull IIngredient base, @NotNull IItemStack output) {
-        MineTweakerAPI.apply(new SpecialAction("ornate", base, output));
+    public static void setDragonforge(@NotNull IIngredient base, @NotNull IItemStack output) {
+        set(minefantasy.mf2.api.crafting.exotic.SpecialForging.DRAGONFORGE, base, output, 0);
     }
 
-    private static class DragonforgeAction implements IUndoableAction {
-
-        private final IIngredient base;
-        private final IItemStack output;
-        private final List<Item> addedBases = new ArrayList<Item>();
-        private final List<Item> previous = new ArrayList<Item>();
-        private Item outputItem;
-
-        private DragonforgeAction(IIngredient base, IItemStack output) {
-            this.base = base;
-            this.output = output;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            outputItem = mcOutput == null ? null : mcOutput.getItem();
-            for (IItemStack stack : base.getItems()) {
-                ItemStack mcBase = MineTweakerMC.getItemStack(stack);
-                if (mcBase == null || mcBase.getItem() == null || outputItem == null) {
-                    continue;
-                }
-                Item baseItem = mcBase.getItem();
-                if (!addedBases.contains(baseItem)) {
-                    addedBases.add(baseItem);
-                    previous.add(minefantasy.mf2.api.crafting.exotic.SpecialForging.dragonforgeCrafts.get(baseItem));
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.addDragonforgeCraft(baseItem, outputItem);
-                }
-            }
-        }
-
-        @Override
-        public void undo() {
-            for (int i = 0; i < addedBases.size(); i++) {
-                Item baseItem = addedBases.get(i);
-                Item old = previous.get(i);
-                if (old == null) {
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.removeDragonforgeCraft(baseItem);
-                } else {
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.dragonforgeCrafts.put(baseItem, old);
-                }
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Adding dragonforge craft";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Undoing dragonforge craft";
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+    @ZenMethod
+    public static void setOrnate(@NotNull IIngredient base, @NotNull IItemStack output) {
+        set("ornate", base, output, 0);
     }
 
-    private static class SpecialAction implements IUndoableAction {
+    /** Removes the design's craft for every base item listed, with the salvage alias it added. */
+    @ZenMethod
+    public static void remove(@NotNull String design, @NotNull IIngredient base) {
+        ScriptRecipes.apply("Removing " + design + " craft of " + base, tx -> {
+            for (Item baseItem : items(base)) {
+                RecipeId id = minefantasy.mf2.api.crafting.exotic.SpecialForging.idFor(design, baseItem);
+                minefantasy.mf2.api.crafting.exotic.SpecialForging.stageRemove(tx, id);
+            }
+        });
+    }
 
-        private final String special;
-        private final IIngredient base;
-        private final IItemStack output;
-        private final List<Item> addedBases = new ArrayList<Item>();
-        private final List<Item> previous = new ArrayList<Item>();
-        private Item outputItem;
-
-        private SpecialAction(String special, IIngredient base, IItemStack output) {
-            this.special = special;
-            this.base = base;
-            this.output = output;
-        }
-
-        @Override
-        public void apply() {
-            ItemStack mcOutput = MineTweakerMC.getItemStack(output);
-            outputItem = mcOutput == null ? null : mcOutput.getItem();
-            for (IItemStack stack : base.getItems()) {
-                ItemStack mcBase = MineTweakerMC.getItemStack(stack);
-                if (mcBase == null || mcBase.getItem() == null || outputItem == null) {
-                    continue;
-                }
-                Item baseItem = mcBase.getItem();
-                if (!addedBases.contains(baseItem)) {
-                    addedBases.add(baseItem);
-                    previous.add(minefantasy.mf2.api.crafting.exotic.SpecialForging.getSpecialCraft(special, mcBase));
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.addSpecialCraft(special, baseItem, outputItem);
-                }
+    private static java.util.List<Item> items(IIngredient ingredient) {
+        java.util.List<Item> items = new java.util.ArrayList<>();
+        for (IItemStack stack : ingredient.getItems()) {
+            ItemStack mc = MineTweakerMC.getItemStack(stack);
+            if (mc != null && mc.getItem() != null && !items.contains(mc.getItem())) {
+                items.add(mc.getItem());
             }
         }
-
-        @Override
-        public void undo() {
-            for (int i = 0; i < addedBases.size(); i++) {
-                Item baseItem = addedBases.get(i);
-                Item old = previous.get(i);
-                if (old == null) {
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.removeSpecialCraft(special, baseItem);
-                } else {
-                    minefantasy.mf2.api.crafting.exotic.SpecialForging.specialCrafts
-                            .put("[" + special + "]" + CustomToolHelper.getSimpleReferenceName(baseItem), old);
-                }
-            }
-        }
-
-        @Override
-        public String describe() {
-            return "Adding " + special + " special craft";
-        }
-
-        @Override
-        public String describeUndo() {
-            return "Undoing " + special + " special craft";
-        }
-
-        @Override
-        public boolean canUndo() {
-            return true;
-        }
-
-        @Override
-        public Object getOverrideKey() {
-            return null;
-        }
+        return items;
     }
 }

@@ -9,13 +9,13 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.helpers.BlockPositionHelper;
 import minefantasy.mf2.api.weapon.IRackItem;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.TileInventoryPacket;
 
@@ -41,24 +41,14 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
 
     @Override
     public ItemStack decrStackSize(int i, int j) {
-        if (inv[i] != null) {
-            if (inv[i].stackSize <= j) {
-                ItemStack itemstack = inv[i];
-                inv[i] = null;
-                onContentsChanged();
-                return itemstack;
-            }
-            ItemStack itemstack1 = inv[i].splitStack(j);
-            if (inv[i].stackSize == 0) {
-                inv[i] = null;
-            }
+        ItemStack taken = InventorySlots.take(inv, i, j);
+        if (taken != null) {
             onContentsChanged();
-            return itemstack1;
         } else {
             syncItems();
             updateInventory();
-            return null;
         }
+        return taken;
     }
 
     @Override
@@ -81,35 +71,14 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        NBTTagList savedItems = nbt.getTagList("Items", 10);
-        this.inv = new ItemStack[this.getSizeInventory()];
-
-        for (int i = 0; i < savedItems.tagCount(); ++i) {
-            NBTTagCompound savedSlot = savedItems.getCompoundTagAt(i);
-            byte slotNum = savedSlot.getByte("Slot");
-
-            if (slotNum >= 0 && slotNum < this.inv.length) {
-                this.inv[slotNum] = ItemStack.loadItemStackFromNBT(savedSlot);
-            }
-        }
+        inv = InventorySlots.read(nbt, "Items", inv.length);
     }
 
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        NBTTagList savedItems = new NBTTagList();
-
-        for (int i = 0; i < this.inv.length; ++i) {
-            if (this.inv[i] != null) {
-                NBTTagCompound savedSlot = new NBTTagCompound();
-                savedSlot.setByte("Slot", (byte) i);
-                this.inv[i].writeToNBT(savedSlot);
-                savedItems.appendTag(savedSlot);
-            }
-        }
-
-        nbt.setTag("Items", savedItems);
+        InventorySlots.write(nbt, "Items", inv);
     }
 
     @Override
@@ -131,7 +100,7 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
 
             NetworkUtils.sendToWatchers(
                     new TileInventoryPacket(this, this).generatePacket(),
-                    (WorldServer) worldObj,
+                    worldObj,
                     this.xCoord,
                     this.zCoord);
             super.sendPacketToClient();

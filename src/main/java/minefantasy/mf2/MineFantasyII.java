@@ -13,6 +13,7 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLLoadCompleteEvent;
 import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -20,6 +21,7 @@ import cpw.mods.fml.relauncher.Side;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.CustomArmourEntry;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.commands.CommandMF;
@@ -182,6 +184,12 @@ public class MineFantasyII {
         proxy.registerTickHandlers();
         MetalMaterial.addHeatables();
         TCCompat.afterRecipes();
+    }
+
+    /** Every mod has registered its recipes by now; publish them for stations and NEI. */
+    @EventHandler
+    public void loadComplete(FMLLoadCompleteEvent event) {
+        MFRecipes.REGISTRIES.finishLoading();
     }
 
     @EventHandler

@@ -46,6 +46,13 @@ public class NetworkUtils {
         }
     }
 
+    /** Sends to the players watching the chunk; a world that is not a server's (a client, a test) has none. */
+    public static void sendToWatchers(Packet packet, net.minecraft.world.World world, int worldX, int worldZ) {
+        if (world instanceof WorldServer) {
+            sendToWatchers(packet, (WorldServer) world, worldX, worldZ);
+        }
+    }
+
     public static void sendToWatchers(Packet packet, WorldServer world, int worldX, int worldZ) {
         try {
             Object playerInstance = getOrCreateChunkWatcher

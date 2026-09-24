@@ -1,10 +1,6 @@
 package minefantasy.mf2.api.crafting;
 
-import java.util.HashMap;
-
-import net.minecraft.block.Block;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.world.World;
@@ -19,62 +15,8 @@ public class BasicTierRecipe extends ShapedRecipes {
     }
 
     public static BasicTierRecipe add(ItemStack result, Object... input) {
-        String var3 = "";
-        int var4 = 0;
-        int var5 = 0;
-        int var6 = 0;
-        int var9;
-
-        if (input[var4] instanceof String[]) {
-            String[] var7 = ((String[]) input[var4++]);
-            String[] var8 = var7;
-            var9 = var7.length;
-
-            for (int var10 = 0; var10 < var9; ++var10) {
-                String var11 = var8[var10];
-                ++var6;
-                var5 = var11.length();
-                var3 = var3 + var11;
-            }
-        } else {
-            while (input[var4] instanceof String) {
-                String var13 = (String) input[var4++];
-                ++var6;
-                var5 = var13.length();
-                var3 = var3 + var13;
-            }
-        }
-
-        HashMap var14;
-
-        for (var14 = new HashMap(); var4 < input.length; var4 += 2) {
-            Character var16 = (Character) input[var4];
-            ItemStack var17 = null;
-
-            if (input[var4 + 1] instanceof Item) {
-                var17 = new ItemStack((Item) input[var4 + 1], 1, 32767);
-            } else if (input[var4 + 1] instanceof Block) {
-                var17 = new ItemStack((Block) input[var4 + 1], 1, 32767);
-            } else if (input[var4 + 1] instanceof ItemStack) {
-                var17 = (ItemStack) input[var4 + 1];
-            }
-
-            var14.put(var16, var17);
-        }
-
-        ItemStack[] var15 = new ItemStack[var5 * var6];
-
-        for (var9 = 0; var9 < var5 * var6; ++var9) {
-            char var18 = var3.charAt(var9);
-
-            if (var14.containsKey(Character.valueOf(var18))) {
-                var15[var9] = ((ItemStack) var14.get(Character.valueOf(var18))).copy();
-            } else {
-                var15[var9] = null;
-            }
-        }
-
-        BasicTierRecipe recipe = new BasicTierRecipe(var5, var6, var15, result);
+        RecipePattern pattern = RecipePattern.shaped(input);
+        BasicTierRecipe recipe = new BasicTierRecipe(pattern.width, pattern.height, pattern.cells, result);
         GameRegistry.addRecipe(recipe);
         return recipe;
     }

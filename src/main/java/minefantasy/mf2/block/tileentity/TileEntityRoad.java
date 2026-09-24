@@ -7,7 +7,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.network.NetworkUtils;
 
@@ -51,7 +50,7 @@ public class TileEntityRoad extends TileEntity {
     public void sendPacketToClients() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(getDescriptionPacket(), (WorldServer) worldObj, this.xCoord, this.zCoord);
+        NetworkUtils.sendToWatchers(getDescriptionPacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     public void writeToNBT(NBTTagCompound nbt) {

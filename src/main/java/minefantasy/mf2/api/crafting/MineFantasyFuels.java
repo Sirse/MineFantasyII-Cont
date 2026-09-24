@@ -48,8 +48,7 @@ public class MineFantasyFuels {
     public static int getCarbon(ItemStack item) {
         if (item == null) return 0;
 
-        for (int i : OreDictionary.getOreIDs(item)) {
-            String name = OreDictionary.getOreName(i);
+        for (String name : minefantasy.mf2.api.recipe.OreNames.get().namesOf(item)) {
             if (name != null && name.startsWith("Carbon-")) {
                 String s = name.substring(7);
                 int uses = Integer.parseInt(s);

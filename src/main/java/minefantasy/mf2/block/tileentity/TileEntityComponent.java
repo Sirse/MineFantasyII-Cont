@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
@@ -125,11 +124,7 @@ public class TileEntityComponent extends TileEntity {
     public void syncData() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(
-                new StorageBlockPacket(this).generatePacket(),
-                (WorldServer) worldObj,
-                this.xCoord,
-                this.zCoord);
+        NetworkUtils.sendToWatchers(new StorageBlockPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
     }
 
     public boolean isFull() {

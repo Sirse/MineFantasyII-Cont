@@ -7,7 +7,9 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
-import minefantasy.mf2.api.crafting.refine.QuernRecipes;
+import minefantasy.mf2.api.crafting.MFRecipeKeys;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 public class RecipeHandlerQuern extends MFNEIRecipeHandler {
@@ -51,55 +53,44 @@ public class RecipeHandlerQuern extends MFNEIRecipeHandler {
     }
 
     private void loadRecipesFor(ItemStack result) {
-        for (QuernRecipes recipe : QuernRecipes.recipeList) {
-            if (isValidRecipe(recipe) && matchesOutput(recipe.result, result)) {
-                CachedQuernRecipe cachedRecipe = new CachedQuernRecipe(recipe);
-                arecipes.add(cachedRecipe);
-            }
+        for (ProcessRecipe recipe : recipesMaking(MFRecipes.QUERN, result)) {
+            arecipes.add(new CachedQuernRecipe(recipe));
         }
     }
 
     @Override
     public void loadUsageRecipes(ItemStack ingredient) {
-        if (NEIHelper.isValidStack(ingredient)) {
-            if (ingredient.getItem().equals(ComponentListMF.clay_pot)) {
-                for (QuernRecipes recipe : QuernRecipes.recipeList) {
-                    if (!isValidRecipe(recipe)) {
-                        continue;
-                    }
-                    CachedQuernRecipe cachedRecipe = new CachedQuernRecipe(recipe);
-                    arecipes.add(cachedRecipe);
-                }
-                return;
-            }
-
-            for (QuernRecipes output : QuernRecipes.recipeList) {
-                if (isValidRecipe(output) && NEIHelper.matchesItemDamage(output.input, ingredient)) {
-                    CachedQuernRecipe recipe = new CachedQuernRecipe(output);
-                    arecipes.add(recipe);
-                }
-            }
+        if (!NEIHelper.isValidStack(ingredient)) {
+            return;
         }
-    }
-
-    private boolean isValidRecipe(QuernRecipes recipe) {
-        return recipe != null && NEIHelper.isValidStack(recipe.input) && NEIHelper.isValidStack(recipe.result);
+        if (ingredient.getItem() == ComponentListMF.clay_pot) {
+            for (ProcessRecipe recipe : recipesMaking(MFRecipes.QUERN, null)) {
+                if (recipe.get(MFRecipeKeys.CONSUME_POT, true)) {
+                    arecipes.add(new CachedQuernRecipe(recipe));
+                }
+            }
+            return;
+        }
+        for (ProcessRecipe recipe : recipesUsing(MFRecipes.QUERN, ingredient)) {
+            arecipes.add(new CachedQuernRecipe(recipe));
+        }
     }
 
     private class CachedQuernRecipe extends CachedRecipe {
 
-        private ItemStack input, output;
-        private boolean consumePot;
+        private final PositionedStack input;
+        private final ItemStack output;
+        private final boolean consumePot;
 
-        private CachedQuernRecipe(QuernRecipes recipe) {
-            input = NEIHelper.validCopy(recipe.input);
-            output = NEIHelper.validCopy(recipe.result);
-            consumePot = recipe.consumePot;
+        private CachedQuernRecipe(ProcessRecipe recipe) {
+            input = NEIHelper.positionedInput(recipe.getInput(), 76, 9);
+            output = recipe.getOutput();
+            consumePot = recipe.get(MFRecipeKeys.CONSUME_POT, true);
         }
 
         @Override
         public PositionedStack getIngredient() {
-            return NEIHelper.positionedStack(input, 76, 9);
+            return input;
         }
 
         @Override

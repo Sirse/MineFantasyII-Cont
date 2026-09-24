@@ -15,9 +15,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import minefantasy.mf2.api.crafting.carpenter.ICarpenterRecipe;
-import minefantasy.mf2.api.crafting.carpenter.ShapedCarpenterRecipes;
-import minefantasy.mf2.api.crafting.carpenter.ShapelessCarpenterRecipes;
+import minefantasy.mf2.api.crafting.GridRecipe;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
@@ -26,7 +25,7 @@ public class EntryPageRecipeCarpenter extends EntryPage {
 
     public static int switchRate = 15;
     private Minecraft mc = Minecraft.getMinecraft();
-    private ICarpenterRecipe[] recipes = new ICarpenterRecipe[] {};
+    private GridRecipe[] recipes = new GridRecipe[] {};
     private int recipeID;
     private boolean shapelessRecipe = false;
     private boolean oreDictRecipe = false;
@@ -36,8 +35,8 @@ public class EntryPageRecipeCarpenter extends EntryPage {
      */
     private String station;
 
-    public EntryPageRecipeCarpenter(List<ICarpenterRecipe> recipes) {
-        ICarpenterRecipe[] array = new ICarpenterRecipe[recipes.size()];
+    public EntryPageRecipeCarpenter(List<GridRecipe> recipes) {
+        GridRecipe[] array = new GridRecipe[recipes.size()];
         for (int a = 0; a < recipes.size(); a++) {
             array[a] = recipes.get(a);
         }
@@ -45,14 +44,14 @@ public class EntryPageRecipeCarpenter extends EntryPage {
 
     }
 
-    public EntryPageRecipeCarpenter(ICarpenterRecipe... recipes) {
+    public EntryPageRecipeCarpenter(GridRecipe... recipes) {
         this.recipes = recipes;
     }
 
     /**
      * @param station tool type key used for the station label and icon, e.g. "carpenter" or "kitchenbench"
      */
-    public EntryPageRecipeCarpenter(String station, ICarpenterRecipe... recipes) {
+    public EntryPageRecipeCarpenter(String station, GridRecipe... recipes) {
         this.recipes = recipes;
         this.station = station;
     }
@@ -68,7 +67,8 @@ public class EntryPageRecipeCarpenter extends EntryPage {
                 .bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/carpenterGrid.png"));
         parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
 
-        ICarpenterRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : recipes[recipeID];
+        // The page holds the recipe registered by the mod; a script may have replaced or removed it since
+        GridRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : current(recipes[recipeID]);
         String cft = "<" + StatCollector.translateToLocal("method." + getStation(recipe)) + ">";
         mc.fontRenderer.drawSplitString(
                 cft,
@@ -100,7 +100,14 @@ public class EntryPageRecipeCarpenter extends EntryPage {
      * Deriving it keeps the page correct when the kitchen bench is disabled and its recipes fall back to the carpenter
      * bench.
      */
-    private String getStation(ICarpenterRecipe recipe) {
+    private static GridRecipe current(GridRecipe recipe) {
+        if (MFRecipes.KITCHEN.idOf(recipe) != null) {
+            return MFRecipes.KITCHEN.current(recipe);
+        }
+        return MFRecipes.CARPENTER.current(recipe);
+    }
+
+    private String getStation(GridRecipe recipe) {
         if (station != null) {
             return station;
         }
@@ -110,7 +117,7 @@ public class EntryPageRecipeCarpenter extends EntryPage {
         return "carpenter";
     }
 
-    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, ICarpenterRecipe recipe) {
+    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, GridRecipe recipe) {
         if (parent == null) return;
         if (recipe == null) return;
         shapelessRecipe = false;
@@ -127,49 +134,10 @@ public class EntryPageRecipeCarpenter extends EntryPage {
                 true);
         GuiHelper.renderToolIcon(parent, getStation(recipe), recipe.getAnvil(), posX + 124, posY + 51, true, true);
 
-        if (recipe instanceof ShapedCarpenterRecipes) {
-            ShapedCarpenterRecipes shaped = (ShapedCarpenterRecipes) recipe;
-
-            for (int y = 0; y < shaped.recipeHeight; y++) {
-                for (int x = 0; x < shaped.recipeWidth; x++) {
-                    renderItemAtGridPos(
-                            parent,
-                            1 + x,
-                            1 + y,
-                            shaped.recipeItems[y * shaped.recipeWidth + x],
-                            true,
-                            posX,
-                            posY,
-                            mx,
-                            my);
-                }
-            }
-        } else if (recipe instanceof ShapelessCarpenterRecipes) {
-            ShapelessCarpenterRecipes shapeless = (ShapelessCarpenterRecipes) recipe;
-
-            drawGrid: {
-                for (int y = 0; y < 4; y++) {
-                    for (int x = 0; x < 4; x++) {
-                        int index = y * 4 + x;
-
-                        if (index >= shapeless.recipeItems.size()) break drawGrid;
-
-                        renderItemAtGridPos(
-                                parent,
-                                1 + x,
-                                1 + y,
-                                (ItemStack) shapeless.recipeItems.get(index),
-                                true,
-                                posX,
-                                posY,
-                                mx,
-                                my);
-                    }
-                }
-            }
-
-            shapelessRecipe = true;
-        }
+        GridPages.forEachEntry(
+                recipe,
+                (x, y, stack) -> renderItemAtGridPos(parent, 1 + x, 1 + y, stack, true, posX, posY, mx, my));
+        shapelessRecipe = !recipe.isShaped();
         renderResult(parent, recipe.getRecipeOutput(), false, posX, posY, mx, my);
     }
 

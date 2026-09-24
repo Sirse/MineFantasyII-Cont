@@ -1,22 +1,21 @@
 package minefantasy.mf2.integration.nei;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
-import codechicken.nei.ItemList;
 import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.util.MFLogUtil;
+import minefantasy.mf2.api.recipe.Input;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 
 public class RecipeHandlerCooking extends MFNEIRecipeHandler {
 
@@ -27,57 +26,39 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
         super("minefantasy2.cooking");
     }
 
-    private static ArrayList<CookingPair> recipeList;
-    private static boolean recipeListBuilt;
-
-    @Override
-    public codechicken.nei.recipe.TemplateRecipeHandler newInstance() {
-        if (!recipeListBuilt) {
-            fillRecipeList();
+    /**
+     * Every cooking recipe NEI can show: the registered ones, then plain food from the vanilla furnace that a spit
+     * cooks when {@link CookRecipe#canCookBasics} allows it and no registered recipe claims the item.
+     */
+    private static List<CookingPair> allRecipes() {
+        List<CookingPair> pairs = new ArrayList<CookingPair>();
+        for (RecipeEntry<CookRecipe> entry : MFRecipes.COOKING.published().all()) {
+            CookRecipe recipe = entry.getRecipe();
+            pairs.add(new CookingPair(recipe.getInput(), null, recipe));
         }
-        return super.newInstance();
-    }
-
-    private static void fillRecipeList() {
-        recipeList = new ArrayList<CookingPair>();
-        Set<String> addedRecipes = new HashSet<String>();
-        ArrayList<ItemStack> items = snapshotItemList();
-        if (items == null) {
-            return;
-        }
-        for (ItemStack item : items) {
-            if (!NEIHelper.isValidStack(item)) {
-                continue;
+        if (CookRecipe.canCookBasics) {
+            for (Object key : FurnaceRecipes.smelting().getSmeltingList().keySet()) {
+                if (!(key instanceof ItemStack) || !NEIHelper.isValidStack((ItemStack) key)) {
+                    continue;
+                }
+                ItemStack input = (ItemStack) key;
+                CookRecipe recipe = CookRecipe.getResult(input, false);
+                if (recipe != null && isBasic(recipe, input)) {
+                    pairs.add(new CookingPair(null, input, recipe));
+                }
             }
-            addRecipe(item, false, addedRecipes);
-            addRecipe(item, true, addedRecipes);
         }
-        recipeListBuilt = true;
+        return pairs;
     }
 
-    private static ArrayList<ItemStack> snapshotItemList() {
-        try {
-            return new ArrayList<ItemStack>(ItemList.items);
-        } catch (ConcurrentModificationException e) {
-            MFLogUtil.warnOnce("nei-cooking-itemlist-cme", "NEI item list changed while building cooking recipes", e);
-            return null;
+    /** A recipe built on the fly for vanilla food, rather than a registered one. */
+    private static boolean isBasic(CookRecipe recipe, ItemStack input) {
+        for (RecipeEntry<CookRecipe> entry : MFRecipes.COOKING.published().candidates(Input.lookupKeys(input))) {
+            if (entry.getRecipe() == recipe) {
+                return false;
+            }
         }
-    }
-
-    private static void addRecipe(ItemStack input, boolean oven, Set<String> addedRecipes) {
-        CookRecipe recipe = CookRecipe.getResult(input, oven);
-        if (recipe == null || !NEIHelper.isValidStack(recipe.output)) {
-            return;
-        }
-        String recipeKey = getRecipeKey(input, recipe.output, oven);
-        if (!addedRecipes.add(recipeKey)) {
-            return;
-        }
-        recipeList.add(new CookingPair(input, recipe, oven));
-    }
-
-    private static String getRecipeKey(ItemStack input, ItemStack output, boolean oven) {
-        return CustomToolHelper.getReferenceName(input) + ">" + CustomToolHelper.getReferenceName(output) + ">" + oven;
+        return true;
     }
 
     @Override
@@ -119,10 +100,10 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
     }
 
     private String formatTemperature(CookRecipe recipe) {
-        if (recipe.minTemperature == recipe.maxTemperature) {
-            return recipe.minTemperature + " C";
+        if (recipe.getMinTemperature() == recipe.getMaxTemperature()) {
+            return recipe.getMinTemperature() + " C";
         }
-        return recipe.minTemperature + "-" + recipe.maxTemperature + " C";
+        return recipe.getMinTemperature() + "-" + recipe.getMaxTemperature() + " C";
     }
 
     @Override
@@ -130,10 +111,9 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(result)) {
             return;
         }
-        ensureRecipeList();
-        for (CookingPair recipePair : recipeList) {
-            if (recipePair != null && CustomToolHelper.areEqual(recipePair.recipe.output, result)) {
-                arecipes.add(new CachedCookingRecipe(recipePair));
+        for (CookingPair pair : allRecipes()) {
+            if (CustomToolHelper.areEqual(pair.recipe.getOutput(), result)) {
+                arecipes.add(new CachedCookingRecipe(pair));
             }
         }
     }
@@ -143,32 +123,26 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(ingredient)) {
             return;
         }
-        ensureRecipeList();
-        for (CookingPair recipePair : recipeList) {
-            if (recipePair != null && CustomToolHelper.areEqual(recipePair.input, ingredient)) {
-                CachedCookingRecipe cachedRecipe = new CachedCookingRecipe(recipePair);
+        for (CookingPair pair : allRecipes()) {
+            if (pair.recipe.getInput().matches(ingredient)) {
+                CachedCookingRecipe cachedRecipe = new CachedCookingRecipe(pair);
                 cachedRecipe.setIngredientPermutation(cachedRecipe.getIngredients(), ingredient);
                 arecipes.add(cachedRecipe);
             }
         }
     }
 
-    private void ensureRecipeList() {
-        if (!recipeListBuilt) {
-            fillRecipeList();
-        }
-    }
-
     private static class CookingPair {
 
-        private final ItemStack input;
+        /** The registered input, or null for a vanilla food shown by its stack. */
+        private final Input input;
+        private final ItemStack stack;
         private final CookRecipe recipe;
-        private final boolean oven;
 
-        private CookingPair(ItemStack input, CookRecipe recipe, boolean oven) {
-            this.input = NEIHelper.validCopy(input);
+        private CookingPair(Input input, ItemStack stack, CookRecipe recipe) {
+            this.input = input;
+            this.stack = NEIHelper.validCopy(stack);
             this.recipe = recipe;
-            this.oven = oven;
         }
     }
 
@@ -181,9 +155,11 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
 
         private CachedCookingRecipe(CookingPair recipePair) {
             recipe = recipePair.recipe;
-            oven = recipePair.oven;
-            input = NEILayout.stack(recipePair.input, NEILayout.COOKING_INPUT);
-            output = NEILayout.stack(recipe.output, NEILayout.COOKING_OUTPUT);
+            oven = recipe.isBaking();
+            input = recipePair.input != null
+                    ? NEIHelper.positionedInput(recipePair.input, NEILayout.COOKING_INPUT.x, NEILayout.COOKING_INPUT.y)
+                    : NEILayout.stack(recipePair.stack, NEILayout.COOKING_INPUT);
+            output = NEILayout.stack(recipe.getOutput(), NEILayout.COOKING_OUTPUT);
         }
 
         @Override
