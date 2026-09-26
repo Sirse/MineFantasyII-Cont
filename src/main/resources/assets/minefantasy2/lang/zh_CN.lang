@@ -151,6 +151,7 @@ component.brace.name=%1$s支架
 materialtype.wood.name=木材等级：%1$s
 materialtype.leather.name=皮革等级：%1$s
 materialtype.metal.name=金属等级：%1$s
+materialtype.Magic.name=魔法材料
 materialtype.workable.name=锻造温度：%1$s*C - %2$s*C
 
 materialtype.resist.name=%1$s 抗性

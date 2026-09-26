@@ -158,6 +158,7 @@ component.brace.name=%1$s крепление
 materialtype.wood.name=Дерево (lvl %1$s)
 materialtype.leather.name=Кожа (lvl %1$s)
 materialtype.metal.name=Металл (lvl %1$s)
+materialtype.Magic.name=Магический материал
 materialtype.workable.name=Темп. ковки: %1$s°C - %2$s°C
 
 materialtype.resist.name=Сопротивление %1$s
