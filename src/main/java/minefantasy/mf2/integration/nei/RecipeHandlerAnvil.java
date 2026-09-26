@@ -347,7 +347,9 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                         continue;
                     }
                     NEIHelper.fillMaterials(iAnvilRecipe, cachedStack, inputStack);
-                    PositionedStack stack = NEIHelper.positionedStack(cachedStack, 31 + x * 18, 54 + y * 18, false);
+                    NEIHelper.settleWildcard(cachedStack);
+                    PositionedStack stack = NEIHelper
+                            .positionedStack(cachedStack, 31 + x * 18, 54 + y * 18, NEIHelper.isWildcard(cachedStack));
                     if (stack == null) {
                         continue;
                     }
@@ -372,11 +374,12 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                     continue;
                 }
                 NEIHelper.fillMaterials(iAnvilRecipe, cachedStack, inputStack);
+                NEIHelper.settleWildcard(cachedStack);
                 PositionedStack stack = NEIHelper.positionedStack(
                         cachedStack,
                         31 + SHAPELESS_STACK_ORDER[ingred][0] * 18,
                         54 + SHAPELESS_STACK_ORDER[ingred][1] * 18,
-                        false);
+                        NEIHelper.isWildcard(cachedStack));
                 if (stack == null) {
                     continue;
                 }

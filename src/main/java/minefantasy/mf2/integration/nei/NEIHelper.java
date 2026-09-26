@@ -112,6 +112,22 @@ public class NEIHelper {
         return copy;
     }
 
+    /** Subtyped items left on the wildcard meta cycle through their variants instead of showing the raw meta. */
+    public static boolean isWildcard(ItemStack stack) {
+        return stack.getItemDamage() == OreDictionary.WILDCARD_VALUE;
+    }
+
+    /**
+     * A wildcard stack that already carries the materials the recipe needs (filled from the result) is one specific
+     * variant: it shows as metadata 0 and must not cycle, or NEI would swap it for every variant of the item and drop
+     * the materials (a sword's plank handle would take any wood).
+     */
+    public static void settleWildcard(ItemStack stack) {
+        if (stack != null && isWildcard(stack) && stack.hasTagCompound()) {
+            stack.setItemDamage(0);
+        }
+    }
+
     public static boolean canViewResearch(net.minecraft.entity.player.EntityPlayer player, String research) {
         if (research == null || research.isEmpty()) {
             return true;
