@@ -5,7 +5,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.integration.thaumcraft.TCRepairRules;
 
 /** Joining two worn items of the same kind into one on the anvil or the carpenter's bench. */
@@ -46,7 +46,7 @@ public final class GridRepair {
         Item item = first.getItem();
         int remainFirst = first.getMaxDamage() - first.getItemDamageForDisplay();
         int remainSecond = second.getMaxDamage() - second.getItemDamageForDisplay();
-        ItemStack nbtSource = ToolHelper.getQualityLevel(first) >= ToolHelper.getQualityLevel(second) ? first : second;
+        ItemStack nbtSource = ItemQuality.get(first) >= ItemQuality.get(second) ? first : second;
         int maxDamage = nbtSource.getMaxDamage();
         int combined = remainFirst + remainSecond + maxDamage * 10 / 100;
         int damage = Math.max(0, maxDamage - combined);

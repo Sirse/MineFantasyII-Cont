@@ -18,6 +18,8 @@ public final class CheckResult {
         public static final Reason SKILL = new Reason("skill");
         public static final Reason OUTPUT_FULL = new Reason("output_full");
         public static final Reason DIRTY = new Reason("dirty");
+        /** Another recipe earlier in the lookup takes the same items. */
+        public static final Reason SHADOWED = new Reason("shadowed");
 
         private final String id;
         private final Object[] args;
@@ -42,6 +44,20 @@ public final class CheckResult {
 
         public static Reason tier(String what, int have, int need) {
             return of("tier", what, have, need);
+        }
+
+        /** A tool or station below the tier needed still works, only harder. */
+        public static Reason harder(String what, int have, int need) {
+            return of("harder", what, have, need);
+        }
+
+        public boolean isShadowed() {
+            return "shadowed".equals(id);
+        }
+
+        /** Whether this only makes the work harder rather than stopping it. */
+        public boolean isPenalty() {
+            return "harder".equals(id);
         }
 
         public String getId() {

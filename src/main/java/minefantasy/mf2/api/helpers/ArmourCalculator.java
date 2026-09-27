@@ -509,8 +509,9 @@ public class ArmourCalculator {
      */
     public static float getArmourValueMod(ItemStack armour, float DT) {
         float initDT = DT;
-        if (armour.hasTagCompound() && armour.getTagCompound().hasKey("MF_Inferior")) {
-            DT *= (armour.getTagCompound().getBoolean("MF_Inferior") ? 0.8F : 1.2F);
+        ItemQuality.Grade grade = ItemQuality.getGrade(armour);
+        if (grade != ItemQuality.Grade.ORDINARY) {
+            DT *= grade == ItemQuality.Grade.INFERIOR ? 0.8F : 1.2F;
         }
         DT *= modifyDTOnDura(armour);
         return DT;

@@ -101,15 +101,8 @@ public class Cooking {
 
     private static CookRecipe recipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time,
             int burnTime, boolean requireBaking, boolean canBurn) {
-        return CookRecipe.of(
-                ScriptInputs.toInput(input),
-                ScriptInputs.toOutput(output),
-                new ItemStack(CookRecipe.burnt_food),
-                minTemp,
-                maxTemp,
-                time,
-                burnTime,
-                requireBaking,
-                canBurn);
+        return CookRecipe.builder(ScriptInputs.toInput(input), ScriptInputs.toOutput(output))
+                .temperature(minTemp, maxTemp).time(time).burnTime(burnTime).oven(requireBaking).canBurn(canBurn)
+                .build();
     }
 }

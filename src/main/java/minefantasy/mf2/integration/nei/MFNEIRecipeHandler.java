@@ -2,9 +2,13 @@ package minefantasy.mf2.integration.nei;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.ToIntFunction;
 
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 
+import codechicken.nei.recipe.IUsageHandler;
+import codechicken.nei.recipe.RecipeCatalysts;
 import codechicken.nei.recipe.TemplateRecipeHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.recipe.Input;
@@ -40,8 +44,40 @@ public abstract class MFNEIRecipeHandler extends TemplateRecipeHandler {
         }
     }
 
-    /** Lists every recipe the player may see; handlers without a station GUI never get asked */
+    /** Lists every recipe the player may see: for the station GUI's click area and for the station as a catalyst */
     protected void loadAllRecipes() {}
+
+    /**
+     * Whether the recipe can be made on this station, one of the handler's catalysts: a station below the tier the
+     * recipe needs cannot. Every recipe by default.
+     */
+    protected boolean madeOn(ItemStack station, CachedRecipe recipe) {
+        return true;
+    }
+
+    /**
+     * Looking up the uses of a station lists the recipes it can make. NEI's own lookup goes through a transfer
+     * rectangle these handlers do not have, and would list every recipe whatever the station's tier.
+     */
+    @Override
+    public IUsageHandler getUsageAndCatalystHandler(String inputId, Object... ingredients) {
+        if ("item".equals(inputId) && ingredients.length > 0
+                && ingredients[0] instanceof ItemStack
+                && RecipeCatalysts.containsCatalyst(this, (ItemStack) ingredients[0])) {
+            ItemStack station = (ItemStack) ingredients[0];
+            MFNEIRecipeHandler handler = (MFNEIRecipeHandler) newInstance();
+            handler.loadAllRecipes();
+            handler.arecipes.removeIf(recipe -> !handler.madeOn(station, recipe));
+            return handler;
+        }
+        return getUsageHandler(inputId, ingredients);
+    }
+
+    /** What the station block says about itself, or the fallback when the stack is not such a block. */
+    protected static int stationTier(ItemStack station, ToIntFunction<Block> tierOf) {
+        Block block = station == null ? null : Block.getBlockFromItem(station.getItem());
+        return block == null ? -1 : tierOf.applyAsInt(block);
+    }
 
     /** Output filter for recipe lookups, where a null wanted stack means "all of them" */
     protected static boolean matchesOutput(ItemStack output, ItemStack wanted) {

@@ -3,6 +3,8 @@ package minefantasy.mf2.api.refine;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
@@ -15,7 +17,7 @@ import minefantasy.mf2.util.MFLogUtil;
 
 /**
  * Crucible alloys, kept in {@link MFRecipes#ALLOY}. Native alloys are named after their output; the ratio copies of one
- * alloy ({@link #addRatioRecipe}) share its id with {@code _x2}, {@code _x3}... and are registered together.
+ * alloy ({@link Builder#ratio}) share its id with {@code _x2}, {@code _x3}... and are registered together.
  */
 public class AlloyRecipes {
 
@@ -32,14 +34,61 @@ public class AlloyRecipes {
         return MFRecipes.ALLOY.published().getGeneration();
     }
 
-    public static Alloy addAlloy(ItemStack out, int level, List in) {
-        Alloy alloy = new Alloy(out, level, in);
-        addAlloy(alloy);
-        return alloy;
+    /** A native alloy making the output; see {@link Builder}. */
+    public static Builder alloy(ItemStack output) {
+        return new Builder(output);
     }
 
-    public static void addAlloy(ItemStack out, List in) {
-        addAlloy(out, 0, in);
+    /**
+     * A native alloy: any crucible, and the ratio taken once, unless said otherwise. It is registered with its
+     * ingredients, items, blocks or stacks.
+     */
+    public static final class Builder {
+
+        private final ItemStack output;
+        private int level;
+        private int ratio = 1;
+
+        private Builder(ItemStack output) {
+            this.output = output;
+        }
+
+        /** The crucible tier it needs. */
+        public Builder level(int level) {
+            this.level = level;
+            return this;
+        }
+
+        /**
+         * Also made with every ingredient and the output multiplied, up to the given number of times as far as the nine
+         * crucible slots allow: 2 copper and 1 tin make it, and so do 4 and 2, and 6 and 3.
+         */
+        public Builder ratio(int times) {
+            this.ratio = times;
+            return this;
+        }
+
+        /** Registers the alloy and its ratio copies; they are returned in order, the plain one first. */
+        public Alloy[] of(Object... ingredients) {
+            return addRatioRecipe(output, level, stacks(ingredients), ratio);
+        }
+    }
+
+    private static List<ItemStack> stacks(Object[] ingredients) {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (Object ingredient : ingredients) {
+            if (ingredient instanceof ItemStack) {
+                stacks.add(((ItemStack) ingredient).copy());
+            } else if (ingredient instanceof Item) {
+                stacks.add(new ItemStack((Item) ingredient));
+            } else if (ingredient instanceof Block) {
+                stacks.add(new ItemStack((Block) ingredient));
+            } else {
+                throw new IllegalArgumentException(
+                        "An alloy ingredient must be an item, block or stack: " + ingredient);
+            }
+        }
+        return stacks;
     }
 
     public static void addAlloy(Alloy alloy) {
@@ -71,7 +120,7 @@ public class AlloyRecipes {
      *
      * @param the amount of times the ratio can be added
      */
-    public static Alloy[] addRatioRecipe(ItemStack out, int level, List in, int levels) {
+    private static Alloy[] addRatioRecipe(ItemStack out, int level, List in, int levels) {
         Alloy[] alloys = ratioAlloys(out, level, in, levels);
         if (alloys.length == 0) {
             return alloys;

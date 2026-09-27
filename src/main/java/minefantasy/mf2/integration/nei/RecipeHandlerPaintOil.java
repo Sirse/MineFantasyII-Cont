@@ -78,17 +78,22 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
     }
 
     @Override
+    protected void loadAllRecipes() {
+        for (ProcessRecipe recipe : recipesMaking(MFRecipes.PAINT_OIL, null)) {
+            ItemStack input = displayInput(recipe);
+            if (input != null) {
+                arecipes.add(new CachedPaintOilRecipe(input, materializeOutput(recipe.getOutput(), input)));
+            }
+        }
+    }
+
+    @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         if (!NEIHelper.isValidStack(ingredient)) {
             return;
         }
         if (ingredient.getItem() == ComponentListMF.plant_oil) {
-            for (ProcessRecipe recipe : recipesMaking(MFRecipes.PAINT_OIL, null)) {
-                ItemStack input = displayInput(recipe);
-                if (input != null) {
-                    arecipes.add(new CachedPaintOilRecipe(input, materializeOutput(recipe.getOutput(), input)));
-                }
-            }
+            loadAllRecipes();
             return;
         }
         for (ProcessRecipe recipe : recipesUsing(MFRecipes.PAINT_OIL, ingredient)) {

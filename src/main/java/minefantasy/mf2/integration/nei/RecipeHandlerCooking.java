@@ -16,6 +16,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.block.crafting.BlockRoast;
 
 public class RecipeHandlerCooking extends MFNEIRecipeHandler {
 
@@ -49,6 +50,22 @@ public class RecipeHandlerCooking extends MFNEIRecipeHandler {
             }
         }
         return pairs;
+    }
+
+    @Override
+    protected void loadAllRecipes() {
+        for (CookingPair pair : allRecipes()) {
+            arecipes.add(new CachedCookingRecipe(pair));
+        }
+    }
+
+    /** The oven bakes; the spit over a fire cooks the rest. */
+    @Override
+    protected boolean madeOn(ItemStack station, CachedRecipe recipe) {
+        boolean oven = stationTier(
+                station,
+                block -> block instanceof BlockRoast && ((BlockRoast) block).isOven() ? 1 : 0) == 1;
+        return ((CachedCookingRecipe) recipe).oven == oven;
     }
 
     /** A recipe built on the fly for vanilla food, rather than a registered one. */

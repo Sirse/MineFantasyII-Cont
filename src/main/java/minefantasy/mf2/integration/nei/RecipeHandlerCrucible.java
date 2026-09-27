@@ -10,9 +10,11 @@ import org.lwjgl.opengl.GL11;
 
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
+import minefantasy.mf2.block.refining.BlockCrucible;
 
 public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
 
@@ -42,6 +44,12 @@ public class RecipeHandlerCrucible extends MFNEIRecipeHandler {
         if (NEIHelper.isValidStack(result)) {
             loadRecipesFor(result);
         }
+    }
+
+    @Override
+    protected boolean madeOn(ItemStack station, CachedRecipe recipe) {
+        int tier = stationTier(station, block -> block instanceof BlockCrucible ? ((BlockCrucible) block).tier : -1);
+        return tier < 0 || Requirements.CRUCIBLE.stationFits(tier, ((CachedAlloyRecipe) recipe).tier);
     }
 
     @Override

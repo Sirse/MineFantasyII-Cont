@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
@@ -25,7 +26,6 @@ import minefantasy.mf2.api.recipe.Diagnosis;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
-import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.crafting.BlockEngineerTanner;
@@ -42,10 +42,13 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
     public float progress;
     public float maxProgress;
     public String tex = "";
+    /** The rack's own tier; it does not limit what the rack tans. */
     public int tier = 0;
     public String toolType = "knife";
-    /** The work the progress belongs to, kept across saves: a changed recipe restarts it. */
-    private final RunningCraft running = new RunningCraft();
+    /** The tool tier the hide on the rack needs. */
+    public int toolTier = -1;
+    /** The work the progress belongs to, kept across saves, and what watchers last got. */
+    private final CraftState craft = new CraftState();
     public float prevAcTime;
     public float acTime;
     private int tempTicksExisted = 0;
@@ -82,7 +85,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
      */
     public boolean interact(EntityPlayer player, boolean leftClick, boolean leverPull) {
         boolean handled = applyInteraction(player, leftClick, leverPull);
-        sendState();
+        sendState(true);
         return handled;
     }
 
@@ -96,7 +99,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
 
         // Interaction
         if (items[1] != null && (leverPull || ToolHelper.getCrafterTool(held).equalsIgnoreCase(toolType))) {
-            if (leverPull || ToolHelper.getCrafterTier(held) >= tier) {
+            if (leverPull || requirements().check(Requirements.TANNING, player, 0).allows()) {
                 if (!leverPull) {
                     held.damageItem(1, player);
                     if (held.getItemDamage() >= held.getMaxDamage()) {
@@ -218,46 +221,42 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         if (items[0] == null) {
             return Diagnosis.problem("tanning", CheckResult.Reason.MISSING_INPUT);
         }
-        ItemStack held = player.getHeldItem();
-        String tool = ToolHelper.getCrafterTool(held);
-        int toolTier = ToolHelper.getCrafterTier(held);
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        boolean chosen = false;
-        for (RecipeEntry<ProcessRecipe> entry : MFRecipes.TANNING.published().candidates(Input.lookupKeys(items[0]))) {
-            ProcessRecipe recipe = entry.getRecipe();
-            CheckResult.Reason reason = recipe.getInput().explain(items[0]);
-            if (reason == null && chosen) {
-                reason = CheckResult.Reason.of("shadowed");
-            }
-            if (reason == null) {
-                chosen = true;
-                String needTool = recipe.get(MFRecipeKeys.TOOL, "knife");
-                int needTier = recipe.get(MFRecipeKeys.TIER, -1);
-                if (!isAutomated() && !needTool.equalsIgnoreCase(tool)) {
-                    reason = CheckResult.Reason.of("tool", needTool, tool);
-                } else if (!isAutomated() && toolTier < needTier) {
-                    reason = CheckResult.Reason.tier("tool", toolTier, needTier);
-                }
-            }
-            candidates.add(Diagnosis.candidate(entry, reason));
-        }
-        return Diagnosis.of("tanning", candidates);
+        return Diagnosis.of(
+                "tanning",
+                Diagnosis.walk(
+                        MFRecipes.TANNING.published().candidates(Input.lookupKeys(items[0])),
+                        recipe -> true,
+                        entry -> entry.getRecipe().getInput().explain(items[0]),
+                        entry -> isAutomated() ? null
+                                : requirements(entry.getRecipe()).check(Requirements.TANNING, player, 0).getRefusal())
+                        .getCandidates());
+    }
+
+    /** What the hide on the rack asks of the tool; a lever pull or a machine works it with none. */
+    private Requirements requirements() {
+        return new Requirements(toolType, toolTier, 0, "");
+    }
+
+    private static Requirements requirements(ProcessRecipe recipe) {
+        return new Requirements(recipe.get(MFRecipeKeys.TOOL, "knife"), recipe.get(MFRecipeKeys.TOOL_TIER, -1), 0, "");
     }
 
     public void updateRecipe() {
         RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.TANNING, items[0]);
         if (entry == null) {
             setInventorySlotContents(1, null);
-            progress = maxProgress = tier = 0;
+            progress = maxProgress = 0;
+            toolTier = -1;
         } else {
             ProcessRecipe recipe = entry.getRecipe();
             setInventorySlotContents(1, recipe.getOutput());
-            tier = recipe.get(MFRecipeKeys.TIER, -1);
+            toolTier = recipe.get(MFRecipeKeys.TOOL_TIER, -1);
             maxProgress = recipe.get(MFRecipeKeys.TIME, 0F);
             toolType = recipe.get(MFRecipeKeys.TOOL, "knife");
         }
-        progress = 0;
-        running.start(plan(entry));
+        if (!craft.follow(plan(entry))) {
+            progress = 0;
+        }
     }
 
     /** The work on the rack as the recipe asks for it now: what it takes from the rack and what it leaves there. */
@@ -270,7 +269,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
                 .use(0, recipe.getInput(), items[0]).output(recipe.getOutput())
                 .require(MFRecipeKeys.TIME, recipe.get(MFRecipeKeys.TIME, 0F))
                 .require(MFRecipeKeys.TOOL, recipe.get(MFRecipeKeys.TOOL, "knife"))
-                .require(MFRecipeKeys.TIER, recipe.get(MFRecipeKeys.TIER, -1)).build();
+                .require(MFRecipeKeys.TOOL_TIER, recipe.get(MFRecipeKeys.TOOL_TIER, -1)).build();
     }
 
     /**
@@ -280,7 +279,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
      */
     private CraftPlan currentPlan() {
         CraftPlan plan = plan(MFRecipes.find(MFRecipes.TANNING, items[0]));
-        if (running.holds(plan)) {
+        if (craft.holds(plan)) {
             return plan;
         }
         updateRecipe();
@@ -320,9 +319,10 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         tex = nbt.getString("tex");
         tier = nbt.getInteger("tier");
         progress = nbt.getFloat("Progress");
-        running.read(nbt);
+        craft.read(nbt);
         maxProgress = nbt.getFloat("maxProgress");
         toolType = nbt.getString("toolType");
+        toolTier = nbt.getInteger("ToolTier");
 
         items = InventorySlots.read(nbt, "Items", items.length);
     }
@@ -334,21 +334,26 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         nbt.setString("tex", tex);
         nbt.setInteger("tier", tier);
         nbt.setFloat("Progress", progress);
-        running.write(nbt);
+        craft.write(nbt);
         nbt.setFloat("maxProgress", maxProgress);
         nbt.setString("toolType", toolType);
+        nbt.setInteger("ToolTier", toolTier);
 
         InventorySlots.write(nbt, "Items", items);
     }
 
     // INVENTORY
     public void onInventoryChanged() {
-        sendState();
+        sendState(false);
     }
 
     /** Re-sends the description packet below to everyone watching */
-    private void sendState() {
-        if (worldObj != null && !worldObj.isRemote) {
+    /**
+     * Sends the rack to the watchers if it changed since they got it last, or always: after an interaction a client may
+     * have guessed wrong even though nothing changed here.
+     */
+    private void sendState(boolean always) {
+        if (worldObj != null && !worldObj.isRemote && (craft.changed(describe()) || always)) {
             worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
         }
     }
@@ -356,9 +361,14 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
     /** The saved state, so a player who starts watching the rack sees what is on it */
     @Override
     public Packet getDescriptionPacket() {
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
+    }
+
+    /** What watchers are shown of the rack: all of its save. */
+    private NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
         writeToNBT(nbt);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+        return nbt;
     }
 
     @Override

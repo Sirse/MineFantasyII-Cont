@@ -25,7 +25,6 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
-import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.block.crafting.BlockRoast;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.network.NetworkUtils;
@@ -45,8 +44,8 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     private Random rand = new Random();
     private int ticksExisted;
     private CookRecipe recipe;
-    /** The cooking the progress belongs to, kept across saves: a changed recipe restarts it. */
-    private final RunningCraft running = new RunningCraft();
+    /** The work the progress belongs to, kept across saves, and what watchers last got. */
+    private final CraftState craft = new CraftState();
     private boolean isOvenTemp;
 
     public TileEntityRoast() {}
@@ -145,11 +144,11 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     private void cook(int temp) {
         CookRecipe.Found found = CookRecipe.find(items[0], isOven());
         CraftPlan plan = plan(found, false);
-        if (plan == null && !running.isRunning()) {
+        if (plan == null && !craft.isRunning()) {
             // Nothing cooks the food, as before: burnt through or its recipe gone. Nothing to restart or resend
             return;
         }
-        if (!running.holds(plan)) {
+        if (!craft.holds(plan)) {
             updateRecipe();
             return;
         }
@@ -211,8 +210,9 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
      */
     public void updateRecipe() {
         cacheRecipe();
-        progress = 0;
-        running.start(plan(CookRecipe.find(items[0], isOven()), false));
+        if (!craft.follow(plan(CookRecipe.find(items[0], isOven()), false))) {
+            progress = 0;
+        }
         sendPacketToClients();
     }
 
@@ -259,7 +259,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         progress = nbt.getFloat("Progress");
-        running.read(nbt);
+        craft.read(nbt);
         maxProgress = nbt.getFloat("maxProgress");
 
         items = InventorySlots.read(nbt, "Items", items.length);
@@ -269,7 +269,7 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setFloat("Progress", progress);
-        running.write(nbt);
+        craft.write(nbt);
         nbt.setFloat("maxProgress", maxProgress);
 
         InventorySlots.write(nbt, "Items", items);
@@ -375,8 +375,12 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         return true;
     }
 
+    /** Sends the station to the watchers, if it changed since they got it last. */
     private void sendPacketToClients() {
         if (worldObj.isRemote) return;
+        NBTTagCompound state = new NBTTagCompound();
+        writeToNBT(state);
+        if (!craft.changed(state)) return;
 
         NetworkUtils.sendToWatchers(
                 new TileInventoryPacket(this, this).generatePacket(),

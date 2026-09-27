@@ -1,6 +1,5 @@
 package minefantasy.mf2.api;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -19,22 +18,18 @@ import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.cooking.CookRecipe;
-import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeGridRecipe;
 import minefantasy.mf2.api.crafting.NativeRecipes;
-import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
-import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
-import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.crafting.refine.QuernRecipes;
+import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
-import minefantasy.mf2.api.rpg.Skill;
-import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class MineFantasyAPI {
@@ -71,265 +66,30 @@ public class MineFantasyAPI {
         }
     }
 
-    public static void addAnvilRecipe(Skill skill, ItemStack result, boolean hot, int hammerType, int anvil,
-            int forgeTime, Object... input) {
-        addAnvilRecipe(skill, result, hot, "hammer", hammerType, anvil, forgeTime, input);
+    /** A native anvil recipe, registered by its pattern; see {@link NativeGridRecipe}. */
+    public static NativeGridRecipe anvilRecipe(ItemStack result) {
+        return NativeGridRecipe.anvil(result);
     }
 
-    public static void addAnvilRecipe(Skill skill, ItemStack result, boolean hot, String toolType, int hammerType,
-            int anvil, int forgeTime, Object... input) {
-        addAnvilRecipe(skill, result, "", hot, toolType, hammerType, anvil, forgeTime, input);
+    public static NativeGridRecipe anvilRecipe(Item result) {
+        return NativeGridRecipe.anvil(result);
     }
 
-    public static GridRecipe addAnvilRecipe(Skill skill, ItemStack result, String research, boolean hot, int hammerType,
-            int anvil, int forgeTime, Object... input) {
-        return addAnvilRecipe(skill, result, research, hot, "hammer", hammerType, anvil, forgeTime, input);
+    /** A native carpenter's bench recipe, registered by its pattern; see {@link NativeGridRecipe}. */
+    public static NativeGridRecipe carpenterRecipe(ItemStack result) {
+        return NativeGridRecipe.carpenter(result);
     }
 
-    /**
-     * Adds a shaped recipe for anvils with all variables
-     *
-     * @param skill      The skill required for crafting
-     * @param result     The output item
-     * @param research   The research required
-     * @param hot        True if the result is hot(Does not apply to blocks)
-     * @param toolType   the tool type required to hit ("hammer", "hvyHammer", etc)
-     * @param hammerType the hammer tier required for creation:
-     * @param anvil      the anvil required bronze 0, iron 1, steel 2
-     * @param forgeTime  The time taken to forge(default is 200. each hit is about 100)
-     * @param input      The input for the item (Exactly the same as regular recipes)
-     */
-    public static GridRecipe addAnvilRecipe(Skill skill, ItemStack result, String research, boolean hot,
-            String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
-        return CraftingManagerAnvil.getInstance()
-                .addRecipe(result, skill, research, hot, toolType, hammerType, anvil, forgeTime, input);
+    public static NativeGridRecipe carpenterRecipe(Item result) {
+        return NativeGridRecipe.carpenter(result);
     }
 
     /**
-     * A special tier-sensitive recipe system for tools
-     *
-     * @param skill      the Skill used
-     * @param result     what item comes out (basic itemstack)
-     * @param research   what research is used
-     * @param hot        whether it requires quenching
-     * @param toolType   the tool used (hammer or hvyHammer)
-     * @param hammerType the tier of hammer
-     * @param anvil      the tier of anvil
-     * @param forgeTime  the time it takes to forge
-     * @param input      the items input
-     * @return
+     * A native kitchen bench recipe, registered by its pattern; it goes to the carpenter's bench when the kitchen bench
+     * is disabled. See {@link NativeGridRecipe}.
      */
-    public static GridRecipe addAnvilToolRecipe(Skill skill, ItemStack result, String research, boolean hot,
-            String toolType, int hammerType, int anvil, int forgeTime, Object... input) {
-        return CraftingManagerAnvil.getInstance()
-                .addToolRecipe(result, skill, research, hot, toolType, hammerType, anvil, forgeTime, input);
-    }
-
-    public static GridRecipe addAnvilToolRecipe(Skill skill, Item result, String research, boolean hot, String toolType,
-            int hammerType, int anvil, int forgeTime, Object... input) {
-        return addAnvilToolRecipe(
-                skill,
-                new ItemStack(result),
-                research,
-                hot,
-                toolType,
-                hammerType,
-                anvil,
-                forgeTime,
-                input);
-    }
-
-    /**
-     * Adds a shaped recipe for carpenter benches sensetive to tiers
-     *
-     * @param result    The output item (basic itemstack)
-     * @param sound     The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
-     * @param toolType  the tool type required to hit
-     * @param toolTier  the tools tier required for creation:
-     * @param craftTime The time taken to craft(default is 200. each hit is about 100)
-     * @param input     The input for the item (Exactly the same as regular recipes)
-     */
-    public static GridRecipe addCarpenterToolRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance()
-                .addToolRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
-    }
-
-    public static GridRecipe addCarpenterToolRecipe(Skill skill, Item result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance().addToolRecipe(
-                new ItemStack(result),
-                skill,
-                research,
-                sound,
-                0F,
-                toolType,
-                toolTier,
-                -1,
-                craftTime,
-                input);
-    }
-
-    public static GridRecipe addCarpenterToolRecipe(Skill skill, Item result, String research, String sound,
-            int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance()
-                .addToolRecipe(new ItemStack(result), skill, research, sound, 0F, "hands", -1, -1, craftTime, input);
-    }
-
-    /**
-     * Adds a shaped recipe for carpenter benches with all variables
-     *
-     * @param result     The output item
-     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
-     * @param experience the experience gained from crafting
-     * @param toolType   the tool type required to hit
-     * @param toolTier   the tools tier required for creation:
-     * @param craftTime  The time taken to craft(default is 200. each hit is about 100)
-     * @param input      The input for the item (Exactly the same as regular recipes)
-     */
-    public static void addCarpenterRecipe(Skill skill, ItemStack result, String sound, String toolType, int toolTier,
-            int craftTime, Object... input) {
-        CraftingManagerCarpenter.getInstance()
-                .addRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
-     */
-    public static void addCarpenterRecipe(Skill skill, ItemStack result, String sound, int craftTime, Object... input) {
-        addCarpenterRecipe(skill, result, "", sound, "hands", -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
-     */
-    public static void addShapelessCarpenterRecipe(Skill skill, ItemStack result, String sound, String toolType,
-            int toolTier, int craftTime, Object... input) {
-        CraftingManagerCarpenter.getInstance()
-                .addShapelessRecipe(result, skill, "", sound, 0F, toolType, toolTier, -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
-     */
-    public static void addShapelessCarpenterRecipe(Skill skill, ItemStack result, String sound, int craftTime,
-            Object... input) {
-        addShapelessCarpenterRecipe(skill, result, sound, "hands", -1, craftTime, input);
-    }
-
-    /**
-     * Adds a basic carpenter recipe similar to regular crafting This uses a single hit with bare hands
-     */
-    public static GridRecipe addBasicCarpenterRecipe(ItemStack result, Object... input) {
-        return CraftingManagerCarpenter.getInstance()
-                .addRecipe(result, null, "", "dig.wood", 0F, "hands", -1, -1, 1, input);
-    }
-
-    /**
-     * Adds a shaped recipe for carpenter benches with all variables
-     *
-     * @param result     The output item
-     * @param research   The research required
-     * @param sound      The sound it makes ("minefantasy2:blocks.carpentermallet"), "step.wood", etc
-     * @param experience the experience gained from crafting
-     * @param toolType   the tool type required to hit
-     * @param toolTier   the tools tier required for creation:
-     * @param craftTime  The time taken to craft(default is 200. each hit is about 100)
-     * @param input      The input for the item (Exactly the same as regular recipes)
-     */
-    public static GridRecipe addCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance()
-                .addRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
-     */
-    public static GridRecipe addCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-            int craftTime, Object... input) {
-        return addCarpenterRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addCarpenterRecipe}
-     */
-    public static GridRecipe addShapelessCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        return CraftingManagerCarpenter.getInstance()
-                .addShapelessRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addShapelessCarpenterRecipe}
-     */
-    public static GridRecipe addShapelessCarpenterRecipe(Skill skill, ItemStack result, String research, String sound,
-            int craftTime, Object... input) {
-        return addShapelessCarpenterRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
-    }
-
-    /**
-     * Adds a shaped recipe for the kitchen bench. Dirty progress defaults from the craft time. When the kitchen bench
-     * is disabled in the config the recipe falls back to the carpenter bench so the food stays obtainable.
-     */
-    public static GridRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        if (!ConfigKitchen.enableBench) {
-            return CraftingManagerCarpenter.getInstance()
-                    .addRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
-        }
-        return CraftingManagerKitchen.getInstance().addRecipe(
-                result,
-                skill,
-                research,
-                sound,
-                toolType,
-                toolTier,
-                craftTime,
-                kitchenDirtyFor(craftTime),
-                input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addKitchenRecipe} with bare hands as the tool
-     */
-    public static GridRecipe addKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
-            int craftTime, Object... input) {
-        return addKitchenRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
-    }
-
-    /**
-     * Adds a shapeless recipe for the kitchen bench. Dirty progress defaults from the craft time. Falls back to the
-     * carpenter bench when the kitchen bench is disabled in the config.
-     */
-    public static GridRecipe addShapelessKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
-            String toolType, int toolTier, int craftTime, Object... input) {
-        if (!ConfigKitchen.enableBench) {
-            return CraftingManagerCarpenter.getInstance()
-                    .addShapelessRecipe(result, skill, research, sound, 0F, toolType, toolTier, -1, craftTime, input);
-        }
-        return CraftingManagerKitchen.getInstance().addShapelessRecipe(
-                result,
-                skill,
-                research,
-                sound,
-                toolType,
-                toolTier,
-                craftTime,
-                kitchenDirtyFor(craftTime),
-                input);
-    }
-
-    /**
-     * {@link MineFantasyAPI#addShapelessKitchenRecipe} with bare hands as the tool
-     */
-    public static GridRecipe addShapelessKitchenRecipe(Skill skill, ItemStack result, String research, String sound,
-            int craftTime, Object... input) {
-        return addShapelessKitchenRecipe(skill, result, research, sound, "hands", -1, craftTime, input);
-    }
-
-    public static float kitchenDirtyFor(int craftTime) {
-        return Math.max(1F, Math.min(8F, craftTime * 0.04F));
+    public static NativeGridRecipe kitchenRecipe(ItemStack result) {
+        return NativeGridRecipe.kitchen(result);
     }
 
     /** Registers a native blast furnace recipe; the input may be an item, block, stack or ore name. */
@@ -350,49 +110,9 @@ public class MineFantasyAPI {
         return fuelValue;
     }
 
-    /**
-     * Adds an alloy for any Crucible
-     *
-     * @param out The result
-     * @param in  The list of required items
-     */
-    public static void addAlloy(ItemStack out, Object... in) {
-        AlloyRecipes.addAlloy(out, convertList(in));
-    }
-
-    /**
-     * Adds an alloy with a minimal furnace level
-     *
-     * @param out   The result
-     * @param level The minimal furnace level
-     * @param in    The list of required items
-     */
-    public static void addAlloy(ItemStack out, int level, Object... in) {
-        AlloyRecipes.addAlloy(out, level, convertList(in));
-    }
-
-    /**
-     * Adds an alloy with a minimal furnace level
-     *
-     * @param dupe  the amount of times the ratio can be added
-     * @param out   The result
-     * @param level The minimal furnace level
-     * @param in    The list of required items
-     */
-    public static Alloy[] addRatioAlloy(int dupe, ItemStack out, int level, Object... in) {
-        return AlloyRecipes.addRatioRecipe(out, level, convertList(in), dupe);
-    }
-
-    /**
-     * Adds an alloy with any smelter
-     *
-     * @param dupe  the amount of times the ratio can be added
-     * @param out   The result
-     * @param level The minimal furnace level
-     * @param in    The list of required items
-     */
-    public static Alloy[] addRatioAlloy(int dupe, ItemStack out, Object... in) {
-        return AlloyRecipes.addRatioRecipe(out, 0, convertList(in), dupe);
+    /** A native crucible alloy, registered with its ingredients; see {@link AlloyRecipes.Builder}. */
+    public static AlloyRecipes.Builder alloyRecipe(ItemStack output) {
+        return AlloyRecipes.alloy(output);
     }
 
     /**
@@ -403,30 +123,6 @@ public class MineFantasyAPI {
      */
     public static void addAlloy(Alloy alloy) {
         AlloyRecipes.addAlloy(alloy);
-    }
-
-    private static List convertList(Object[] in) {
-        ArrayList arraylist = new ArrayList();
-        Object[] aobject = in;
-        int i = in.length;
-
-        for (int j = 0; j < i; ++j) {
-            Object object1 = aobject[j];
-
-            if (object1 instanceof ItemStack) {
-                arraylist.add(((ItemStack) object1).copy());
-            } else if (object1 instanceof Item) {
-                arraylist.add(new ItemStack((Item) object1));
-            } else {
-                if (!(object1 instanceof Block)) {
-                    throw new RuntimeException("MineFantasy: Invalid alloy!");
-                }
-
-                arraylist.add(new ItemStack((Block) object1));
-            }
-        }
-
-        return arraylist;
     }
 
     /**
@@ -520,108 +216,23 @@ public class MineFantasyAPI {
                 && (item2.getItemDamage() == 32767 || item2.getItemDamage() == item1.getItemDamage());
     }
 
-    /**
-     * Add a cooking recipe
-     *
-     * @param input           what goes in
-     * @param output          what is made
-     * @param min_temperature minimal temperature to work
-     * @param max_temperature maximum temperature until burn
-     * @param time            how many ticks until it finishes
-     * @param requireBaking   whether it needs to be in an oven
-     */
-    public static RecipeEntry<CookRecipe> addCookingRecipe(ItemStack input, ItemStack output, int min_temperature,
-            int max_temperature, int time, boolean requireBaking) {
-        return CookRecipe.addRecipe(input, output, min_temperature, max_temperature, time, requireBaking, true);
+    /** A native cooking recipe; see {@link CookRecipe.Builder}. */
+    public static CookRecipe.Builder cookingRecipe(ItemStack input, ItemStack output) {
+        return CookRecipe.nativeRecipe(input, output);
     }
 
-    /**
-     * Add a cooking recipe
-     *
-     * @param input           what goes in
-     * @param output          what is made
-     * @param min_temperature minimal temperature to work
-     * @param max_temperature maximum temperature until burn
-     * @param time            how many ticks until it finishes
-     * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
-     */
-    public static RecipeEntry<CookRecipe> addCookingRecipe(ItemStack input, ItemStack output, int min_temperature,
-            int max_temperature, int time, boolean requireBaking, boolean canBurn) {
-        return CookRecipe.addRecipe(input, output, min_temperature, max_temperature, time, requireBaking, canBurn);
+    /** A native quern recipe; the input may be an item, block, stack or ore name. */
+    public static QuernRecipes.Builder quernRecipe(Object input, ItemStack output) {
+        return QuernRecipes.recipe(input, output);
     }
 
-    /**
-     * Add a cooking recipe
-     *
-     * @param input           what goes in
-     * @param output          what is made
-     * @param min_temperature minimal temperature to work
-     * @param max_temperature maximum temperature until burn
-     * @param time            how many ticks until it finishes
-     * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
-     */
-    public static RecipeEntry<CookRecipe> addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-            int min_temperature, int max_temperature, int time, boolean requireBaking) {
-        return CookRecipe
-                .addRecipe(input, output, burnItem, min_temperature, max_temperature, time, requireBaking, true);
+    /** A native big furnace recipe; the input may be an item, block, stack or ore name. */
+    public static BigFurnaceRecipes.Builder bigFurnaceRecipe(Object input, ItemStack output) {
+        return BigFurnaceRecipes.recipe(input, output);
     }
 
-    /**
-     * Add a cooking recipe
-     *
-     * @param input           what goes in
-     * @param output          what is made
-     * @param min_temperature minimal temperature to work
-     * @param max_temperature maximum temperature until burn
-     * @param time            how many ticks until it finishes
-     * @param burn_time       how long until a finished product burns
-     * @param requireBaking   whether it needs to be in an oven
-     * @param canBurn         false if it cannot burn by traditional means (such as if its in a container)
-     */
-    public static RecipeEntry<CookRecipe> addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-            int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking) {
-        return CookRecipe.addRecipe(
-                input,
-                output,
-                burnItem,
-                min_temperature,
-                max_temperature,
-                time,
-                burn_time,
-                requireBaking,
-                true);
-    }
-
-    public static RecipeEntry<CookRecipe> addCookingRecipe(ItemStack input, ItemStack output, ItemStack burnItem,
-            int min_temperature, int max_temperature, int time, int burn_time, boolean requireBaking, boolean canBurn) {
-        return CookRecipe.addRecipe(
-                input,
-                output,
-                burnItem,
-                min_temperature,
-                max_temperature,
-                time,
-                burn_time,
-                requireBaking,
-                canBurn);
-    }
-
-    public static RecipeEntry<ProcessRecipe> addQuernRecipe(Object input, ItemStack output) {
-        return addQuernRecipe(input, output, 1, true);
-    }
-
-    public static RecipeEntry<ProcessRecipe> addQuernRecipe(Object input, ItemStack output, int tier) {
-        return addQuernRecipe(input, output, tier, true);
-    }
-
-    public static RecipeEntry<ProcessRecipe> addQuernRecipe(Object input, ItemStack output, int tier,
-            boolean consumePot) {
-        return QuernRecipes.addRecipe(input, output, tier, consumePot);
-    }
-
-    public static RecipeEntry<ProcessRecipe> addFurnaceRecipe(Object input, ItemStack output, int tier) {
-        return BigFurnaceRecipes.addRecipe(input, output, tier);
+    /** A native tanning recipe; the input may be an item, block, stack or ore name. */
+    public static TanningRecipe.Builder tanningRecipe(Object input, ItemStack output) {
+        return TanningRecipe.recipe(input, output);
     }
 }

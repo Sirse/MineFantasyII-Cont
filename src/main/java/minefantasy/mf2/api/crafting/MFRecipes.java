@@ -53,7 +53,7 @@ public final class MFRecipes {
     /** Quern: {@link MFRecipeKeys#TIER}, {@link MFRecipeKeys#CONSUME_POT}. */
     public static final RecipeRegistry<ProcessRecipe> QUERN = REGISTRIES
             .create("quern", ProcessRecipe::indexKeys, InputSupport.PLANNED.of(ProcessRecipe::getInput));
-    /** Tanning rack: {@link MFRecipeKeys#TIME}, {@link MFRecipeKeys#TIER}, {@link MFRecipeKeys#TOOL}. */
+    /** Tanning rack: {@link MFRecipeKeys#TIME}, {@link MFRecipeKeys#TOOL}, {@link MFRecipeKeys#TOOL_TIER}. */
     public static final RecipeRegistry<ProcessRecipe> TANNING = REGISTRIES
             .create("tanning", ProcessRecipe::indexKeys, SLOT_INPUTS.of(ProcessRecipe::getInput));
     /** Big furnace: {@link MFRecipeKeys#TIER}. */
@@ -84,8 +84,9 @@ public final class MFRecipes {
     public static final RecipeRegistry<GridRecipe> ANVIL = REGISTRIES.create("anvil", recipe -> null);
     /** Carpenter's bench recipes. */
     public static final RecipeRegistry<GridRecipe> CARPENTER = REGISTRIES.create("carpenter", recipe -> null);
-    /** Kitchen bench recipes. */
-    public static final RecipeRegistry<GridRecipe> KITCHEN = REGISTRIES.create("kitchen", recipe -> null);
+    /** Kitchen bench recipes; the bench has no tier, so a recipe asking for one is refused. */
+    public static final RecipeRegistry<GridRecipe> KITCHEN = REGISTRIES
+            .create("kitchen", recipe -> null, recipe -> Requirements.KITCHEN.validate(0, recipe.getAnvil()));
 
     /** Crucible alloys; see {@link minefantasy.mf2.api.refine.AlloyRecipes}. */
     public static final RecipeRegistry<Alloy> ALLOY = REGISTRIES.create("alloy", recipe -> null);

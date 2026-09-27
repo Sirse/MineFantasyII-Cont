@@ -146,7 +146,8 @@ public class WorldStationTest {
                 tx -> tx.add(
                         MFRecipes.COOKING,
                         id("cooking", name),
-                        CookRecipe.of(input, output, new ItemStack(junk), 50, max, 3, 3, false, canBurn),
+                        CookRecipe.builder(input, output).temperature(50, max).time(3).burnTime(3)
+                                .burnt(new ItemStack(junk)).canBurn(canBurn).build(),
                         0));
     }
 
@@ -175,7 +176,8 @@ public class WorldStationTest {
     }
 
     private static CookRecipe potRecipe(int min) {
-        return CookRecipe.of(Input.of(pot), new ItemStack(flour), null, min, 2000, 3, 3, false, false);
+        return CookRecipe.builder(Input.of(pot), new ItemStack(flour)).temperature(min, 2000).time(3).burnTime(3)
+                .canBurn(false).build();
     }
 
     @GameTest(timeoutTicks = 800)
@@ -203,21 +205,14 @@ public class WorldStationTest {
                 tx.add(
                         MFRecipes.COOKING,
                         id("cooking", "four"),
-                        CookRecipe.of(
-                                Input.of(metaBar).amount(4),
-                                new ItemStack(flour),
-                                null,
-                                50,
-                                500,
-                                3,
-                                3,
-                                false,
-                                false),
+                        CookRecipe.builder(Input.of(metaBar).amount(4), new ItemStack(flour)).temperature(50, 500)
+                                .time(3).burnTime(3).canBurn(false).build(),
                         10);
                 tx.add(
                         MFRecipes.COOKING,
                         id("cooking", "one"),
-                        CookRecipe.of(Input.of(metaBar), new ItemStack(bar), null, 50, 500, 3, 3, false, false),
+                        CookRecipe.builder(Input.of(metaBar), new ItemStack(bar)).temperature(50, 500).time(3)
+                                .burnTime(3).canBurn(false).build(),
                         0);
             });
             assertEquals(bar, CookRecipe.find(new ItemStack(metaBar, 1), false).recipe.getOutput().getItem());

@@ -13,6 +13,7 @@ import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
+import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
@@ -532,8 +533,8 @@ public class StationBoundaryTest {
                 tx -> tx.add(
                         MFRecipes.COOKING,
                         id("cooking", "seed"),
-                        minefantasy.mf2.api.cooking.CookRecipe
-                                .of(Input.of(seed), output, new ItemStack(junk), 100, 500, time, time / 2, false, true),
+                        CookRecipe.builder(Input.of(seed), output).temperature(100, 500).time(time)
+                                .burnt(new ItemStack(junk)).build(),
                         0));
     }
 

@@ -78,6 +78,16 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
     }
 
     @Override
+    protected void loadAllRecipes() {
+        for (SalvageRecipe recipe : Salvage.displayRecipes()) {
+            CachedSalvageRecipe cachedRecipe = createRecipe(recipe, null);
+            if (cachedRecipe != null) {
+                arecipes.add(cachedRecipe);
+            }
+        }
+    }
+
+    @Override
     public void loadCraftingRecipes(ItemStack result) {
         if (!NEIHelper.isValidStack(result)) {
             return;

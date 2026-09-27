@@ -11,7 +11,6 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
-import minefantasy.mf2.api.crafting.tanning.TanningRecipe;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.basic.ConstructionBlockMF;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -107,26 +106,26 @@ public class BasicRecipesMF {
             }
         }
 
-        KnowledgeListMF.fireclayR = MineFantasyAPI.addBasicCarpenterRecipe(
-                new ItemStack(ComponentListMF.fireclay, 4),
-                new Object[] { " C ", "CDC", " C ",
+        KnowledgeListMF.fireclayR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.fireclay, 4)).time(1)
+                .sound("dig.wood").shaped(
+                        new Object[] { " C ", "CDC", " C ",
 
-                        'D', ComponentListMF.kaolinite_dust, 'C', Items.clay_ball });
-        KnowledgeListMF.fireBrickR = MineFantasyAPI.addBasicCarpenterRecipe(
-                new ItemStack(ComponentListMF.fireclay_brick),
-                new Object[] { "C",
+                                'D', ComponentListMF.kaolinite_dust, 'C', Items.clay_ball });
+        KnowledgeListMF.fireBrickR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.fireclay_brick))
+                .time(1).sound("dig.wood").shaped(
+                        new Object[] { "C",
 
-                        'C', ComponentListMF.fireclay });
-        KnowledgeListMF.fireBricksR = MineFantasyAPI.addBasicCarpenterRecipe(
-                new ItemStack(BlockListMF.firebricks),
-                new Object[] { "BB", "BB",
+                                'C', ComponentListMF.fireclay });
+        KnowledgeListMF.fireBricksR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.firebricks)).time(1)
+                .sound("dig.wood").shaped(
+                        new Object[] { "BB", "BB",
 
-                        'B', ComponentListMF.strong_brick });
-        KnowledgeListMF.fireBrickStairR = MineFantasyAPI.addBasicCarpenterRecipe(
-                new ItemStack(BlockListMF.firebrick_stair),
-                new Object[] { "B ", "BB",
+                                'B', ComponentListMF.strong_brick });
+        KnowledgeListMF.fireBrickStairR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.firebrick_stair))
+                .time(1).sound("dig.wood").shaped(
+                        new Object[] { "B ", "BB",
 
-                        'B', ComponentListMF.strong_brick });
+                                'B', ComponentListMF.strong_brick });
         BaseMaterialMF mat = BaseMaterialMF.iron;
 
         GameRegistry.addShapelessRecipe(
@@ -139,61 +138,59 @@ public class BasicRecipesMF {
                 new ItemStack(ComponentListMF.hideLarge),
                 new Object[] { ComponentListMF.rawhideLarge, ComponentListMF.flux });
 
-        TanningRecipe
-                .addRecipe(ComponentListMF.hideSmall, mat.craftTimeModifier * 2F, -1, new ItemStack(Items.leather));
-        TanningRecipe
-                .addRecipe(ComponentListMF.hideMedium, mat.craftTimeModifier * 3F, -1, new ItemStack(Items.leather, 3));
-        TanningRecipe
-                .addRecipe(ComponentListMF.hideLarge, mat.craftTimeModifier * 4F, -1, new ItemStack(Items.leather, 5));
-        TanningRecipe.addRecipe(
-                Items.leather,
-                mat.craftTimeModifier * 2F,
-                -1,
-                "shears",
-                new ItemStack(ComponentListMF.leather_strip, 4));
+        MineFantasyAPI.tanningRecipe(ComponentListMF.hideSmall, new ItemStack(Items.leather))
+                .time(mat.craftTimeModifier * 2F).register();
+        MineFantasyAPI.tanningRecipe(ComponentListMF.hideMedium, new ItemStack(Items.leather, 3))
+                .time(mat.craftTimeModifier * 3F).register();
+        MineFantasyAPI.tanningRecipe(ComponentListMF.hideLarge, new ItemStack(Items.leather, 5))
+                .time(mat.craftTimeModifier * 4F).register();
+        MineFantasyAPI.tanningRecipe(Items.leather, new ItemStack(ComponentListMF.leather_strip, 4))
+                .time(mat.craftTimeModifier * 2F).tool("shears", -1).register();
 
         if (!ConfigHardcore.HCCRemoveBooksCraft) {
-            KnowledgeListMF.artBookR = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_artisanry),
-                    new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
-                            new ItemStack(Items.dye, 1, 1), 'B', Items.book, });
-            KnowledgeListMF.conBookR = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_construction),
-                    new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
-                            new ItemStack(Items.dye, 1, 14), 'B', Items.book, });
-            KnowledgeListMF.proBookR = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_provisioning),
-                    new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
-                            new ItemStack(Items.dye, 1, 2), 'B', Items.book, });
-            KnowledgeListMF.engBookR = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_engineering),
-                    new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
-                            new ItemStack(Items.dye, 1, 12), 'B', Items.book, });
-            KnowledgeListMF.comBookR = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_combat),
-                    new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
-                            new ItemStack(Items.dye, 1, 5), 'B', Items.book, });
+            KnowledgeListMF.artBookR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_artisanry))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
+                                    new ItemStack(Items.dye, 1, 1), 'B', Items.book, });
+            KnowledgeListMF.conBookR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_construction))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
+                                    new ItemStack(Items.dye, 1, 14), 'B', Items.book, });
+            KnowledgeListMF.proBookR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_provisioning))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
+                                    new ItemStack(Items.dye, 1, 2), 'B', Items.book, });
+            KnowledgeListMF.engBookR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_engineering))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
+                                    new ItemStack(Items.dye, 1, 12), 'B', Items.book, });
+            KnowledgeListMF.comBookR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_combat))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "D", "B", 'T', ComponentListMF.talisman_lesser, 'D',
+                                    new ItemStack(Items.dye, 1, 5), 'B', Items.book, });
 
-            KnowledgeListMF.artBook2R = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_artisanry2),
-                    new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
-                            ToolListMF.skillbook_artisanry, });
-            KnowledgeListMF.conBook2R = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_construction2),
-                    new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
-                            ToolListMF.skillbook_construction, });
-            KnowledgeListMF.proBook2R = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_provisioning2),
-                    new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
-                            ToolListMF.skillbook_provisioning, });
-            KnowledgeListMF.engBook2R = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_engineering2),
-                    new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
-                            ToolListMF.skillbook_engineering, });
-            KnowledgeListMF.comBook2R = MineFantasyAPI.addBasicCarpenterRecipe(
-                    new ItemStack(ToolListMF.skillbook_combat2),
-                    new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
-                            ToolListMF.skillbook_combat, });
+            KnowledgeListMF.artBook2R = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_artisanry2))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
+                                    ToolListMF.skillbook_artisanry, });
+            KnowledgeListMF.conBook2R = MineFantasyAPI
+                    .carpenterRecipe(new ItemStack(ToolListMF.skillbook_construction2)).time(1).sound("dig.wood")
+                    .shaped(
+                            new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
+                                    ToolListMF.skillbook_construction, });
+            KnowledgeListMF.proBook2R = MineFantasyAPI
+                    .carpenterRecipe(new ItemStack(ToolListMF.skillbook_provisioning2)).time(1).sound("dig.wood")
+                    .shaped(
+                            new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
+                                    ToolListMF.skillbook_provisioning, });
+            KnowledgeListMF.engBook2R = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_engineering2))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
+                                    ToolListMF.skillbook_engineering, });
+            KnowledgeListMF.comBook2R = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.skillbook_combat2))
+                    .time(1).sound("dig.wood").shaped(
+                            new Object[] { "T", "B", 'T', ComponentListMF.talisman_greater, 'B',
+                                    ToolListMF.skillbook_combat, });
         }
 
         GameRegistry.addShapedRecipe(

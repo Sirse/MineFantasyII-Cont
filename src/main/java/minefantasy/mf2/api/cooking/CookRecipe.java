@@ -65,7 +65,7 @@ public final class CookRecipe implements RecipeChecks.Validated {
      * @param burnt    what the output becomes when overheated; ignored unless {@code canBurn}
      * @param burnTime ticks a finished product takes to burn
      */
-    public static CookRecipe of(Input input, ItemStack output, ItemStack burnt, int min, int max, int time,
+    private static CookRecipe of(Input input, ItemStack output, ItemStack burnt, int min, int max, int time,
             int burnTime, boolean baking, boolean canBurn) {
         if (input == null || output == null || output.getItem() == null) {
             throw new IllegalArgumentException("A cooking recipe needs an input and an output");
@@ -126,33 +126,98 @@ public final class CookRecipe implements RecipeChecks.Validated {
 
     // region native registration
 
-    public static RecipeEntry<CookRecipe> addRecipe(ItemStack in, ItemStack out, int min, int max, int time,
-            boolean bake, boolean canBurn) {
-        return addRecipe(in, out, new ItemStack(burnt_food), min, max, time, bake, canBurn);
+    /** A recipe cooking what the input takes into the output; see {@link Builder}. */
+    public static Builder builder(Input input, ItemStack output) {
+        return new Builder(input, output, null);
     }
 
-    public static RecipeEntry<CookRecipe> addRecipe(ItemStack in, ItemStack out, ItemStack burnt, int min, int max,
-            int time, boolean bake, boolean canBurn) {
-        return addRecipe(in, out, burnt, min, max, time, time / 2, bake, canBurn);
+    /** A native recipe cooking the input into the output, registered by {@link Builder#register}. */
+    public static Builder nativeRecipe(ItemStack input, ItemStack output) {
+        return new Builder(NativeRecipes.input(input), output, input);
     }
 
     /**
-     * Registers a native recipe (and its burn stage) under an id derived from the input.
-     *
-     * @param min  the limit temperature for cooking
-     * @param max  the max temperature before burning
-     * @param time the time in ticks taken
-     * @param bake whether it needs to be enclosed in an oven
+     * A cooking recipe set up term by term. The temperatures and the time must be given; by default it cooks over a
+     * fire, and once done burns into burnt food after half its time when the heat goes above the maximum.
      */
-    public static RecipeEntry<CookRecipe> addRecipe(ItemStack in, ItemStack out, ItemStack burnt, int min, int max,
-            int time, int burntime, boolean bake, boolean canBurn) {
-        CookRecipe recipe = of(NativeRecipes.input(in), out, burnt, min, max, time, burntime, bake, canBurn);
-        RecipeId id = NativeRecipes.nativeId(MFRecipes.COOKING, in);
-        try (RecipeTransaction tx = MFRecipes.REGISTRIES.begin(RecipeSource.NATIVE)) {
-            recipe.addTo(tx, id, 0);
-            tx.commit();
+    public static final class Builder {
+
+        private final Input input;
+        private final ItemStack output;
+        /** The item a native recipe is named after; null for one built from a script input. */
+        private final ItemStack nativeInput;
+        private ItemStack burnt = new ItemStack(burnt_food);
+        private Integer min;
+        private int max;
+        private Integer time;
+        private Integer burnTime;
+        private boolean oven;
+        private boolean canBurn = true;
+
+        private Builder(Input input, ItemStack output, ItemStack nativeInput) {
+            this.input = input;
+            this.output = output;
+            this.nativeInput = nativeInput;
         }
-        return MFRecipes.COOKING.workingEntry(id);
+
+        /** The heat it cooks above, and the heat it burns above. */
+        public Builder temperature(int min, int max) {
+            this.min = min;
+            this.max = max;
+            return this;
+        }
+
+        /** The ticks it takes at the least heat. */
+        public Builder time(int time) {
+            this.time = time;
+            return this;
+        }
+
+        /** What it burns into; null for nothing. */
+        public Builder burnt(ItemStack burnt) {
+            this.burnt = burnt;
+            return this;
+        }
+
+        /** How long the cooked food takes to burn; half the cooking time by default. */
+        public Builder burnTime(int burnTime) {
+            this.burnTime = burnTime;
+            return this;
+        }
+
+        /** It needs an oven, enclosed, rather than a fire. */
+        public Builder oven() {
+            return oven(true);
+        }
+
+        public Builder oven(boolean oven) {
+            this.oven = oven;
+            return this;
+        }
+
+        /** Whether it can burn at all; not when it cooks in a container, say. */
+        public Builder canBurn(boolean canBurn) {
+            this.canBurn = canBurn;
+            return this;
+        }
+
+        public CookRecipe build() {
+            RecipeChecks.require(min != null, "a cooking recipe needs its temperatures");
+            RecipeChecks.require(time != null, "a cooking recipe needs its time");
+            return of(input, output, burnt, min, max, time, burnTime != null ? burnTime : time / 2, oven, canBurn);
+        }
+
+        /** Registers a native recipe, with its burn stage, under an id derived from its input. */
+        public RecipeEntry<CookRecipe> register() {
+            RecipeChecks.require(nativeInput != null, "only a native cooking recipe registers itself");
+            CookRecipe recipe = build();
+            RecipeId id = NativeRecipes.nativeId(MFRecipes.COOKING, nativeInput);
+            try (RecipeTransaction tx = MFRecipes.REGISTRIES.begin(RecipeSource.NATIVE)) {
+                recipe.addTo(tx, id, 0);
+                tx.commit();
+            }
+            return MFRecipes.COOKING.workingEntry(id);
+        }
     }
 
     // endregion

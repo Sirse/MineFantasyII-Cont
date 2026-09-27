@@ -1,38 +1,24 @@
 package minefantasy.mf2.commands;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
-import net.minecraft.command.ICommand;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
 
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.ToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
+/**
+ * {@code /minefantasy} ({@code /mf}): routes {@code edit} and {@code recipes} to their handlers. Both act on the
+ * player's held item or view, need operator level 2, and report a wrong argument through the usual command errors.
+ */
+public class CommandMF extends CommandBase {
 
-public class CommandMF implements ICommand {
+    static final String USAGE = "command.mf.usage";
 
-    private final List<String> materials;
-    private final List<String> aliases = Arrays.asList("mf", "minefantasy");
-
-    public CommandMF() {
-        materials = setupMaterialsList();
-    }
-
-    private List<String> setupMaterialsList() {
-        List<String> materials = new ArrayList<String>();
-        for (CustomMaterial material : CustomMaterial.materialList.values()) {
-            if (material.type.equalsIgnoreCase("wood") || material.type.equalsIgnoreCase("metal")) {
-                materials.add(material.getName());
-            }
-        }
-        return materials;
-    }
+    private static final List<String> ALIASES = Collections.unmodifiableList(Arrays.asList("mf"));
 
     @Override
     public String getCommandName() {
@@ -40,153 +26,52 @@ public class CommandMF implements ICommand {
     }
 
     @Override
-    public String getCommandUsage(ICommandSender iCommandSender) {
-        return "/minefantasy edit <material|quality|unbreakable> <value> | recipes [station]";
-    }
-
-    @Override
     public List<String> getCommandAliases() {
-        return this.aliases;
+        return ALIASES;
     }
 
     @Override
-    public void processCommand(ICommandSender iCommandSender, String[] strings) {
-        if (!(iCommandSender instanceof EntityPlayer)) {
-            return;
-        }
-        EntityPlayer player = (EntityPlayer) iCommandSender;
-        boolean hasPerms = iCommandSender.canCommandSenderUseCommand(2, getCommandName());
-        if (!hasPerms) {
-            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.mf.no_permission")));
-            return;
-        }
-
-        if (strings.length >= 1 && "recipes".equalsIgnoreCase(strings[0])) {
-            RecipeDiagnostics.run(player, strings.length >= 2 ? strings[1] : null);
-            return;
-        }
-
-        if (strings.length < 3 || !"edit".equalsIgnoreCase(strings[0])) {
-            player.addChatMessage(new ChatComponentText(getCommandUsage(iCommandSender)));
-            return;
-        }
-
-        ItemStack equippedItem = player.getCurrentEquippedItem();
-        if (equippedItem == null) {
-            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.invalid.item")));
-            return;
-        }
-
-        String sub = strings[1].toLowerCase();
-        if ("material".equals(sub)) {
-            processEditMaterialCommand(strings, player, equippedItem);
-        } else if ("quality".equals(sub)) {
-            processQualityCommand(strings, player, equippedItem);
-        } else if ("unbreakable".equals(sub)) {
-            processUnbreakableCommand(strings, player, equippedItem);
-        } else {
-            player.addChatMessage(new ChatComponentText(getCommandUsage(iCommandSender)));
-        }
-    }
-
-    private void processEditMaterialCommand(String[] strings, EntityPlayer player, ItemStack equippedItem) {
-        if (!CustomToolHelper.hasAnyMaterial(equippedItem)) {
-            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.invalid.item")));
-            return;
-        }
-
-        CustomMaterial material = CustomMaterial.getMaterial(strings[2]);
-        if (material == null) {
-            player.addChatMessage(
-                    new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.material")));
-            return;
-        }
-
-        String slot = material.type.equalsIgnoreCase("metal") ? CustomToolHelper.slot_main : CustomToolHelper.slot_haft;
-        CustomMaterial.addMaterial(equippedItem, slot, material.getName());
-        onSuccess(player);
-    }
-
-    private void processQualityCommand(String[] strings, EntityPlayer player, ItemStack equippedItem) {
-        try {
-            int qualityLvl = Integer.parseInt(strings[2]);
-            if (qualityLvl < 0 || qualityLvl > 200) {
-                player.addChatMessage(
-                        new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.quality")));
-                return;
-            }
-            ItemStack updated = ToolHelper.setQuality(equippedItem, qualityLvl);
-            if (updated != null && updated.stackTagCompound != null) {
-                if (qualityLvl <= 50) {
-                    updated.stackTagCompound.setBoolean("MF_Inferior", true);
-                }
-                if (qualityLvl >= 150) {
-                    updated.stackTagCompound.setBoolean("MF_Inferior", false);
-                }
-            }
-            onSuccess(player);
-        } catch (NumberFormatException e) {
-            player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.number")));
-        }
-    }
-
-    private void processUnbreakableCommand(String[] strings, EntityPlayer player, ItemStack equippedItem) {
-        String value = strings[2].toLowerCase();
-        if (!"true".equals(value) && !"false".equals(value)) {
-            player.addChatMessage(
-                    new ChatComponentText(StatCollector.translateToLocal("command.edit.invalid.boolean")));
-            return;
-        }
-        boolean isUnbreakable = Boolean.parseBoolean(value);
-        ToolHelper.setUnbreakable(equippedItem, isUnbreakable);
-        onSuccess(player);
-    }
-
-    private void onSuccess(EntityPlayer player) {
-        player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("command.edit.success")));
+    public int getRequiredPermissionLevel() {
+        return 2;
     }
 
     @Override
-    public boolean canCommandSenderUseCommand(ICommandSender iCommandSender) {
-        return iCommandSender.canCommandSenderUseCommand(2, getCommandName());
+    public String getCommandUsage(ICommandSender sender) {
+        return USAGE;
     }
 
     @Override
-    public List<String> addTabCompletionOptions(ICommandSender iCommandSender, String[] strings) {
-        if (strings.length <= 1) {
-            return Arrays.asList("edit", "recipes");
+    public void processCommand(ICommandSender sender, String[] args) {
+        EntityPlayer player = getCommandSenderAsPlayer(sender);
+        if (args.length == 0) {
+            throw new WrongUsageException(USAGE);
         }
-
-        if (strings[0].equalsIgnoreCase("recipes") && strings.length == 2) {
-            return RecipeDiagnostics.stations();
+        String[] rest = Arrays.copyOfRange(args, 1, args.length);
+        switch (args[0].toLowerCase(Locale.ROOT)) {
+            case "edit":
+                EditCommand.run(player, rest);
+                break;
+            case "recipes":
+                RecipesCommand.run(player, rest);
+                break;
+            default:
+                throw new WrongUsageException(USAGE);
         }
-
-        if (strings[0].equalsIgnoreCase("edit")) {
-            if (strings.length == 2) {
-                return Arrays.asList("material", "quality", "unbreakable");
-            }
-
-            if (strings.length == 3) {
-                if (strings[1].equalsIgnoreCase("material")) {
-                    return materials;
-                }
-
-                if (strings[1].equalsIgnoreCase("unbreakable")) {
-                    return Arrays.asList("true", "false");
-                }
-            }
-        }
-
-        return null;
     }
 
     @Override
-    public boolean isUsernameIndex(String[] strings, int i) {
-        return false;
-    }
-
-    @Override
-    public int compareTo(Object o) {
-        return getCommandName().compareTo(((ICommand) o).getCommandName());
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args, "edit", "recipes");
+        }
+        String[] rest = Arrays.copyOfRange(args, 1, args.length);
+        switch (args[0].toLowerCase(Locale.ROOT)) {
+            case "edit":
+                return EditCommand.complete(rest);
+            case "recipes":
+                return RecipesCommand.complete(rest);
+            default:
+                return Collections.emptyList();
+        }
     }
 }

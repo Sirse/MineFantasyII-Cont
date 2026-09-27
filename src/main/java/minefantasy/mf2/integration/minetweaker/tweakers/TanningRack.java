@@ -43,7 +43,7 @@ public class TanningRack {
         return ProcessRecipe.of(
                 ScriptInputs.toInput(input),
                 ScriptInputs.toOutput(output),
-                RecipeMetadata.builder().put(MFRecipeKeys.TIME, time).put(MFRecipeKeys.TIER, tier)
+                RecipeMetadata.builder().put(MFRecipeKeys.TIME, time).put(MFRecipeKeys.TOOL_TIER, tier)
                         .put(MFRecipeKeys.TOOL, tool == null || tool.isEmpty() ? "knife" : tool).build());
     }
 }

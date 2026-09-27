@@ -17,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -193,7 +194,7 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
 
         RecipeEntry<Alloy> entry = AlloyRecipes.find(inputs);
         Alloy alloy = entry == null ? null : entry.getRecipe();
-        if (alloy != null && alloy.getLevel() <= getTier()) {
+        if (alloy != null && Requirements.CRUCIBLE.stationFits(getTier(), alloy.getLevel())) {
             this.cachedRecipeId = entry.getId();
             this.cachedRecipeOutput = alloy.getRecipeOutput();
             this.cachedRequiredAmounts = alloy.getRequiredAmounts(inputs);

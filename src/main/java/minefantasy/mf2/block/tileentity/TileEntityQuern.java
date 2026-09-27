@@ -1,8 +1,5 @@
 package minefantasy.mf2.block.tileentity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -14,6 +11,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -47,7 +45,8 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
         ItemStack pot = inv[1];
         RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.QUERN, input, recipe -> {
             boolean consumePot = recipe.get(MFRecipeKeys.CONSUME_POT, true);
-            return (!consumePot || pot != null) && recipe.get(MFRecipeKeys.TIER, 0) <= getTier();
+            return (!consumePot || pot != null)
+                    && Requirements.QUERN.stationFits(getTier(), recipe.get(MFRecipeKeys.TIER, 0));
         });
         if (entry == null) {
             return CheckResult.failure(CheckResult.Reason.NO_RECIPE);
@@ -71,28 +70,24 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
         if (input == null) {
             return Diagnosis.problem("quern", CheckResult.Reason.MISSING_INPUT);
         }
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        boolean chosen = false;
-        for (RecipeEntry<ProcessRecipe> entry : MFRecipes.QUERN.published().candidates(Input.lookupKeys(input))) {
-            ProcessRecipe recipe = entry.getRecipe();
-            CheckResult.Reason reason = recipe.getInput().explain(input);
-            if (reason == null && recipe.get(MFRecipeKeys.CONSUME_POT, true) && pot == null) {
-                reason = CheckResult.Reason.of("pot");
-            }
-            if (reason == null && recipe.get(MFRecipeKeys.TIER, 0) > getTier()) {
-                reason = CheckResult.Reason.tier("quern", getTier(), recipe.get(MFRecipeKeys.TIER, 0));
-            }
-            if (reason == null && chosen) {
-                reason = CheckResult.Reason.of("shadowed");
-            }
-            if (reason == null) {
-                CheckResult result = check();
-                reason = result.isSuccess() ? null : result.getReason();
-                chosen = true;
-            }
-            candidates.add(Diagnosis.candidate(entry, reason));
-        }
-        return Diagnosis.of("quern", candidates);
+        return Diagnosis.of(
+                "quern",
+                Diagnosis.walk(
+                        MFRecipes.QUERN.published().candidates(Input.lookupKeys(input)),
+                        recipe -> true,
+                        entry -> {
+                            ProcessRecipe recipe = entry.getRecipe();
+                            CheckResult.Reason reason = recipe.getInput().explain(input);
+                            if (reason == null && recipe.get(MFRecipeKeys.CONSUME_POT, true) && pot == null) {
+                                reason = CheckResult.Reason.of("pot");
+                            }
+                            return reason != null ? reason
+                                    : Requirements.QUERN.stationProblem(getTier(), recipe.get(MFRecipeKeys.TIER, 0));
+                        },
+                        entry -> {
+                            CheckResult result = check();
+                            return result.isSuccess() ? null : result.getReason();
+                        }).getCandidates());
     }
 
     public static boolean isPot(ItemStack item) {

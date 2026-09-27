@@ -63,6 +63,13 @@ public class RecipeHandlerTanning extends MFNEIRecipeHandler {
     }
 
     @Override
+    protected void loadAllRecipes() {
+        for (ProcessRecipe recipe : recipesMaking(MFRecipes.TANNING, null)) {
+            arecipes.add(new TanningPair(recipe));
+        }
+    }
+
+    @Override
     public void loadUsageRecipes(ItemStack ingredient) {
         for (ProcessRecipe recipe : recipesUsing(MFRecipes.TANNING, ingredient)) {
             TanningPair cachedRecipe = new TanningPair(recipe);

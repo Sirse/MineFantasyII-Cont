@@ -1,7 +1,5 @@
 package minefantasy.mf2.block.tileentity;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
@@ -131,17 +129,13 @@ public class TileEntityBloomery extends TileEntity implements IInventory, Diagno
         if (problem != null) {
             return Diagnosis.problem("bloomery", problem);
         }
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        boolean chosen = false;
-        for (RecipeEntry<BloomRecipe> entry : MFRecipes.BLOOMERY.published()
-                .candidates(Input.lookupKeys(inv[SLOT_INPUT]))) {
-            CheckResult result = checkEntry(entry, player);
-            CheckResult.Reason reason = result.isSuccess() ? (chosen ? CheckResult.Reason.of("shadowed") : null)
-                    : result.getReason();
-            chosen |= result.isSuccess();
-            candidates.add(Diagnosis.candidate(entry, reason));
-        }
-        return Diagnosis.of("bloomery", candidates);
+        return Diagnosis.of(
+                "bloomery",
+                Diagnosis.walk(
+                        MFRecipes.BLOOMERY.published().candidates(Input.lookupKeys(inv[SLOT_INPUT])),
+                        recipe -> true,
+                        entry -> checkEntry(entry, player).getReason(),
+                        entry -> null).getCandidates());
     }
 
     @Override

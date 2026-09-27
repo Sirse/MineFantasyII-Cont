@@ -24,6 +24,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -317,32 +318,18 @@ public class TileEntityBigFurnace extends TileEntity
             if (in == null) {
                 continue;
             }
-            boolean chosen = false;
-            for (RecipeEntry<ProcessRecipe> entry : MFRecipes.BIG_FURNACE.published()
-                    .candidates(Input.lookupKeys(in))) {
-                ProcessRecipe recipe = entry.getRecipe();
-                int need = recipe.get(MFRecipeKeys.TIER, 0);
-                CheckResult.Reason reason = recipe.getInput().explain(in);
-                if (reason == null && need > getTier()) {
-                    reason = CheckResult.Reason.tier("furnace", getTier(), need);
-                }
-                if (reason == null && chosen) {
-                    reason = CheckResult.Reason.of("shadowed");
-                }
-                if (reason == null) {
-                    chosen = true;
-                    if (planFor(slot, slot + 4) == null) {
-                        reason = CheckResult.Reason.OUTPUT_FULL;
-                    }
-                }
-                candidates.add(Diagnosis.candidate(entry, reason));
-            }
-            if (!chosen && vanillaResult(in) != null) {
-                candidates.add(
-                        new Diagnosis.Candidate(
-                                VANILLA,
-                                0,
-                                planFor(slot, slot + 4) == null ? CheckResult.Reason.OUTPUT_FULL : null));
+            int output = slot + 4;
+            CheckResult.Reason full = planFor(slot, output) == null ? CheckResult.Reason.OUTPUT_FULL : null;
+            Diagnosis.Walk<ProcessRecipe> walk = Diagnosis
+                    .walk(MFRecipes.BIG_FURNACE.published().candidates(Input.lookupKeys(in)), recipe -> true, entry -> {
+                        CheckResult.Reason reason = entry.getRecipe().getInput().explain(in);
+                        return reason != null ? reason
+                                : Requirements.BIG_FURNACE
+                                        .stationProblem(getTier(), entry.getRecipe().get(MFRecipeKeys.TIER, 0));
+                    }, entry -> full);
+            candidates.addAll(walk.getCandidates());
+            if (walk.getChosen() == null && vanillaResult(in) != null) {
+                candidates.add(new Diagnosis.Candidate(VANILLA, 0, full));
             }
         }
         return Diagnosis.of("big_furnace", candidates);
@@ -359,8 +346,10 @@ public class TileEntityBigFurnace extends TileEntity
         }
         long generation = MFRecipes.BIG_FURNACE.published().getGeneration();
         CraftPlan plan;
-        RecipeEntry<ProcessRecipe> entry = MFRecipes
-                .find(MFRecipes.BIG_FURNACE, in, r -> r.get(MFRecipeKeys.TIER, 0) <= this.getTier());
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(
+                MFRecipes.BIG_FURNACE,
+                in,
+                r -> Requirements.BIG_FURNACE.stationFits(getTier(), r.get(MFRecipeKeys.TIER, 0)));
         if (entry != null) {
             plan = CraftPlan.builder(entry.getId(), generation, output).use(input, entry.getRecipe().getInput(), in)
                     .output(entry.getRecipe().getOutput()).build();
@@ -446,8 +435,10 @@ public class TileEntityBigFurnace extends TileEntity
         if (item == null) return null;
 
         // SPECIAL SMELTING
-        RecipeEntry<ProcessRecipe> recipe = MFRecipes
-                .find(MFRecipes.BIG_FURNACE, item, r -> r.get(MFRecipeKeys.TIER, 0) <= this.getTier());
+        RecipeEntry<ProcessRecipe> recipe = MFRecipes.find(
+                MFRecipes.BIG_FURNACE,
+                item,
+                r -> Requirements.BIG_FURNACE.stationFits(getTier(), r.get(MFRecipeKeys.TIER, 0)));
         if (recipe != null) {
             return recipe.getRecipe().getOutput();
         }

@@ -3,32 +3,27 @@ package minefantasy.mf2.commands;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Salvage;
-import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.Diagnosis;
 import minefantasy.mf2.api.recipe.Input;
-import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 
 /**
- * {@code /mf recipes}: how a station looks its recipes up. Looking at a station, it lists the candidates for what the
- * station holds; with a station name, the candidates for the held item. Each line gives the recipe id, its priority and
- * why it is not the one crafted, in lookup order, so a pack maker sees which recipe wins and why the others lose.
+ * How a station looks its recipes up, for {@code /mf recipes}: the station a player looks at explains its own lookup; a
+ * named station judges a held stack. Each candidate comes in lookup order with why it is not the one crafted. What is
+ * shown of it is {@link RecipesCommand}.
  */
 final class RecipeDiagnostics {
 
@@ -36,15 +31,23 @@ final class RecipeDiagnostics {
     private static final Map<String, Function<ItemStack, Diagnosis>> LOOKUPS = new LinkedHashMap<>();
 
     static {
-        LOOKUPS.put("bloomery", held -> lookup(MFRecipes.BLOOMERY, r -> r.getInput(), single(held)));
-        LOOKUPS.put("quern", held -> lookup(MFRecipes.QUERN, r -> r.getInput(), held));
-        LOOKUPS.put("tanning", held -> lookup(MFRecipes.TANNING, r -> r.getInput(), held));
-        LOOKUPS.put("big_furnace", held -> lookup(MFRecipes.BIG_FURNACE, r -> r.getInput(), held));
-        LOOKUPS.put("blast_furnace", held -> lookup(MFRecipes.BLAST_FURNACE, r -> r.getInput(), held));
-        LOOKUPS.put("paint_oil", held -> lookup(MFRecipes.PAINT_OIL, r -> r.getInput(), held));
-        LOOKUPS.put("cooking", held -> lookup(MFRecipes.COOKING, r -> r.getInput(), single(held)));
-        LOOKUPS.put("forge_heat", held -> lookup(MFRecipes.HEATING, r -> r.getInput(), single(held)));
-        LOOKUPS.put("salvage", held -> lookup(MFRecipes.SALVAGE, Salvage.SalvageRecipe::getInput, single(held)));
+        LOOKUPS.put("bloomery", held -> lookup("bloomery", MFRecipes.BLOOMERY, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put("quern", held -> lookup("quern", MFRecipes.QUERN, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put("tanning", held -> lookup("tanning", MFRecipes.TANNING, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put(
+                "big_furnace",
+                held -> lookup("big_furnace", MFRecipes.BIG_FURNACE, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put(
+                "blast_furnace",
+                held -> lookup("blast_furnace", MFRecipes.BLAST_FURNACE, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put("paint_oil", held -> lookup("paint_oil", MFRecipes.PAINT_OIL, r -> true, r -> r.getInput(), held));
+        // A spit and an oven each look up only their own recipes: an oven recipe never shadows a spit one
+        LOOKUPS.put("spit", held -> lookup("spit", MFRecipes.COOKING, r -> !r.isBaking(), r -> r.getInput(), held));
+        LOOKUPS.put("oven", held -> lookup("oven", MFRecipes.COOKING, r -> r.isBaking(), r -> r.getInput(), held));
+        LOOKUPS.put("forge_heat", held -> lookup("forge_heat", MFRecipes.HEATING, r -> true, r -> r.getInput(), held));
+        LOOKUPS.put(
+                "salvage",
+                held -> lookup("salvage", MFRecipes.SALVAGE, r -> true, Salvage.SalvageRecipe::getInput, held));
     }
 
     private RecipeDiagnostics() {}
@@ -53,80 +56,34 @@ final class RecipeDiagnostics {
         return new ArrayList<>(LOOKUPS.keySet());
     }
 
-    static void run(EntityPlayer player, String station) {
-        Diagnosis diagnosis;
-        if (station == null) {
-            TileEntity tile = lookedAt(player);
-            if (!(tile instanceof Diagnosis.Source)) {
-                player.addChatMessage(grey(new ChatComponentTranslation("command.mf.recipes.no_station")));
-                return;
-            }
-            diagnosis = ((Diagnosis.Source) tile).diagnose(player);
-        } else {
-            Function<ItemStack, Diagnosis> lookup = LOOKUPS.get(station.toLowerCase());
-            if (lookup == null) {
-                player.addChatMessage(
-                        grey(new ChatComponentTranslation("command.mf.recipes.unknown_station", station)));
-                return;
-            }
-            if (player.getHeldItem() == null) {
-                player.addChatMessage(grey(new ChatComponentTranslation("command.mf.recipes.no_item")));
-                return;
-            }
-            diagnosis = lookup.apply(player.getHeldItem());
-        }
-        report(player, diagnosis);
+    static boolean isStation(String name) {
+        return LOOKUPS.containsKey(name.toLowerCase(Locale.ROOT));
     }
 
-    private static void report(EntityPlayer player, Diagnosis diagnosis) {
-        player.addChatMessage(
-                new ChatComponentTranslation(
-                        "command.mf.recipes.header",
-                        diagnosis.getStation(),
-                        diagnosis.getCandidates().size()));
-        if (diagnosis.getProblem() != null) {
-            player.addChatMessage(color(reason(diagnosis.getProblem()), EnumChatFormatting.RED));
-            return;
-        }
-        int n = 1;
-        for (Diagnosis.Candidate candidate : diagnosis.getCandidates()) {
-            CheckResult.Reason reason = candidate.getReason();
-            IChatComponent verdict = reason == null
-                    ? color(new ChatComponentTranslation("command.mf.recipes.crafts"), EnumChatFormatting.GREEN)
-                    : color(
-                            reason(reason),
-                            "harder".equals(reason.getId()) ? EnumChatFormatting.YELLOW
-                                    : "shadowed".equals(reason.getId()) ? EnumChatFormatting.GRAY
-                                            : EnumChatFormatting.RED);
-            IChatComponent line = new ChatComponentText(
-                    "#" + n++ + " " + candidate.getId() + " [" + candidate.getPriority() + "] ");
-            player.addChatMessage(line.appendSibling(verdict));
-        }
+    /** The candidates of the named station for the stack, as held: a recipe taking several must see them all. */
+    static Diagnosis forStack(String station, ItemStack held) {
+        return LOOKUPS.get(station.toLowerCase(Locale.ROOT)).apply(held);
+    }
+
+    /** The lookup of the station the player looks at, or null when it is none that explains itself. */
+    static Diagnosis lookedAt(EntityPlayer player) {
+        TileEntity tile = lookedAtTile(player);
+        return tile instanceof Diagnosis.Source ? ((Diagnosis.Source) tile).diagnose(player) : null;
     }
 
     /** Candidates for one stack, in lookup order: the first that takes it wins, later ones are shadowed. */
-    private static <R> Diagnosis lookup(RecipeRegistry<R> registry, Function<R, Input> input, ItemStack held) {
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        boolean chosen = false;
-        for (RecipeEntry<R> entry : registry.published().candidates(Input.lookupKeys(held))) {
-            CheckResult.Reason reason = input.apply(entry.getRecipe()).explain(held);
-            if (reason == null && chosen) {
-                reason = CheckResult.Reason.of("shadowed");
-            }
-            chosen |= reason == null;
-            candidates.add(Diagnosis.candidate(entry, reason));
-        }
-        return Diagnosis.of(registry.getStation(), candidates);
+    private static <R> Diagnosis lookup(String station, RecipeRegistry<R> registry, Predicate<R> inContext,
+            Function<R, Input> input, ItemStack held) {
+        return Diagnosis.of(
+                station,
+                Diagnosis.walk(
+                        registry.published().candidates(Input.lookupKeys(held)),
+                        inContext,
+                        entry -> input.apply(entry.getRecipe()).explain(held),
+                        entry -> null).getCandidates());
     }
 
-    /** Stations that take one item at a time judge a single one of the held stack. */
-    private static ItemStack single(ItemStack held) {
-        ItemStack one = held.copy();
-        one.stackSize = 1;
-        return one;
-    }
-
-    private static TileEntity lookedAt(EntityPlayer player) {
+    private static TileEntity lookedAtTile(EntityPlayer player) {
         Vec3 eyes = Vec3.createVectorHelper(player.posX, player.posY + player.getEyeHeight(), player.posZ);
         Vec3 look = player.getLookVec();
         Vec3 end = eyes.addVector(look.xCoord * REACH, look.yCoord * REACH, look.zCoord * REACH);
@@ -135,18 +92,5 @@ final class RecipeDiagnostics {
             return null;
         }
         return player.worldObj.getTileEntity(hit.blockX, hit.blockY, hit.blockZ);
-    }
-
-    private static IChatComponent reason(CheckResult.Reason reason) {
-        return new ChatComponentTranslation(reason.getTranslationKey(), reason.getArgs());
-    }
-
-    private static IChatComponent color(IChatComponent component, EnumChatFormatting color) {
-        component.setChatStyle(new ChatStyle().setColor(color));
-        return component;
-    }
-
-    private static IChatComponent grey(IChatComponent component) {
-        return color(component, EnumChatFormatting.GRAY);
     }
 }

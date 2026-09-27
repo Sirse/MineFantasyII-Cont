@@ -4,6 +4,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
 
 /**
@@ -37,6 +38,16 @@ public final class RecipeChecks {
     /** A tier: -1 for any, otherwise 0 or more. */
     public static void tier(String what, int value) {
         require(value >= -1, what + " must be -1 (any) or more, got " + value);
+    }
+
+    /**
+     * A research the player must have, if any: it must be one the mod knows. An unknown name would count as known to
+     * everyone, so a misspelt research would quietly lift the requirement.
+     */
+    public static void research(String what, String name) {
+        if (name != null && !name.isEmpty()) {
+            require(ResearchLogic.getResearch(name) != null, what + " '" + name + "' is not a known research");
+        }
     }
 
     public static void notEmpty(String what, String value) {

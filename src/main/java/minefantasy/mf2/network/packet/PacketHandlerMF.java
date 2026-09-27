@@ -27,9 +27,7 @@ public class PacketHandlerMF {
         packetList.put(StaminaPacket.packetName, new StaminaPacket());
         packetList.put(ParryPacket.packetName, new ParryPacket());
         packetList.put(HitSoundPacket.packetName, new HitSoundPacket());
-        packetList.put(AnvilPacket.packetName, new AnvilPacket());
-        packetList.put(CarpenterPacket.packetName, new CarpenterPacket());
-        packetList.put(KitchenBenchPacket.packetName, new KitchenBenchPacket());
+        packetList.put(StationStatePacket.packetName, new StationStatePacket());
         packetList.put(KnowledgePacket.packetName, new KnowledgePacket());
         packetList.put(ResearchRequest.packetName, new ResearchRequest());
         packetList.put(ChimneyPacket.packetName, new ChimneyPacket());

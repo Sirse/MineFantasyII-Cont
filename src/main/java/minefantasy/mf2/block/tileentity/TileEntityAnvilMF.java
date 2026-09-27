@@ -22,19 +22,19 @@ import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.IQualityBalance;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.Diagnosis;
-import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
-import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.container.ContainerAnvilMF;
 import minefantasy.mf2.entity.EntityItemUnbreakable;
@@ -43,9 +43,10 @@ import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
 import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.AnvilPacket;
+import minefantasy.mf2.network.packet.StationStatePacket;
 
-public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualityBalance, Diagnosis.Source {
+public class TileEntityAnvilMF extends TileEntity
+        implements StationStatePacket.Shown, IInventory, IQualityBalance, Diagnosis.Source {
 
     private final Random rand = new Random();
     public int tier;
@@ -72,10 +73,12 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     private boolean isFakeAnvil = false;
     private ItemStack recipe;
     private GridRecipe activeRecipe;
+    /** The id of the recipe the grid holds, as the lookup found it. */
+    private RecipeId activeId;
     /** The craft the grid holds, worked out in full; the HUD, the save and finishing all read it. */
     private CraftPlan project;
-    /** The project the progress belongs to, kept across saves. */
-    private final RunningCraft running = new RunningCraft();
+    /** The project the progress belongs to, kept across saves, and what watchers last got. */
+    private final CraftState craft = new CraftState();
     private static final RecipeId REPAIR = RecipeId.of("minefantasy2", "anvil/repair");
     private int hammerTierRequired;
     private int anvilTierRequired;
@@ -101,7 +104,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        running.read(nbt);
+        craft.read(nbt);
         tier = nbt.getInteger("tier");
         inventory = InventorySlots.read(nbt, "Items", inventory.length);
         progress = nbt.getFloat("Progress");
@@ -119,7 +122,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        running.write(nbt);
+        craft.write(nbt);
         nbt.setInteger("tier", tier);
 
         InventorySlots.write(nbt, "Items", inventory);
@@ -240,7 +243,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         if (user == null) return false;
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
-        int hammerTier = ToolHelper.getCrafterTier(user.getHeldItem());
         if (toolType.equalsIgnoreCase("hammer") || toolType.equalsIgnoreCase("hvyHammer")) {
             if (user.getHeldItem() != null) {
                 user.getHeldItem().damageItem(1, user);
@@ -252,9 +254,10 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
             }
             if (worldObj.isRemote) return true;
 
-            if (doesPlayerKnowCraft(user) && canCraft() && toolType.equalsIgnoreCase(toolTypeRequired)) {
+            Requirements.Verdict verdict = verdict(user);
+            if (verdict != null && verdict.allows() && canCraft()) {
                 float mod = 1.0F;
-                if (hammerTier < hammerTierRequired) {
+                if (verdict.isToolWeak()) {
                     mod = 2.0F;
                     if (rand.nextInt(5) == 0) {
                         reassignHitValues();
@@ -456,12 +459,12 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         }
 
         if (isPerfectItem() && !isMythicRecipe()) {
-            this.setTrait(result, "MF_Inferior", false);
+            grade(result, ItemQuality.Grade.SUPERIOR);
             if (CustomToolHelper.isMythic(result)) {
-                result.getTagCompound().setBoolean("Unbreakable", true);
+                ToolHelper.setUnbreakable(result, true);
                 result.getTagCompound().setBoolean(EntityItemUnbreakable.persistNBT, true);
             } else {
-                ToolHelper.setQuality(result, 200.0F);
+                ItemQuality.set(result, ItemQuality.MAX);
             }
             return result;
         }
@@ -475,22 +478,20 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         float totalPts = 0F;
         int totalItems = 0;
         for (ItemStack item : inventory) {
-            if (item != null && item.hasTagCompound()) {
-                if (item.getTagCompound().hasKey("MF_Inferior")) {
-                    ++totalItems;
-                    boolean inf = item.getTagCompound().getBoolean("MF_Inferior");
-                    totalPts += (inf ? -50F : 100F);
-                }
+            ItemQuality.Grade grade = ItemQuality.getGrade(item);
+            if (grade != ItemQuality.Grade.ORDINARY) {
+                ++totalItems;
+                totalPts += grade == ItemQuality.Grade.INFERIOR ? -50F : 100F;
             }
         }
         if (totalItems > 0 && totalPts > 0) {
             totalPts /= totalItems;
-            ToolHelper.setQuality(result, ToolHelper.getQualityLevel(result) + totalPts);
+            ItemQuality.set(result, ItemQuality.get(result) + totalPts);
             if (totalPts <= -85F) {
-                this.setTrait(result, "MF_Inferior", true);
+                grade(result, ItemQuality.Grade.INFERIOR);
             }
             if (totalPts >= 80) {
-                this.setTrait(result, "MF_Inferior", false);
+                grade(result, ItemQuality.Grade.SUPERIOR);
             }
         }
         return result;
@@ -585,11 +586,17 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         return count >= number;
     }
 
+    /** Sends the state to the watchers, if it changed since they got it last. */
     public void syncData() {
-
         if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new AnvilPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        NBTTagCompound state = describe();
+        if (craft.changed(state)) {
+            NetworkUtils.sendToWatchers(
+                    new StationStatePacket(this, state).generatePacket(),
+                    worldObj,
+                    this.xCoord,
+                    this.zCoord);
+        }
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
@@ -598,10 +605,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     /** The recipe result, or on the client the copy the server synced for display */
     public ItemStack getShownResult() {
         return worldObj != null && worldObj.isRemote ? clientResult : recipe;
-    }
-
-    public void setClientResult(ItemStack result) {
-        clientResult = result;
     }
 
     /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
@@ -699,7 +702,7 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         if (recipe == null) {
             return null;
         }
-        RecipeId id = activeRecipe == null ? REPAIR : MFRecipes.ANVIL.published().idOf(activeRecipe);
+        RecipeId id = activeRecipe == null ? REPAIR : activeId;
         CraftPlan.Builder plan = CraftPlan
                 .builder(id == null ? REPAIR : id, MFRecipes.ANVIL.published().getGeneration(), getSizeInventory() - 1);
         GridProject.addGrid(plan, this, getSizeInventory() - 1, match == null ? null : match.getAmounts(), true);
@@ -731,21 +734,11 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     @Override
     public Diagnosis diagnose(EntityPlayer player) {
         updateCraftingData();
-        List<RecipeEntry<GridRecipe>> matched = new ArrayList<>();
-        if (craftMatrix != null && findRepair() == null) {
-            for (RecipeEntry<GridRecipe> entry : MFRecipes.ANVIL.published().all()) {
-                if (entry.getRecipe().matches(craftMatrix)) {
-                    matched.add(entry);
-                }
-            }
-        }
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        for (int i = 0; i < matched.size(); i++) {
-            candidates.add(
-                    Diagnosis.candidate(
-                            matched.get(i),
-                            i == 0 ? requirementProblem(player) : CheckResult.Reason.of("shadowed")));
-        }
+        List<Diagnosis.Candidate> candidates = craftMatrix != null && findRepair() == null ? Diagnosis.walk(
+                MFRecipes.ANVIL.published().all(),
+                recipe -> recipe.matches(craftMatrix),
+                entry -> null,
+                entry -> requirementProblem(player)).getCandidates() : new ArrayList<>();
         if (candidates.isEmpty() && recipe != null && project != null) {
             candidates.add(new Diagnosis.Candidate(project.getRecipeId(), 0, requirementProblem(player)));
         }
@@ -755,35 +748,21 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
         return Diagnosis.of("anvil", candidates);
     }
 
-    /** What stops the player crafting the project, or null; a soft reason means it only works harder. */
+    /** How the project's requirements judge the player and this anvil; null without a project. */
+    private Requirements.Verdict verdict(EntityPlayer player) {
+        return project == null ? null : Requirements.of(project).check(Requirements.ANVIL, player, tier);
+    }
+
+    /** What stops the player crafting the project, or null; a penalty means it only works harder. */
     private CheckResult.Reason requirementProblem(EntityPlayer player) {
-        if (project == null) {
+        Requirements.Verdict verdict = verdict(player);
+        if (verdict == null) {
             return CheckResult.Reason.NO_RECIPE;
         }
-        ItemStack held = player.getHeldItem();
-        String tool = ToolHelper.getCrafterTool(held);
-        int toolTier = ToolHelper.getCrafterTier(held);
-        String needTool = project.require(MFRecipeKeys.TOOL, "");
-        int needToolTier = project.require(MFRecipeKeys.TOOL_TIER, 0);
-        int needStation = project.require(MFRecipeKeys.TIER, 0);
-        String research = project.require(MFRecipeKeys.RESEARCH, "");
-        if (!needTool.equalsIgnoreCase(tool)) {
-            return CheckResult.Reason.of("tool", needTool, tool);
+        if (!verdict.allows()) {
+            return verdict.getRefusal();
         }
-        if (!research.isEmpty() && !ResearchLogic.hasInfoUnlocked(player, research)) {
-            return CheckResult.Reason.of("research", research);
-        }
-        if (!canCraft()) {
-            return CheckResult.Reason.OUTPUT_FULL;
-        }
-        // A weaker hammer or anvil still works, only harder
-        if (toolTier < needToolTier) {
-            return CheckResult.Reason.of("harder", "tool", toolTier, needToolTier);
-        }
-        if (tier < needStation) {
-            return CheckResult.Reason.of("harder", "anvil", tier, needStation);
-        }
-        return null;
+        return canCraft() ? verdict.getPenalty() : CheckResult.Reason.OUTPUT_FULL;
     }
 
     private ItemStack findRepair() {
@@ -798,21 +777,23 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
                 }
             }
             ItemStack repair = findRepair();
-            GridRecipe.Match match = repair != null || craftMatrix == null ? null
-                    : CraftingManagerAnvil.getInstance().match(craftMatrix);
+            GridRecipe.Found found = repair != null || craftMatrix == null ? null
+                    : CraftingManagerAnvil.getInstance().find(craftMatrix);
+            GridRecipe.Match match = found == null ? null : found.getMatch();
             activeRecipe = match == null ? null : match.getRecipe();
+            activeId = found == null ? null : found.getId();
             skillUsed = activeRecipe == null ? null : activeRecipe.getSkill();
             recipe = repair != null ? repair : match == null ? null : match.getResult();
             project = buildProject(match);
             show(project);
 
             // Progress belongs to one project: another recipe, material, requirement or input starts over
-            if (progress > 0 && (!canCraft() || !running.holds(project))) {
+            boolean carriesOn = craft.follow(project);
+            if (progress > 0 && (!canCraft() || !carriesOn)) {
                 progress = 0;
                 reassignHitValues();
                 qualityBalance = 0;
             }
-            running.start(project);
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
@@ -824,37 +805,44 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
      */
     @Override
     public Packet getDescriptionPacket() {
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
+    }
+
+    /**
+     * What watchers are shown of the station: the description packet and the state packet carry the same, and
+     * {@link #show} reads it back.
+     */
+    private NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setFloat("Progress", progress);
-        nbt.setFloat("ProgressMax", progressMax);
+        CraftHud.write(nbt, progress, progressMax, toolTypeRequired, researchRequired, recipe);
         nbt.setFloat("QualityBalance", qualityBalance);
         nbt.setFloat("ThresholdPosition", thresholdPosition);
         nbt.setFloat("LeftHit", leftHit);
         nbt.setFloat("RightHit", rightHit);
-        nbt.setInteger("HammerTier", hammerTierRequired);
+        nbt.setInteger(CraftHud.TOOL_TIER, hammerTierRequired);
         nbt.setInteger("AnvilTier", anvilTierRequired);
-        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
-        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
-        if (recipe != null) {
-            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
-        }
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+        return nbt;
     }
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        NBTTagCompound nbt = packet.func_148857_g();
-        progress = nbt.getFloat("Progress");
-        progressMax = nbt.getFloat("ProgressMax");
-        qualityBalance = nbt.getFloat("QualityBalance");
-        thresholdPosition = nbt.getFloat("ThresholdPosition");
-        leftHit = nbt.getFloat("LeftHit");
-        rightHit = nbt.getFloat("RightHit");
-        hammerTierRequired = nbt.getInteger("HammerTier");
-        anvilTierRequired = nbt.getInteger("AnvilTier");
-        toolTypeRequired = nbt.getString("ToolNeeded");
-        researchRequired = nbt.getString("Research");
-        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
+        show(packet.func_148857_g());
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        CraftHud hud = CraftHud.read(state);
+        progress = hud.progress;
+        progressMax = hud.progressMax;
+        toolTypeRequired = hud.tool;
+        researchRequired = hud.research;
+        clientResult = hud.result;
+        qualityBalance = state.getFloat("QualityBalance");
+        thresholdPosition = state.getFloat("ThresholdPosition");
+        leftHit = state.getFloat("LeftHit");
+        rightHit = state.getFloat("RightHit");
+        hammerTierRequired = state.getInteger(CraftHud.TOOL_TIER);
+        anvilTierRequired = state.getInteger("AnvilTier");
     }
 
     public boolean canCraft() {
@@ -946,36 +934,29 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     private ItemStack damageItem(ItemStack item) {
         float itemdam = getItemDamage();
         if (itemdam > 0.5F) {
-            setTrait(item, "MF_Inferior");
+            grade(item, ItemQuality.Grade.INFERIOR);
             float q = 100F * (0.75F - (itemdam - 0.5F));
-            ToolHelper.setQuality(item, Math.max(10F, q));
+            ItemQuality.set(item, Math.max(10F, q));
         }
         float damage = itemdam * item.getMaxDamage();
         if (item.isItemStackDamageable()) {
             if (damage > 0) {
                 item.setItemDamage((int) (damage));
                 if (isMythicRecipe()) {
-                    setTrait(item, "MF_Inferior");
+                    grade(item, ItemQuality.Grade.INFERIOR);
                 }
             } else if (isMythicRecipe()) {
-                setTrait(item, "Unbreakable");
+                ToolHelper.setUnbreakable(item, true);
             }
         }
         return item;
     }
 
-    private void setTrait(ItemStack item, String trait) {
-        setTrait(item, trait, true);
-    }
-
-    private void setTrait(ItemStack item, String trait, boolean flag) {
-        if (item == null) return;
-        if (item.getMaxStackSize() > 1 || !item.isItemStackDamageable()) {
-            return;
+    /** Grades a forged item; only one that wears down has a grade. */
+    private void grade(ItemStack item, ItemQuality.Grade grade) {
+        if (item != null && item.isItemStackDamageable()) {
+            ItemQuality.setGrade(item, grade);
         }
-
-        NBTTagCompound nbt = this.getNBT(item);
-        nbt.setBoolean(trait, flag);
     }
 
     private void updateThreshold() {
@@ -1014,14 +995,6 @@ public class TileEntityAnvilMF extends TileEntity implements IInventory, IQualit
     }
 
     // region client sync: the server shows the project; its packets and container fill these on the client
-
-    public void setToolType(String toolType) {
-        toolTypeRequired = toolType;
-    }
-
-    public void setResearch(String research) {
-        researchRequired = research;
-    }
 
     public void setHammerUsed(int tier) {
         hammerTierRequired = tier;

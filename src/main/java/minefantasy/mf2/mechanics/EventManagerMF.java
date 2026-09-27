@@ -52,6 +52,7 @@ import minefantasy.mf2.api.armour.ItemArmourMFBase;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.*;
+import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.LevelupEvent;
@@ -699,15 +700,11 @@ public class EventManagerMF {
                 }
             }
 
-            if (event.itemStack.hasTagCompound() && event.itemStack.getTagCompound().hasKey("MF_Inferior")) {
-                if (event.itemStack.getTagCompound().getBoolean("MF_Inferior")) {
-                    event.toolTip
-                            .add(EnumChatFormatting.RED + StatCollector.translateToLocal("attribute.inferior.name"));
-                }
-                if (!event.itemStack.getTagCompound().getBoolean("MF_Inferior")) {
-                    event.toolTip
-                            .add(EnumChatFormatting.GREEN + StatCollector.translateToLocal("attribute.superior.name"));
-                }
+            ItemQuality.Grade grade = ItemQuality.getGrade(event.itemStack);
+            if (grade == ItemQuality.Grade.INFERIOR) {
+                event.toolTip.add(EnumChatFormatting.RED + StatCollector.translateToLocal("attribute.inferior.name"));
+            } else if (grade == ItemQuality.Grade.SUPERIOR) {
+                event.toolTip.add(EnumChatFormatting.GREEN + StatCollector.translateToLocal("attribute.superior.name"));
             }
             if (event.itemStack.getItem() instanceof ItemArmor
                     && (!(event.itemStack.getItem() instanceof ItemArmourMFBase) || ClientItemsMF.showSpecials(

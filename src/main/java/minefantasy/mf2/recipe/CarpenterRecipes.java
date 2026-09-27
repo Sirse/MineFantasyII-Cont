@@ -12,7 +12,6 @@ import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.NativeRecipes;
 import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.refine.PaintOilRecipe;
-import minefantasy.mf2.api.crafting.refine.QuernRecipes;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.api.rpg.SkillList;
@@ -64,27 +63,14 @@ public class CarpenterRecipes {
         } else {
             addNonPrimitiveStone();
         }
-        MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.researchBook),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "B", 'B', Items.book, });
+        MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.researchBook)).tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "B", 'B', Items.book, });
 
         if (ConfigHardcore.HCCallowRocks) {
             try (NativeRecipes.Variant v = NativeRecipes.variant("from_cobblestone")) {
-                KnowledgeListMF.sharpRocksR = MineFantasyAPI.addCarpenterRecipe(
-                        null,
-                        new ItemStack(ComponentListMF.sharp_rock, 8),
-                        "",
-                        stonemason,
-                        "hammer",
-                        -1,
-                        10,
-                        new Object[] { "S", 'S', Blocks.cobblestone, });
+                KnowledgeListMF.sharpRocksR = MineFantasyAPI
+                        .carpenterRecipe(new ItemStack(ComponentListMF.sharp_rock, 8)).tool("hammer", -1).time(10)
+                        .sound(stonemason).shaped(new Object[] { "S", 'S', Blocks.cobblestone, });
             }
 
         } else {
@@ -92,83 +78,39 @@ public class CarpenterRecipes {
         }
         Salvage.addSalvage(ToolListMF.dryrocks, Blocks.cobblestone);
 
-        KnowledgeListMF.threadR1 = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.thread, 4),
-                "commodities",
-                sewing,
-                "hands",
-                -1,
-                5,
-                new Object[] { "W", "S", 'W', Blocks.wool, 'S', Items.stick, });
+        KnowledgeListMF.threadR1 = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.thread, 4))
+                .research("commodities").tool("hands", -1).time(5).sound(sewing)
+                .shaped(new Object[] { "W", "S", 'W', Blocks.wool, 'S', Items.stick, });
         try (NativeRecipes.Variant v = NativeRecipes.variant("from_vine")) {
-            KnowledgeListMF.threadR2 = MineFantasyAPI.addCarpenterRecipe(
-                    null,
-                    new ItemStack(ComponentListMF.thread),
-                    "commodities",
-                    sewing,
-                    "hands",
-                    -1,
-                    5,
-                    new Object[] { " V ", "VSV", " V ", 'S', Items.stick, 'V', ComponentListMF.vine });
+            KnowledgeListMF.threadR2 = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.thread))
+                    .research("commodities").tool("hands", -1).time(5).sound(sewing)
+                    .shaped(new Object[] { " V ", "VSV", " V ", 'S', Items.stick, 'V', ComponentListMF.vine });
         }
-        KnowledgeListMF.stringR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(Items.string),
-                "commodities",
-                sewing,
-                "hands",
-                -1,
-                10,
-                new Object[] { "T", "T", "T", "T", 'T', ComponentListMF.thread });
+        KnowledgeListMF.stringR = MineFantasyAPI.carpenterRecipe(new ItemStack(Items.string)).research("commodities")
+                .tool("hands", -1).time(10).sound(sewing)
+                .shaped(new Object[] { "T", "T", "T", "T", 'T', ComponentListMF.thread });
 
-        KnowledgeListMF.lStripsR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.leather_strip, 4),
-                "commodities",
-                snipping,
-                "shears",
-                -1,
-                10,
-                new Object[] { "L", 'L', Items.leather, });
+        KnowledgeListMF.lStripsR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.leather_strip, 4))
+                .research("commodities").tool("shears", -1).time(10).sound(snipping)
+                .shaped(new Object[] { "L", 'L', Items.leather, });
 
-        MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(ToolListMF.swordTraining),
-                nailHammer,
-                "knife",
-                1,
-                40,
-                new Object[] { "NI  ", "SIII", "NI  ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank, 'I',
-                        Blocks.planks, });
+        MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.swordTraining)).skill(artisanry).tool("knife", 1)
+                .time(40).sound(nailHammer).shaped(
+                        new Object[] { "NI  ", "SIII", "NI  ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank,
+                                'I', Blocks.planks, });
 
-        MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(ToolListMF.waraxeTraining),
-                nailHammer,
-                "knife",
-                1,
-                30,
-                new Object[] { " II ", "SSIN", "  I ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank, 'I',
-                        Blocks.planks, });
-        MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(ToolListMF.maceTraining),
-                nailHammer,
-                "knife",
-                1,
-                35,
-                new Object[] { "  II", "SSII", "  N ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank, 'I',
-                        Blocks.planks, });
-        MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(ToolListMF.spearTraining),
-                nailHammer,
-                "knife",
-                1,
-                20,
-                new Object[] { "  N ", "SSSI", "  N ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank, 'I',
-                        Blocks.planks, });
+        MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.waraxeTraining)).skill(artisanry).tool("knife", 1)
+                .time(30).sound(nailHammer).shaped(
+                        new Object[] { " II ", "SSIN", "  I ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank,
+                                'I', Blocks.planks, });
+        MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.maceTraining)).skill(artisanry).tool("knife", 1)
+                .time(35).sound(nailHammer).shaped(
+                        new Object[] { "  II", "SSII", "  N ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank,
+                                'I', Blocks.planks, });
+        MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.spearTraining)).skill(artisanry).tool("knife", 1)
+                .time(20).sound(nailHammer).shaped(
+                        new Object[] { "  N ", "SSSI", "  N ", 'N', ComponentListMF.nail, 'S', ComponentListMF.plank,
+                                'I', Blocks.planks, });
         ItemStack scrapWood = ComponentListMF.plank.construct("ScrapWood");
         Salvage.addSalvage(
                 ToolListMF.swordTraining,
@@ -195,98 +137,45 @@ public class CarpenterRecipes {
                 scrapWood,
                 scrapWood);
 
-        KnowledgeListMF.badBandageR = MineFantasyAPI.addCarpenterRecipe(
-                provisioning,
-                new ItemStack(ToolListMF.bandage_crude, 2),
-                "bandage",
-                sewing,
-                "needle",
-                -1,
-                10,
-                new Object[] { "LLL", 'L', ComponentListMF.rawhideSmall, });
+        KnowledgeListMF.badBandageR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bandage_crude, 2))
+                .skill(provisioning).research("bandage").tool("needle", -1).time(10).sound(sewing)
+                .shaped(new Object[] { "LLL", 'L', ComponentListMF.rawhideSmall, });
 
         try (NativeRecipes.Variant v = NativeRecipes.variant("rawhide_medium")) {
-            MineFantasyAPI.addCarpenterRecipe(
-                    provisioning,
-                    new ItemStack(ToolListMF.bandage_crude, 4),
-                    "bandage",
-                    sewing,
-                    "needle",
-                    -1,
-                    20,
-                    new Object[] { "LLL", 'L', ComponentListMF.rawhideMedium, });
+            MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bandage_crude, 4)).skill(provisioning)
+                    .research("bandage").tool("needle", -1).time(20).sound(sewing)
+                    .shaped(new Object[] { "LLL", 'L', ComponentListMF.rawhideMedium, });
         }
         try (NativeRecipes.Variant v = NativeRecipes.variant("rawhide_large")) {
-            MineFantasyAPI.addCarpenterRecipe(
-                    provisioning,
-                    new ItemStack(ToolListMF.bandage_crude, 6),
-                    "bandage",
-                    sewing,
-                    "needle",
-                    -1,
-                    30,
-                    new Object[] { "LLL", 'L', ComponentListMF.rawhideLarge, });
+            MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bandage_crude, 6)).skill(provisioning)
+                    .research("bandage").tool("needle", -1).time(30).sound(sewing)
+                    .shaped(new Object[] { "LLL", 'L', ComponentListMF.rawhideLarge, });
         }
-        KnowledgeListMF.bandageR = MineFantasyAPI.addCarpenterRecipe(
-                provisioning,
-                new ItemStack(ToolListMF.bandage_wool, 4),
-                "bandage",
-                sewing,
-                "needle",
-                1,
-                10,
-                new Object[] { "CTC", 'T', ComponentListMF.thread, 'C', Blocks.wool, });
+        KnowledgeListMF.bandageR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bandage_wool, 4))
+                .skill(provisioning).research("bandage").tool("needle", 1).time(10).sound(sewing)
+                .shaped(new Object[] { "CTC", 'T', ComponentListMF.thread, 'C', Blocks.wool, });
 
-        KnowledgeListMF.goodBandageR = MineFantasyAPI.addCarpenterRecipe(
-                provisioning,
-                new ItemStack(ToolListMF.bandage_tough),
-                "bandageadv",
-                sewing,
-                "needle",
-                2,
-                20,
-                new Object[] { "T", "L", "B", 'T', ComponentListMF.thread, 'L', ComponentListMF.leather_strip, 'B',
-                        ToolListMF.bandage_wool });
+        KnowledgeListMF.goodBandageR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bandage_tough))
+                .skill(provisioning).research("bandageadv").tool("needle", 2).time(20).sound(sewing).shaped(
+                        new Object[] { "T", "L", "B", 'T', ComponentListMF.thread, 'L', ComponentListMF.leather_strip,
+                                'B', ToolListMF.bandage_wool });
 
-        KnowledgeListMF.roughHelmetR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 1, 0),
-                "craftArmourBasic",
-                sewing,
-                "needle",
-                -1,
-                25,
-                new Object[] { "TLT", "S S", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip, 'L',
-                        Items.leather });
-        KnowledgeListMF.roughChestR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 1, 1),
-                "craftArmourBasic",
-                sewing,
-                "needle",
-                -1,
-                40,
-                new Object[] { "S S", "LLL", "TLT", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip,
-                        'L', Items.leather });
-        KnowledgeListMF.roughLegsR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 1, 2),
-                "craftArmourBasic",
-                sewing,
-                "needle",
-                -1,
-                35,
-                new Object[] { "TLT", "L L", "S S", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip,
-                        'L', Items.leather });
-        KnowledgeListMF.roughBootsR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 1, 3),
-                "craftArmourBasic",
-                sewing,
-                "needle",
-                -1,
-                20,
-                new Object[] { "T T", "S S", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip, });
+        KnowledgeListMF.roughHelmetR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 1, 0))
+                .skill(artisanry).research("craftArmourBasic").tool("needle", -1).time(25).sound(sewing).shaped(
+                        new Object[] { "TLT", "S S", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip,
+                                'L', Items.leather });
+        KnowledgeListMF.roughChestR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 1, 1))
+                .skill(artisanry).research("craftArmourBasic").tool("needle", -1).time(40).sound(sewing).shaped(
+                        new Object[] { "S S", "LLL", "TLT", 'T', ComponentListMF.thread, 'S',
+                                ComponentListMF.leather_strip, 'L', Items.leather });
+        KnowledgeListMF.roughLegsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 1, 2))
+                .skill(artisanry).research("craftArmourBasic").tool("needle", -1).time(35).sound(sewing).shaped(
+                        new Object[] { "TLT", "L L", "S S", 'T', ComponentListMF.thread, 'S',
+                                ComponentListMF.leather_strip, 'L', Items.leather });
+        KnowledgeListMF.roughBootsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 1, 3))
+                .skill(artisanry).research("craftArmourBasic").tool("needle", -1).time(20).sound(sewing).shaped(
+                        new Object[] { "T T", "S S", 'T', ComponentListMF.thread, 'S',
+                                ComponentListMF.leather_strip, });
         Salvage.addSalvage(
                 ArmourListMF.armourItem(ArmourListMF.leather, 1, 0),
                 new ItemStack(ComponentListMF.thread, 2),
@@ -307,46 +196,22 @@ public class CarpenterRecipes {
                 new ItemStack(ComponentListMF.thread, 4),
                 new ItemStack(ComponentListMF.leather_strip, 2));
 
-        KnowledgeListMF.reHelmetR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 2, 0),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                50,
-                new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
-                        ArmourListMF.armour(ArmourListMF.leather, 1, 0), 'U', Items.leather });
-        KnowledgeListMF.reChestR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 2, 1),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                80,
-                new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
-                        ArmourListMF.armour(ArmourListMF.leather, 1, 1), 'U', Items.leather });
-        KnowledgeListMF.reLegsR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 2, 2),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                70,
-                new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
-                        ArmourListMF.armour(ArmourListMF.leather, 1, 2), 'U', Items.leather });
-        KnowledgeListMF.reBootsR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 2, 3),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                40,
-                new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
-                        ArmourListMF.armour(ArmourListMF.leather, 1, 3), 'U', Items.leather });
+        KnowledgeListMF.reHelmetR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 2, 0))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(50).sound(sewing).shaped(
+                        new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
+                                ArmourListMF.armour(ArmourListMF.leather, 1, 0), 'U', Items.leather });
+        KnowledgeListMF.reChestR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 2, 1))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(80).sound(sewing).shaped(
+                        new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
+                                ArmourListMF.armour(ArmourListMF.leather, 1, 1), 'U', Items.leather });
+        KnowledgeListMF.reLegsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 2, 2))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(70).sound(sewing).shaped(
+                        new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
+                                ArmourListMF.armour(ArmourListMF.leather, 1, 2), 'U', Items.leather });
+        KnowledgeListMF.reBootsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 2, 3))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(40).sound(sewing).shaped(
+                        new Object[] { "TTT", "UPU", 'T', ComponentListMF.thread, 'P',
+                                ArmourListMF.armour(ArmourListMF.leather, 1, 3), 'U', Items.leather });
         Salvage.addSalvage(
                 ArmourListMF.armourItem(ArmourListMF.leather, 2, 0),
                 ArmourListMF.armourItem(ArmourListMF.leather, 1, 0),
@@ -369,46 +234,22 @@ public class CarpenterRecipes {
                 new ItemStack(Items.leather, 2));
 
         // PADDING
-        KnowledgeListMF.padding[0] = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 4, 0),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                50,
-                new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 0), 'W',
-                        Blocks.wool, 'S', ComponentListMF.thread, });
-        KnowledgeListMF.padding[1] = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 4, 1),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                80,
-                new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 1), 'W',
-                        Blocks.wool, 'S', ComponentListMF.thread, });
-        KnowledgeListMF.padding[2] = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 4, 2),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                70,
-                new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 2), 'W',
-                        Blocks.wool, 'S', ComponentListMF.thread, });
-        KnowledgeListMF.padding[3] = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                ArmourListMF.armour(ArmourListMF.leather, 4, 3),
-                "craftArmourLight",
-                sewing,
-                "needle",
-                1,
-                40,
-                new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 3), 'W',
-                        Blocks.wool, 'S', ComponentListMF.thread, });
+        KnowledgeListMF.padding[0] = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 4, 0))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(50).sound(sewing).shaped(
+                        new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 0), 'W',
+                                Blocks.wool, 'S', ComponentListMF.thread, });
+        KnowledgeListMF.padding[1] = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 4, 1))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(80).sound(sewing).shaped(
+                        new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 1), 'W',
+                                Blocks.wool, 'S', ComponentListMF.thread, });
+        KnowledgeListMF.padding[2] = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 4, 2))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(70).sound(sewing).shaped(
+                        new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 2), 'W',
+                                Blocks.wool, 'S', ComponentListMF.thread, });
+        KnowledgeListMF.padding[3] = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 4, 3))
+                .skill(artisanry).research("craftArmourLight").tool("needle", 1).time(40).sound(sewing).shaped(
+                        new Object[] { " W ", "SPS", " S ", 'P', ArmourListMF.armour(ArmourListMF.leather, 1, 3), 'W',
+                                Blocks.wool, 'S', ComponentListMF.thread, });
         Salvage.addSalvage(
                 ArmourListMF.armourItem(ArmourListMF.leather, 4, 0),
                 ArmourListMF.armourItem(ArmourListMF.leather, 1, 0),
@@ -430,38 +271,20 @@ public class CarpenterRecipes {
                 new ItemStack(ComponentListMF.thread, 3),
                 Blocks.wool);
 
-        KnowledgeListMF.repairBasicR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.repair_basic),
-                "repair_basic",
-                sewing,
-                "needle",
-                1,
-                20,
-                new Object[] { "TTT", "FNH", "SLS", 'T', ComponentListMF.thread, 'S', ComponentListMF.leather_strip,
-                        'L', Items.leather, 'F', Items.flint, 'H', CustomToolListMF.standard_hammer, 'N',
-                        ComponentListMF.nail, });
+        KnowledgeListMF.repairBasicR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.repair_basic))
+                .skill(artisanry).research("repair_basic").tool("needle", 1).time(20).sound(sewing).shaped(
+                        new Object[] { "TTT", "FNH", "SLS", 'T', ComponentListMF.thread, 'S',
+                                ComponentListMF.leather_strip, 'L', Items.leather, 'F', Items.flint, 'H',
+                                CustomToolListMF.standard_hammer, 'N', ComponentListMF.nail, });
         ItemStack bronzePlate = ComponentListMF.plate.createComm("bronze");
-        KnowledgeListMF.repairAdvancedR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.repair_advanced),
-                "repair_advanced",
-                sewing,
-                "needle",
-                2,
-                50,
-                new Object[] { "SCS", "PKH", "CSC", 'K', BlockListMF.repair_basic, 'P', bronzePlate, 'H',
-                        CustomToolListMF.standard_hammer, 'C', Items.slime_ball, 'S', Items.string, });
-        KnowledgeListMF.repairOrnateR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.repair_ornate),
-                "repair_ornate",
-                sewing,
-                "needle",
-                3,
-                100,
-                new Object[] { "GDG", "LKL", "GLG", 'K', BlockListMF.repair_advanced, 'G', Items.gold_ingot, 'L',
-                        new ItemStack(Items.dye, 1, 4), 'D', Items.diamond, });
+        KnowledgeListMF.repairAdvancedR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.repair_advanced))
+                .skill(artisanry).research("repair_advanced").tool("needle", 2).time(50).sound(sewing).shaped(
+                        new Object[] { "SCS", "PKH", "CSC", 'K', BlockListMF.repair_basic, 'P', bronzePlate, 'H',
+                                CustomToolListMF.standard_hammer, 'C', Items.slime_ball, 'S', Items.string, });
+        KnowledgeListMF.repairOrnateR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.repair_ornate))
+                .skill(artisanry).research("repair_ornate").tool("needle", 3).time(100).sound(sewing).shaped(
+                        new Object[] { "GDG", "LKL", "GLG", 'K', BlockListMF.repair_advanced, 'G', Items.gold_ingot,
+                                'L', new ItemStack(Items.dye, 1, 4), 'D', Items.diamond, });
 
         Salvage.addSalvage(
                 BlockListMF.repair_basic,
@@ -483,17 +306,11 @@ public class CarpenterRecipes {
                 Items.diamond,
                 new ItemStack(Items.dye, 3, 4));
 
-        KnowledgeListMF.trilogyRecipe = MineFantasyAPI.addShapelessCarpenterRecipe(
-                artisanry,
-                new ItemStack(ComponentListMF.artefacts, 1, 3),
-                "smeltMaster",
-                basic,
-                "hands",
-                -1,
-                1,
-                new Object[] { new ItemStack(ComponentListMF.artefacts, 1, 0),
-                        new ItemStack(ComponentListMF.artefacts, 1, 1),
-                        new ItemStack(ComponentListMF.artefacts, 1, 2) });
+        KnowledgeListMF.trilogyRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.artefacts, 1, 3))
+                .skill(artisanry).research("smeltMaster").tool("hands", -1).time(1).sound(basic).shapeless(
+                        new Object[] { new ItemStack(ComponentListMF.artefacts, 1, 0),
+                                new ItemStack(ComponentListMF.artefacts, 1, 1),
+                                new ItemStack(ComponentListMF.artefacts, 1, 2) });
     }
 
     public static void assembleWoodBasic() {
@@ -505,85 +322,37 @@ public class CarpenterRecipes {
                 ComponentListMF.plank.construct("ScrapWood", 4),
                 Blocks.crafting_table);
 
-        KnowledgeListMF.nailPlanksR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.nailed_planks),
-                "refined_planks",
-                nailHammer,
-                "hammer",
-                1,
-                5,
-                new Object[] { "N ", "PP", "PP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("OakWood"), });
-        KnowledgeListMF.nailStairR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.nailed_planks_stair),
-                "refined_planks",
-                nailHammer,
-                "hammer",
-                1,
-                5,
-                new Object[] { "N ", "P ", "PP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("OakWood"), });
-        KnowledgeListMF.tannerRecipe = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.tanner),
-                "",
-                nailHammer,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "PPP", "P P", "PPP", 'P', ComponentListMF.plank, });
+        KnowledgeListMF.nailPlanksR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.nailed_planks))
+                .skill(construction).research("refined_planks").tool("hammer", 1).time(5).sound(nailHammer).shaped(
+                        new Object[] { "N ", "PP", "PP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("OakWood"), });
+        KnowledgeListMF.nailStairR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.nailed_planks_stair))
+                .skill(construction).research("refined_planks").tool("hammer", 1).time(5).sound(nailHammer).shaped(
+                        new Object[] { "N ", "P ", "PP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("OakWood"), });
+        KnowledgeListMF.tannerRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.tanner))
+                .skill(construction).tool("hammer", -1).time(10).sound(nailHammer)
+                .shaped(new Object[] { "PPP", "P P", "PPP", 'P', ComponentListMF.plank, });
 
-        KnowledgeListMF.clayWallR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.clayWall, 4),
-                "clay_wall",
-                nailHammer,
-                "hammer",
-                1,
-                2,
-                new Object[] { "NPN", "PCP", "NPN", 'N', ComponentListMF.nail, 'P', ComponentListMF.plank, 'C',
-                        Blocks.clay });
+        KnowledgeListMF.clayWallR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.clayWall, 4))
+                .skill(construction).research("clay_wall").tool("hammer", 1).time(2).sound(nailHammer).shaped(
+                        new Object[] { "NPN", "PCP", "NPN", 'N', ComponentListMF.nail, 'P', ComponentListMF.plank, 'C',
+                                Blocks.clay });
 
-        KnowledgeListMF.researchTableRecipe = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.research),
-                "",
-                nailHammer,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "B", "C", 'B', ToolListMF.researchBook, 'C', BlockListMF.carpenter, });
-        KnowledgeListMF.bSalvageR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.salvage_basic),
-                "",
-                nailHammer,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "SFS", "PWP", 'W', Blocks.crafting_table, 'S', Blocks.stone, 'F', Items.flint, 'P',
-                        ComponentListMF.plank });
+        KnowledgeListMF.researchTableRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.research))
+                .skill(construction).tool("hammer", -1).time(10).sound(nailHammer)
+                .shaped(new Object[] { "B", "C", 'B', ToolListMF.researchBook, 'C', BlockListMF.carpenter, });
+        KnowledgeListMF.bSalvageR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.salvage_basic))
+                .skill(construction).tool("hammer", -1).time(10).sound(nailHammer).shaped(
+                        new Object[] { "SFS", "PWP", 'W', Blocks.crafting_table, 'S', Blocks.stone, 'F', Items.flint,
+                                'P', ComponentListMF.plank });
 
-        KnowledgeListMF.framedGlassR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.framed_glass),
-                "",
-                nailHammer,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "PGP", 'P', ComponentListMF.plank, 'G', Blocks.glass });
-        KnowledgeListMF.windowR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.window),
-                "",
-                nailHammer,
-                "hammer",
-                -1,
-                10,
-                new Object[] { " P ", "PGP", " P ", 'P', ComponentListMF.plank, 'G', Blocks.glass });
+        KnowledgeListMF.framedGlassR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.framed_glass))
+                .skill(construction).tool("hammer", -1).time(10).sound(nailHammer)
+                .shaped(new Object[] { "PGP", 'P', ComponentListMF.plank, 'G', Blocks.glass });
+        KnowledgeListMF.windowR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.window)).skill(construction)
+                .tool("hammer", -1).time(10).sound(nailHammer)
+                .shaped(new Object[] { " P ", "PGP", " P ", 'P', ComponentListMF.plank, 'G', Blocks.glass });
 
         Salvage.addSalvage(BlockListMF.framed_glass, ComponentListMF.plank.construct("ScrapWood", 2), Blocks.glass);
         Salvage.addSalvage(BlockListMF.window, ComponentListMF.plank.construct("ScrapWood", 4), Blocks.glass);
@@ -603,127 +372,66 @@ public class CarpenterRecipes {
     }
 
     private static void addDusts() {
-        QuernRecipes.addRecipe(new ItemStack(Items.dye, 1, 3), new ItemStack(FoodListMF.coca_powder), 0, true);// ItemDye
-        QuernRecipes.addRecipe(Items.wheat, new ItemStack(FoodListMF.flour), 0, true);
-        QuernRecipes.addRecipe(Items.reeds, new ItemStack(FoodListMF.sugarpot), 0, true);
-        QuernRecipes.addRecipe(FoodListMF.breadroll, new ItemStack(FoodListMF.breadcrumbs), 0, true);
+        MineFantasyAPI.quernRecipe(new ItemStack(Items.dye, 1, 3), new ItemStack(FoodListMF.coca_powder)).register();// ItemDye
+        MineFantasyAPI.quernRecipe(Items.wheat, new ItemStack(FoodListMF.flour)).register();
+        MineFantasyAPI.quernRecipe(Items.reeds, new ItemStack(FoodListMF.sugarpot)).register();
+        MineFantasyAPI.quernRecipe(FoodListMF.breadroll, new ItemStack(FoodListMF.breadcrumbs)).register();
 
-        QuernRecipes.addRecipe(
-                FoodListMF.generic_meat_uncooked,
-                new ItemStack(FoodListMF.generic_meat_mince_uncooked),
-                0,
-                true);
-        QuernRecipes.addRecipe(
+        MineFantasyAPI
+                .quernRecipe(FoodListMF.generic_meat_uncooked, new ItemStack(FoodListMF.generic_meat_mince_uncooked))
+                .register();
+        MineFantasyAPI.quernRecipe(
                 FoodListMF.generic_meat_strip_uncooked,
-                new ItemStack(FoodListMF.generic_meat_mince_uncooked),
-                0,
-                true);
-        QuernRecipes.addRecipe(
+                new ItemStack(FoodListMF.generic_meat_mince_uncooked)).register();
+        MineFantasyAPI.quernRecipe(
                 FoodListMF.generic_meat_chunk_uncooked,
-                new ItemStack(FoodListMF.generic_meat_mince_uncooked),
-                0,
-                true);
-        QuernRecipes.addRecipe(
-                FoodListMF.generic_meat_cooked,
-                new ItemStack(FoodListMF.generic_meat_mince_cooked),
-                0,
-                true);
-        QuernRecipes.addRecipe(
-                FoodListMF.generic_meat_strip_cooked,
-                new ItemStack(FoodListMF.generic_meat_mince_cooked),
-                0,
-                true);
-        QuernRecipes.addRecipe(
-                FoodListMF.generic_meat_chunk_cooked,
-                new ItemStack(FoodListMF.generic_meat_mince_cooked),
-                0,
-                true);
+                new ItemStack(FoodListMF.generic_meat_mince_uncooked)).register();
+        MineFantasyAPI.quernRecipe(FoodListMF.generic_meat_cooked, new ItemStack(FoodListMF.generic_meat_mince_cooked))
+                .register();
+        MineFantasyAPI
+                .quernRecipe(FoodListMF.generic_meat_strip_cooked, new ItemStack(FoodListMF.generic_meat_mince_cooked))
+                .register();
+        MineFantasyAPI
+                .quernRecipe(FoodListMF.generic_meat_chunk_cooked, new ItemStack(FoodListMF.generic_meat_mince_cooked))
+                .register();
 
-        QuernRecipes.addRecipe(Items.coal, new ItemStack(ComponentListMF.coalDust), 0, true);
-        QuernRecipes.addRecipe(new ItemStack(Items.coal, 1, 1), new ItemStack(ComponentListMF.coalDust), 0, true);
-        QuernRecipes.addRecipe(ComponentListMF.kaolinite, new ItemStack(ComponentListMF.kaolinite_dust), 0, true);
-        QuernRecipes.addRecipe(Items.flint, new ItemStack(ComponentListMF.shrapnel), 0, true);
+        MineFantasyAPI.quernRecipe(Items.coal, new ItemStack(ComponentListMF.coalDust)).register();
+        MineFantasyAPI.quernRecipe(new ItemStack(Items.coal, 1, 1), new ItemStack(ComponentListMF.coalDust)).register();
+        MineFantasyAPI.quernRecipe(ComponentListMF.kaolinite, new ItemStack(ComponentListMF.kaolinite_dust)).register();
+        MineFantasyAPI.quernRecipe(Items.flint, new ItemStack(ComponentListMF.shrapnel)).register();
 
-        QuernRecipes.addRecipe(ComponentListMF.flux, new ItemStack(ComponentListMF.flux_pot), 0, true);
+        MineFantasyAPI.quernRecipe(ComponentListMF.flux, new ItemStack(ComponentListMF.flux_pot)).register();
 
-        KnowledgeListMF.pieTrayRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.pie_tray_uncooked),
-                "",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { "CC", 'C', Items.clay_ball, });
+        KnowledgeListMF.pieTrayRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.pie_tray_uncooked))
+                .tool("hands", -1).time(10).sound(basic).shaped(new Object[] { "CC", 'C', Items.clay_ball, });
 
-        KnowledgeListMF.potRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.clay_pot_uncooked, 8),
-                "",
-                basic,
-                "hands",
-                -1,
-                5,
-                new Object[] { "C  C", " CC ", 'C', Items.clay_ball, });
-        KnowledgeListMF.mouldRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.ingot_mould_uncooked),
-                "crucible",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { "CCC", " C ", 'C', Items.clay_ball, });
-        KnowledgeListMF.jugRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(FoodListMF.jug_uncooked, 4),
-                "",
-                basic,
-                "hands",
-                -1,
-                8,
-                new Object[] { "C  ", "C C", " C ", 'C', Items.clay_ball, });
-        KnowledgeListMF.blackpowderRec = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.blackpowder, 2),
-                "blackpowder",
-                basic,
-                "hands",
-                -1,
-                2,
-                new Object[] { "NS", "CC", "PP", 'C', ComponentListMF.coalDust, 'N', ComponentListMF.nitre, 'S',
-                        ComponentListMF.sulfur, 'P', ComponentListMF.clay_pot, });
-        KnowledgeListMF.crudeBombR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ToolListMF.bomb_crude),
-                "blackpowder",
-                primitive,
-                "hands",
-                -1,
-                5,
-                new Object[] { "T", "B", "P",
+        KnowledgeListMF.potRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.clay_pot_uncooked, 8))
+                .tool("hands", -1).time(5).sound(basic).shaped(new Object[] { "C  C", " CC ", 'C', Items.clay_ball, });
+        KnowledgeListMF.mouldRecipe = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.ingot_mould_uncooked)).research("crucible")
+                .tool("hands", -1).time(10).sound(basic).shaped(new Object[] { "CCC", " C ", 'C', Items.clay_ball, });
+        KnowledgeListMF.jugRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(FoodListMF.jug_uncooked, 4))
+                .tool("hands", -1).time(8).sound(basic)
+                .shaped(new Object[] { "C  ", "C C", " C ", 'C', Items.clay_ball, });
+        KnowledgeListMF.blackpowderRec = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.blackpowder, 2))
+                .research("blackpowder").tool("hands", -1).time(2).sound(basic).shaped(
+                        new Object[] { "NS", "CC", "PP", 'C', ComponentListMF.coalDust, 'N', ComponentListMF.nitre, 'S',
+                                ComponentListMF.sulfur, 'P', ComponentListMF.clay_pot, });
+        KnowledgeListMF.crudeBombR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bomb_crude))
+                .skill(engineering).research("blackpowder").tool("hands", -1).time(5).sound(primitive).shaped(
+                        new Object[] { "T", "B", "P",
 
-                        'B', ComponentListMF.blackpowder, 'T', ComponentListMF.thread, 'P', Items.paper, });
-        KnowledgeListMF.advblackpowderRec = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.blackpowder_advanced),
-                "advblackpowder",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { " B ", "RGR", " P ", 'B', ComponentListMF.blackpowder, 'G', Items.glowstone_dust, 'R',
-                        Items.redstone, 'P', ComponentListMF.clay_pot, });
-        KnowledgeListMF.magmaRefinedR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.magma_cream_refined),
-                "firebomb",
-                grinding,
-                "pestle",
-                -1,
-                10,
-                new Object[] { "B", "H", "C", "P", 'H', ComponentListMF.dragon_heart, 'B', Items.blaze_powder, 'C',
-                        Items.magma_cream, 'P', ComponentListMF.clay_pot, });
+                                'B', ComponentListMF.blackpowder, 'T', ComponentListMF.thread, 'P', Items.paper, });
+        KnowledgeListMF.advblackpowderRec = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.blackpowder_advanced)).research("advblackpowder")
+                .tool("hands", -1).time(10).sound(basic).shaped(
+                        new Object[] { " B ", "RGR", " P ", 'B', ComponentListMF.blackpowder, 'G', Items.glowstone_dust,
+                                'R', Items.redstone, 'P', ComponentListMF.clay_pot, });
+        KnowledgeListMF.magmaRefinedR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.magma_cream_refined)).research("firebomb")
+                .tool("pestle", -1).time(10).sound(grinding).shaped(
+                        new Object[] { "B", "H", "C", "P", 'H', ComponentListMF.dragon_heart, 'B', Items.blaze_powder,
+                                'C', Items.magma_cream, 'P', ComponentListMF.clay_pot, });
         Salvage.addSalvage(
                 ComponentListMF.magma_cream_refined,
                 ComponentListMF.dragon_heart,
@@ -733,27 +441,15 @@ public class CarpenterRecipes {
     }
 
     private static void addWoodworks() {
-        KnowledgeListMF.refinedPlankBlockR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.refined_planks),
-                "refined_planks",
-                nailHammer,
-                "hammer",
-                1,
-                10,
-                new Object[] { "N ", "PP", "PP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), });
+        KnowledgeListMF.refinedPlankBlockR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.refined_planks))
+                .skill(construction).research("refined_planks").tool("hammer", 1).time(10).sound(nailHammer).shaped(
+                        new Object[] { "N ", "PP", "PP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), });
 
-        KnowledgeListMF.refinedStairR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.refined_planks_stair),
-                "refined_planks",
-                nailHammer,
-                "hammer",
-                1,
-                10,
-                new Object[] { "N ", "P ", "PP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), });
+        KnowledgeListMF.refinedStairR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.refined_planks_stair))
+                .skill(construction).research("refined_planks").tool("hammer", 1).time(10).sound(nailHammer).shaped(
+                        new Object[] { "N ", "P ", "PP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), });
         Salvage.addSalvage(
                 BlockListMF.nailed_planks,
                 ComponentListMF.nail,
@@ -771,16 +467,10 @@ public class CarpenterRecipes {
                 ComponentListMF.nail,
                 ComponentListMF.plank.construct("RefinedWood", 3));
 
-        KnowledgeListMF.bellowsRecipe = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.bellows),
-                "",
-                nailHammer,
-                "hammer",
-                1,
-                50,
-                new Object[] { "NNN", "PPP", "LL ", "PP ", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), 'L', Items.leather, });
+        KnowledgeListMF.bellowsRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.bellows))
+                .skill(construction).tool("hammer", 1).time(50).sound(nailHammer).shaped(
+                        new Object[] { "NNN", "PPP", "LL ", "PP ", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), 'L', Items.leather, });
         Salvage.addSalvage(
                 BlockListMF.bellows,
                 new ItemStack(ComponentListMF.nail, 3),
@@ -788,44 +478,27 @@ public class CarpenterRecipes {
                 new ItemStack(Items.leather, 2));
 
         try (NativeRecipes.Variant v = NativeRecipes.variant("from_planks")) {
-            KnowledgeListMF.woodTroughRecipe = MineFantasyAPI.addCarpenterRecipe(
-                    construction,
-                    ((BlockWoodDecor) BlockListMF.trough_wood).construct("ScrapWood"),
-                    "",
-                    nailHammer,
-                    "hammer",
-                    -1,
-                    20,
-                    new Object[] { "P P", "PPP",
+            KnowledgeListMF.woodTroughRecipe = MineFantasyAPI
+                    .carpenterRecipe(((BlockWoodDecor) BlockListMF.trough_wood).construct("ScrapWood"))
+                    .skill(construction).tool("hammer", -1).time(20).sound(nailHammer).shaped(
+                            new Object[] { "P P", "PPP",
 
-                            'P', ComponentListMF.plank, });
+                                    'P', ComponentListMF.plank, });
         }
 
-        KnowledgeListMF.strongRackR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.advTanner),
-                "",
-                nailHammer,
-                "hammer",
-                1,
-                80,
-                new Object[] { "NNN", "PPP", "P P", "PPP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), });
+        KnowledgeListMF.strongRackR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.advTanner))
+                .skill(construction).tool("hammer", 1).time(80).sound(nailHammer).shaped(
+                        new Object[] { "NNN", "PPP", "P P", "PPP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), });
         Salvage.addSalvage(
                 BlockListMF.advTanner,
                 ComponentListMF.plank.construct("RefinedWood", 8),
                 new ItemStack(ComponentListMF.nail, 3));
 
         try (NativeRecipes.Variant v = NativeRecipes.variant("paint_brush")) {
-            MineFantasyAPI.addCarpenterRecipe(
-                    construction,
-                    new ItemStack(BlockListMF.refined_planks),
-                    "paint_brush",
-                    sewing,
-                    "brush",
-                    -1,
-                    3,
-                    new Object[] { "O", "P", 'O', ComponentListMF.plant_oil, 'P', BlockListMF.nailed_planks, });
+            MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.refined_planks)).skill(construction)
+                    .research("paint_brush").tool("brush", -1).time(3).sound(sewing)
+                    .shaped(new Object[] { "O", "P", 'O', ComponentListMF.plant_oil, 'P', BlockListMF.nailed_planks, });
         }
 
         PaintOilRecipe.addRecipe(BlockListMF.nailed_planks, BlockListMF.refined_planks);
@@ -834,110 +507,46 @@ public class CarpenterRecipes {
     }
 
     private static void addStonemason() {
-        KnowledgeListMF.quernR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(BlockListMF.quern),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "FSF", "SSS", 'F', Items.flint, 'S', Blocks.stone, });
-        KnowledgeListMF.stoneovenRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(BlockListMF.oven_stone),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "S", "C", 'C', BlockListMF.roast, 'S', Blocks.stone, });
+        KnowledgeListMF.quernR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.quern)).tool("hammer", -1)
+                .time(10).sound(stonemason).shaped(new Object[] { "FSF", "SSS", 'F', Items.flint, 'S', Blocks.stone, });
+        KnowledgeListMF.stoneovenRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.oven_stone))
+                .tool("hammer", -1).time(10).sound(stonemason)
+                .shaped(new Object[] { "S", "C", 'C', BlockListMF.roast, 'S', Blocks.stone, });
 
-        KnowledgeListMF.kitchenBenchRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(BlockListMF.kitchenBench),
-                "",
-                chopping,
-                "hammer",
-                -1,
-                200,
-                new Object[] { "KSP", "TGT", "TTT", 'K', CustomToolListMF.standard_knife, 'S', FoodListMF.salt, 'P',
-                        ComponentListMF.plank_cut, 'G', Blocks.stone, 'T', ComponentListMF.plank, });
+        KnowledgeListMF.kitchenBenchRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.kitchenBench))
+                .tool("hammer", -1).time(200).sound(chopping).shaped(
+                        new Object[] { "KSP", "TGT", "TTT", 'K', CustomToolListMF.standard_knife, 'S', FoodListMF.salt,
+                                'P', ComponentListMF.plank_cut, 'G', Blocks.stone, 'T', ComponentListMF.plank, });
 
-        KnowledgeListMF.bloomeryR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.bloomery),
-                "bloomery",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { " S ", "S S", "SCS", 'C', Blocks.coal_block, 'S', Blocks.stone, });
-        KnowledgeListMF.crucibleRecipe = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.crucible),
-                "crucible",
-                stonemason,
-                "hammer",
-                -1,
-                20,
-                new Object[] { "SSS", "S S", "SSS", 'S', Blocks.stone, });
-        KnowledgeListMF.advCrucibleRecipe = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.crucibleadv),
-                "crucible2",
-                basic,
-                40,
-                new Object[] { "SSS", "SCS", "SSS", 'S', ComponentListMF.fireclay, 'C', BlockListMF.crucible });
+        KnowledgeListMF.bloomeryR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.bloomery)).skill(artisanry)
+                .research("bloomery").tool("hammer", -1).time(10).sound(stonemason)
+                .shaped(new Object[] { " S ", "S S", "SCS", 'C', Blocks.coal_block, 'S', Blocks.stone, });
+        KnowledgeListMF.crucibleRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.crucible))
+                .skill(artisanry).research("crucible").tool("hammer", -1).time(20).sound(stonemason)
+                .shaped(new Object[] { "SSS", "S S", "SSS", 'S', Blocks.stone, });
+        KnowledgeListMF.advCrucibleRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.crucibleadv))
+                .skill(artisanry).research("crucible2").time(40).sound(basic)
+                .shaped(new Object[] { "SSS", "SCS", "SSS", 'S', ComponentListMF.fireclay, 'C', BlockListMF.crucible });
         Salvage.addSalvage(BlockListMF.crucible, new ItemStack(Blocks.stone, 8));
         Salvage.addSalvage(BlockListMF.crucibleadv, new ItemStack(ComponentListMF.fireclay, 8), BlockListMF.crucible);
 
-        KnowledgeListMF.chimneyRecipe = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.chimney_stone, 8),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                30,
-                new Object[] { "S S", "S S", "S S", 'S', Blocks.stone, });
-        KnowledgeListMF.wideChimneyRecipe = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.chimney_stone_wide),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "S", "C", 'C', BlockListMF.chimney_stone, 'S', Blocks.stone, });
-        KnowledgeListMF.extractChimneyRecipe = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(BlockListMF.chimney_stone_extractor),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                15,
-                new Object[] { "C", 'C', BlockListMF.chimney_stone_wide, });
+        KnowledgeListMF.chimneyRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.chimney_stone, 8))
+                .skill(artisanry).tool("hammer", -1).time(30).sound(stonemason)
+                .shaped(new Object[] { "S S", "S S", "S S", 'S', Blocks.stone, });
+        KnowledgeListMF.wideChimneyRecipe = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(BlockListMF.chimney_stone_wide)).skill(artisanry).tool("hammer", -1)
+                .time(10).sound(stonemason)
+                .shaped(new Object[] { "S", "C", 'C', BlockListMF.chimney_stone, 'S', Blocks.stone, });
+        KnowledgeListMF.extractChimneyRecipe = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(BlockListMF.chimney_stone_extractor)).skill(artisanry).tool("hammer", -1)
+                .time(15).sound(stonemason).shaped(new Object[] { "C", 'C', BlockListMF.chimney_stone_wide, });
 
-        KnowledgeListMF.stoneAnvilRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(BlockListMF.anvilStone),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "SS ", "SSS", " S ", 'S', Blocks.stone });
-        KnowledgeListMF.forgeRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(BlockListMF.forge),
-                "",
-                stonemason,
-                "hammer",
-                -1,
-                10,
-                new Object[] { "S S", "SCS", 'C', Items.coal, 'S', Blocks.stone });
+        KnowledgeListMF.stoneAnvilRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.anvilStone))
+                .tool("hammer", -1).time(10).sound(stonemason)
+                .shaped(new Object[] { "SS ", "SSS", " S ", 'S', Blocks.stone });
+        KnowledgeListMF.forgeRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.forge))
+                .tool("hammer", -1).time(10).sound(stonemason)
+                .shaped(new Object[] { "S S", "SCS", 'C', Items.coal, 'S', Blocks.stone });
         Salvage.addSalvage(BlockListMF.forge, new ItemStack(Blocks.stone, 4), Items.coal);
         Salvage.addSalvage(BlockListMF.anvilStone, new ItemStack(Blocks.stone, 6));
 
@@ -977,421 +586,175 @@ public class CarpenterRecipes {
         addOreD("listAllchickenraw", meatRaw);
         addOreD("listAllfishraw", meatRaw);
 
-        KnowledgeListMF.curdRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.curds),
-                "",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { "T", "S", "M", "P", 'P', ComponentListMF.clay_pot, 'T', FoodListMF.salt, 'S',
-                        FoodListMF.sugarpot, 'M', FoodListMF.jug_milk, });
+        KnowledgeListMF.curdRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.curds)).skill(provisioning)
+                .tool("hands", -1).time(10).sound(basic).shaped(
+                        new Object[] { "T", "S", "M", "P", 'P', ComponentListMF.clay_pot, 'T', FoodListMF.salt, 'S',
+                                FoodListMF.sugarpot, 'M', FoodListMF.jug_milk, });
 
-        KnowledgeListMF.oatsRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.oats),
-                "",
-                chopping,
-                "knife",
-                -1,
-                20,
-                new Object[] { "M", "W", "S", "B", 'S', Items.wheat_seeds, 'W', Items.wheat, 'M', FoodListMF.jug_milk,
-                        'B', Items.bowl });
-        KnowledgeListMF.doughRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.dough),
-                "",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { "W", "F", 'W', FoodListMF.jug_water, 'F', FoodListMF.flour, });
-        KnowledgeListMF.pastryRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pastry),
-                "",
-                basic,
-                "hands",
-                -1,
-                10,
-                new Object[] { " S ", "FEF", 'F', FoodListMF.flour, 'E', Items.egg, 'S', FoodListMF.salt, });
-        KnowledgeListMF.breadRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.raw_bread),
-                "",
-                basic,
-                "hands",
-                -1,
-                15,
-                new Object[] { "DDD", 'D', FoodListMF.dough, });
-        KnowledgeListMF.sweetrollRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.sweetroll_raw),
-                "sweetroll",
-                basic,
-                5,
-                new Object[] { " M ", "FES", "BBB", 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'B',
-                        FoodListMF.berries, 'E', Items.egg, 'F', FoodListMF.flour, });
-        KnowledgeListMF.icingRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.icing),
-                "",
-                mixing,
-                "spoon",
-                -1,
-                10,
-                new Object[] { "W", "S", "B", 'W', FoodListMF.jug_water, 'S', FoodListMF.sugarpot, 'B',
-                        ComponentListMF.clay_pot, });
-        KnowledgeListMF.chocoRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.chocolate),
-                "icing",
-                mixing,
-                "spoon",
-                -1,
-                10,
-                new Object[] { " M ", "SCS", " B ", 'C', FoodListMF.coca_powder, 'M', FoodListMF.jug_milk, 'S',
-                        FoodListMF.sugarpot, 'B', ComponentListMF.clay_pot, });
-        KnowledgeListMF.custardRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.custard),
-                "icing",
-                mixing,
-                "spoon",
-                -1,
-                10,
-                new Object[] { " M ", "SES", " B ", 'E', Items.egg, 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot,
-                        'B', ComponentListMF.clay_pot, });
-        KnowledgeListMF.iceSR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.sweetroll),
-                "sweetroll",
-                basic,
-                "knife",
-                -1,
-                15,
-                new Object[] { "I", "R", 'I', FoodListMF.icing, 'R', FoodListMF.sweetroll_uniced, });
-        KnowledgeListMF.eclairDoughR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.eclair_raw),
-                "eclair",
-                basic,
-                8,
-                new Object[] { "SSS", "PPP", 'P', FoodListMF.pastry, 'S', FoodListMF.sugarpot, });
-        KnowledgeListMF.eclairIceR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.eclair_empty),
-                "eclair",
-                basic,
-                "knife",
-                2,
-                20,
-                new Object[] { "C", "E", 'C', FoodListMF.chocolate, 'E', FoodListMF.eclair_uniced, });
-        KnowledgeListMF.eclairFillR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.eclair),
-                "eclair",
-                basic,
-                "knife",
-                2,
-                20,
-                new Object[] { "C", "E", 'C', FoodListMF.custard, 'E', FoodListMF.eclair_empty, });
+        KnowledgeListMF.oatsRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.oats)).skill(provisioning)
+                .tool("knife", -1).time(20).sound(chopping).shaped(
+                        new Object[] { "M", "W", "S", "B", 'S', Items.wheat_seeds, 'W', Items.wheat, 'M',
+                                FoodListMF.jug_milk, 'B', Items.bowl });
+        KnowledgeListMF.doughRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.dough)).skill(provisioning)
+                .tool("hands", -1).time(10).sound(basic)
+                .shaped(new Object[] { "W", "F", 'W', FoodListMF.jug_water, 'F', FoodListMF.flour, });
+        KnowledgeListMF.pastryRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pastry))
+                .skill(provisioning).tool("hands", -1).time(10).sound(basic)
+                .shaped(new Object[] { " S ", "FEF", 'F', FoodListMF.flour, 'E', Items.egg, 'S', FoodListMF.salt, });
+        KnowledgeListMF.breadRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.raw_bread))
+                .skill(provisioning).tool("hands", -1).time(15).sound(basic)
+                .shaped(new Object[] { "DDD", 'D', FoodListMF.dough, });
+        KnowledgeListMF.sweetrollRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.sweetroll_raw))
+                .skill(provisioning).research("sweetroll").time(5).sound(basic).shaped(
+                        new Object[] { " M ", "FES", "BBB", 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'B',
+                                FoodListMF.berries, 'E', Items.egg, 'F', FoodListMF.flour, });
+        KnowledgeListMF.icingRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.icing)).skill(provisioning)
+                .tool("spoon", -1).time(10).sound(mixing).shaped(
+                        new Object[] { "W", "S", "B", 'W', FoodListMF.jug_water, 'S', FoodListMF.sugarpot, 'B',
+                                ComponentListMF.clay_pot, });
+        KnowledgeListMF.chocoRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.chocolate))
+                .skill(provisioning).research("icing").tool("spoon", -1).time(10).sound(mixing).shaped(
+                        new Object[] { " M ", "SCS", " B ", 'C', FoodListMF.coca_powder, 'M', FoodListMF.jug_milk, 'S',
+                                FoodListMF.sugarpot, 'B', ComponentListMF.clay_pot, });
+        KnowledgeListMF.custardRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.custard))
+                .skill(provisioning).research("icing").tool("spoon", -1).time(10).sound(mixing).shaped(
+                        new Object[] { " M ", "SES", " B ", 'E', Items.egg, 'M', FoodListMF.jug_milk, 'S',
+                                FoodListMF.sugarpot, 'B', ComponentListMF.clay_pot, });
+        KnowledgeListMF.iceSR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.sweetroll)).skill(provisioning)
+                .research("sweetroll").tool("knife", -1).time(15).sound(basic)
+                .shaped(new Object[] { "I", "R", 'I', FoodListMF.icing, 'R', FoodListMF.sweetroll_uniced, });
+        KnowledgeListMF.eclairDoughR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.eclair_raw))
+                .skill(provisioning).research("eclair").time(8).sound(basic)
+                .shaped(new Object[] { "SSS", "PPP", 'P', FoodListMF.pastry, 'S', FoodListMF.sugarpot, });
+        KnowledgeListMF.eclairIceR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.eclair_empty))
+                .skill(provisioning).research("eclair").tool("knife", 2).time(20).sound(basic)
+                .shaped(new Object[] { "C", "E", 'C', FoodListMF.chocolate, 'E', FoodListMF.eclair_uniced, });
+        KnowledgeListMF.eclairFillR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.eclair)).skill(provisioning)
+                .research("eclair").tool("knife", 2).time(20).sound(basic)
+                .shaped(new Object[] { "C", "E", 'C', FoodListMF.custard, 'E', FoodListMF.eclair_empty, });
         for (ItemStack food : OreDictionary.getOres(meatRaw)) {
             int size = getSize(food);
             try (NativeRecipes.Variant v = NativeRecipes.variantOf(food)) {
                 KnowledgeListMF.meatRecipes.add(
-                        MineFantasyAPI.addKitchenRecipe(
-                                provisioning,
-                                new ItemStack(FoodListMF.generic_meat_uncooked, size),
-                                "",
-                                chopping,
-                                "knife",
-                                -1,
-                                15,
-                                new Object[] { "M", 'M', food, }));
+                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_uncooked, size))
+                                .skill(provisioning).tool("knife", -1).time(15).sound(chopping)
+                                .shaped(new Object[] { "M", 'M', food, }));
             }
         }
         for (ItemStack food : OreDictionary.getOres(cookedMeat)) {
             int size = 1;
             try (NativeRecipes.Variant v = NativeRecipes.variantOf(food)) {
                 KnowledgeListMF.meatRecipes.add(
-                        MineFantasyAPI.addKitchenRecipe(
-                                provisioning,
-                                new ItemStack(FoodListMF.generic_meat_cooked, size),
-                                "",
-                                chopping,
-                                "knife",
-                                -1,
-                                15,
-                                new Object[] { "M", 'M', food, }));
+                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_cooked, size))
+                                .skill(provisioning).tool("knife", -1).time(15).sound(chopping)
+                                .shaped(new Object[] { "M", 'M', food, }));
             }
         }
-        KnowledgeListMF.meatStripR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.generic_meat_strip_uncooked),
-                "",
-                chopping,
-                "knife",
-                -1,
-                5,
-                new Object[] { "M", 'M', FoodListMF.generic_meat_uncooked, });
-        MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.generic_meat_strip_cooked),
-                "",
-                chopping,
-                "knife",
-                -1,
-                5,
-                new Object[] { "M", 'M', FoodListMF.generic_meat_cooked, });
-        KnowledgeListMF.meatHunkR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.generic_meat_chunk_uncooked),
-                "",
-                chopping,
-                "knife",
-                -1,
-                5,
-                new Object[] { "M", 'M', FoodListMF.generic_meat_strip_uncooked, });
-        MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.generic_meat_chunk_cooked),
-                "",
-                chopping,
-                "knife",
-                -1,
-                5,
-                new Object[] { "M", 'M', FoodListMF.generic_meat_strip_cooked, });
-        KnowledgeListMF.gutsRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.guts),
-                "",
-                chopping,
-                "knife",
-                1,
-                8,
-                new Object[] { "MMMM", 'M', Items.rotten_flesh, });
+        KnowledgeListMF.meatStripR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_strip_uncooked))
+                .skill(provisioning).tool("knife", -1).time(5).sound(chopping)
+                .shaped(new Object[] { "M", 'M', FoodListMF.generic_meat_uncooked, });
+        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_strip_cooked)).skill(provisioning)
+                .tool("knife", -1).time(5).sound(chopping)
+                .shaped(new Object[] { "M", 'M', FoodListMF.generic_meat_cooked, });
+        KnowledgeListMF.meatHunkR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_chunk_uncooked))
+                .skill(provisioning).tool("knife", -1).time(5).sound(chopping)
+                .shaped(new Object[] { "M", 'M', FoodListMF.generic_meat_strip_uncooked, });
+        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_chunk_cooked)).skill(provisioning)
+                .tool("knife", -1).time(5).sound(chopping)
+                .shaped(new Object[] { "M", 'M', FoodListMF.generic_meat_strip_cooked, });
+        KnowledgeListMF.gutsRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.guts)).skill(provisioning)
+                .tool("knife", 1).time(8).sound(chopping).shaped(new Object[] { "MMMM", 'M', Items.rotten_flesh, });
 
-        KnowledgeListMF.stewRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.stew),
-                "",
-                chopping,
-                "knife",
-                -1,
-                15,
-                new Object[] { "M", "B", 'M', FoodListMF.generic_meat_chunk_cooked, 'B', Items.bowl });
-        KnowledgeListMF.jerkyRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.jerky, 1),
-                "jerky",
-                chopping,
-                "knife",
-                2,
-                20,
-                new Object[] { "S", "M", 'S', FoodListMF.salt, 'M', FoodListMF.generic_meat_strip_cooked, });
-        KnowledgeListMF.saussageR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.saussage_raw, 4),
-                "saussage",
-                chopping,
-                "knife",
-                2,
-                30,
-                new Object[] { " G ", "MMM", "BES", 'G', FoodListMF.guts, 'E', Items.egg, 'S', FoodListMF.salt, 'B',
-                        FoodListMF.breadcrumbs, 'M', FoodListMF.generic_meat_mince_uncooked, });
-        KnowledgeListMF.meatPieRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pie_meat_uncooked),
-                "meatpie",
-                chopping,
-                "knife",
-                2,
-                150,
-                new Object[] { " P ", "MMM", " P ", " T ", 'P', FoodListMF.pastry, 'M',
-                        FoodListMF.generic_meat_mince_cooked, 'T', FoodListMF.pie_tray, });
-        KnowledgeListMF.breadSliceR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.breadSlice, 12),
-                "",
-                "step.cloth",
-                "knife",
-                -1,
-                10,
-                new Object[] { "B", 'B', Items.bread, });
-        KnowledgeListMF.sandwitchRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.sandwitch_meat),
-                "sandwitch",
-                chopping,
-                "hands",
-                -1,
-                4,
-                new Object[] { "B", "C", "M", "B", 'C', FoodListMF.cheese_slice, 'M', FoodListMF.generic_meat_cooked,
-                        'B', FoodListMF.breadSlice });
-        KnowledgeListMF.sandwitchBigRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.sandwitch_big),
-                "sandwitchBig",
-                chopping,
-                "knife",
-                1,
-                10,
-                new Object[] { "CSC", "MBM", 'S', FoodListMF.salt, 'C', FoodListMF.cheese_slice, 'M',
-                        FoodListMF.generic_meat_cooked, 'B', Items.bread });
-        KnowledgeListMF.shepardRecipe = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pie_shepard_uncooked),
-                "shepardpie",
-                chopping,
-                "knife",
-                3,
-                200,
-                new Object[] { "PFP", "MMM", "CFC", " T ", 'C', Items.carrot, 'P', Items.potato, 'F', FoodListMF.pastry,
-                        'M', FoodListMF.generic_meat_mince_cooked, 'T', FoodListMF.pie_tray, });
+        KnowledgeListMF.stewRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.stew)).skill(provisioning)
+                .tool("knife", -1).time(15).sound(chopping)
+                .shaped(new Object[] { "M", "B", 'M', FoodListMF.generic_meat_chunk_cooked, 'B', Items.bowl });
+        KnowledgeListMF.jerkyRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.jerky, 1))
+                .skill(provisioning).research("jerky").tool("knife", 2).time(20).sound(chopping)
+                .shaped(new Object[] { "S", "M", 'S', FoodListMF.salt, 'M', FoodListMF.generic_meat_strip_cooked, });
+        KnowledgeListMF.saussageR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.saussage_raw, 4))
+                .skill(provisioning).research("saussage").tool("knife", 2).time(30).sound(chopping).shaped(
+                        new Object[] { " G ", "MMM", "BES", 'G', FoodListMF.guts, 'E', Items.egg, 'S', FoodListMF.salt,
+                                'B', FoodListMF.breadcrumbs, 'M', FoodListMF.generic_meat_mince_uncooked, });
+        KnowledgeListMF.meatPieRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pie_meat_uncooked))
+                .skill(provisioning).research("meatpie").tool("knife", 2).time(150).sound(chopping).shaped(
+                        new Object[] { " P ", "MMM", " P ", " T ", 'P', FoodListMF.pastry, 'M',
+                                FoodListMF.generic_meat_mince_cooked, 'T', FoodListMF.pie_tray, });
+        KnowledgeListMF.breadSliceR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.breadSlice, 12))
+                .skill(provisioning).tool("knife", -1).time(10).sound("step.cloth")
+                .shaped(new Object[] { "B", 'B', Items.bread, });
+        KnowledgeListMF.sandwitchRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.sandwitch_meat))
+                .skill(provisioning).research("sandwitch").tool("hands", -1).time(4).sound(chopping).shaped(
+                        new Object[] { "B", "C", "M", "B", 'C', FoodListMF.cheese_slice, 'M',
+                                FoodListMF.generic_meat_cooked, 'B', FoodListMF.breadSlice });
+        KnowledgeListMF.sandwitchBigRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.sandwitch_big))
+                .skill(provisioning).research("sandwitchBig").tool("knife", 1).time(10).sound(chopping).shaped(
+                        new Object[] { "CSC", "MBM", 'S', FoodListMF.salt, 'C', FoodListMF.cheese_slice, 'M',
+                                FoodListMF.generic_meat_cooked, 'B', Items.bread });
+        KnowledgeListMF.shepardRecipe = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pie_shepard_uncooked))
+                .skill(provisioning).research("shepardpie").tool("knife", 3).time(200).sound(chopping).shaped(
+                        new Object[] { "PFP", "MMM", "CFC", " T ", 'C', Items.carrot, 'P', Items.potato, 'F',
+                                FoodListMF.pastry, 'M', FoodListMF.generic_meat_mince_cooked, 'T',
+                                FoodListMF.pie_tray, });
 
-        KnowledgeListMF.appleR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pie_apple_uncooked),
-                "applepie",
-                chopping,
-                "knife",
-                2,
-                120,
-                new Object[] { "SPS", "MMM", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry, 'M',
-                        Items.apple, 'T', FoodListMF.pie_tray, });
-        KnowledgeListMF.pumpPieR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pie_pumpkin_uncooked),
-                "bread",
-                chopping,
-                "knife",
-                1,
-                50,
-                new Object[] { "SMS", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry, 'M',
-                        Blocks.pumpkin, 'T', FoodListMF.pie_tray, });
-        KnowledgeListMF.berryR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.pie_berry_uncooked),
-                "berrypie",
-                chopping,
-                "knife",
-                2,
-                100,
-                new Object[] { "SPS", "MMM", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry, 'M',
-                        FoodListMF.berries, 'T', FoodListMF.pie_tray, });
+        KnowledgeListMF.appleR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pie_apple_uncooked))
+                .skill(provisioning).research("applepie").tool("knife", 2).time(120).sound(chopping).shaped(
+                        new Object[] { "SPS", "MMM", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry,
+                                'M', Items.apple, 'T', FoodListMF.pie_tray, });
+        KnowledgeListMF.pumpPieR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pie_pumpkin_uncooked))
+                .skill(provisioning).research("bread").tool("knife", 1).time(50).sound(chopping).shaped(
+                        new Object[] { "SMS", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry, 'M',
+                                Blocks.pumpkin, 'T', FoodListMF.pie_tray, });
+        KnowledgeListMF.berryR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.pie_berry_uncooked))
+                .skill(provisioning).research("berrypie").tool("knife", 2).time(100).sound(chopping).shaped(
+                        new Object[] { "SPS", "MMM", "SPS", " T ", 'S', FoodListMF.sugarpot, 'P', FoodListMF.pastry,
+                                'M', FoodListMF.berries, 'T', FoodListMF.pie_tray, });
 
-        KnowledgeListMF.simpCakeR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cake_simple_raw),
-                "bread",
-                mixing,
-                "spoon",
-                -1,
-                15,
-                new Object[] { "MMM", "SES", "FFF", " T ", 'F', FoodListMF.flour, 'E', Items.egg, 'M',
-                        FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
+        KnowledgeListMF.simpCakeR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cake_simple_raw))
+                .skill(provisioning).research("bread").tool("spoon", -1).time(15).sound(mixing).shaped(
+                        new Object[] { "MMM", "SES", "FFF", " T ", 'F', FoodListMF.flour, 'E', Items.egg, 'M',
+                                FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
 
-        KnowledgeListMF.cakeR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cake_raw),
-                "cake",
-                mixing,
-                "spoon",
-                -1,
-                20,
-                new Object[] { "SMS", "SES", "FFF", " T ", 'F', FoodListMF.flour, 'E', Items.egg, 'M',
-                        FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
-        KnowledgeListMF.carrotCakeR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cake_carrot_raw),
-                "carrotcake",
-                mixing,
-                "spoon",
-                -1,
-                25,
-                new Object[] { "SMS", "SES", "CCC", "FTF", 'C', Items.carrot, 'F', FoodListMF.flour, 'E', Items.egg,
-                        'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
-        KnowledgeListMF.chocoCakeR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cake_choc_raw),
-                "chococake",
-                mixing,
-                "spoon",
-                -1,
-                25,
-                new Object[] { "SMS", "SES", "CCC", "FTF", 'C', FoodListMF.chocolate, 'F', FoodListMF.flour, 'E',
-                        Items.egg, 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
-        KnowledgeListMF.bfCakeR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cake_bf_raw),
-                "bfcake",
-                mixing,
-                "spoon",
-                -1,
-                30,
-                new Object[] { "SMMS", "SEES", "CBBC", "FTFF", 'B', FoodListMF.berriesJuicy, 'C', FoodListMF.chocolate,
-                        'F', FoodListMF.flour, 'E', Items.egg, 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T',
-                        FoodListMF.cake_tin, });
-        KnowledgeListMF.simpCakeOut = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(Items.cake),
-                "bread",
-                basic,
-                "knife",
-                -1,
-                10,
-                new Object[] { "I", "R", 'I', FoodListMF.icing, 'R', FoodListMF.cake_simple_uniced, });
+        KnowledgeListMF.cakeR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cake_raw)).skill(provisioning)
+                .research("cake").tool("spoon", -1).time(20).sound(mixing).shaped(
+                        new Object[] { "SMS", "SES", "FFF", " T ", 'F', FoodListMF.flour, 'E', Items.egg, 'M',
+                                FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
+        KnowledgeListMF.carrotCakeR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cake_carrot_raw))
+                .skill(provisioning).research("carrotcake").tool("spoon", -1).time(25).sound(mixing).shaped(
+                        new Object[] { "SMS", "SES", "CCC", "FTF", 'C', Items.carrot, 'F', FoodListMF.flour, 'E',
+                                Items.egg, 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T',
+                                FoodListMF.cake_tin, });
+        KnowledgeListMF.chocoCakeR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cake_choc_raw))
+                .skill(provisioning).research("chococake").tool("spoon", -1).time(25).sound(mixing).shaped(
+                        new Object[] { "SMS", "SES", "CCC", "FTF", 'C', FoodListMF.chocolate, 'F', FoodListMF.flour,
+                                'E', Items.egg, 'M', FoodListMF.jug_milk, 'S', FoodListMF.sugarpot, 'T',
+                                FoodListMF.cake_tin, });
+        KnowledgeListMF.bfCakeR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cake_bf_raw))
+                .skill(provisioning).research("bfcake").tool("spoon", -1).time(30).sound(mixing).shaped(
+                        new Object[] { "SMMS", "SEES", "CBBC", "FTFF", 'B', FoodListMF.berriesJuicy, 'C',
+                                FoodListMF.chocolate, 'F', FoodListMF.flour, 'E', Items.egg, 'M', FoodListMF.jug_milk,
+                                'S', FoodListMF.sugarpot, 'T', FoodListMF.cake_tin, });
+        KnowledgeListMF.simpCakeOut = MineFantasyAPI.kitchenRecipe(new ItemStack(Items.cake)).skill(provisioning)
+                .research("bread").tool("knife", -1).time(10).sound(basic)
+                .shaped(new Object[] { "I", "R", 'I', FoodListMF.icing, 'R', FoodListMF.cake_simple_uniced, });
 
-        KnowledgeListMF.cakeI = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(BlockListMF.cake_vanilla),
-                "cake",
-                basic,
-                "knife",
-                -1,
-                60,
-                new Object[] { "III", " R ", 'I', FoodListMF.icing, 'R', FoodListMF.cake_uniced, });
-        KnowledgeListMF.carrotCakeI = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(BlockListMF.cake_carrot),
-                "carrotcake",
-                basic,
-                "knife",
-                -1,
-                60,
-                new Object[] { "III", " R ", 'I', FoodListMF.icing, 'R', FoodListMF.cake_carrot_uniced, });
-        KnowledgeListMF.chocoCakeI = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(BlockListMF.cake_chocolate),
-                "chococake",
-                basic,
-                "knife",
-                -1,
-                60,
-                new Object[] { "ICI", " R ", 'C', FoodListMF.chocolate, 'I', FoodListMF.icing, 'R',
-                        FoodListMF.cake_choc_uniced, });
-        KnowledgeListMF.bfCakeI = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(BlockListMF.cake_bf),
-                "bfcake",
-                basic,
-                "knife",
-                -1,
-                100,
-                new Object[] { "BBB", "III", "CRC", 'C', FoodListMF.chocolate, 'B', FoodListMF.berries, 'I',
-                        FoodListMF.icing, 'R', FoodListMF.cake_bf_uniced, });
+        KnowledgeListMF.cakeI = MineFantasyAPI.kitchenRecipe(new ItemStack(BlockListMF.cake_vanilla))
+                .skill(provisioning).research("cake").tool("knife", -1).time(60).sound(basic)
+                .shaped(new Object[] { "III", " R ", 'I', FoodListMF.icing, 'R', FoodListMF.cake_uniced, });
+        KnowledgeListMF.carrotCakeI = MineFantasyAPI.kitchenRecipe(new ItemStack(BlockListMF.cake_carrot))
+                .skill(provisioning).research("carrotcake").tool("knife", -1).time(60).sound(basic)
+                .shaped(new Object[] { "III", " R ", 'I', FoodListMF.icing, 'R', FoodListMF.cake_carrot_uniced, });
+        KnowledgeListMF.chocoCakeI = MineFantasyAPI.kitchenRecipe(new ItemStack(BlockListMF.cake_chocolate))
+                .skill(provisioning).research("chococake").tool("knife", -1).time(60).sound(basic).shaped(
+                        new Object[] { "ICI", " R ", 'C', FoodListMF.chocolate, 'I', FoodListMF.icing, 'R',
+                                FoodListMF.cake_choc_uniced, });
+        KnowledgeListMF.bfCakeI = MineFantasyAPI.kitchenRecipe(new ItemStack(BlockListMF.cake_bf)).skill(provisioning)
+                .research("bfcake").tool("knife", -1).time(100).sound(basic).shaped(
+                        new Object[] { "BBB", "III", "CRC", 'C', FoodListMF.chocolate, 'B', FoodListMF.berries, 'I',
+                                FoodListMF.icing, 'R', FoodListMF.cake_bf_uniced, });
 
-        KnowledgeListMF.cheeserollR = MineFantasyAPI.addKitchenRecipe(
-                provisioning,
-                new ItemStack(FoodListMF.cheese_roll),
-                "cheeseroll",
-                chopping,
-                "knife",
-                1,
-                30,
-                new Object[] { "C", "R", 'C', FoodListMF.cheese_slice, 'R', FoodListMF.breadroll, });
+        KnowledgeListMF.cheeserollR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.cheese_roll))
+                .skill(provisioning).research("cheeseroll").tool("knife", 1).time(30).sound(chopping)
+                .shaped(new Object[] { "C", "R", 'C', FoodListMF.cheese_slice, 'R', FoodListMF.breadroll, });
     }
 
     private static void addOreD(String list, String mfList) {
@@ -1410,60 +773,40 @@ public class CarpenterRecipes {
 
     private static void addMisc() {
         // Fletching
-        KnowledgeListMF.fletchingR = MineFantasyAPI.addCarpenterRecipe(
-                artisanry,
-                new ItemStack(ComponentListMF.fletching, 16),
-                "arrows",
-                chopping,
-                4,
-                new Object[] { "T", "F",
+        KnowledgeListMF.fletchingR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.fletching, 16))
+                .skill(artisanry).research("arrows").time(4).sound(chopping).shaped(
+                        new Object[] { "T", "F",
 
-                        'F', Items.feather, 'T', ComponentListMF.plank, });
+                                'F', Items.feather, 'T', ComponentListMF.plank, });
         try (NativeRecipes.Variant v = NativeRecipes.variant("paper")) {
-            KnowledgeListMF.fletchingR2 = MineFantasyAPI.addCarpenterRecipe(
-                    artisanry,
-                    new ItemStack(ComponentListMF.fletching, 4),
-                    "arrows",
-                    chopping,
-                    4,
-                    new Object[] { " T ", "PPP",
+            KnowledgeListMF.fletchingR2 = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.fletching, 4))
+                    .skill(artisanry).research("arrows").time(4).sound(chopping).shaped(
+                            new Object[] { " T ", "PPP",
 
-                            'P', Items.paper, 'T', ComponentListMF.plank, });
+                                    'P', Items.paper, 'T', ComponentListMF.plank, });
         }
 
         // BOMBS
-        KnowledgeListMF.bombCaseCeramicR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.bomb_casing_uncooked, 2),
-                "bombCeramic",
-                basic,
-                2,
-                new Object[] { " C ", "C C", " C ", 'C', Items.clay_ball, });
-        KnowledgeListMF.mineCaseCeramicR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.mine_casing_uncooked),
-                "mineCeramic",
-                basic,
-                2,
-                new Object[] { " P ", "C C", " C ",
+        KnowledgeListMF.bombCaseCeramicR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.bomb_casing_uncooked, 2)).skill(engineering)
+                .research("bombCeramic").time(2).sound(basic)
+                .shaped(new Object[] { " C ", "C C", " C ", 'C', Items.clay_ball, });
+        KnowledgeListMF.mineCaseCeramicR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.mine_casing_uncooked)).skill(engineering)
+                .research("mineCeramic").time(2).sound(basic).shaped(
+                        new Object[] { " P ", "C C", " C ",
 
-                        'P', Blocks.stone_pressure_plate, 'C', Items.clay_ball, });
-        KnowledgeListMF.bombCaseCrystalR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.bomb_casing_crystal),
-                "bombCrystal",
-                basic,
-                10,
-                new Object[] { " D ", "R R", " B ", 'B', Items.glass_bottle, 'D', ComponentListMF.diamond_shards, 'R',
-                        Items.redstone });
-        KnowledgeListMF.mineCaseCrystalR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.mine_casing_crystal),
-                "mineCrystal",
-                basic,
-                10,
-                new Object[] { " P ", "RDR", " B ", 'P', Blocks.heavy_weighted_pressure_plate, 'B', Items.glass_bottle,
-                        'D', ComponentListMF.diamond_shards, 'R', Items.redstone });
+                                'P', Blocks.stone_pressure_plate, 'C', Items.clay_ball, });
+        KnowledgeListMF.bombCaseCrystalR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.bomb_casing_crystal)).skill(engineering)
+                .research("bombCrystal").time(10).sound(basic).shaped(
+                        new Object[] { " D ", "R R", " B ", 'B', Items.glass_bottle, 'D',
+                                ComponentListMF.diamond_shards, 'R', Items.redstone });
+        KnowledgeListMF.mineCaseCrystalR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.mine_casing_crystal)).skill(engineering)
+                .research("mineCrystal").time(10).sound(basic).shaped(
+                        new Object[] { " P ", "RDR", " B ", 'P', Blocks.heavy_weighted_pressure_plate, 'B',
+                                Items.glass_bottle, 'D', ComponentListMF.diamond_shards, 'R', Items.redstone });
         Salvage.addSalvage(ComponentListMF.bomb_casing_uncooked, new ItemStack(Items.clay_ball, 2));
         Salvage.addSalvage(
                 ComponentListMF.mine_casing_uncooked,
@@ -1482,91 +825,41 @@ public class CarpenterRecipes {
                 ComponentListMF.diamond_shards,
                 new ItemStack(Items.redstone, 2));
 
-        KnowledgeListMF.bombFuseR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.bomb_fuse, 8),
-                "bombs",
-                basic,
-                4,
-                new Object[] { "R", "C", "S", 'S', ComponentListMF.thread, 'C', ComponentListMF.coalDust, 'R',
-                        Items.redstone, });
-        KnowledgeListMF.longFuseR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.bomb_fuse_long),
-                "bombs",
-                basic,
-                1,
-                new Object[] { "F", "R", "F", 'F', ComponentListMF.bomb_fuse, 'R', Items.redstone, });
+        KnowledgeListMF.bombFuseR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.bomb_fuse, 8))
+                .skill(engineering).research("bombs").time(4).sound(basic).shaped(
+                        new Object[] { "R", "C", "S", 'S', ComponentListMF.thread, 'C', ComponentListMF.coalDust, 'R',
+                                Items.redstone, });
+        KnowledgeListMF.longFuseR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.bomb_fuse_long))
+                .skill(engineering).research("bombs").time(1).sound(basic)
+                .shaped(new Object[] { "F", "R", "F", 'F', ComponentListMF.bomb_fuse, 'R', Items.redstone, });
         Salvage.addSalvage(ComponentListMF.bomb_fuse_long, new ItemStack(ComponentListMF.bomb_fuse, 2), Items.redstone);
 
-        KnowledgeListMF.thatchR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.thatch),
-                "",
-                "dig.grass",
-                "hands",
-                -1,
-                1,
-                new Object[] { "HH", "HH", 'H', new ItemStack(Blocks.tallgrass, 1, 1) });
-        KnowledgeListMF.thatchStairR = MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                new ItemStack(BlockListMF.thatch_stair),
-                "",
-                "dig.grass",
-                "hands",
-                -1,
-                1,
-                new Object[] { "H ", "HH", 'H', new ItemStack(Blocks.tallgrass, 1, 1) });
+        KnowledgeListMF.thatchR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.thatch)).skill(construction)
+                .tool("hands", -1).time(1).sound("dig.grass")
+                .shaped(new Object[] { "HH", "HH", 'H', new ItemStack(Blocks.tallgrass, 1, 1) });
+        KnowledgeListMF.thatchStairR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.thatch_stair))
+                .skill(construction).tool("hands", -1).time(1).sound("dig.grass")
+                .shaped(new Object[] { "H ", "HH", 'H', new ItemStack(Blocks.tallgrass, 1, 1) });
         Salvage.addSalvage(BlockListMF.thatch_stair, new ItemStack(Blocks.tallgrass, 3, 1));
         Salvage.addSalvage(BlockListMF.thatch, new ItemStack(Blocks.tallgrass, 4, 1));
 
-        KnowledgeListMF.apronRecipe = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ArmourListMF.leatherapron),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "LCL", " L ", 'L', Items.leather, 'C', Items.coal, });
+        KnowledgeListMF.apronRecipe = MineFantasyAPI.carpenterRecipe(new ItemStack(ArmourListMF.leatherapron))
+                .tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "LCL", " L ", 'L', Items.leather, 'C', Items.coal, });
         Salvage.addSalvage(ArmourListMF.leatherapron, new ItemStack(Items.leather, 3), Items.coal);
 
-        KnowledgeListMF.hideHelmR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                ArmourListMF.armour(ArmourListMF.leather, 0, 0),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "H", "C", "H", 'H', ComponentListMF.hideSmall, 'C', Blocks.wool, });
-        KnowledgeListMF.hideChestR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                ArmourListMF.armour(ArmourListMF.leather, 0, 1),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "H", "C", 'H', ComponentListMF.hideLarge, 'C', Blocks.wool, });
-        KnowledgeListMF.hideLegsR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                ArmourListMF.armour(ArmourListMF.leather, 0, 2),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "H", "C", 'H', ComponentListMF.hideMedium, 'C', Blocks.wool, });
-        KnowledgeListMF.hideBootsR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                ArmourListMF.armour(ArmourListMF.leather, 0, 3),
-                "",
-                sewing,
-                "hands",
-                -1,
-                1,
-                new Object[] { "H", "C", 'H', ComponentListMF.hideSmall, 'C', Blocks.wool, });
+        KnowledgeListMF.hideHelmR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 0, 0))
+                .tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "H", "C", "H", 'H', ComponentListMF.hideSmall, 'C', Blocks.wool, });
+        KnowledgeListMF.hideChestR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 0, 1))
+                .tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "H", "C", 'H', ComponentListMF.hideLarge, 'C', Blocks.wool, });
+        KnowledgeListMF.hideLegsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 0, 2))
+                .tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "H", "C", 'H', ComponentListMF.hideMedium, 'C', Blocks.wool, });
+        KnowledgeListMF.hideBootsR = MineFantasyAPI.carpenterRecipe(ArmourListMF.armour(ArmourListMF.leather, 0, 3))
+                .tool("hands", -1).time(1).sound(sewing)
+                .shaped(new Object[] { "H", "C", 'H', ComponentListMF.hideSmall, 'C', Blocks.wool, });
 
         Salvage.addSalvage(
                 ArmourListMF.armourItem(ArmourListMF.leather, 0, 0),
@@ -1579,15 +872,10 @@ public class CarpenterRecipes {
                 Blocks.wool);
         Salvage.addSalvage(ArmourListMF.armourItem(ArmourListMF.leather, 0, 3), ComponentListMF.hideSmall, Blocks.wool);
 
-        KnowledgeListMF.bedrollR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.bedroll),
-                "",
-                sewing,
-                "needle",
-                -1,
-                50,
-                new Object[] { "TLT", "CCC", 'C', Blocks.wool, 'T', ComponentListMF.thread, 'L', Items.leather });
+        KnowledgeListMF.bedrollR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.bedroll)).tool("needle", -1)
+                .time(50).sound(sewing).shaped(
+                        new Object[] { "TLT", "CCC", 'C', Blocks.wool, 'T', ComponentListMF.thread, 'L',
+                                Items.leather });
         Salvage.addSalvage(
                 ToolListMF.bedroll,
                 new ItemStack(Blocks.wool, 3),
@@ -1597,99 +885,55 @@ public class CarpenterRecipes {
 
     public static void addCrossbows() {
         // CROSSBOWS
-        KnowledgeListMF.crossHandleWoodR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.crossbow_handle_wood),
-                "crossShafts",
-                nailHammer,
-                "hammer",
-                2,
-                150,
-                new Object[] { "N N", "PP ", " P ", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
-                        ComponentListMF.nail });
-        KnowledgeListMF.crossStockWoodR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.crossbow_stock_wood),
-                "crossShafts",
-                nailHammer,
-                "hammer",
-                2,
-                300,
-                new Object[] { "NN N", "PPPP", " PPP", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
-                        ComponentListMF.nail });
-        KnowledgeListMF.crossStockIronR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.crossbow_stock_iron),
-                "crossShaftAdvanced",
-                spanner,
-                "spanner",
-                2,
-                300,
-                new Object[] { " BBB", "BOGG", "SWSS", "    ", 'O', Blocks.obsidian, 'G',
-                        ComponentListMF.tungsten_gears, 'W', ComponentListMF.crossbow_stock_wood, 'S',
-                        ComponentListMF.iron_strut, 'B', ComponentListMF.bolt, });
+        KnowledgeListMF.crossHandleWoodR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.crossbow_handle_wood)).skill(engineering)
+                .research("crossShafts").tool("hammer", 2).time(150).sound(nailHammer).shaped(
+                        new Object[] { "N N", "PP ", " P ", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
+                                ComponentListMF.nail });
+        KnowledgeListMF.crossStockWoodR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.crossbow_stock_wood)).skill(engineering)
+                .research("crossShafts").tool("hammer", 2).time(300).sound(nailHammer).shaped(
+                        new Object[] { "NN N", "PPPP", " PPP", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
+                                ComponentListMF.nail });
+        KnowledgeListMF.crossStockIronR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.crossbow_stock_iron)).skill(engineering)
+                .research("crossShaftAdvanced").tool("spanner", 2).time(300).sound(spanner).shaped(
+                        new Object[] { " BBB", "BOGG", "SWSS", "    ", 'O', Blocks.obsidian, 'G',
+                                ComponentListMF.tungsten_gears, 'W', ComponentListMF.crossbow_stock_wood, 'S',
+                                ComponentListMF.iron_strut, 'B', ComponentListMF.bolt, });
 
-        KnowledgeListMF.crossHeadLightR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_arms_light),
-                "crossHeads",
-                nailHammer,
-                "hammer",
-                2,
-                200,
-                new Object[] { "PPP", "NSN", " P ", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
-                        ComponentListMF.nail, 'S', Items.string, });
-        KnowledgeListMF.crossHeadMediumR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_arms_basic),
-                "crossHeads",
-                nailHammer,
-                "hammer",
-                2,
-                250,
-                new Object[] { "NNN", "PAP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), 'A', ComponentListMF.cross_arms_light, });
-        KnowledgeListMF.crossHeadHeavyR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_arms_heavy),
-                "crossHeads",
-                nailHammer,
-                "hammer",
-                2,
-                350,
-                new Object[] { "NNN", "PAP", 'N', ComponentListMF.nail, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), 'A', ComponentListMF.cross_arms_basic, });
-        KnowledgeListMF.crossHeadAdvancedR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_arms_advanced),
-                "crossHeadAdvanced",
-                nailHammer,
-                "hammer",
-                2,
-                350,
-                new Object[] { "NRN", "RGR", " A ", 'G', ComponentListMF.tungsten_gears, 'N', ComponentListMF.nail, 'R',
-                        ComponentListMF.steel_tube, 'A', ComponentListMF.cross_arms_basic, });
+        KnowledgeListMF.crossHeadLightR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.cross_arms_light)).skill(engineering)
+                .research("crossHeads").tool("hammer", 2).time(200).sound(nailHammer).shaped(
+                        new Object[] { "PPP", "NSN", " P ", 'P', ComponentListMF.plank.construct("RefinedWood"), 'N',
+                                ComponentListMF.nail, 'S', Items.string, });
+        KnowledgeListMF.crossHeadMediumR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.cross_arms_basic)).skill(engineering)
+                .research("crossHeads").tool("hammer", 2).time(250).sound(nailHammer).shaped(
+                        new Object[] { "NNN", "PAP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), 'A',
+                                ComponentListMF.cross_arms_light, });
+        KnowledgeListMF.crossHeadHeavyR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.cross_arms_heavy)).skill(engineering)
+                .research("crossHeads").tool("hammer", 2).time(350).sound(nailHammer).shaped(
+                        new Object[] { "NNN", "PAP", 'N', ComponentListMF.nail, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), 'A',
+                                ComponentListMF.cross_arms_basic, });
+        KnowledgeListMF.crossHeadAdvancedR = MineFantasyAPI
+                .carpenterRecipe(new ItemStack(ComponentListMF.cross_arms_advanced)).skill(engineering)
+                .research("crossHeadAdvanced").tool("hammer", 2).time(350).sound(nailHammer).shaped(
+                        new Object[] { "NRN", "RGR", " A ", 'G', ComponentListMF.tungsten_gears, 'N',
+                                ComponentListMF.nail, 'R', ComponentListMF.steel_tube, 'A',
+                                ComponentListMF.cross_arms_basic, });
 
-        KnowledgeListMF.crossAmmoR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_ammo),
-                "crossAmmo",
-                nailHammer,
-                "hammer",
-                2,
-                200,
-                new Object[] { "NNN", "P P", "PGP", "PPP", 'G', ComponentListMF.tungsten_gears, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), 'N', ComponentListMF.nail, });
-        KnowledgeListMF.crossScopeR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cross_scope),
-                "crossScope",
-                spanner,
-                "spanner",
-                2,
-                150,
-                new Object[] { "BSB", "GP ", 'G', ComponentListMF.tungsten_gears, 'S', ToolListMF.spyglass, 'P',
-                        ComponentListMF.plank.construct("RefinedWood"), 'B', ComponentListMF.bolt, });
+        KnowledgeListMF.crossAmmoR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.cross_ammo))
+                .skill(engineering).research("crossAmmo").tool("hammer", 2).time(200).sound(nailHammer).shaped(
+                        new Object[] { "NNN", "P P", "PGP", "PPP", 'G', ComponentListMF.tungsten_gears, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), 'N', ComponentListMF.nail, });
+        KnowledgeListMF.crossScopeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.cross_scope))
+                .skill(engineering).research("crossScope").tool("spanner", 2).time(150).sound(spanner).shaped(
+                        new Object[] { "BSB", "GP ", 'G', ComponentListMF.tungsten_gears, 'S', ToolListMF.spyglass, 'P',
+                                ComponentListMF.plank.construct("RefinedWood"), 'B', ComponentListMF.bolt, });
         Salvage.addSalvage(
                 ComponentListMF.cross_arms_light,
                 new ItemStack(ComponentListMF.nail, 2),
@@ -1742,118 +986,63 @@ public class CarpenterRecipes {
 
     private static void addEngineering() {
         addCrossbows();
-        KnowledgeListMF.bombBenchCraft = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.bombBench),
-                "bombs",
-                spanner,
-                "spanner",
-                0,
-                150,
-                new Object[] { "BFB", "BCB", 'B', ComponentListMF.bolt, 'F', ComponentListMF.iron_frame, 'C',
-                        BlockListMF.carpenter, });
-        KnowledgeListMF.bombPressCraft = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.bombPress),
-                "bpress",
-                spanner,
-                "spanner",
-                3,
-                200,
-                new Object[] { "BFB", "GGL", "SPS", 'S', ComponentListMF.iron_strut, 'B', ComponentListMF.bolt, 'F',
-                        ComponentListMF.iron_frame, 'L', Blocks.lever, 'P',
-                        new ItemStack(CustomToolListMF.standard_spanner, 1, 0), 'G', ComponentListMF.bronze_gears, });
+        KnowledgeListMF.bombBenchCraft = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.bombBench))
+                .skill(engineering).research("bombs").tool("spanner", 0).time(150).sound(spanner).shaped(
+                        new Object[] { "BFB", "BCB", 'B', ComponentListMF.bolt, 'F', ComponentListMF.iron_frame, 'C',
+                                BlockListMF.carpenter, });
+        KnowledgeListMF.bombPressCraft = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.bombPress))
+                .skill(engineering).research("bpress").tool("spanner", 3).time(200).sound(spanner).shaped(
+                        new Object[] { "BFB", "GGL", "SPS", 'S', ComponentListMF.iron_strut, 'B', ComponentListMF.bolt,
+                                'F', ComponentListMF.iron_frame, 'L', Blocks.lever, 'P',
+                                new ItemStack(CustomToolListMF.standard_spanner, 1, 0), 'G',
+                                ComponentListMF.bronze_gears, });
 
-        KnowledgeListMF.crossBenchCraft = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.crossbowBench),
-                "crossbows",
-                spanner,
-                "spanner",
-                0,
-                200,
-                new Object[] { " F ", "PSP", "NCN", 'F', ComponentListMF.iron_frame, 'P', ComponentListMF.plank, 'N',
-                        ComponentListMF.bolt, 'S', Items.string, 'C', BlockListMF.carpenter, });
+        KnowledgeListMF.crossBenchCraft = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.crossbowBench))
+                .skill(engineering).research("crossbows").tool("spanner", 0).time(200).sound(spanner).shaped(
+                        new Object[] { " F ", "PSP", "NCN", 'F', ComponentListMF.iron_frame, 'P', ComponentListMF.plank,
+                                'N', ComponentListMF.bolt, 'S', Items.string, 'C', BlockListMF.carpenter, });
 
-        KnowledgeListMF.engTannerR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.engTanner),
-                "engTanner",
-                spanner,
-                "spanner",
-                3,
-                300,
-                new Object[] { "BLB", "SPS", "GGG", "SFS", 'S', ComponentListMF.iron_strut, 'B', ComponentListMF.bolt,
-                        'F', ComponentListMF.iron_frame, 'L', Blocks.lever, 'P',
-                        new ItemStack(CustomToolListMF.standard_knife, 1, 0), 'G', ComponentListMF.bronze_gears, });
+        KnowledgeListMF.engTannerR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.engTanner))
+                .skill(engineering).research("engTanner").tool("spanner", 3).time(300).sound(spanner).shaped(
+                        new Object[] { "BLB", "SPS", "GGG", "SFS", 'S', ComponentListMF.iron_strut, 'B',
+                                ComponentListMF.bolt, 'F', ComponentListMF.iron_frame, 'L', Blocks.lever, 'P',
+                                new ItemStack(CustomToolListMF.standard_knife, 1, 0), 'G',
+                                ComponentListMF.bronze_gears, });
         ItemStack blackPlate = ComponentListMF.plate.createComm("blackSteel");
-        KnowledgeListMF.advancedForgeR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.forge_metal),
-                "advforge",
-                spanner,
-                "spanner",
-                4,
-                400,
-                new Object[] { " T  ", "FRRF", "PPPP", "BBBB", 'B', ComponentListMF.bolt, 'F',
-                        ComponentListMF.iron_frame, 'T', ToolListMF.engin_anvil_tools, 'P', blackPlate, 'R',
-                        Blocks.redstone_block, });
+        KnowledgeListMF.advancedForgeR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.forge_metal))
+                .skill(engineering).research("advforge").tool("spanner", 4).time(400).sound(spanner).shaped(
+                        new Object[] { " T  ", "FRRF", "PPPP", "BBBB", 'B', ComponentListMF.bolt, 'F',
+                                ComponentListMF.iron_frame, 'T', ToolListMF.engin_anvil_tools, 'P', blackPlate, 'R',
+                                Blocks.redstone_block, });
         ItemStack steelPlate = ComponentListMF.plate.createComm("steel");
-        KnowledgeListMF.autoCrucibleR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(BlockListMF.crucibleauto),
-                "advcrucible",
-                spanner,
-                "spanner",
-                4,
-                200,
-                new Object[] { " T ", "PCP", "PGP", "BBB", 'B', ComponentListMF.bolt, 'C', BlockListMF.crucibleadv, 'G',
-                        ComponentListMF.tungsten_gears, 'T', ToolListMF.engin_anvil_tools, 'P', steelPlate });
-        KnowledgeListMF.spyglassR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ToolListMF.spyglass),
-                "spyglass",
-                spanner,
-                "spanner",
-                1,
-                300,
-                new Object[] { " T ", "BCB", "GPG", 'C', ComponentListMF.bronze_gears, 'G', Blocks.glass, 'B',
-                        ComponentListMF.bolt, 'T', ToolListMF.engin_anvil_tools, 'P', ComponentListMF.steel_tube, });
+        KnowledgeListMF.autoCrucibleR = MineFantasyAPI.carpenterRecipe(new ItemStack(BlockListMF.crucibleauto))
+                .skill(engineering).research("advcrucible").tool("spanner", 4).time(200).sound(spanner).shaped(
+                        new Object[] { " T ", "PCP", "PGP", "BBB", 'B', ComponentListMF.bolt, 'C',
+                                BlockListMF.crucibleadv, 'G', ComponentListMF.tungsten_gears, 'T',
+                                ToolListMF.engin_anvil_tools, 'P', steelPlate });
+        KnowledgeListMF.spyglassR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.spyglass))
+                .skill(engineering).research("spyglass").tool("spanner", 1).time(300).sound(spanner).shaped(
+                        new Object[] { " T ", "BCB", "GPG", 'C', ComponentListMF.bronze_gears, 'G', Blocks.glass, 'B',
+                                ComponentListMF.bolt, 'T', ToolListMF.engin_anvil_tools, 'P',
+                                ComponentListMF.steel_tube, });
 
-        KnowledgeListMF.syringeR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ToolListMF.syringe_empty),
-                "syringe",
-                spanner,
-                "spanner",
-                1,
-                200,
-                new Object[] { "E", "T", "B", "N", 'E', ToolListMF.engin_anvil_tools, 'T', ComponentListMF.steel_tube,
-                        'B', Items.glass_bottle, 'N', new ItemStack(CustomToolListMF.standard_needle), });
+        KnowledgeListMF.syringeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.syringe_empty))
+                .skill(engineering).research("syringe").tool("spanner", 1).time(200).sound(spanner).shaped(
+                        new Object[] { "E", "T", "B", "N", 'E', ToolListMF.engin_anvil_tools, 'T',
+                                ComponentListMF.steel_tube, 'B', Items.glass_bottle, 'N',
+                                new ItemStack(CustomToolListMF.standard_needle), });
 
-        KnowledgeListMF.parachuteR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ToolListMF.parachute),
-                "parachute",
-                sewing,
-                "needle",
-                1,
-                350,
-                new Object[] { "TTT", "CCC", "BEB", "BLB", 'E', ToolListMF.engin_anvil_tools, 'T',
-                        ComponentListMF.thread, 'B', ComponentListMF.leather_strip, 'L', Items.leather, 'C',
-                        Blocks.wool, });
-        KnowledgeListMF.cogShaftR = MineFantasyAPI.addCarpenterRecipe(
-                engineering,
-                new ItemStack(ComponentListMF.cogwork_shaft),
-                "cogArmour",
-                spanner,
-                "spanner",
-                4,
-                150,
-                new Object[] { "BPB", "SGS", "BFB",
+        KnowledgeListMF.parachuteR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.parachute))
+                .skill(engineering).research("parachute").tool("needle", 1).time(350).sound(sewing).shaped(
+                        new Object[] { "TTT", "CCC", "BEB", "BLB", 'E', ToolListMF.engin_anvil_tools, 'T',
+                                ComponentListMF.thread, 'B', ComponentListMF.leather_strip, 'L', Items.leather, 'C',
+                                Blocks.wool, });
+        KnowledgeListMF.cogShaftR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.cogwork_shaft))
+                .skill(engineering).research("cogArmour").tool("spanner", 4).time(150).sound(spanner).shaped(
+                        new Object[] { "BPB", "SGS", "BFB",
 
-                        'P', Blocks.piston, 'G', ComponentListMF.tungsten_gears, 'B', ComponentListMF.bolt, 'F',
-                        ComponentListMF.iron_frame, 'S', ComponentListMF.iron_strut, });
+                                'P', Blocks.piston, 'G', ComponentListMF.tungsten_gears, 'B', ComponentListMF.bolt, 'F',
+                                ComponentListMF.iron_frame, 'S', ComponentListMF.iron_strut, });
         Salvage.addSalvage(
                 ComponentListMF.cogwork_shaft,
                 new ItemStack(ComponentListMF.iron_strut, 2),
@@ -1920,43 +1109,18 @@ public class CarpenterRecipes {
     }
 
     private static void addNonPrimitiveStone() {
-        KnowledgeListMF.stoneKnifeR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.knifeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "R", "R", "S", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
-        KnowledgeListMF.stoneHammerR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.hammerStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "R", "S", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
+        KnowledgeListMF.stoneKnifeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.knifeStone))
+                .tool("hands", -1).time(4).sound(primitive)
+                .shaped(new Object[] { "R", "R", "S", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
+        KnowledgeListMF.stoneHammerR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.hammerStone))
+                .tool("hands", -1).time(4).sound(primitive)
+                .shaped(new Object[] { "R", "S", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
 
-        KnowledgeListMF.stoneTongsR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.tongsStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "R ", "SR", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
-        KnowledgeListMF.boneNeedleR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.needleBone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "B", 'B', Items.bone, });
+        KnowledgeListMF.stoneTongsR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.tongsStone))
+                .tool("hands", -1).time(4).sound(primitive)
+                .shaped(new Object[] { "R ", "SR", 'R', Blocks.cobblestone, 'S', ComponentListMF.plank, });
+        KnowledgeListMF.boneNeedleR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.needleBone))
+                .tool("hands", -1).time(4).sound(primitive).shaped(new Object[] { "B", 'B', Items.bone, });
 
         Salvage.addSalvage(
                 ToolListMF.knifeStone,
@@ -1971,136 +1135,57 @@ public class CarpenterRecipes {
     }
 
     private static void addPrimitive() {
-        KnowledgeListMF.dirtRockR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ComponentListMF.sharp_rock),
-                "",
-                "minecraft:dig.gravel",
-                "hands",
-                -1,
-                1,
-                new Object[] { "D", 'D', Blocks.dirt, });
+        KnowledgeListMF.dirtRockR = MineFantasyAPI.carpenterRecipe(new ItemStack(ComponentListMF.sharp_rock))
+                .tool("hands", -1).time(1).sound("minecraft:dig.gravel")
+                .shaped(new Object[] { "D", 'D', Blocks.dirt, });
 
-        KnowledgeListMF.stonePickR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.pickStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                5,
-                new Object[] { "RVR", " S ", " S ", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneAxeR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.axeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                5,
-                new Object[] { "RV", "RS", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneSpadeR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.spadeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                5,
-                new Object[] { "VR", " S", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneHoeR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.hoeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                5,
-                new Object[] { "RV", " S", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneSwordR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.swordStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                8,
-                new Object[] { "R ", "R ", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneWarR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.waraxeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                8,
-                new Object[] { "VRV", "RS", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneMaceR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.maceStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                8,
-                new Object[] { " V ", "RSR", " S ", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneSpearR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.spearStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                8,
-                new Object[] { "R", "V", "S", "S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneKnifeR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.knifeStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "R ", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.stoneHammerR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.hammerStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "R", "V", "S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
+        KnowledgeListMF.stonePickR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.pickStone))
+                .tool("hands", -1).time(5).sound(primitive).shaped(
+                        new Object[] { "RVR", " S ", " S ", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneAxeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.axeStone)).tool("hands", -1)
+                .time(5).sound(primitive).shaped(
+                        new Object[] { "RV", "RS", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneSpadeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.spadeStone))
+                .tool("hands", -1).time(5).sound(primitive).shaped(
+                        new Object[] { "VR", " S", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneHoeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.hoeStone)).tool("hands", -1)
+                .time(5).sound(primitive).shaped(
+                        new Object[] { "RV", " S", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneSwordR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.swordStone))
+                .tool("hands", -1).time(8).sound(primitive).shaped(
+                        new Object[] { "R ", "R ", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneWarR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.waraxeStone))
+                .tool("hands", -1).time(8).sound(primitive).shaped(
+                        new Object[] { "VRV", "RS", " S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneMaceR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.maceStone))
+                .tool("hands", -1).time(8).sound(primitive).shaped(
+                        new Object[] { " V ", "RSR", " S ", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneSpearR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.spearStone))
+                .tool("hands", -1).time(8).sound(primitive).shaped(
+                        new Object[] { "R", "V", "S", "S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine,
+                                'S', Items.stick });
+        KnowledgeListMF.stoneKnifeR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.knifeStone))
+                .tool("hands", -1).time(4).sound(primitive).shaped(
+                        new Object[] { "R ", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
+                                Items.stick });
+        KnowledgeListMF.stoneHammerR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.hammerStone))
+                .tool("hands", -1).time(4).sound(primitive).shaped(
+                        new Object[] { "R", "V", "S", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
+                                Items.stick });
 
-        KnowledgeListMF.stoneTongsR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.tongsStone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { " R", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
-                        Items.stick });
-        KnowledgeListMF.boneNeedleR = MineFantasyAPI.addCarpenterRecipe(
-                null,
-                new ItemStack(ToolListMF.needleBone),
-                "",
-                primitive,
-                "hands",
-                -1,
-                4,
-                new Object[] { "B", 'B', Items.bone, });
+        KnowledgeListMF.stoneTongsR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.tongsStone))
+                .tool("hands", -1).time(4).sound(primitive).shaped(
+                        new Object[] { " R", "SV", 'R', ComponentListMF.sharp_rock, 'V', ComponentListMF.vine, 'S',
+                                Items.stick });
+        KnowledgeListMF.boneNeedleR = MineFantasyAPI.carpenterRecipe(new ItemStack(ToolListMF.needleBone))
+                .tool("hands", -1).time(4).sound(primitive).shaped(new Object[] { "B", 'B', Items.bone, });
 
         Salvage.addSalvage(
                 ToolListMF.pickStone,
@@ -2154,50 +1239,27 @@ public class CarpenterRecipes {
         float time = 4;
         Item plank = ComponentListMF.plank;
 
-        KnowledgeListMF.spoonR = MineFantasyAPI.addCarpenterToolRecipe(
-                artisanry,
-                CustomToolListMF.standard_spoon,
-                "",
-                basic,
-                "hands",
-                -1,
-                1 + (int) (1 * time),
-                new Object[] { "W", "S", 'W', plank, 'S', Items.stick });
+        KnowledgeListMF.spoonR = MineFantasyAPI.carpenterRecipe(CustomToolListMF.standard_spoon).skill(artisanry)
+                .tool("hands", -1).time(1 + (int) (1 * time)).sound(basic).materialTiers()
+                .shaped(new Object[] { "W", "S", 'W', plank, 'S', Items.stick });
         Salvage.addSalvage(CustomToolListMF.standard_spoon, plank, Items.stick);
-        KnowledgeListMF.malletR = MineFantasyAPI.addCarpenterToolRecipe(
-                artisanry,
-                CustomToolListMF.standard_mallet,
-                "",
-                basic,
-                "hands",
-                -1,
-                1 + (int) (2 * time),
-                new Object[] { "WW", " S", 'W', plank, 'S', Items.stick });
+        KnowledgeListMF.malletR = MineFantasyAPI.carpenterRecipe(CustomToolListMF.standard_mallet).skill(artisanry)
+                .tool("hands", -1).time(1 + (int) (2 * time)).sound(basic).materialTiers()
+                .shaped(new Object[] { "WW", " S", 'W', plank, 'S', Items.stick });
         Salvage.addSalvage(CustomToolListMF.standard_mallet, new ItemStack(plank, 2), Items.stick);
         Salvage.addSalvage(CustomToolListMF.standard_spoon, plank, Items.stick);
 
         KnowledgeListMF.refinedPlankR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        ComponentListMF.plank.construct("RefinedWood"),
-                        "",
-                        basic,
-                        "hands",
-                        -1,
-                        1,
-                        new Object[] { "O", "P", 'O', ComponentListMF.plant_oil, 'P', (ComponentListMF.plank) }));
+                MineFantasyAPI.carpenterRecipe(ComponentListMF.plank.construct("RefinedWood")).skill(construction)
+                        .tool("hands", -1).time(1).sound(basic).shaped(
+                                new Object[] { "O", "P", 'O', ComponentListMF.plant_oil, 'P',
+                                        (ComponentListMF.plank) }));
         try (NativeRecipes.Variant v = NativeRecipes.variant("paint_brush")) {
             KnowledgeListMF.easyPaintPlank.add(
-                    MineFantasyAPI.addCarpenterRecipe(
-                            construction,
-                            ComponentListMF.plank.construct("RefinedWood", 4),
-                            "paint_brush",
-                            sewing,
-                            "brush",
-                            -1,
-                            2,
-                            new Object[] { " O  ", "PPPP", 'O', ComponentListMF.plant_oil, 'P',
-                                    (ComponentListMF.plank) }));
+                    MineFantasyAPI.carpenterRecipe(ComponentListMF.plank.construct("RefinedWood", 4))
+                            .skill(construction).research("paint_brush").tool("brush", -1).time(2).sound(sewing).shaped(
+                                    new Object[] { " O  ", "PPPP", 'O', ComponentListMF.plant_oil, 'P',
+                                            (ComponentListMF.plank) }));
         }
     }
 
@@ -2213,14 +1275,8 @@ public class CarpenterRecipes {
     }
 
     static void addSawPlanks(ItemStack planks, CustomMaterial material) {
-        MineFantasyAPI.addCarpenterRecipe(
-                construction,
-                (ComponentListMF.plank).construct(material.name, 4),
-                "commodities",
-                sawing,
-                "saw",
-                -1,
-                10,
-                new Object[] { "P", 'P', planks.copy() });
+        MineFantasyAPI.carpenterRecipe((ComponentListMF.plank).construct(material.name, 4)).skill(construction)
+                .research("commodities").tool("saw", -1).time(10).sound(sawing)
+                .shaped(new Object[] { "P", 'P', planks.copy() });
     }
 }

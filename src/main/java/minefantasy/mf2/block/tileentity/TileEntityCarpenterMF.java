@@ -20,23 +20,23 @@ import net.minecraft.util.StatCollector;
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.Diagnosis;
-import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
-import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.container.ContainerCarpenterMF;
 import minefantasy.mf2.item.armour.ItemArmourMF;
 import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.CarpenterPacket;
+import minefantasy.mf2.network.packet.StationStatePacket;
 import minefantasy.mf2.util.MFLogUtil;
 
-public class TileEntityCarpenterMF extends TileEntity implements IInventory, Diagnosis.Source {
+public class TileEntityCarpenterMF extends TileEntity
+        implements StationStatePacket.Shown, IInventory, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -58,11 +58,13 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     private boolean needsRecipeRestore;
     private ItemStack recipe;
     private GridRecipe activeRecipe;
+    /** The id of the recipe the grid holds, as the lookup found it. */
+    private RecipeId activeId;
     /** The project read from the save, checked on the first recipe update after loading. */
     /** The craft the grid holds, worked out in full; the HUD, the save and finishing all read it. */
     private CraftPlan project;
-    /** The project the progress belongs to, kept across saves. */
-    private final RunningCraft running = new RunningCraft();
+    /** The project the progress belongs to, kept across saves, and what watchers last got. */
+    private final CraftState craft = new CraftState();
     private static final RecipeId REPAIR = RecipeId.of("minefantasy2", "carpenter/repair");
     private int hammerTierRequired;
     private int CarpenterTierRequired;
@@ -80,7 +82,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        running.read(nbt);
+        craft.read(nbt);
         tier = nbt.getInteger("tier");
 
         inventory = InventorySlots.read(nbt, "Items", inventory.length);
@@ -95,7 +97,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        running.write(nbt);
+        craft.write(nbt);
         nbt.setInteger("tier", tier);
 
         InventorySlots.write(nbt, "Items", inventory);
@@ -199,7 +201,6 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
         if (user == null) return false;
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
-        int hammerTier = ToolHelper.getCrafterTier(user.getHeldItem());
         if (!toolType.equalsIgnoreCase("nothing")) {
             if (user.getHeldItem() != null) {
                 user.getHeldItem().damageItem(1, user);
@@ -211,10 +212,8 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
             }
             if (worldObj.isRemote) return true;
 
-            if (doesPlayerKnowCraft(user) && canCraft()
-                    && toolType.equalsIgnoreCase(toolTypeRequired)
-                    && tier >= CarpenterTierRequired
-                    && hammerTier >= hammerTierRequired) {
+            Requirements.Verdict verdict = verdict(user);
+            if (verdict != null && verdict.allows() && canCraft()) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getUseSound(), 1.0F, 1.0F);
                 float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem());
 
@@ -375,17 +374,17 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
         }
     }
 
+    /** Sends the state to the watchers, if it changed since they got it last. */
     public void syncData() {
-
         if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new CarpenterPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new CarpenterPacket(this).generatePacket()); }
-         */
+        NBTTagCompound state = describe();
+        if (craft.changed(state)) {
+            NetworkUtils.sendToWatchers(
+                    new StationStatePacket(this, state).generatePacket(),
+                    worldObj,
+                    this.xCoord,
+                    this.zCoord);
+        }
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
@@ -394,10 +393,6 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     /** The recipe result, or on the client the copy the server synced for display */
     public ItemStack getShownResult() {
         return worldObj != null && worldObj.isRemote ? clientResult : recipe;
-    }
-
-    public void setClientResult(ItemStack result) {
-        clientResult = result;
     }
 
     /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
@@ -483,7 +478,7 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
         if (recipe == null) {
             return null;
         }
-        RecipeId id = activeRecipe == null ? REPAIR : MFRecipes.CARPENTER.published().idOf(activeRecipe);
+        RecipeId id = activeRecipe == null ? REPAIR : activeId;
         int returns = getSizeInventory() - 4;
         CraftPlan.Builder plan = CraftPlan.builder(
                 id == null ? REPAIR : id,
@@ -520,21 +515,11 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     @Override
     public Diagnosis diagnose(EntityPlayer player) {
         updateCraftingData();
-        List<RecipeEntry<GridRecipe>> matched = new ArrayList<>();
-        if (craftMatrix != null) {
-            for (RecipeEntry<GridRecipe> entry : MFRecipes.CARPENTER.published().all()) {
-                if (entry.getRecipe().matches(craftMatrix)) {
-                    matched.add(entry);
-                }
-            }
-        }
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        for (int i = 0; i < matched.size(); i++) {
-            candidates.add(
-                    Diagnosis.candidate(
-                            matched.get(i),
-                            i == 0 ? requirementProblem(player) : CheckResult.Reason.of("shadowed")));
-        }
+        List<Diagnosis.Candidate> candidates = craftMatrix != null ? Diagnosis.walk(
+                MFRecipes.CARPENTER.published().all(),
+                recipe -> recipe.matches(craftMatrix),
+                entry -> null,
+                entry -> requirementProblem(player)).getCandidates() : new ArrayList<>();
         if (candidates.isEmpty() && recipe != null && project != null) {
             candidates.add(new Diagnosis.Candidate(project.getRecipeId(), 0, requirementProblem(player)));
         }
@@ -544,34 +529,21 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
         return Diagnosis.of("carpenter", candidates);
     }
 
-    /** What stops the player crafting the project, or null; a soft reason means it only works harder. */
+    /** How the project's requirements judge the player and this bench; null without a project. */
+    private Requirements.Verdict verdict(EntityPlayer player) {
+        return project == null ? null : Requirements.of(project).check(Requirements.CARPENTER, player, tier);
+    }
+
+    /** What stops the player crafting the project, or null. */
     private CheckResult.Reason requirementProblem(EntityPlayer player) {
-        if (project == null) {
+        Requirements.Verdict verdict = verdict(player);
+        if (verdict == null) {
             return CheckResult.Reason.NO_RECIPE;
         }
-        ItemStack held = player.getHeldItem();
-        String tool = ToolHelper.getCrafterTool(held);
-        int toolTier = ToolHelper.getCrafterTier(held);
-        String needTool = project.require(MFRecipeKeys.TOOL, "");
-        int needToolTier = project.require(MFRecipeKeys.TOOL_TIER, 0);
-        int needStation = project.require(MFRecipeKeys.TIER, 0);
-        String research = project.require(MFRecipeKeys.RESEARCH, "");
-        if (!needTool.equalsIgnoreCase(tool)) {
-            return CheckResult.Reason.of("tool", needTool, tool);
+        if (!verdict.allows()) {
+            return verdict.getRefusal();
         }
-        if (toolTier < needToolTier) {
-            return CheckResult.Reason.tier("tool", toolTier, needToolTier);
-        }
-        if (tier < needStation) {
-            return CheckResult.Reason.tier("bench", tier, needStation);
-        }
-        if (!research.isEmpty() && !ResearchLogic.hasInfoUnlocked(player, research)) {
-            return CheckResult.Reason.of("research", research);
-        }
-        if (!canCraft()) {
-            return CheckResult.Reason.OUTPUT_FULL;
-        }
-        return null;
+        return canCraft() ? null : CheckResult.Reason.OUTPUT_FULL;
     }
 
     public void updateCraftingData() {
@@ -583,9 +555,11 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
             }
             ItemStack repair = craftMatrix == null ? null
                     : CraftingManagerCarpenter.getInstance().findRepairResult(craftMatrix);
-            GridRecipe.Match match = repair != null || craftMatrix == null ? null
-                    : CraftingManagerCarpenter.getInstance().match(craftMatrix);
+            GridRecipe.Found found = repair != null || craftMatrix == null ? null
+                    : CraftingManagerCarpenter.getInstance().find(craftMatrix);
+            GridRecipe.Match match = found == null ? null : found.getMatch();
             activeRecipe = match == null ? null : match.getRecipe();
+            activeId = found == null ? null : found.getId();
             recipe = repair != null ? repair : match == null ? null : match.getResult();
             skillUsed = activeRecipe == null ? null : activeRecipe.getSkill();
             craftSound = activeRecipe == null ? craftSound : activeRecipe.getSound();
@@ -593,10 +567,10 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
             show(project);
 
             // Progress belongs to one project: another recipe, material, requirement or input starts over
-            if (progress > 0 && (!canCraft() || !running.holds(project))) {
+            boolean carriesOn = craft.follow(project);
+            if (progress > 0 && (!canCraft() || !carriesOn)) {
                 progress = 0;
             }
-            running.start(project);
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
@@ -608,29 +582,36 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
      */
     @Override
     public Packet getDescriptionPacket() {
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
+    }
+
+    /**
+     * What watchers are shown of the station: the description packet and the state packet carry the same, and
+     * {@link #show} reads it back.
+     */
+    private NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setFloat("Progress", progress);
-        nbt.setFloat("ProgressMax", progressMax);
-        nbt.setInteger("HammerTier", hammerTierRequired);
+        CraftHud.write(nbt, progress, progressMax, toolTypeRequired, researchRequired, recipe);
+        nbt.setInteger(CraftHud.TOOL_TIER, hammerTierRequired);
         nbt.setInteger("CarpenterTier", CarpenterTierRequired);
-        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
-        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
-        if (recipe != null) {
-            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
-        }
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+        return nbt;
     }
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        NBTTagCompound nbt = packet.func_148857_g();
-        progress = nbt.getFloat("Progress");
-        progressMax = nbt.getFloat("ProgressMax");
-        hammerTierRequired = nbt.getInteger("HammerTier");
-        CarpenterTierRequired = nbt.getInteger("CarpenterTier");
-        toolTypeRequired = nbt.getString("ToolNeeded");
-        researchRequired = nbt.getString("Research");
-        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
+        show(packet.func_148857_g());
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        CraftHud hud = CraftHud.read(state);
+        progress = hud.progress;
+        progressMax = hud.progressMax;
+        toolTypeRequired = hud.tool;
+        researchRequired = hud.research;
+        clientResult = hud.result;
+        hammerTierRequired = state.getInteger(CraftHud.TOOL_TIER);
+        CarpenterTierRequired = state.getInteger("CarpenterTier");
     }
 
     public boolean canCraft() {
@@ -675,14 +656,6 @@ public class TileEntityCarpenterMF extends TileEntity implements IInventory, Dia
     }
 
     // region client sync: the server shows the project; its packets and container fill these on the client
-
-    public void setToolType(String toolType) {
-        toolTypeRequired = toolType;
-    }
-
-    public void setResearch(String research) {
-        researchRequired = research;
-    }
 
     public void setToolTier(int tier) {
         hammerTierRequired = tier;

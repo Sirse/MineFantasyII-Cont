@@ -22,23 +22,23 @@ import net.minecraftforge.fluids.FluidStack;
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.Diagnosis;
-import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
-import minefantasy.mf2.api.recipe.RunningCraft;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.container.ContainerKitchenBench;
 import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.KitchenBenchPacket;
+import minefantasy.mf2.network.packet.StationStatePacket;
 
-public class TileEntityKitchenBench extends TileEntity implements IInventory, Diagnosis.Source {
+public class TileEntityKitchenBench extends TileEntity
+        implements StationStatePacket.Shown, IInventory, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -60,11 +60,13 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
     private boolean resetRecipe = false;
     private ItemStack recipe;
     private GridRecipe activeRecipe;
+    /** The id of the recipe the grid holds, as the lookup found it. */
+    private RecipeId activeId;
     /** The project read from the save, checked on the first recipe update after loading. */
     /** The craft the grid holds, worked out in full; the HUD, the save and finishing all read it. */
     private CraftPlan project;
-    /** The project the progress belongs to, kept across saves. */
-    private final RunningCraft running = new RunningCraft();
+    /** The project the progress belongs to, kept across saves, and what watchers last got. */
+    private final CraftState craft = new CraftState();
     private static final RecipeId UNLISTED = RecipeId.of("minefantasy2", "kitchen/unlisted");
 
     public TileEntityKitchenBench() {
@@ -75,7 +77,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        running.read(nbt);
+        craft.read(nbt);
 
         inventory = InventorySlots.read(nbt, "Items", inventory.length);
         progress = nbt.getFloat("Progress");
@@ -89,7 +91,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
     @Override
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        running.write(nbt);
+        craft.write(nbt);
 
         InventorySlots.write(nbt, "Items", inventory);
 
@@ -196,7 +198,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
         }
 
         String toolType = ToolHelper.getCrafterTool(held);
-        int toolTier = ToolHelper.getCrafterTier(held);
         float efficiency = ToolHelper.getCrafterEfficiency(held);
         if (!toolType.equalsIgnoreCase("hands") || recipeRequiresHands()) {
             if (worldObj.isRemote) {
@@ -212,7 +213,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
 
             if (dirty) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
-            } else if (doesPlayerKnowCraft(user) && canCraft() && isToolSufficient(toolType, toolTier)) {
+            } else if (isAllowed(verdict(user)) && canCraft()) {
                 worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getCraftingSound(), 1.0F, 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
@@ -235,16 +236,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
 
     private boolean recipeRequiresHands() {
         return toolTypeRequired.equalsIgnoreCase("hands");
-    }
-
-    private boolean isToolSufficient(String toolType, int toolTier) {
-        if (toolTier < getToolTierNeeded()) {
-            return false;
-        }
-        if (recipeRequiresHands()) {
-            return true;// hands recipes may also be hit with any tool
-        }
-        return toolType.equalsIgnoreCase(toolTypeRequired);
     }
 
     private boolean isWaterContainer(ItemStack held) {
@@ -392,10 +383,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
         return worldObj != null && worldObj.isRemote ? clientResult : recipe;
     }
 
-    public void setClientResult(ItemStack result) {
-        clientResult = result;
-    }
-
     /** True while the grid holds a recipe; getResultName always returns text, even with nothing to make */
     public boolean hasProject() {
         ItemStack result = getShownResult();
@@ -465,7 +452,8 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
         for (int a = 0; a < getOutputSlotNum(); a++) {
             craftMatrix.setInventorySlotContents(a, inventory[a]);
         }
-        GridRecipe.Match match = CraftingManagerKitchen.getInstance().match(craftMatrix);
+        GridRecipe.Found found = CraftingManagerKitchen.getInstance().find(craftMatrix);
+        GridRecipe.Match match = found == null ? null : found.getMatch();
         return match == null ? null : match.getResult();
     }
 
@@ -474,7 +462,7 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
         if (recipe == null) {
             return null;
         }
-        RecipeId id = MFRecipes.KITCHEN.published().idOf(activeRecipe);
+        RecipeId id = activeId;
         int returns = getSizeInventory() - 4;
         CraftPlan.Builder plan = CraftPlan.builder(
                 id == null ? UNLISTED : id,
@@ -509,20 +497,13 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
     @Override
     public Diagnosis diagnose(EntityPlayer player) {
         updateCraftingData();
-        List<RecipeEntry<GridRecipe>> matched = new ArrayList<>();
-        if (craftMatrix != null) {
-            for (RecipeEntry<GridRecipe> entry : MFRecipes.KITCHEN.published().all()) {
-                if (entry.getRecipe().matches(craftMatrix)) {
-                    matched.add(entry);
-                }
-            }
-        }
-        List<Diagnosis.Candidate> candidates = new ArrayList<>();
-        for (int i = 0; i < matched.size(); i++) {
-            candidates.add(
-                    Diagnosis.candidate(
-                            matched.get(i),
-                            i == 0 ? requirementProblem(player) : CheckResult.Reason.of("shadowed")));
+        List<Diagnosis.Candidate> candidates = craftMatrix != null ? Diagnosis.walk(
+                MFRecipes.KITCHEN.published().all(),
+                recipe -> recipe.matches(craftMatrix),
+                entry -> null,
+                entry -> requirementProblem(player)).getCandidates() : new ArrayList<>();
+        if (candidates.isEmpty() && recipe != null && project != null) {
+            candidates.add(new Diagnosis.Candidate(project.getRecipeId(), 0, requirementProblem(player)));
         }
         if (candidates.isEmpty()) {
             return Diagnosis.problem("kitchen", CheckResult.Reason.of("no_match"));
@@ -530,31 +511,28 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
         return Diagnosis.of("kitchen", candidates);
     }
 
-    /** What stops the player crafting the project, or null; a soft reason means it only works harder. */
+    /** How the project's requirements judge the player; null without a project. The bench has no tier. */
+    private Requirements.Verdict verdict(EntityPlayer player) {
+        return project == null ? null : Requirements.of(project).check(Requirements.KITCHEN, player, 0);
+    }
+
+    private static boolean isAllowed(Requirements.Verdict verdict) {
+        return verdict != null && verdict.allows();
+    }
+
+    /** What stops the player crafting the project, or null. */
     private CheckResult.Reason requirementProblem(EntityPlayer player) {
-        if (project == null) {
+        Requirements.Verdict verdict = verdict(player);
+        if (verdict == null) {
             return CheckResult.Reason.NO_RECIPE;
         }
-        ItemStack held = player.getHeldItem();
-        String tool = ToolHelper.getCrafterTool(held);
-        int toolTier = ToolHelper.getCrafterTier(held);
-        String needTool = project.require(MFRecipeKeys.TOOL, "");
-        int needToolTier = project.require(MFRecipeKeys.TOOL_TIER, 0);
-        int needStation = project.require(MFRecipeKeys.TIER, 0);
-        String research = project.require(MFRecipeKeys.RESEARCH, "");
         if (isDirty()) {
             return CheckResult.Reason.DIRTY;
         }
-        if (!recipeRequiresHands() && !needTool.equalsIgnoreCase(tool)) {
-            return CheckResult.Reason.of("tool", needTool, tool);
+        if (!verdict.allows()) {
+            return verdict.getRefusal();
         }
-        if (!research.isEmpty() && !ResearchLogic.hasInfoUnlocked(player, research)) {
-            return CheckResult.Reason.of("research", research);
-        }
-        if (!canCraft()) {
-            return CheckResult.Reason.OUTPUT_FULL;
-        }
-        return null;
+        return canCraft() ? null : CheckResult.Reason.OUTPUT_FULL;
     }
 
     public void updateCraftingData() {
@@ -564,9 +542,11 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
                     craftMatrix.setInventorySlotContents(a, inventory[a]);
                 }
             }
-            GridRecipe.Match match = craftMatrix == null ? null
-                    : CraftingManagerKitchen.getInstance().match(craftMatrix);
+            GridRecipe.Found found = craftMatrix == null ? null
+                    : CraftingManagerKitchen.getInstance().find(craftMatrix);
+            GridRecipe.Match match = found == null ? null : found.getMatch();
             activeRecipe = match == null ? null : match.getRecipe();
+            activeId = found == null ? null : found.getId();
             recipe = match == null ? null : match.getResult();
             skillUsed = activeRecipe == null ? null : activeRecipe.getSkill();
             craftSound = activeRecipe == null ? craftSound : activeRecipe.getSound();
@@ -576,19 +556,27 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
             show(project);
 
             // Progress belongs to one project: another recipe, material, requirement or input starts over
-            if (progress > 0 && (!canCraft() || isDirty() || !running.holds(project))) {
+            boolean carriesOn = craft.follow(project);
+            if (progress > 0 && (!canCraft() || isDirty() || !carriesOn)) {
                 progress = 0;
             }
-            running.start(project);
             if (progress > progressMax) progress = progressMax - 1;
             syncData();
         }
     }
 
     /** Sends what the GUI and the in-world HUD show */
+    /** Sends the state to the watchers, if it changed since they got it last. */
     public void syncData() {
         if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new KitchenBenchPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        NBTTagCompound state = describe();
+        if (craft.changed(state)) {
+            NetworkUtils.sendToWatchers(
+                    new StationStatePacket(this, state).generatePacket(),
+                    worldObj,
+                    this.xCoord,
+                    this.zCoord);
+        }
     }
 
     /**
@@ -597,29 +585,36 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
      */
     @Override
     public Packet getDescriptionPacket() {
+        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
+    }
+
+    /**
+     * What watchers are shown of the station: the description packet and the state packet carry the same, and
+     * {@link #show} reads it back.
+     */
+    private NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setFloat("Progress", progress);
-        nbt.setFloat("ProgressMax", progressMax);
+        CraftHud.write(nbt, progress, progressMax, toolTypeRequired, researchRequired, recipe);
         nbt.setFloat("DirtyProgress", dirtyProgress);
         nbt.setFloat("DirtyMax", dirtyMax);
-        nbt.setString("ToolNeeded", toolTypeRequired == null ? "" : toolTypeRequired);
-        nbt.setString("Research", researchRequired == null ? "" : researchRequired);
-        if (recipe != null) {
-            nbt.setTag("Result", recipe.writeToNBT(new NBTTagCompound()));
-        }
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+        return nbt;
     }
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        NBTTagCompound nbt = packet.func_148857_g();
-        progress = nbt.getFloat("Progress");
-        progressMax = nbt.getFloat("ProgressMax");
-        dirtyProgress = nbt.getFloat("DirtyProgress");
-        dirtyMax = nbt.getFloat("DirtyMax");
-        toolTypeRequired = nbt.getString("ToolNeeded");
-        researchRequired = nbt.getString("Research");
-        clientResult = nbt.hasKey("Result") ? ItemStack.loadItemStackFromNBT(nbt.getCompoundTag("Result")) : null;
+        show(packet.func_148857_g());
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        CraftHud hud = CraftHud.read(state);
+        progress = hud.progress;
+        progressMax = hud.progressMax;
+        toolTypeRequired = hud.tool;
+        researchRequired = hud.research;
+        clientResult = hud.result;
+        dirtyProgress = state.getFloat("DirtyProgress");
+        dirtyMax = state.getFloat("DirtyMax");
     }
 
     public boolean canCraft() {
@@ -676,14 +671,6 @@ public class TileEntityKitchenBench extends TileEntity implements IInventory, Di
     }
 
     // region client sync: the server shows the project; its packets and container fill these on the client
-
-    public void setToolType(String toolType) {
-        toolTypeRequired = toolType;
-    }
-
-    public void setResearch(String research) {
-        researchRequired = research;
-    }
 
     // endregion
 }

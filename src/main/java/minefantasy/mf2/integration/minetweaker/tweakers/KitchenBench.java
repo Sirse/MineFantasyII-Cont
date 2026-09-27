@@ -2,9 +2,9 @@ package minefantasy.mf2.integration.minetweaker.tweakers;
 
 import java.util.function.Supplier;
 
-import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeGridRecipe;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -36,7 +36,7 @@ public class KitchenBench {
         add(name, () -> {
             return TweakedIngredients.shaped(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, -1).time(time)
                     .sound(sound).research(research).skill(getSkillOrWarn(skill, output))
-                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : MineFantasyAPI.kitchenDirtyFor(time)).build();
+                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : NativeGridRecipe.kitchenDirt(time)).build();
         }, priority);
     }
 
@@ -46,7 +46,7 @@ public class KitchenBench {
         add(name, () -> {
             return TweakedIngredients.shapeless(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, -1).time(time)
                     .sound(sound).research(research).skill(getSkillOrWarn(skill, output))
-                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : MineFantasyAPI.kitchenDirtyFor(time)).build();
+                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : NativeGridRecipe.kitchenDirt(time)).build();
         }, priority);
     }
 

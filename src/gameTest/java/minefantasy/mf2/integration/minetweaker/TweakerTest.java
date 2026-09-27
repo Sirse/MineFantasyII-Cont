@@ -441,4 +441,29 @@ public class TweakerTest {
             added(MFRecipes.QUERN, "t_after");
         });
     }
+
+    @GameTest
+    public static void unknownResearchIsRefused(GameTestHelper helper) throws Exception {
+        around(helper, () -> {
+            String known = minefantasy.mf2.api.knowledge.InformationList.nameMap.keySet().iterator().next();
+            String grid = "mods.minefantasy.Anvil.addShapeless(\"%s\", " + item("bar")
+                    + ", \"\", \"%s\", false, \"hammer\", 0, 0, 10, ["
+                    + item("ore")
+                    + "]);";
+            List<String> errors = run(
+                    String.format(grid, "t_typo", "no_such_research"),
+                    String.format(grid, "t_known", known),
+                    "mods.minefantasy.Bloomery.add(\"t_typo\", " + item("bar")
+                            + ", "
+                            + item("ore")
+                            + ", \"no_such_research\");");
+            assertEquals("both misspelt researches are refused: " + errors, 2, errors.size());
+            for (String error : errors) {
+                assertTrue(error, error.contains("'no_such_research' is not a known research"));
+            }
+            absent(MFRecipes.ANVIL, ScriptRecipes.scriptId("anvil", "t_typo"));
+            absent(MFRecipes.BLOOMERY, ScriptRecipes.scriptId("bloomery", "t_typo"));
+            assertEquals(known, added(MFRecipes.ANVIL, "t_known").getResearch());
+        });
+    }
 }

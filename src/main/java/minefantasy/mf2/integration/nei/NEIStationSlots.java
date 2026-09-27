@@ -21,6 +21,7 @@ import org.lwjgl.opengl.GL11;
 import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.CustomCrafterEntry;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.block.crafting.BlockAnvilMF;
 import minefantasy.mf2.block.crafting.BlockCarpenter;
@@ -146,7 +147,8 @@ public final class NEIStationSlots {
     /** The carpenter bench, or nothing when the recipe asks for a tier no bench has (scripts can) */
     public static List<ItemStack> carpenters(int tier) {
         BlockCarpenter bench = BlockListMF.carpenter;
-        return bench != null && bench.getTier() >= tier ? single(bench) : Collections.<ItemStack>emptyList();
+        return bench != null && Requirements.CARPENTER.stationFits(bench.getTier(), tier) ? single(bench)
+                : Collections.<ItemStack>emptyList();
     }
 
     public static List<ItemStack> single(Block block) {

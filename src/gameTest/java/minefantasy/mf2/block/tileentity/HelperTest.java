@@ -16,7 +16,9 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.crafting.RecipePattern;
+import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.item.list.ToolListMF;
 
 /** The shared pattern reader of the native registration methods, and the slot helpers of station inventories. */
 @GameTestHolder("minefantasy2")
@@ -103,6 +105,35 @@ public class HelperTest {
         }
         helper.succeed();
     }
+
+    // region quality
+
+    @GameTest
+    public static void anItemIsOrdinaryInferiorOrSuperior(GameTestHelper helper) throws Exception {
+        ItemStack hammer = new ItemStack(ToolListMF.hammerStone);
+        assertEquals(ItemQuality.Grade.ORDINARY, ItemQuality.getGrade(hammer));
+        assertEquals(ItemQuality.ORDINARY, ItemQuality.get(hammer), 0F);
+        ItemQuality.setGrade(hammer, ItemQuality.Grade.INFERIOR);
+        assertTrue(hammer.getTagCompound().getBoolean(ItemQuality.INFERIOR_KEY));
+        assertEquals(5F, ItemQuality.getGrade(hammer).scale(10F, 2F), 0F);
+        ItemQuality.setGrade(hammer, ItemQuality.Grade.SUPERIOR);
+        assertEquals(20F, ItemQuality.getGrade(hammer).scale(10F, 2F), 0F);
+        ItemQuality.setGrade(hammer, ItemQuality.Grade.ORDINARY);
+        assertFalse("an ordinary item kept a mark", hammer.getTagCompound().hasKey(ItemQuality.INFERIOR_KEY));
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void stackingItemsHaveNoQuality(GameTestHelper helper) throws Exception {
+        ItemStack stack = new ItemStack(ore, 4);
+        ItemQuality.set(stack, 150F);
+        ItemQuality.setGrade(stack, ItemQuality.Grade.SUPERIOR);
+        assertFalse(stack.hasTagCompound());
+        assertEquals(ItemQuality.ORDINARY, ItemQuality.get(stack), 0F);
+        helper.succeed();
+    }
+
+    // endregion
 
     // region inventory slots
 

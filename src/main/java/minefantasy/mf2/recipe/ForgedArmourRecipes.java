@@ -38,60 +38,32 @@ public class ForgedArmourRecipes {
 
         int time = 20;
         KnowledgeListMF.mailHelmetR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_chain_helmet),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMR", "MPM", "RMR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_chain_helmet)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMR", "MPM", "RMR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
         time = 30;
         KnowledgeListMF.mailChestR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_chain_chest),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RM MR", "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_chain_chest)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RM MR", "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
         time = 20;
         KnowledgeListMF.mailLegsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_chain_legs),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_chain_legs)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
         time = 10;
         KnowledgeListMF.mailBootsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_chain_boots),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "R R", "MPM",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_chain_boots)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "R R", "MPM",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_chain_helmet,
                 helm,
@@ -125,60 +97,32 @@ public class ForgedArmourRecipes {
 
         int time = 20;
         KnowledgeListMF.scaleHelmetR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_scale_helmet),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMR", "MPM", "RMR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_scale_helmet)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMR", "MPM", "RMR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
         time = 30;
         KnowledgeListMF.scaleChestR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_scale_chest),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RM MR", "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_scale_chest)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RM MR", "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
         time = 20;
         KnowledgeListMF.scaleLegsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_scale_legs),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_scale_legs)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
         time = 10;
         KnowledgeListMF.scaleBootsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_scale_boots),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "R R", "MPM",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_scale_boots)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "R R", "MPM",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_scale_helmet,
                 helm,
@@ -212,60 +156,32 @@ public class ForgedArmourRecipes {
 
         int time = 20;
         KnowledgeListMF.splintHelmetR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_splint_helmet),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMR", "MPM", "RMR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_splint_helmet)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMR", "MPM", "RMR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(helm, 1, 0) }));
         time = 30;
         KnowledgeListMF.splintChestR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_splint_chest),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RM MR", "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_splint_chest)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RM MR", "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(chest, 1, 0) }));
         time = 20;
         KnowledgeListMF.splintLegsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_splint_legs),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RMPMR", "RM MR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_splint_legs)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RMPMR", "RM MR",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(legs, 1, 0) }));
         time = 10;
         KnowledgeListMF.splintBootsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_splint_boots),
-                        "craftArmourMedium",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "R R", "MPM",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_splint_boots)).skill(artisanry)
+                        .research("craftArmourMedium").hot().tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "R R", "MPM",
 
-                                'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
+                                        'R', rivet, 'M', mail, 'P', new ItemStack(boots, 1, 0) }));
         Salvage.addSalvage(
                 CustomArmourListMF.standard_splint_helmet,
                 helm,
@@ -299,60 +215,32 @@ public class ForgedArmourRecipes {
 
         int time = 40;
         KnowledgeListMF.plateHelmetR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_plate_helmet),
-                        "craftArmourHeavy",
-                        false,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { " R ", "PHP", " R ",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_plate_helmet)).skill(artisanry)
+                        .research("craftArmourHeavy").tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { " R ", "PHP", " R ",
 
-                                'R', rivet, 'P', plate, 'H', new ItemStack(helm, 1, 0), }));
+                                        'R', rivet, 'P', plate, 'H', new ItemStack(helm, 1, 0), }));
         time = 60;
         KnowledgeListMF.plateChestR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_plate_chest),
-                        "craftArmourHeavy",
-                        false,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RP PR", "RPCPR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_plate_chest)).skill(artisanry)
+                        .research("craftArmourHeavy").tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RP PR", "RPCPR",
 
-                                'R', rivet, 'P', plate, 'C', new ItemStack(chest, 1, 0), }));
+                                        'R', rivet, 'P', plate, 'C', new ItemStack(chest, 1, 0), }));
         time = 40;
         KnowledgeListMF.plateLegsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_plate_legs),
-                        "craftArmourHeavy",
-                        false,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RPLPR", "RP PR",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_plate_legs)).skill(artisanry)
+                        .research("craftArmourHeavy").tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RPLPR", "RP PR",
 
-                                'R', rivet, 'P', plate, 'L', new ItemStack(legs, 1, 0), }));
+                                        'R', rivet, 'P', plate, 'L', new ItemStack(legs, 1, 0), }));
         time = 20;
         KnowledgeListMF.plateBootsR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(CustomArmourListMF.standard_plate_boots),
-                        "craftArmourHeavy",
-                        false,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "R R", "PBP",
+                MineFantasyAPI.anvilRecipe(new ItemStack(CustomArmourListMF.standard_plate_boots)).skill(artisanry)
+                        .research("craftArmourHeavy").tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "R R", "PBP",
 
-                                'R', rivet, 'P', plate, 'B', new ItemStack(boots, 1, 0), }));
+                                        'R', rivet, 'P', plate, 'B', new ItemStack(boots, 1, 0), }));
 
         Salvage.addSalvage(
                 CustomArmourListMF.standard_plate_helmet,
@@ -384,16 +272,9 @@ public class ForgedArmourRecipes {
 
         int time = 4;
         KnowledgeListMF.hugePlateR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        engineering,
-                        majorPiece,
-                        "cogArmour",
-                        true,
-                        "hvyhammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { " RR ", "RIIR", 'R', ComponentListMF.rivet, 'I', minorPiece }));
+                MineFantasyAPI.anvilRecipe(majorPiece).skill(engineering).research("cogArmour").hot()
+                        .tool("hvyhammer", -1).time(time).materialTiers()
+                        .shaped(new Object[] { " RR ", "RIIR", 'R', ComponentListMF.rivet, 'I', minorPiece }));
 
         Salvage.addSalvage(
                 majorPiece,
@@ -402,18 +283,11 @@ public class ForgedArmourRecipes {
 
         time = 25;
         KnowledgeListMF.cogPlateR.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        engineering,
-                        new ItemStack(ComponentListMF.cogwork_armour),
-                        "cogArmour",
-                        true,
-                        "hvyhammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "  P  ", "pPPPp", "p P p", " pPp ",
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.cogwork_armour)).skill(engineering)
+                        .research("cogArmour").hot().tool("hvyhammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "  P  ", "pPPPp", "p P p", " pPp ",
 
-                                'p', minorPiece, 'P', majorPiece, }));
+                                        'p', minorPiece, 'P', majorPiece, }));
 
         Salvage.addSalvage(
                 ComponentListMF.cogwork_armour,
@@ -427,58 +301,30 @@ public class ForgedArmourRecipes {
 
         int time = 3;
         KnowledgeListMF.mailRecipes.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(ComponentListMF.chainmesh),
-                        "",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { " H ", "H H", " H ",
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.chainmesh)).skill(artisanry).hot()
+                        .tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { " H ", "H H", " H ",
 
-                                'H', hunk }));
+                                        'H', hunk }));
         time = 3;
         KnowledgeListMF.scaleRecipes.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(ComponentListMF.scalemesh),
-                        "",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "HHH", " H ",
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.scalemesh)).skill(artisanry).hot()
+                        .tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "HHH", " H ",
 
-                                'H', hunk }));
+                                        'H', hunk }));
         time = 4;
         KnowledgeListMF.splintRecipes.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        new ItemStack(ComponentListMF.splintmesh),
-                        "",
-                        true,
-                        "hammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "RHR", " H ", " H ", " H ",
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.splintmesh)).skill(artisanry).hot()
+                        .tool("hammer", -1).time(time).materialTiers().shaped(
+                                new Object[] { "RHR", " H ", " H ", " H ",
 
-                                'H', hunk, 'R', ComponentListMF.rivet, }));
+                                        'H', hunk, 'R', ComponentListMF.rivet, }));
         time = 4;
         KnowledgeListMF.plateRecipes.add(
-                MineFantasyAPI.addAnvilToolRecipe(
-                        artisanry,
-                        ComponentListMF.plate,
-                        "",
-                        true,
-                        "hvyhammer",
-                        -1,
-                        -1,
-                        time,
-                        new Object[] { "FF", "II", 'F', ComponentListMF.flux, 'I', bar }));
+                MineFantasyAPI.anvilRecipe(ComponentListMF.plate).skill(artisanry).hot().tool("hvyhammer", -1)
+                        .time(time).materialTiers()
+                        .shaped(new Object[] { "FF", "II", 'F', ComponentListMF.flux, 'I', bar }));
 
         Salvage.addSalvage(ComponentListMF.chainmesh, hunk);
         Salvage.addSalvage(ComponentListMF.scalemesh, hunk);

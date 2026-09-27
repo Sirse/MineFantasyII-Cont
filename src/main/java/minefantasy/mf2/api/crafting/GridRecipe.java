@@ -10,6 +10,9 @@ import net.minecraft.item.ItemStack;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.RecipeChecks;
+import minefantasy.mf2.api.recipe.RecipeEntry;
+import minefantasy.mf2.api.recipe.RecipeId;
+import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.rpg.Skill;
 
 /**
@@ -292,6 +295,41 @@ public final class GridRecipe implements RecipeChecks.Validated {
 
     // region matching
 
+    /** A recipe a grid holds: its entry in the registry, id and all, and what the grid makes by it. */
+    public static final class Found {
+
+        private final RecipeEntry<GridRecipe> entry;
+        private final Match match;
+
+        private Found(RecipeEntry<GridRecipe> entry, Match match) {
+            this.entry = entry;
+            this.match = match;
+        }
+
+        public RecipeId getId() {
+            return entry.getId();
+        }
+
+        public GridRecipe getRecipe() {
+            return entry.getRecipe();
+        }
+
+        public Match getMatch() {
+            return match;
+        }
+    }
+
+    /** The first published recipe of the registry the grid holds, in lookup order; null for none. */
+    public static Found find(RecipeRegistry<GridRecipe> registry, InventoryCrafting grid) {
+        for (RecipeEntry<GridRecipe> entry : registry.published().all()) {
+            Match match = entry.getRecipe().match(grid);
+            if (match != null) {
+                return new Found(entry, match);
+            }
+        }
+        return null;
+    }
+
     /** What the grid makes by this recipe, or null when it does not hold it. */
     public Match match(InventoryCrafting grid) {
         int[] amounts = shaped
@@ -466,6 +504,10 @@ public final class GridRecipe implements RecipeChecks.Validated {
         RecipeChecks.tier("station tier", stationTier);
         RecipeChecks.notEmpty("tool", tool);
         RecipeChecks.require(dirtyAmount >= 0, "dirty amount must not be negative");
+        // "tier" asks for the research of the parts' metal, worked out when the grid is matched
+        if (!"tier".equalsIgnoreCase(research)) {
+            RecipeChecks.research("research", research);
+        }
         int filled = 0;
         for (int i = 0; i < entries.length; i++) {
             if (cells[i] == null) {

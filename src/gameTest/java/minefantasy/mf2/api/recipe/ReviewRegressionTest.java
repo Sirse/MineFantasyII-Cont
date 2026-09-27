@@ -14,6 +14,7 @@ import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
+import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.NativeRecipes;
@@ -275,8 +276,8 @@ public class ReviewRegressionTest {
             assertRefused(
                     () -> cooking.add(
                             RecipeId.of("test", "cooking/cold"),
-                            minefantasy.mf2.api.cooking.CookRecipe
-                                    .of(Input.of(ore), new ItemStack(bar), null, 300, 100, 20, 0, false, false),
+                            CookRecipe.builder(Input.of(ore), new ItemStack(bar)).temperature(300, 100).time(20)
+                                    .burnTime(0).canBurn(false).build(),
                             RecipeSource.NATIVE),
                     "test:cooking/cold (NATIVE(minefantasy2))",
                     "temperatures must rise");

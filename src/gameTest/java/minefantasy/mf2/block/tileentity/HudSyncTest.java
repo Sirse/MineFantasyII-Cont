@@ -21,8 +21,10 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.knowledge.InformationList;
+import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeMetadata;
 
 /**
@@ -52,10 +54,10 @@ public class HudSyncTest {
         return InformationList.nameMap.keySet().iterator().next();
     }
 
-    /** One junk into three bars: hammer tier 2, station tier 1, time 7, a real research. */
-    private static GridRecipe gridRecipe(GridRecipe.Grid grid) {
+    /** One junk into three bars: hammer tier 2, the given station tier, time 7, a real research. */
+    private static GridRecipe gridRecipe(GridRecipe.Grid grid, int stationTier) {
         return GridRecipe.shaped(grid, 1, 1, new Object[] { new ItemStack(junk) }, null, new ItemStack(bar, 3))
-                .tool("hammer", 2).stationTier(1).time(7).research(knownResearch()).build();
+                .tool("hammer", 2).stationTier(stationTier).time(7).research(knownResearch()).build();
     }
 
     private static void assertProject(NBTTagCompound hud, float progress) {
@@ -73,7 +75,7 @@ public class HudSyncTest {
     public static void anvilSendsItsProject(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {
-            reload(tx -> tx.add(MFRecipes.ANVIL, id("anvil", "hud"), gridRecipe(GridRecipe.Grid.ANVIL), 0));
+            reload(tx -> tx.add(MFRecipes.ANVIL, id("anvil", "hud"), gridRecipe(GridRecipe.Grid.ANVIL, 1), 0));
             TileEntityAnvilMF anvil = place(new TileEntityAnvilMF());
             anvil.setInventorySlotContents(0, new ItemStack(junk));
             anvil.updateCraftingData();
@@ -95,7 +97,7 @@ public class HudSyncTest {
     public static void carpenterSendsItsProject(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {
-            reload(tx -> tx.add(MFRecipes.CARPENTER, id("carpenter", "hud"), gridRecipe(GridRecipe.Grid.BENCH), 0));
+            reload(tx -> tx.add(MFRecipes.CARPENTER, id("carpenter", "hud"), gridRecipe(GridRecipe.Grid.BENCH, 1), 0));
             TileEntityCarpenterMF bench = place(new TileEntityCarpenterMF());
             bench.setInventorySlotContents(0, new ItemStack(junk));
             bench.updateCraftingData();
@@ -114,7 +116,7 @@ public class HudSyncTest {
     public static void kitchenSendsItsProjectAndDirt(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {
-            reload(tx -> tx.add(MFRecipes.KITCHEN, id("kitchen", "hud"), gridRecipe(GridRecipe.Grid.BENCH), 0));
+            reload(tx -> tx.add(MFRecipes.KITCHEN, id("kitchen", "hud"), gridRecipe(GridRecipe.Grid.BENCH, 0), 0));
             TileEntityKitchenBench bench = place(new TileEntityKitchenBench());
             bench.setInventorySlotContents(0, new ItemStack(junk));
             bench.updateCraftingData();
@@ -124,6 +126,78 @@ public class HudSyncTest {
             assertProject(hud, 3);
             assertEquals("dirt", 20F, hud.getFloat("DirtyProgress"), 0F);
             assertEquals("dirt limit", bench.getDirtyMax(), hud.getFloat("DirtyMax"), 0F);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    /** A client copy of a station, fed only the state the station sends; its result is kept as a client one. */
+    private static <T extends TileEntity & minefantasy.mf2.network.packet.StationStatePacket.Shown> T shown(T copy,
+            TileEntity station) throws Exception {
+        copy.show(sent(station));
+        return copy;
+    }
+
+    @GameTest
+    public static void aClientShowsWhatTheAnvilSends(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            RecipeId id = id("anvil", "shown");
+            reload(tx -> tx.add(MFRecipes.ANVIL, id, gridRecipe(GridRecipe.Grid.ANVIL, 1), 0));
+            TileEntityAnvilMF anvil = place(new TileEntityAnvilMF());
+            anvil.setInventorySlotContents(0, new ItemStack(junk));
+            anvil.updateCraftingData();
+            assertEquals(
+                    "the project lost the id the lookup found",
+                    id,
+                    ((CraftPlan) get(anvil, "project")).getRecipeId());
+            anvil.progress = 3;
+            anvil.qualityBalance = 0.25F;
+            TileEntityAnvilMF client = shown(new TileEntityAnvilMF(), anvil);
+            assertEquals(3F, client.progress, 0F);
+            assertEquals(7F, client.progressMax, 0F);
+            assertEquals(0.25F, client.qualityBalance, 0F);
+            assertEquals("hammer", client.getToolNeeded());
+            assertEquals(knownResearch(), client.getResearchNeeded());
+            assertEquals(2, client.getToolTierNeeded());
+            assertEquals(1, client.getAnvilTierNeeded());
+            ItemStack shownResult = (ItemStack) get(client, "clientResult");
+            assertEquals(bar, shownResult.getItem());
+            assertEquals(3, shownResult.stackSize);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aClientShowsWhatTheBenchesSend(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            reload(tx -> {
+                tx.add(MFRecipes.CARPENTER, id("carpenter", "shown"), gridRecipe(GridRecipe.Grid.BENCH, 1), 0);
+                tx.add(MFRecipes.KITCHEN, id("kitchen", "shown"), gridRecipe(GridRecipe.Grid.BENCH, 0), 0);
+            });
+            TileEntityCarpenterMF bench = place(new TileEntityCarpenterMF());
+            bench.setInventorySlotContents(0, new ItemStack(junk));
+            bench.updateCraftingData();
+            bench.progress = 2;
+            TileEntityCarpenterMF carpenter = shown(new TileEntityCarpenterMF(), bench);
+            assertEquals(2F, carpenter.progress, 0F);
+            assertEquals(2, carpenter.getToolTierNeeded());
+            assertEquals(1, carpenter.getCarpenterTierNeeded());
+            assertEquals(bar, ((ItemStack) get(carpenter, "clientResult")).getItem());
+
+            TileEntityKitchenBench kitchen = place(new TileEntityKitchenBench());
+            kitchen.setInventorySlotContents(0, new ItemStack(junk));
+            kitchen.updateCraftingData();
+            kitchen.dirtyProgress = 5;
+            TileEntityKitchenBench cook = shown(new TileEntityKitchenBench(), kitchen);
+            assertEquals(5F, cook.dirtyProgress, 0F);
+            assertEquals(kitchen.getDirtyMax(), cook.getDirtyMax(), 0F);
+            assertEquals("hammer", cook.getToolNeeded());
+            assertEquals(bar, ((ItemStack) get(cook, "clientResult")).getItem());
         } finally {
             Stations.end();
         }
@@ -185,7 +259,8 @@ public class HudSyncTest {
                     tx -> tx.add(
                             MFRecipes.COOKING,
                             id("cooking", "hud"),
-                            CookRecipe.of(Input.of(seed), new ItemStack(flour), null, 50, 500, 30, 10, false, false),
+                            CookRecipe.builder(Input.of(seed), new ItemStack(flour)).temperature(50, 500).time(30)
+                                    .burnTime(10).canBurn(false).build(),
                             0));
             TileEntityRoast spit = place(new TileEntityRoast());
             spit.setInventorySlotContents(0, new ItemStack(seed));

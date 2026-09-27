@@ -72,36 +72,9 @@ public class ToolHelper {
         return false;
     }
 
-    public static ItemStack setQuality(ItemStack item, float qualityLvl) {
-        if (item.getMaxStackSize() > 1) return item;
-
-        NBTTagCompound nbt = getOrCreateNBT(item);
-        nbt.setFloat("MFCraftQuality", qualityLvl);
-
-        return item;
-    }
-
-    /**
-     * Gets how well an item has been crafted: 100 is default ranging from 0-200
-     */
-    public static float getQualityLevel(ItemStack stack) {
-        if (stack.getMaxStackSize() == 1) {
-            if (stack.hasTagCompound() && stack.getTagCompound().hasKey("MFCraftQuality")) {
-                return stack.getTagCompound().getFloat("MFCraftQuality");
-            }
-        }
-        return 100.0F;
-    }
-
     public static int setDuraOnQuality(ItemStack item, int dura) {
-        float quality = getQualityLevel(item);
-        if (item.hasTagCompound() && item.getTagCompound().hasKey("MF_Inferior")) {
-            if (item.getTagCompound().getBoolean("MF_Inferior")) {
-                dura /= 2;
-            } else {
-                dura *= 2;
-            }
-        }
+        float quality = ItemQuality.get(item);
+        dura = (int) ItemQuality.getGrade(item).scale(dura, 2F);
 
         if (quality > 100) {
             // This means 100+ adds to 2x durability at level 200. Cast spelled out: the compound assignment was
@@ -116,14 +89,8 @@ public class ToolHelper {
     }
 
     public static float modifyDigOnQuality(ItemStack item, float digspeed) {
-        if (item.hasTagCompound() && item.getTagCompound().hasKey("MF_Inferior")) {
-            if (item.getTagCompound().getBoolean("MF_Inferior")) {
-                digspeed /= 1.25F;
-            } else {
-                digspeed *= 1.25F;
-            }
-        }
-        float quality = getQualityLevel(item);
+        digspeed = ItemQuality.getGrade(item).scale(digspeed, 1.25F);
+        float quality = ItemQuality.get(item);
 
         if (quality > 100) {
             digspeed += ((digspeed * 0.5F) / 100F * (quality - 100));// This means 100+ adds 50% speed at level 200
@@ -138,14 +105,8 @@ public class ToolHelper {
     // NBT//
 
     public static float modifyDamOnQuality(ItemStack item, float damage) {
-        float quality = getQualityLevel(item);
-        if (item.hasTagCompound() && item.getTagCompound().hasKey("MF_Inferior")) {
-            if (item.getTagCompound().getBoolean("MF_Inferior")) {
-                damage /= 1.25F;
-            } else {
-                damage *= 1.25F;
-            }
-        }
+        float quality = ItemQuality.get(item);
+        damage = ItemQuality.getGrade(item).scale(damage, 1.25F);
         if (quality > 100) {
             damage += ((damage * 0.25F) / 100F * (quality - 100));// This means 100+ adds 25% damage at level 200
         }
@@ -157,14 +118,8 @@ public class ToolHelper {
     }
 
     public static float modifyArmourRating(ItemStack item, float rating) {
-        float quality = getQualityLevel(item);
-        if (item.hasTagCompound() && item.getTagCompound().hasKey("MF_Inferior")) {
-            if (item.getTagCompound().getBoolean("MF_Inferior")) {
-                rating /= 1.25F;
-            } else {
-                rating *= 1.25F;
-            }
-        }
+        float quality = ItemQuality.get(item);
+        rating = ItemQuality.getGrade(item).scale(rating, 1.25F);
 
         if (quality > 100) {
             rating += ((rating * 0.5F) / 100F * (quality - 100));// This means 100+ adds 50% armour at level 200
@@ -182,10 +137,6 @@ public class ToolHelper {
         }
 
         return item.getTagCompound();
-    }
-
-    public static boolean hasCustomQualityTag(ItemStack item) {
-        return item.hasTagCompound() && item.getTagCompound().hasKey("MFCraftQuality");
     }
 
     public static void setSpecial(ItemStack item, String type) {

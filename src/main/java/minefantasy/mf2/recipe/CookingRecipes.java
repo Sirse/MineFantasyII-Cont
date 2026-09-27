@@ -41,23 +41,14 @@ public class CookingRecipes {
         bake(FoodListMF.eclair_raw, FoodListMF.eclair_uniced, 150, 250, 60, 5, true);
 
         addCeramics();
-        MineFantasyAPI.addCookingRecipe(
-                new ItemStack(FoodListMF.generic_meat_mince_uncooked),
-                new ItemStack(FoodListMF.generic_meat_mince_cooked),
-                new ItemStack(FoodListMF.burnt_pot),
-                100,
-                200,
-                10,
-                false);
+        MineFantasyAPI
+                .cookingRecipe(
+                        new ItemStack(FoodListMF.generic_meat_mince_uncooked),
+                        new ItemStack(FoodListMF.generic_meat_mince_cooked))
+                .temperature(100, 200).time(10).burnt(new ItemStack(FoodListMF.burnt_pot)).register();
 
-        MineFantasyAPI.addCookingRecipe(
-                new ItemStack(FoodListMF.bowl_water_salt),
-                new ItemStack(FoodListMF.salt),
-                100,
-                200,
-                2,
-                false,
-                false);
+        MineFantasyAPI.cookingRecipe(new ItemStack(FoodListMF.bowl_water_salt), new ItemStack(FoodListMF.salt))
+                .temperature(100, 200).time(2).canBurn(false).register();
 
         if (!ConfigHardcore.preventCook) {
             smeltFood();
@@ -68,7 +59,8 @@ public class CookingRecipes {
      * Cook in for out on anything (100C-200C, for ~15s)
      */
     private static RecipeEntry<CookRecipe> cookMeat(Item in, Item out) {
-        return MineFantasyAPI.addCookingRecipe(new ItemStack(in), new ItemStack(out), 100, 200, 15, false);
+        return MineFantasyAPI.cookingRecipe(new ItemStack(in), new ItemStack(out)).temperature(100, 200).time(15)
+                .register();
     }
 
     /**
@@ -80,16 +72,8 @@ public class CookingRecipes {
      */
     private static RecipeEntry<CookRecipe> bake(Item in, Item out, int mint, int maxt, int time, int burn_time,
             boolean burn) {
-        return MineFantasyAPI.addCookingRecipe(
-                new ItemStack(in),
-                new ItemStack(out),
-                new ItemStack(FoodListMF.burnt_food),
-                mint,
-                maxt,
-                time,
-                burn_time,
-                true,
-                burn);
+        return MineFantasyAPI.cookingRecipe(new ItemStack(in), new ItemStack(out)).temperature(mint, maxt).time(time)
+                .burnTime(burn_time).burnt(new ItemStack(FoodListMF.burnt_food)).oven().canBurn(burn).register();
     }
 
     /**
@@ -101,15 +85,8 @@ public class CookingRecipes {
      */
     private static RecipeEntry<CookRecipe> bake(Item in, Item out, int mint, int maxt, int time, int burn_time,
             Item burn) {
-        return MineFantasyAPI.addCookingRecipe(
-                new ItemStack(in),
-                new ItemStack(out),
-                new ItemStack(burn),
-                mint,
-                maxt,
-                time,
-                burn_time,
-                true);
+        return MineFantasyAPI.cookingRecipe(new ItemStack(in), new ItemStack(out)).temperature(mint, maxt).time(time)
+                .burnTime(burn_time).burnt(new ItemStack(burn)).oven().register();
     }
 
     private static void smeltFood() {
@@ -148,16 +125,8 @@ public class CookingRecipes {
             GameRegistry.addSmelting(clay, new ItemStack(ceramic), 0F);
         }
         int maxTemp = Math.max(temp, 1000);
-        return MineFantasyAPI.addCookingRecipe(
-                new ItemStack(clay),
-                new ItemStack(ceramic),
-                null,
-                temp,
-                maxTemp,
-                time,
-                0,
-                true,
-                false);
+        return MineFantasyAPI.cookingRecipe(new ItemStack(clay), new ItemStack(ceramic)).temperature(temp, maxTemp)
+                .time(time).burnTime(0).burnt(null).oven().canBurn(false).register();
 
     }
 }

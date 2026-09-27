@@ -38,27 +38,16 @@ public class CustomWoodRecipes {
 
         time = 5;
         KnowledgeListMF.sawnPlankR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        cutPlank,
-                        "",
-                        sawing,
-                        "saw",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "T", 'T', timber, }));
+                MineFantasyAPI.carpenterRecipe(cutPlank).skill(construction).tool("saw", material.tier)
+                        .time((int) (material.durability * time)).sound(sawing)
+                        .shaped(new Object[] { "T", 'T', timber, }));
 
         time = 20;
         KnowledgeListMF.plankPaneR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        woodpane,
-                        "",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "NNN", "CTC", "CTC", 'T', timber, 'C', cutPlank, 'N', ComponentListMF.nail, }));
+                MineFantasyAPI.carpenterRecipe(woodpane).skill(construction).tool("hammer", material.tier)
+                        .time((int) (material.durability * time)).sound(nailHammer).shaped(
+                                new Object[] { "NNN", "CTC", "CTC", 'T', timber, 'C', cutPlank, 'N',
+                                        ComponentListMF.nail, }));
         Salvage.addSalvage(
                 woodpane,
                 new ItemStack(cutPlank.getItem(), 4, cutPlank.getItemDamage()),
@@ -68,16 +57,10 @@ public class CustomWoodRecipes {
         time = 10;
         result = ((BlockWoodDecor) BlockListMF.rack_wood).construct(material.name);
         KnowledgeListMF.rackRecipe.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        result,
-                        "",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "N N", "T T", "CCC", "T T", 'N', ComponentListMF.nail, 'T', timber, 'C',
-                                cutPlank, }));
+                MineFantasyAPI.carpenterRecipe(result).skill(construction).tool("hammer", material.tier)
+                        .time((int) (material.durability * time)).sound(nailHammer).shaped(
+                                new Object[] { "N N", "T T", "CCC", "T T", 'N', ComponentListMF.nail, 'T', timber, 'C',
+                                        cutPlank, }));
         Salvage.addSalvage(
                 result,
                 new ItemStack(cutPlank.getItem(), 3, cutPlank.getItemDamage()),
@@ -87,16 +70,11 @@ public class CustomWoodRecipes {
         time = 20;
         result = ((BlockWoodDecor) BlockListMF.food_box_basic).construct(material.name);
         KnowledgeListMF.foodboxR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        result,
-                        "food_box",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "HC ", "C C", "NCN", 'N', ComponentListMF.nail, 'H', ComponentListMF.hinge, 'C',
-                                cutPlank, }));
+                MineFantasyAPI.carpenterRecipe(result).skill(construction).research("food_box")
+                        .tool("hammer", material.tier).time((int) (material.durability * time)).sound(nailHammer)
+                        .shaped(
+                                new Object[] { "HC ", "C C", "NCN", 'N', ComponentListMF.nail, 'H',
+                                        ComponentListMF.hinge, 'C', cutPlank, }));
         Salvage.addSalvage(
                 result,
                 new ItemStack(cutPlank.getItem(), 4, cutPlank.getItemDamage()),
@@ -106,16 +84,11 @@ public class CustomWoodRecipes {
         time = 30;
         result = ((BlockWoodDecor) BlockListMF.ammo_box_basic).construct(material.name);
         KnowledgeListMF.ammoboxR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        result,
-                        "ammo_box",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "HPH", "C C", "NPN", 'N', ComponentListMF.nail, 'H', ComponentListMF.hinge, 'P',
-                                woodpane, 'C', cutPlank, }));
+                MineFantasyAPI.carpenterRecipe(result).skill(construction).research("ammo_box")
+                        .tool("hammer", material.tier).time((int) (material.durability * time)).sound(nailHammer)
+                        .shaped(
+                                new Object[] { "HPH", "C C", "NPN", 'N', ComponentListMF.nail, 'H',
+                                        ComponentListMF.hinge, 'P', woodpane, 'C', cutPlank, }));
         Salvage.addSalvage(
                 result,
                 new ItemStack(cutPlank.getItem(), 2, cutPlank.getItemDamage()),
@@ -126,16 +99,11 @@ public class CustomWoodRecipes {
         time = 50;
         result = ((BlockWoodDecor) BlockListMF.crate_basic).construct(material.name);
         KnowledgeListMF.bigboxR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        result,
-                        "big_box",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "NNNN", "HPPH", "P  P", " PP ", 'N', ComponentListMF.nail, 'H',
-                                ComponentListMF.hinge, 'P', woodpane, }));
+                MineFantasyAPI.carpenterRecipe(result).skill(construction).research("big_box")
+                        .tool("hammer", material.tier).time((int) (material.durability * time)).sound(nailHammer)
+                        .shaped(
+                                new Object[] { "NNNN", "HPPH", "P  P", " PP ", 'N', ComponentListMF.nail, 'H',
+                                        ComponentListMF.hinge, 'P', woodpane, }));
         Salvage.addSalvage(
                 result,
                 new ItemStack(woodpane.getItem(), 6, woodpane.getItemDamage()),
@@ -145,15 +113,9 @@ public class CustomWoodRecipes {
         time = 15;
         result = ((BlockWoodDecor) BlockListMF.trough_wood).construct(material.name);
         KnowledgeListMF.nailTroughR.add(
-                MineFantasyAPI.addCarpenterRecipe(
-                        construction,
-                        result,
-                        "",
-                        nailHammer,
-                        "hammer",
-                        material.tier,
-                        (int) (material.durability * time),
-                        new Object[] { "P P", "PPP", "NNN", 'N', ComponentListMF.nail, 'P', timber, }));
+                MineFantasyAPI.carpenterRecipe(result).skill(construction).tool("hammer", material.tier)
+                        .time((int) (material.durability * time)).sound(nailHammer)
+                        .shaped(new Object[] { "P P", "PPP", "NNN", 'N', ComponentListMF.nail, 'P', timber, }));
         Salvage.addSalvage(
                 result,
                 new ItemStack(timber.getItem(), 5, timber.getItemDamage()),

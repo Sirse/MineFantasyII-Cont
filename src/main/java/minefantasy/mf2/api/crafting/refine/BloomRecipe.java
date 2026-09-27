@@ -17,6 +17,9 @@ public final class BloomRecipe implements RecipeChecks.Validated {
     public void validate() {
         RecipeChecks.input("input", input);
         RecipeChecks.output("bloom", output);
+        // Every item of the smelted stack gives one bloom; a larger output could not fit the stack's worth
+        RecipeChecks.require(output.stackSize == 1, "the bloom must be a single item: each input item gives one");
+        RecipeChecks.research("research", research);
     }
 
     /** Ticks of burning per input item. */
@@ -42,9 +45,7 @@ public final class BloomRecipe implements RecipeChecks.Validated {
         if (input == null || output == null || output.getItem() == null) {
             throw new IllegalArgumentException("Bloomery recipe needs an input and an output");
         }
-        ItemStack single = output.copy();
-        single.stackSize = 1;
-        return new BloomRecipe(input, single, research == null || research.isEmpty() ? null : research);
+        return new BloomRecipe(input, output.copy(), research == null || research.isEmpty() ? null : research);
     }
 
     public Input getInput() {
