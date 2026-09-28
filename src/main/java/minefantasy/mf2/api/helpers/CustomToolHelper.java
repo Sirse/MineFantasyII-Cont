@@ -244,9 +244,7 @@ public class CustomToolHelper {
         }
 
         if (haft != null) {
-            String matName = StatCollector.translateToLocalFormatted(
-                    "item.mod_haft.name",
-                    StatCollector.translateToLocal("material." + haft.getName() + ".name"));
+            String matName = withMaterial("item.mod_haft.name", haft.getName());
             list.add(EnumChatFormatting.GOLD + matName);
         }
 
@@ -267,40 +265,93 @@ public class CustomToolHelper {
 
         CustomMaterial metals = getCustomPrimaryMaterial(item);
         if (metals != null) {
-            String matName = StatCollector.translateToLocalFormatted(
-                    "item.mod_joint.name",
-                    StatCollector.translateToLocal("material." + metals.getName() + ".name"));
+            String matName = withMaterial("item.mod_joint.name", metals.getName());
             list.add(EnumChatFormatting.GOLD + matName);
         }
 
     }
 
     public static String getWoodenLocalisedName(ItemStack item, String unlocalName) {
-        if (materialOnTooltip()) {
-            StatCollector.translateToLocal(unlocalName);
-        }
-
         CustomMaterial base = getCustomSecondaryMaterial(item);
         String name = "any";
         if (base != null) {
             name = base.getName();
         }
-        return StatCollector
-                .translateToLocalFormatted(unlocalName, StatCollector.translateToLocal("material." + name + ".name"));
+        return withMaterial(unlocalName, name);
     }
 
     public static String getLocalisedName(ItemStack item, String unlocalName) {
-        if (materialOnTooltip()) {
-            StatCollector.translateToLocal(unlocalName);
-        }
-
         CustomMaterial base = getCustomPrimaryMaterial(item);
         String name = "any";
         if (base != null) {
             name = base.getName();
         }
-        return StatCollector
-                .translateToLocalFormatted(unlocalName, StatCollector.translateToLocal("material." + name + ".name"));
+        return withMaterial(unlocalName, name);
+    }
+
+    /**
+     * Translates a name that holds a material, for languages that decline it. Arguments: %1$s the material name, %2$s
+     * its genitive (material.NAME.gen), %3$s-%6$s its adjective for masculine, feminine, neuter and plural
+     * (material.NAME.adj = "m|f|n|pl"), %7$s languagecfg.materialof with the genitive when the material has no
+     * adjective, empty otherwise. So "%3$s меч %7$s" gives "Стальной меч" or "Меч из красного дерева". Missing forms
+     * fall back to the name; spaces are collapsed and the first letter capitalised.
+     */
+    public static String withMaterial(String unlocalName, String material) {
+        String key = "material." + material;
+        String name = StatCollector.translateToLocal(key + ".name");
+        String genitive = StatCollector.canTranslate(key + ".gen") ? StatCollector.translateToLocal(key + ".gen")
+                : name;
+        String[] adjective = adjectiveForms(
+                StatCollector.canTranslate(key + ".adj") ? StatCollector.translateToLocal(key + ".adj") : null);
+        String of = "";
+        if (adjective == null) {
+            adjective = new String[] { "", "", "", "" };
+            if (StatCollector.canTranslate("languagecfg.materialof")) {
+                of = StatCollector.translateToLocalFormatted("languagecfg.materialof", genitive);
+            }
+        }
+        String result = StatCollector.translateToLocalFormatted(
+                unlocalName,
+                name,
+                genitive,
+                adjective[0],
+                adjective[1],
+                adjective[2],
+                adjective[3],
+                of).replaceAll(" {2,}", " ").trim();
+        return result.isEmpty() ? result : Character.toUpperCase(result.charAt(0)) + result.substring(1);
+    }
+
+    /**
+     * Parses material.NAME.adj ("m|f|n|pl"). A missing or blank form takes the one before it, so a resource pack may
+     * give fewer forms; null when there is no form at all (absent key, "", "|||"), which names by the genitive.
+     */
+    public static String[] adjectiveForms(String raw) {
+        if (raw == null) {
+            return null;
+        }
+        String[] parts = raw.split("\\|", -1);
+        String[] forms = new String[4];
+        String last = null;
+        for (int i = 0; i < forms.length; i++) {
+            String form = i < parts.length ? parts[i].trim() : "";
+            if (!form.isEmpty()) {
+                last = form;
+            }
+            forms[i] = last;
+        }
+        if (last == null) {
+            return null;
+        }
+        // leading blanks take the first form given
+        int first = 0;
+        while (forms[first] == null) {
+            first++;
+        }
+        for (int i = 0; i < first; i++) {
+            forms[i] = forms[first];
+        }
+        return forms;
     }
 
     public static boolean areEqual(ItemStack recipeItem, ItemStack inputItem) {

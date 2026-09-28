@@ -309,9 +309,6 @@ attribute.armour.dtcutting=斩击阈值
 attribute.armour.dtblunt=打击阈值
 attribute.armour.dtpiercing=突刺阈值
 
-arrow.head.normal.name=常规箭头
-arrow.head.bodkin.name=穿甲箭头
-arrow.head.broad.name=宽箭头
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -895,6 +892,8 @@ item.standard_plate_boots.name=%1$s护靴
 
 item.standard_bow.name=%1$s弓
 item.standard_arrow.name=%1$s箭
+item.standard_arrow_bodkin.name=%1$s穿甲箭
+item.standard_arrow_broad.name=%1$s宽头箭
 item.standard_bolt.name=%1$s弩箭
 
 item.standard_mallet.name=%1$s槌
@@ -1165,7 +1164,7 @@ item.pie_pumpkin_cooked.name=熟南瓜派
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 food.stat.list.name=进食时：
 food.stat.hunger.name=+%1$s 饱食度
-food.stat.staminaPlus.name=恢复%1$耐力
+food.stat.staminaPlus.name=恢复%1$s耐力
 food.stat.staminabuffHours.name=%2$s小时内增加%1$s耐力
 food.stat.staminabuffMinutes.name=%2$s分钟内增加%1$s耐力
 food.stat.staminabuffSeconds.name=%2$s秒内增加%1$s耐力
@@ -2214,9 +2213,6 @@ knowledge.bandageadv.1=这种增强的绷带可以回复更多生命值，然而
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MASTERY TEXT/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-knowledge.title=
-knowledge.title.desc=
-knowledge.title.1=
 
 knowledge.fitness=健康值
 knowledge.fitness.desc=保持健康
@@ -2224,7 +2220,7 @@ knowledge.fitness.1=你战场上的 (除了真实的外) 最大敌人是能量�
 
 knowledge.toughness=韧性
 knowledge.toughness.desc=坚持住！
-knowledge.toughness.1=你对战斗的熟知已经证明你有了对各种攻击的抗性。^所有伤害降低25%。
+knowledge.toughness.1=你对战斗的熟知已经证明你有了对各种攻击的抗性。^所有伤害降低10%。
 
 knowledge.armourpro=精通兵器
 knowledge.armourpro.desc=举重若轻

@@ -46,46 +46,17 @@ item.scaleleather_chest.name=Scaled Armour
 /TOOL/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 item.stone_pick.name=Stone Pick
-item.copper_pick.name=Copper Pick
-item.bronze_pick.name=Bronze Pick
-item.iron_pick.name=Iron Pick
-item.steel_pick.name=Steel Pick
-item.dragonforge_pick.name=Dragonforge Pick
-item.encrusted_pick.name=Encrusted Pick
 
-item.redsteel_pick.name=Red Steel Pick
-item.blacksteel_pick.name=Black Steel Pick
-item.bluesteel_pick.name=Blue Steel Pick
 
-item.adamantium_pick.name=Adamantium Pick
-item.mithril_pick.name=Mithril Pick
 
-item.ignotumite_pick.name=Ignotumite Pick
-item.mithium_pick.name=Mithium Pick
 
-item.ender_pick.name=Enderforge Pick
 
-item.dwarven_pick.name=%1$s Dwarven Pick
-item.dwarven_hvypick.name=Heavy %1$s Dwarven Pick
 item.standard_pick.name=%1$s Pick
 item.standard_hvypick.name=Heavy %1$s Pick
 
-item.bronze_hvypick.name=Heavy Bronze Pick
-item.iron_hvypick.name=Heavy Iron Pick
-item.steel_hvypick.name=Heavy Steel Pick
-item.dragonforge_hvypick.name=Heavy Dragonforge Pick
-item.encrusted_hvypick.name=Heavy Encrusted Pick
 
-item.redsteel_hvypick.name=Heavy Red Steel Pick
-item.blacksteel_hvypick.name=Heavy Black Steel Pick
-item.bluesteel_hvypick.name=Heavy Blue Steel Pick
 
-item.adamantium_hvypick.name=Heavy Adamantium Pick
-item.mithril_hvypick.name=Heavy Mithril Pick
 
-item.ignotumite_hvypick.name=Heavy Ignotumite Pick
-item.mithium_hvypick.name=Heavy Mithium Pick
 
-item.ender_hvypick.name=Heavy Enderforge Pick
 nei.method.big_furnace=Big Furnace
 nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn items yield less

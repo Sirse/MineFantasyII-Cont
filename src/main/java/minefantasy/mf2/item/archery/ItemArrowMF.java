@@ -227,18 +227,11 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
 
     @Override
     public String getItemStackDisplayName(ItemStack item) {
-        String name = ("" + StatCollector.translateToLocal(this.getUnlocalizedNameInefficiently(item) + ".name"))
-                .trim();
-
-        if (isCustom) name = CustomToolHelper.getLocalisedName(item, name);
-
-        if (design != ArrowType.NORMAL && design != ArrowType.EXPLOSIVE
-                && design != ArrowType.BOLT
-                && design != ArrowType.EXPLOSIVEBOLT) {
-            name += " (" + StatCollector.translateToLocal("arrow.head." + design.name.toLowerCase() + ".name") + ")";
-        }
-
-        return name;
+        // arrows of every head share one item name, so bodkin and broad heads get their own key
+        String key = this.getUnlocalizedNameInefficiently(item)
+                + (design == ArrowType.BODKIN || design == ArrowType.BROADHEAD ? "_" + design.name : "")
+                + ".name";
+        return isCustom ? CustomToolHelper.getLocalisedName(item, key) : StatCollector.translateToLocal(key).trim();
     }
 
     @Override

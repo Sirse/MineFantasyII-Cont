@@ -310,9 +310,6 @@ attribute.armour.dtcutting=Cutting Threshold
 attribute.armour.dtblunt=Blunt Threshold
 attribute.armour.dtpiercing=Piercing Threshold
 
-arrow.head.normal.name=Regular Head
-arrow.head.bodkin.name=Bodkin Head
-arrow.head.broad.name=Broad Head
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -915,6 +912,8 @@ item.standard_plate_boots.name=%1$s Sabatons
 
 item.standard_bow.name=%1$s Bow
 item.standard_arrow.name=%1$s Arrow
+item.standard_arrow_bodkin.name=%1$s Bodkin Arrow
+item.standard_arrow_broad.name=%1$s Broadhead Arrow
 item.standard_bolt.name=%1$s Quarrel
 
 item.standard_mallet.name=%1$s Mallet
@@ -2234,9 +2233,6 @@ knowledge.bandageadv.1=These advanced leather bandages heal much more damage. Th
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MASTERY TEXT/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-knowledge.title=
-knowledge.title.desc=
-knowledge.title.1=
 
 knowledge.fitness=Fitness
 knowledge.fitness.desc=Kept in shape
