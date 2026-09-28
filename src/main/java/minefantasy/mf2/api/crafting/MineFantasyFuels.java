@@ -8,6 +8,10 @@ import net.minecraftforge.oredict.OreDictionary;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 
+/**
+ * Forge fuels, with how long and how hot they burn, and carbon for the bloomery and the blast furnace, kept as the ore
+ * name {@code Carbon-<uses>}.
+ */
 public class MineFantasyFuels {
 
     public static void addForgeFuel(Object input, float time, int temperature) {

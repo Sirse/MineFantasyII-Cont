@@ -5,6 +5,11 @@ import java.util.HashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+/**
+ * Makes an item of another mod count as a crafting tool: its type ("hammer", "knife", ...), tier and efficiency, as
+ * recipes and {@link minefantasy.mf2.api.crafting.Requirements} read them through
+ * {@link minefantasy.mf2.api.helpers.ToolHelper}.
+ */
 public class CustomCrafterEntry {
 
     public static HashMap<Item, CustomCrafterEntry> entries = new HashMap<Item, CustomCrafterEntry>();

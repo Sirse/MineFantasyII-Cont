@@ -8,6 +8,10 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 
+/**
+ * A vanilla crafting-table recipe whose result takes the metal and wood of the parts put in; parts of different metals
+ * or woods do not match. Registered with {@link #add}, straight into the vanilla crafting manager.
+ */
 public class BasicTierRecipe extends ShapedRecipes {
 
     public BasicTierRecipe(int width, int height, ItemStack[] input, ItemStack output) {

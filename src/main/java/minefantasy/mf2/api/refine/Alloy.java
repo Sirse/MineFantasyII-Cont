@@ -11,6 +11,10 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.RecipeChecks;
 
+/**
+ * A crucible alloy: ingredients in any arrangement melting into the output, in a crucible of at least {@link #level}.
+ * Registered through {@link minefantasy.mf2.api.MineFantasyAPI#alloyRecipe}, which also adds its ratio copies.
+ */
 public class Alloy implements RecipeChecks.Validated {
 
     @Override

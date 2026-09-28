@@ -32,6 +32,13 @@ import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.api.refine.BigFurnaceRecipes;
 import minefantasy.mf2.util.MFLogUtil;
 
+/**
+ * Entry points for other mods. Recipes are registered through builders named after their station ({@link #anvilRecipe},
+ * {@link #carpenterRecipe}, {@link #kitchenRecipe}, {@link #alloyRecipe}, {@link #cookingRecipe}, {@link #quernRecipe},
+ * {@link #tanningRecipe}, {@link #bigFurnaceRecipe}), in init or postInit; see the package
+ * {@code minefantasy.mf2.api.crafting} for how they are named, checked and published. Heat, fuel and crossbow parts
+ * register here too.
+ */
 public class MineFantasyAPI {
 
     /**
@@ -110,7 +117,10 @@ public class MineFantasyAPI {
         return fuelValue;
     }
 
-    /** A native crucible alloy, registered with its ingredients; see {@link AlloyRecipes.Builder}. */
+    /**
+     * A native crucible alloy, registered with its ingredients; see
+     * {@link minefantasy.mf2.api.refine.AlloyRecipes.Builder}.
+     */
     public static AlloyRecipes.Builder alloyRecipe(ItemStack output) {
         return AlloyRecipes.alloy(output);
     }
@@ -216,7 +226,7 @@ public class MineFantasyAPI {
                 && (item2.getItemDamage() == 32767 || item2.getItemDamage() == item1.getItemDamage());
     }
 
-    /** A native cooking recipe; see {@link CookRecipe.Builder}. */
+    /** A native cooking recipe; see {@link minefantasy.mf2.api.cooking.CookRecipe.Builder}. */
     public static CookRecipe.Builder cookingRecipe(ItemStack input, ItemStack output) {
         return CookRecipe.nativeRecipe(input, output);
     }
