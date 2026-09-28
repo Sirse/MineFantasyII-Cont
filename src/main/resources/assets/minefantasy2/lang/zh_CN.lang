@@ -5,12 +5,13 @@ forge.fuel.name=~燃料~
 vehicle.fuel.name=燃料：%1$s
 info.bow.reload=潜行状态下右键打开火器。
 info.firearm.ammo=%1$s/%2$s
+info.tooltip.moreinfo=按住[%1$s]查看更多信息。
 
 attribute.kit.salvage.name=回收调节
 
-attribute.kit.repairRate.name=修复值
-attribute.kit.repairRate_enchant.name=修复值 (附魔物品)  
-attribute.kit.repairRate_normal.name=修复值 (普通物品)  
+attribute.kit.repairRate.name=耐久恢复
+attribute.kit.repairRate_enchant.name=耐久恢复 (附魔物品)
+attribute.kit.repairRate_normal.name=耐久恢复 (普通物品)
 
 attribute.kit.repairChance.name=修复成功率
 attribute.kit.breakChance.name=修复失败率
@@ -587,6 +588,25 @@ tile.limestone_pavement.name=石灰岩铺路石
 tile.limestone_stair.name=石灰岩楼梯
 tile.limestone_cobblestone_stair.name=石灰圆石楼梯
 tile.limestone_brick_stair.name=石灰岩砖楼梯
+tile.mud_brick_slab.name=泥砖台阶
+tile.cobble_brick_slab.name=圆石砖台阶
+tile.thatch_slab.name=茅草台阶
+tile.firebricks_slab.name=耐火砖台阶
+tile.clay_wall_slab.name=黏土墙板台阶
+tile.refined_planks_slab.name=精制木板台阶
+tile.nailed_planks_slab.name=钉合木板台阶
+tile.yew_planks_slab.name=紫杉木板台阶
+tile.ironbark_planks_slab.name=铁皮木板台阶
+tile.ebony_planks_slab.name=乌木木板台阶
+tile.reinforced_stone_slab.name=强化石台阶
+tile.reinforced_stone_bricks_slab.name=强化石砖台阶
+tile.reinforced_stone_bricks_mossy_slab.name=苔藓强化石砖台阶
+tile.reinforced_stone_bricks_cracked_slab.name=磨损的强化石砖台阶
+tile.limestone_slab.name=石灰岩台阶
+tile.limestone_cobble_slab.name=石灰岩圆石台阶
+tile.limestone_brick_slab.name=石灰岩砖台阶
+tile.road_mf.name=道路
+tile.road_mf_short.name=低矮道路
 tile.limestone_pavement_stair.name=石灰岩铺路石楼梯
 
 tile.slate.name=板岩
@@ -1229,7 +1249,7 @@ item.skillbook_combat2.desc=锻铸-MAX
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 method.workbench=基础工作台
 method.furnace=熔炉
-method.bloomery=锻铁炉
+method.bloomery=冶炼炉
 method.blastfurnace=高炉
 method.anvil=砧
 method.carpenter=木匠工作台
@@ -1313,7 +1333,7 @@ knowledge.gettingStarted.carpenter=$h木匠工作台-$r^木匠工作台是用于
 
 knowledge.gettingStarted.tanning=$h制革-$r^目前为止你可能收集了一些兽皮但却无法使用，刮兽皮是一种简单的制作皮革的方法。^首先，找到水源把你的兽皮冲洗干净，然后做一个简陋的制革架和一把石头小刀。这些原始工具的质量非常差，但你可以在发展起来后换用更好的工具。
 
-knowledge.gettingStarted.forging=$h锻造-$r^锻造是制作物品的主要方法。几乎每一个工具和金属物件都是通过这一工序制作的。首先你需要做一个石头锻造炉、砧和一些工具，然后将砧放在靠近石头锻造炉和水的地方。“工艺”一栏包含了完整的关于如何进行锻造工作的信息，在这之前你得先做一个最基础的引火器 (干燥岩石) ，别忘了穿上围裙！(参考“工艺”一栏的“锻铁炉”一节来了解如何把那些金属原矿处理成能用的金属条)
+knowledge.gettingStarted.forging=$h锻造-$r^锻造是制作物品的主要方法。几乎每一个工具和金属物件都是通过这一工序制作的。首先你需要做一个石头锻造炉、砧和一些工具，然后将砧放在靠近石头锻造炉和水的地方。“工艺”一栏包含了完整的关于如何进行锻造工作的信息，在这之前你得先做一个最基础的引火器 (干燥岩石) ，别忘了穿上围裙！(参考“工艺”一栏的“冶炼炉”一节来了解如何把那些金属原矿处理成能用的金属条)
 
 knowledge.gettingStarted.forgingbars=大多数配方需要的是金属条而不是金属锭。金属条是从金属锭加工出的易于加工的材料，把加热后的金属锭放在砧中然后用锤子砸之即可获得金属条 (右键砧的顶部或者直接左键砸) 。
 knowledge.gettingStarted.flux=熔剂在锻造金属时扮演着重要的净化剂角色。原则上来说这个物品是处理锻造过程中的金属以及制作合金用的。但是制作某些金属片和金属板时同样需要熔剂，一些工具和护甲也是。^熔剂的最好来源是石灰岩。在你云游四方的时候最好留意一下。
@@ -1322,7 +1342,7 @@ knowledge.gettingStarted.4=拿起你的剪刀，然后把皮革放在木匠工�
 
 knowledge.gettingStarted.5=到了这步，你应该有一些皮革，铜锭，木材和皮革条了吧。是时候升级下你的石锤子了。
 
-knowledge.gettingStarted.6=随着锻造设备的建立，你现在可以打造铜制工具了。查看“工艺”一栏的“锻造工具”一节可以找到些铜制工具的替代品。^务必使用钳子来取出和移动滚烫的金属，拿着钳子靠近锻铁炉夹起金属，再右键砧即可。(目前直接从锻造炉里拿出加热后的金属似乎是没有惩罚的，不知道是不是bug)
+knowledge.gettingStarted.6=随着锻造设备的建立，你现在可以打造铜制工具了。查看“工艺”一栏的“锻造工具”一节可以找到些铜制工具的替代品。^务必使用钳子来取出和移动滚烫的金属，拿着钳子靠近冶炼炉夹起金属，再右键砧即可。(目前直接从锻造炉里拿出加热后的金属似乎是没有惩罚的，不知道是不是bug)
 
 knowledge.gettingStarted.upgrade=$h升级-$r^渐渐地，基础的铜已经满足不了你了。研究手册和研究台可以让你获悉目前可以做什么以及怎么做。^首先你需要一个研究台。研究台可以研究各种物品来解锁合成配方和科技树以帮助你更好的生存。打开研究手册来阅览你当前的研究进度，将物品放进研究台以开始研究。
 
@@ -1576,7 +1596,7 @@ knowledge.bigfurn.2=这种冶炼炉可以一次熔炼四种物品，而且效率
 
 knowledge.bigfurn.heater=一个冶炼炉要想发挥作用，就得有个放燃料的地方。冶炼炉加热器能够持续的加热炉子，加热器烧的越旺，冶炼炉冶炼物品的速度越快。只不过加热器需要保持稳定，你得在其周围围上耐火石砖。
 
-knowledge.bigfurn.top=在加热器顶上摆上冶炼炉。冶炼炉本身与锻铁炉原理类似，只不过能更有效的调节温度。和它下面那个烧燃料的伙计差不多，冶炼炉也需要在周围和顶部摆上耐火石砖。
+knowledge.bigfurn.top=在加热器顶上摆上冶炼炉。冶炼炉本身与冶炼炉原理类似，只不过能更有效的调节温度。和它下面那个烧燃料的伙计差不多，冶炼炉也需要在周围和顶部摆上耐火石砖。
 
 knowledge.bigfurn.structure=此结构同样适用于多重冶炼炉结构。两堵侧墙和一堵背墙即可支持起一排相连的冶炼炉，参考单个冶炼炉的情况。
 
@@ -1601,12 +1621,12 @@ knowledge.blastfurn.hcc=$h困难合成模式-$r^此模式开启时，高炉加�
 
 knowledge.blastfurn.9=处理好的铁矿石可用于制造生铁。^生铁可以精炼成钢。^你可以用强力熔剂来使产量加倍，但是由于制作强力熔剂的原料——硼砂很稀有，所以你应该明智的使用它。
 
-knowledge.bloomery=锻铁炉
+knowledge.bloomery=冶炼炉
 knowledge.bloomery.desc=初级金属熔炉
 
-knowledge.bloomery.1==从包裹着岩石的资源中获取珍贵材料并非易事。锻铁炉可以将矿石冶炼成金属锭。
+knowledge.bloomery.1=从裹着岩石的矿物中获取珍贵的材料并非易事。冶炼炉让你第一次能够真正地把原矿冶炼成金属锭。
 
-knowledge.bloomery.2=使用方法：在锻铁炉中放入等量的煤和原矿，然后用一个点火器右键。如果一切顺利熔炼就开始了，要熔炼的矿物越多，工作速度越慢。^冶炼炉必须被放置在户外，无遮拦的环境下工作（其实只要顶部无障碍露天即可），如果没有符合条件，它就不会工作，另外烟囱不会对其发挥作用。^整堆物品将在熔炼过程中全部融化，在熔炼过程完成时，炉子顶部会打开。这时使用一把锤子反复敲击炉子，直到所有的金属条全部弹出来。
+knowledge.bloomery.2=使用方法：在冶炼炉中放入等量的煤和原矿，然后用一个点火器右键。如果一切顺利熔炼就开始了，要熔炼的矿物越多，工作速度越慢。^冶炼炉必须被放置在户外，无遮拦的环境下工作（其实只要顶部无障碍露天即可），如果没有符合条件，它就不会工作，另外烟囱不会对其发挥作用。^整堆物品将在熔炼过程中全部融化，在熔炼过程完成时，炉子顶部会打开。这时使用一把锤子反复敲击炉子，直到所有的金属条全部弹出来。
 
 knowledge.bloomery.3=当你准备拿起金属锭时，确保你拿着的是一把空钳子。钳子可以一次夹起一组物品。
 
@@ -1664,7 +1684,7 @@ knowledge.forge.3=$y"可锻造"$r 的物品需要在砧上进行加工，$d"不�
 knowledge.bellows=风箱
 knowledge.bellows.desc=注入热量
 
-knowledge.bellows.1=有时候炉火并不够热，或者可能需要很久才能热上来。使用更高燃烧温度的燃料对你的帮助有限，在不需要的时候还会徒增浪费。^风箱可以将锻造炉的温度暂时提高50%。使用方法：把它放在你想提升温度的炉子旁边 (喷嘴对准炉子) ，然后持续右击风箱。风箱也可以穿墙发挥作用。
+knowledge.bellows.1=有时候炉火并不够热，或者可能需要很久才能热上来。使用更高燃烧温度的燃料对你的帮助有限，在不需要的时候还会徒增浪费。^风箱可以暂时提高锻造炉的温度：普通锻造炉提高50%，高级锻造炉提高一倍。使用方法：把它放在你想提升温度的炉子旁边 (喷嘴对准炉子) ，然后持续右击风箱。风箱也可以穿墙发挥作用。
 
 knowledge.trough=水槽
 knowledge.trough.desc=准备淬火
@@ -1905,7 +1925,7 @@ knowledge.crossbows.6=完成以后，你就得到了一张弩。弩与弓在功�
 knowledge.crossShafts=弩臂
 knowledge.crossShafts.desc=重要组成部分
 knowledge.crossShafts.handle=手柄是迷你型的弩臂，用于合成手弩。这种设计提高了换弹速度，以牺牲精度和后坐力的代价。
-knowledge.crossShafts.stock=弩臂是完整体型版的手柄，可以以更小的后坐力发射弩箭。因其尺寸较大，换弹的时间减少了。
+knowledge.crossShafts.stock=枪托是完整尺寸的握把，装上后弩的后坐力更小。但由于体积较大，装填时间会更长。
 
 knowledge.crossHeads=弩弓
 knowledge.crossHeads.desc=重要组成部分
@@ -2087,7 +2107,7 @@ knowledge.food_box.1=食品和医疗用品在需要时能被很容易地获取�
 
 knowledge.ammo_box=弹药箱
 knowledge.ammo_box.desc=弹药储存
-knowledge.ammo_box.1=弹药应该也必须在使用时能被很容易地获取。弹药箱允许你存储箭、弩箭、炸弹或地雷八倍于它们的最大堆叠数。点击右键可放入物品或空手将整组物品取回，手持远程武器 (弓/弩) 可装载弹药。
+knowledge.ammo_box.1=弹药应该也必须在使用时能被很容易地获取。弹药箱可以存放数倍于最大堆叠数的箭、弩箭、炸弹或地雷 (倍数取决于木材)。点击右键可放入物品或空手将整组物品取回，手持远程武器 (弓/弩) 可装载弹药。
 knowledge.ammo_box.2=被破坏时，所存储的物品仍然存储，并可在二次放置后存取物品。
 
 knowledge.big_box=存储箱
@@ -2104,7 +2124,7 @@ knowledge.stew.1=你不是厨师……至少现在还不是。就将一些肉粒
 
 knowledge.jerky=肉干
 knowledge.jerky.desc=旅行者必备
-knowledge.jerky.1=肉干不可能是最好吃的食物，但它有自己的用场。这是为数不多的可堆叠食品，且有一个像样的耐力加成。适合挖掘和探索时食用。
+knowledge.jerky.1=肉干也许不是最好吃、最暖和的食物，但它有自己的用处。这是为数不多的可堆叠食物之一，而且非常顶饱。适合挖矿和探险时食用。
 
 knowledge.saussage=香肠
 knowledge.saussage.desc=密封的肉
@@ -2180,7 +2200,7 @@ knowledge.berrypie.1=浆果美味多汁，但你也许需要加工。浆果派�
 
 knowledge.applepie=苹果派
 knowledge.applepie.desc=简易的甜点
-knowledge.applepie.1=浆果馅饼类似，具有更好一点的效果。苹果派可以恢复一些耐力并附有一个短时间的耐力提升buff。可将派放到地上并用刀右击将其切片。
+knowledge.applepie.1=与浆果派类似，但恢复的耐力略少，不过会在一小时内提高耐力上限。可将派放到地上并用刀右击将其切片。
 
 knowledge.cheese=奶酪
 knowledge.cheese.desc=固体奶酪
@@ -2233,7 +2253,7 @@ knowledge.parrypro.1=战场上的位置是一种重要武器，也能发挥更�
 knowledge.counteratt=反击
 knowledge.counteratt.desc=反弹伤害
 knowledge.counteratt.1=闪避也许能保护你，但也会带来一些副作用，不过只要你有足够的经验，反击将给你带来优势。^闪避后可进行攻击，但效果减弱。
-knowledge.counteratt.2=对剑、短剑和太刀采取刺击。^对战斧采取背部刺击。^对重武器采取连续碾压。^对钝的武器和长柄武器没有任何效果。
+knowledge.counteratt.2=剑、短剑和太刀会进行刺击。^战斧会用斧背进行穿刺攻击。^重武器会进行猛力重击。^钝器和长柄武器没有反击效果。
 
 knowledge.autoparry=自动格挡
 knowledge.autoparry.desc=洞察攻击
@@ -2252,6 +2272,7 @@ knowledge.doctor.desc=救死扶伤
 knowledge.doctor.1=你不断救助你的同伴，因此获得了医学上的经验。^绑带治疗加成50%。
 
 nei.minefantasy2.special_output=需要在输出槽放置%s
+nei.minefantasy2.anvil.low_tier=低于%1$s级：敲击窗口仅有%2$s%%宽
 nei.minefantasy2.tool=工具：%s
 nei.minefantasy2.station=工作站：%s
 nei.minefantasy2.tier=等级：%s
@@ -2260,6 +2281,14 @@ nei.minefantasy2.salvage.durability_note=显示的是满耐久度的产出；磨
 # GUI inventory names
 gui.anvilmf.name=铁砧
 gui.carpentermf.name=木工台
+tile.kitchen_bench.name=厨房工作台
+gui.kitchenbench.name=厨房工作台
+gui.kitchenbench.dirty=工作台太脏了——用水清洗一下！
+method.kitchenbench=厨房工作台
+knowledge.kitchen_bench=厨房工作台
+knowledge.kitchen_bench.desc=厨房制作
+knowledge.kitchen_bench.1=专门用来准备饭菜的工作台。可以在这里制作生面团、糕点、馅饼和三明治。工作会弄脏台面：工作台脏了以后，必须用装水的容器清洗，才能继续烹饪。
+knowledge.kitchen_bench.2=擀面和剁肉都会留下污渍，太脏的工作台完全无法制作。^手持任何装水的容器右击工作台即可擦洗。每个容器能洗掉很大一部分污垢，并会被倒空。^厨师越熟练，工作台变脏得越慢。
 gui.quern.name=石磨
 gui.crucible.name=坩埚
 gui.forge.name=锻造炉
@@ -2314,6 +2343,13 @@ item.chestplateGold.name=粗糙的金胸甲
 item.leggingsGold.name=粗糙的金护腿
 item.bootsGold.name=粗糙的金靴子
 item.bow.name=粗糙的弓
+tc.research_category.MF2=MineFantasy II
+tc.research_name.MF2_THAUMIC_FORGING=神秘锻造
+tc.research_text.MF2_THAUMIC_FORGING=铁砧止步之处
+tc.research_page.MF2_THAUMIC_FORGING.1=魔法无法替你锻造头盔。形状、品质和背后的技艺都是铁匠的工作，注魔改变不了其中任何一样。<BR>注魔能做的，是赋予金属一种它从未有过的特性。先用神秘金属锻造好物品，就像锻造其他任何物品一样。然后再把它带到注魔矩阵。<BR>你拿回的头盔就是你亲手打造的那一顶：相同的材料、相同的品质、相同的名字、相同的磨损。
+tc.research_name.MF2_REVEALING_HELM=揭示头盔
+tc.research_text.MF2_REVEALING_HELM=透过锻造金属的视野
+tc.research_page.MF2_REVEALING_HELM.1=神秘金属头盔能很好地容纳灵气，足以将视觉承载其中。以此方式结合后，它能像护目镜一样显示节点和世界中的要素，同时不会失去锻造头盔应有的防护。<BR>任何神秘金属锻造头盔都可以。已经带有注魔的头盔则不行：结合之力无处可去。
 command.mf.usage=/mf edit <material|quality|unbreakable> <值> | /mf recipes [工作站] [页码]
 command.mf.edit.usage=/mf edit material <材料> [main|haft] | quality <0-200> | unbreakable <true|false>
 command.mf.edit.no_item=请手持要编辑的物品

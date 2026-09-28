@@ -1,62 +1,93 @@
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/INFORMATION/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-knowledge.craftArmourBasic=Basic Armour
-knowledge.craftArmourBasic.desc=Nothing fancy
-knowledge.craftArmourBasic.1=When you first start out in this world, you may want something to wear. These Armours don't offer much protection but their better than nothing.
-
-knowledge.craftArmourLight=Light Armour
-
-knowledge.craftArmourMedium=Medium Armour
-
-knowledge.craftArmourHeavy=Heavy Armour
-
-knowledge.armourpro=Armour Proficiency
-knowledge.armourpro.1=After all this time, your core has become stronger.^Armour penalty to stamina cost is halved.
-
-knowledge.cogArmour.desc=Power Armour
-gui.noproject=No Project Set
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/ITEM STATS/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# British English: only the keys that differ from en_US, which the game loads first
+death.attack.acidblast=%1$s was Vaporised by %2$s
+death.attack.acidblastBase=%1$s was Vaporised
 attribute.weapon.penetrateArmor=Armour Penetration
 attribute.armour.protection=Armour Rating
 attribute.armour.light=Light Armour
 attribute.armour.medium=Medium Armour
 attribute.armour.heavy=Heavy Armour
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/COMPONENT/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+item.ingot_mould.name=Ingot Mould
+item.ingot_mould_uncooked.name=Raw Ingot Mould
 item.nitre.name=Nitre
-item.engin_anvil_tools.name=Engineering Tools
+item.sulfur.name=Sulphur
+bomb.range.metric.name=Blast Radius: %1$s metres
 tile.oreNitre.name=Nitre Deposit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/ARMOUR/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tile.oreSulfur.name=Sulphur Deposit
 itemGroup.forgedarmour=[MF] Forged Armour
-
 item.hide_chest.name=Hide Armour
 item.roughleather_chest.name=Rough Leather Armour
 item.strongleather_chest.name=Reinforced Leather Armour
 item.studleather_chest.name=Studded Armour
 item.scaleleather_chest.name=Scaled Armour
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-/TOOL/
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 item.stone_pick.name=Stone Pick
-
-
-
-
-
 item.standard_pick.name=%1$s Pick
 item.standard_hvypick.name=Heavy %1$s Pick
-
-
-
-
-
-nei.method.big_furnace=Big Furnace
-nei.minefantasy2.salvage.durability_note=Output shown at full durability; worn items yield less
+stat.artefact.name=Artefact
+knowledge.minotaurs.1=Few creatures match the strength and rage of a minotaur. Legend has it these creatures were once human and cow before being fused into this new, horrible form. Minotaurs are omnivores and have an extremely short temper.^Regardless of origins, a minotaur is powerful enough to rip someone to shreds within seconds if they're set off, are able to heal quickly from the blood of their foes, and (in some cases) show signs of organisation.
+knowledge.minotaurs.2=$hLesser Minotaur-$r^It may be common to see lesser minotaurs in the wild, proving a threat to those unfortunate enough to come close.^These creatures are little more than beasts, yet provide a misconception for the actual minotaur behaviour. Lesser minotaurs either have no home or are set out to scavenge for their greater counterparts.
+knowledge.minotaurs.3=$hGreater Minotaur-$r^Greater minotaurs are found dwelling in dwarven complexes underground, providing a challenge to explorers.^The minotaurs that are housed within these ruins are more organised and deadly. Standard minotaur warriors are brutal and armed, while the elite and warlords that can be found deeper within ruins are foes of even more power. It shall be made clear that ruins should be explored only by the prepared. One warrior may prove a challenge, but a group? Few have survived.
+knowledge.minotaurs.4=$hSpecies-$r^There are three known species of minotaur found in both wild and ruin. There is no difference to the behaviour or living patterns of minotaurs of different species - but physical properties do vary.
+knowledge.minotaurs.combat=$hCombat-$r^The best advice that could be given to fighting off a minotaur would be range. Don't let them get close enough to hit you, for even the strongest armour buckles under the force of their fury. Many minotaurs are heavily armoured as well, but both hide and plate are vulnerable to piercing attacks - a spear would be capable of exploiting both of these weaknesses. Spears, explosives, distance and heavy armour give the best chances of survival.
+knowledge.minotaur.1=Brown-fur minotaurs are the more common species in the overworld. They are found to have excessive strength and prove to be a powerful foe. Standard minotaurs have no natural armour but are still hard to kill.
+knowledge.minotaur_frost.1=Found in colder regions, these Minotaurs appear to have thicker hide than the brown minotaurs, resulting in natural armour. The Albino minotaur is difficult to see in the snow and can unleash a devastating rage on the unsuspecting traveller.
+knowledge.minotaur_dread.1=Not as much is known about what some call the Dread Minotaur. Denizens of the nether, dark-grey or black fur, powerfully thick skin, and immunity to fire. This species are far hardier than their overworld cousins.
+knowledge.dragons.1=Dragons are proud but destructive reptiles found stalking their prey from above. Many breeds of dragon are found in the world, varying greatly in their offensive capabilities. Keep an eye on the skies when travelling to avoid an ill omen.^Each dragon has a unique ability to emit deadly substances from their breath, though the actual mechanics behind this still remain unknown, it's always a decent idea to prepare for these dangers.^ Although their young may be easy to kill, the elder dragons are powerful monsters to be reckoned with.
+knowledge.green_dragon.1=Green dragons, also known as "Venom Dragons" have a filthy, gruesome nature. They fly mainly in swampland, but can also come out in the rain. Green dragons emit a deadly acid from their breath, decaying armour and poisoning their victim.
+knowledge.dragons.combat=$hCombat-$r^Dragons may be fast and have the sky advantage, but they have a few weaknesses to exploit. Firstly is the ability to leave and return to the battlefield, you are best to pay attention and avoid losing sight of your foe. As the dragon swoops, make your strike. A properly lined ranged attack will grant an advantage when it takes off again. As well as that: specialised dragonforged items may be crafted to give an edge to the battle.
+knowledge.gettingStarted.flux=Flux is an important purification agent for metalworks. Primarily this is used for the treatment of metals in the forging process and some alloy creation. Flux is required for hunks and plates, required for some tools and armour.^The best source of flux is limestone. Make sure to keep a look out in your travels.
+knowledge.gettingStarted.7=Start off by smelting a copper and tin ingot and placing each on the research table, assuming your artisanry skill is high enough (level 5): you will be able to learn something from them. Try and work towards bronze smithing. You may also try looking at some leather to learn how to make better armour.
+knowledge.gettingStarted.11=Try work towards "Bronze Smithing" now, crucibles are already known as you see. For this you will need 5 "Artisanry". You gain artisanry from crafting tools, weapons, armour and some commodities.^Once bronze smithing is researched, try upgrading your tools and start the road to the next endeavour.
+knowledge.ironbark.1=Ironbark is a recognisable tree that can be found in the forests occasionally. The rough grey bark and orange inners make this tree stand out above the rest. Ironbark is a strong wood, excellent for creating durable items.
+knowledge.ebony.1=Ebony trees are huge and rare. These are found in moderate regions and provide extremely strong timber. Ebony trees are recognised by their size and dark brown to black wood. They produce the strongest wood available.
+knowledge.minerals.nitre=A common occurrence within some cave walls in layers 16-64. Nitre is used in explosive creation.
+knowledge.minerals.sulfur=Sulphur is found deep underground near lava at layers <16. It can be used to make explosives.
+knowledge.tanning.1=Leather is a useful resource to have. Nearly any tool, weapon or armour uses leather.^Tanning is a simple method of cleaning up raw hide into a useable commodity.^To start off: you will need a tanning rack.
+knowledge.advparry.info=$hParrying abilities$r^When a parry succeeds: if you're holding shift, you will lunge forward, and even past an attacker, throwing them your way. This consumes stamina but timed right, can change the battlefield to your favour. It is also possible to do this while jumping.
+knowledge.dodge.info=$hDodge$r^In many situations, it's better to avoid being hit altogether. If you jump to the sides or back while blocking, you will leap quickly. This, however, cannot be done in heavy armour.
+knowledge.armour.info=$hArmour Selection$r^There are three main types of armour: Light, Medium and Heavy. If you rely more on avoidance and skill, use Light; if you want more protection, rely on Heavy; use Medium for a mix of both.
+knowledge.bar.desc=Standardised shaping
+knowledge.bar.1=An ingot may be used for your standard crafting and trading needs, but they are far too thick for easy forging. Bars are produced from ingots to create a standardised, easy to reforge commodity, allowing easy setup and production of items. Bars are used in artisanry in particular over ingots for this reason.^A bar can be reconverted to an ingot with a similar method.
+knowledge.smeltCopper.1=The path of metalworking is a long and difficult one to learn. Copper is an easily workable and risk-free material.^It's still of relatively low worth though, and is unable to make advanced tools, heavy weapons or heavy armour.
+knowledge.smeltObsidian.1=Studies into obsidian crystallisations have pointed you towards new discoveries in metallurgy. The high impact resistance of obsidian is unmatched in nature, and now it may be possible to make use of these in your own works.^Mixing some molten obsidian with steel makes a strong crystalline ingot, which can be worked into tools providing a range of advantages.
+knowledge.craftOrnate.1=With the proper materials and time, it is possible to create more decorative varients of weapon, tool and armour. Ornate items are far more powerful against the unholy such as undead.^An ornate crest is used to craft these. place a single crest in the output slot of anvils then craft an appropriate item. When crafting finishes: an ornate item will be crafted.
+knowledge.smeltMaster.1=You're seeing some patterns emerging here. Whatever civilisation left these talismans behind appear to use them as a basic form of storing information, though it seems a book would have done just fine, but why judge.^You have found a new one, similar to the rest with the anvil shaped edges on a barbed shield shape, this follows the same set of instructions as the previously found artefacts. However with all three of these; it appears that they fit together like a puzzle. The master talisman appears to be carried by an elite artisan, with the two apprentices carrying the
+knowledge.smeltMaster.2=lesser talismans. There are also markings on the back of the master talisman describing a combined piece being placed into a working mythic crucible... This may be able to improve the crucible in some way.^The interesting part is the locations you have found these artefacts. Though the master talisman could be found anywhere, the lesser talismans were found depending on geographical location. Further south regions had the mithril workers while the northern regions had the adamantium workers. This pattern reinforces the idea that the mythic works were formed
+knowledge.smeltEnderforge.1=There's always been something strange about those ender creatures... And this discovery may lead to their origins, perhaps they were the ones that created these artefacts, can't explain how though, ender creatures don't appear too civilised.^Enderforge appears to be designed as a compromise between the two materials of mithril and adamantium, taking the best from both to create a new material. It appears that ender pearls can act as a catalyst to form these two materials together.^This can only be made in a master crucible.
+knowledge.blastfurn.hcc=$hHardcore Crafting-$r^With Hardcore crafting; A crucible must be placed underneath the furnace heater to catch molten ingots, you need to use a mould to remove them.
+knowledge.crucible.hcc=$hHardcore Crafting-$r^With hardcore crafting however: Items cannot be retrieved from the crucible GUI. You need to craft an ingot mould, right-click this to retrieve the ingots 1 at a time, and cool them in water.^Also: If you break the crucible, outputs will be lost!
+knowledge.anvil.6=While crafting, keep track of the quality metre. The aim here is to keep the marker away from the edges. If it hits either side it ruins the recipe. When crafting damageable items however; the durability of the item is diminished if the marker is outside the pins when completing.^As you see, there's the two green pins that damage items if the blue marker is outside, either end of the bar itself is the dead zone. Be sure to distribute a mix of left-click and right-clicks to craft an item and think ahead before hitting. also note the metre moves right slower than left.
+knowledge.anvil.7=If you SHIFT-LEFT click however it will knock the metre back(to give you some more time to craft), don't exceed 0 however, or it will ruin the item.
+knowledge.craftArmourBasic=Basic Armour
+knowledge.craftArmourBasic.1=When you first start out in this world, you may want something to wear. These Armours don't offer much protection but they're better than nothing.
+knowledge.craftArmourLight=Light Armour
+knowledge.craftArmourLight.1=Light armour is designed to be as easy to wear as possible and is only made from a small variety of material. You do not get much protection from it, but your ability to dodge and parry will be unaffected.^These suits are best worn where tactics and avoidance are used.
+knowledge.craftArmourLight.3=Padded armour is highly effective against light attacks, blunt in particular. This suit is used as a foundation for heavy armour.
+knowledge.craftArmourLight.4=Reinforced and studded leather are upgraded versions from rough leather. Reinforced leather can be used to craft medium armour.
+knowledge.craftArmourMedium=Medium Armour
+knowledge.craftArmourMedium.1=Through inspection of leather, it appears obvious that it has many limits to its strength and impact resistance.^Much similar to how animals have fur, scales and bone that may assist in protection, you must also find something to reinforce leather with, to allow for better protective capabilities.^Mail armour is made of standard leather, with metal components to give some extra resistance, though it may restrict movements slightly more as well.
+knowledge.craftArmourMedium.scale=As an alternative, Scalemail can be created. Scale armour has more balanced protection against all forms of damage; it's not quite as effective against piercing and cutting resistance, but makes it up in blunt.
+knowledge.craftArmourHeavy=Heavy Armour
+knowledge.craftArmourHeavy.1=You have gained decent protection from medium armour, yet it still seems limited. Medium armour does have a large amount of advantages, but there may be a way to improve further.^Through the study of the anatomy of the wildlife, it seems apparent that wool and feathers cushion blows rather effectively - a padded piece of armour may offer a decent advantage.^This would make armour created in this style very heavy and hard to wear, though.
+knowledge.craftArmourHeavy.2=Heavy armour is crafted with a padded suit already made. Padded armour provides a soft and protective layer for underneath armour.
+knowledge.craftArmourHeavy.splint=Splintmail isn't quite as heavy as a full blown suit of plate, and has lesser protective qualities in return. It is, however, still far superior to medium armour and protects against all damage types equally.
+knowledge.craftArmourHeavy.plate=Plate armour is the strongest, but also the most expensive and difficult to craft.
+knowledge.craftWeapons.desc=For "Defence"
+knowledge.waraxe.info=$hWaraxe$r^A heavy hand axe for brutal hacking at your foes' armour. War axes do decent damage and have bonuses when sprinting and jumping attacks. Good for the barbaric types. They also take more damage from blocking.
+knowledge.craftAdvWeapons.1=I'm not sure what you're intending to kill, but here are some of the... larger pieces.^$hKatana$r^Katanas are the lightest heavy weapon and aren't much heavier than a normal sword. This weapon strikes fast and is the least tiring to use. Power attacks will also damage armour.^^East approved!
+knowledge.firebomb.3=Incineration bombs may be expensive, but they're extremely effective against armour.
+knowledge.cogArmour.desc=Power Armour
+knowledge.cogArmour.1=These are the schematics for an advanced set of gears, which can translate player movement in a heavy exoskeleton. What this reveals is a massive suit of armour capable of making the wearer nearly invulnerable to damage.^Cogwork armour is the pinnacle of dwarven engineering, and capable of carrying a huge amount of weight. The only downside, however, is powering the suit, as it requires pure-burning fuel (coke or magma cream), and a lot of it. The heavier the armour on the suit, the faster it burns.
+knowledge.cogArmour.crafting=To craft cogwork armour, you need the three blocks: Helmet, Chest and Legs. Stack these on top of each other inside the frame, then right-click the chest with a spanner.
+knowledge.cogArmour.fuel=$hRefueling$r^Cogwork armour only takes refined fuels (coke or magma cream). Right-click the suit to add fuel.^The heavier the armour on the suit, the faster fuel decays.
+knowledge.cogArmour.advantage=$hAdvantages$r^An unarmoured suit can give immunity to smoke, remove fall damage, increase attack damage, and eliminate stamina decay.
+knowledge.cogArmour.advantage.2=When fitted with plating: the suit is sealed, and you will gain a substantial armour bonus, along with the ability to breathe underwater. The suit also removes poison/wither damage and makes the wearer immune to fire.
+knowledge.cogArmour.advantage.3=The armour can still take damage from fire depending on its melting point, mind - and while higher durability tiers make the armour last longer, the plating must be removed at a cogwork station for repair.
+knowledge.cogArmour.disadvantage.2=Explosions damage the armour more than other damage sources; each hit stuns you for a second, as well.
+knowledge.cogArmour.removal=Although plating is removed when the suit is broken, the framework remains intact, and an empty, unarmoured suit can be broken by hitting it with a spanner; if left in fire or lava when plating is broken, it may also be destroyed.
+knowledge.compPlate.1=So far, most alloys have simply been a matter of mixing them together in a pot. This dwarven design of alloy appears to be different, layering multiple materials together into a plate. Although not as efficient at making tools, the applications for armour would be very efficient, although heavy.^It is rather obvious that this particular alloy was designed to be used with the cogwork armour.
+knowledge.reinforced_stone.1=Stone is a useful material, being strong, non-flammable and resistant to explosions. You can increase the capabilities of stone, though, by melting some obsidian and kaolinite with it.^You will not need an ingot mould to retrieve this from the crucible.
+knowledge.decorated_stone.1=Stone can look bland in large quantities, so you've learnt to trim reinforced stone with metals, adding just a little bit of style to your walls.
+knowledge.cheeseroll.1=Cheese goes well with bread. Put some cheese in a roll to give it some flavour.
+knowledge.armourpro=Armour Proficiency
+knowledge.armourpro.1=After all this time, your core has become stronger.^Armour penalty to stamina cost is halved.
+knowledge.kitchen_bench.2=Rolling dough and chopping meat leaves a mess, and a filthy bench will not craft at all.^Right-click it with any container of water to scrub it down. Each container washes away a good part of the grime and is emptied in the process.^The more practised the cook, the slower the bench gets dirty.
