@@ -71,7 +71,6 @@ public class GuiKnowledge extends GuiScreen {
     private GuiButton button;
     private LinkedList<InformationBase> informationList = new LinkedList<InformationBase>();
     private EntityPlayer player;
-    private boolean hasScroll = false;
     private boolean canPurchase = false;
 
     public GuiKnowledge(EntityPlayer user) {
@@ -641,13 +640,7 @@ public class GuiKnowledge extends GuiScreen {
             int white = 16777215;
             mc.fontRenderer.drawString(selected.getDisplayName(), x + 22, y + 12, white, false);
 
-            if (hasScroll) {
-                mc.fontRenderer.drawStringWithShadow(
-                        StatCollector.translateToLocal("knowledge.hasScroll"),
-                        x + 20,
-                        y + 32,
-                        red);
-            } else if (requirements != null) {
+            if (requirements != null) {
                 for (int a = 0; a < requirements.length; a++) {
                     boolean isUnlocked = selected.isUnlocked(a, mc.thePlayer);
                     String text = requirements[a];
