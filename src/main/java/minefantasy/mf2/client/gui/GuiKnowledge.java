@@ -16,6 +16,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.*;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -56,6 +57,7 @@ public class GuiKnowledge extends GuiScreen {
     private static final int VIEW_MIN_Y = InformationList.minDisplayRow * CELL - 112;
     private static final int VIEW_MAX_X = InformationList.maxDisplayColumn * CELL - 77;
     private static final int VIEW_MAX_Y = InformationList.maxDisplayRow * CELL - 77;
+    private static final int SKILL_PANEL_WIDTH = 143;
     private static final float ZOOM_MIN = 1.0F;
     private static final float ZOOM_MAX = 3.0F;
     private static final float ZOOM_STEP = 0.25F;
@@ -68,6 +70,8 @@ public class GuiKnowledge extends GuiScreen {
     private static final int LINK_LOCKED = 0xFF000000;
     private static final int LINK_DISCOVERED = 0xFFA0A0A0;
     private static final int LINK_AVAILABLE = 0xFF00FF00;
+    /** Links among entries still out of reach: faint, so the tree reads whole without giving it away. */
+    private static final int LINK_DISTANT = 0x50000000;
     private static final int TOOLTIP_BACKGROUND = 0xC0000000;
     private static final int TOOLTIP_REQUIRES = 0xFF705050;
     private static final int TOOLTIP_DESCRIPTION = 0xFFA0A0A0;
@@ -116,15 +120,23 @@ public class GuiKnowledge extends GuiScreen {
 
     public GuiKnowledge(EntityPlayer user) {
         this.player = user;
-        int half = 141 / 2;
-        prevViewX = viewX = targetViewX = KnowledgeListMF.gettingStarted.displayColumn * CELL - half - 12;
-        prevViewY = viewY = targetViewY = KnowledgeListMF.gettingStarted.displayRow * CELL - half;
+        prevViewX = viewX = targetViewX = homeViewX();
+        prevViewY = viewY = targetViewY = homeViewY();
         informationList.clear();
         for (Object info : InformationList.knowledgeList) {
             if (!InformationPage.isInfoInPages((InformationBase) info)) {
                 informationList.add((InformationBase) info);
             }
         }
+    }
+
+    /** The view with Getting Started near the middle, where the book opens and the home key returns. */
+    private static int homeViewX() {
+        return KnowledgeListMF.gettingStarted.displayColumn * CELL - 141 / 2 - 12;
+    }
+
+    private static int homeViewY() {
+        return KnowledgeListMF.gettingStarted.displayRow * CELL - 141 / 2;
     }
 
     private int frameLeft() {
@@ -223,6 +235,10 @@ public class GuiKnowledge extends GuiScreen {
         if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
             this.mc.displayGuiScreen((GuiScreen) null);
             this.mc.setIngameFocus();
+        } else if (keyCode == Keyboard.KEY_HOME || keyCode == Keyboard.KEY_H) {
+            zoom = ZOOM_MIN;
+            targetViewX = homeViewX();
+            targetViewY = homeViewY();
         } else {
             super.keyTyped(typedChar, keyCode);
         }
@@ -231,7 +247,7 @@ public class GuiKnowledge extends GuiScreen {
     @Override
     public void drawScreen(int mx, int my, float partialTicks) {
         handleDrag(mx, my);
-        handleZoom();
+        handleZoom(mx, my);
         targetViewX = MathHelper.clamp_double(targetViewX, VIEW_MIN_X, VIEW_MAX_X - 1);
         targetViewY = MathHelper.clamp_double(targetViewY, VIEW_MIN_Y, VIEW_MAX_Y - 1);
 
@@ -272,8 +288,8 @@ public class GuiKnowledge extends GuiScreen {
         }
     }
 
-    /** The wheel zooms out and in, keeping the middle of the map where it is. */
-    private void handleZoom() {
+    /** The wheel zooms out and in about the point under the mouse, or the middle of the map when outside it. */
+    private void handleZoom(int mx, int my) {
         int wheel = Mouse.getDWheel();
         float oldZoom = zoom;
         if (wheel < 0) {
@@ -284,8 +300,15 @@ public class GuiKnowledge extends GuiScreen {
         zoom = MathHelper.clamp_float(zoom, ZOOM_MIN, ZOOM_MAX);
 
         if (zoom != oldZoom) {
-            viewX -= (zoom - oldZoom) * FRAME_WIDTH * 0.5F;
-            viewY -= (zoom - oldZoom) * FRAME_HEIGHT * 0.5F;
+            int pivotX = mx - (frameLeft() + MAP_LEFT);
+            int pivotY = my - (frameTop() + MAP_TOP);
+            if (pivotX < 0 || pivotX >= MAP_WIDTH || pivotY < 0 || pivotY >= MAP_HEIGHT) {
+                pivotX = MAP_WIDTH / 2;
+                pivotY = MAP_HEIGHT / 2;
+            }
+            // The map point under the pivot stays under it
+            viewX += pivotX * (oldZoom - zoom);
+            viewY += pivotY * (oldZoom - zoom);
             targetViewX = prevViewX = viewX;
             targetViewY = prevViewY = viewY;
         }
@@ -366,6 +389,9 @@ public class GuiKnowledge extends GuiScreen {
         if (selected == null && hovered != null) {
             drawTooltip(hovered, mx + 12, my - 4);
         }
+        if (selected == null) {
+            drawSkillTooltip(mx, my);
+        }
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -395,7 +421,7 @@ public class GuiKnowledge extends GuiScreen {
         this.mc.getTextureManager().bindTexture(screenTex);
         for (InformationBase entry : entries) {
             if (entry.parentInfo == null || !entries.contains(entry.parentInfo)
-                    || ResearchLogic.func_150874_c(player, entry) > LINKS_DEPTH) {
+                    || ResearchLogic.func_150874_c(player, entry) > HIDDEN_DEPTH) {
                 continue;
             }
             int childX = entry.displayColumn * CELL - scrollX + 11;
@@ -403,7 +429,8 @@ public class GuiKnowledge extends GuiScreen {
             int parentX = entry.parentInfo.displayColumn * CELL - scrollX + 11;
             int parentY = entry.parentInfo.displayRow * CELL - scrollY + 11;
 
-            int colour = LINK_LOCKED;
+            boolean distant = ResearchLogic.func_150874_c(player, entry) > LINKS_DEPTH;
+            int colour = distant ? LINK_DISTANT : LINK_LOCKED;
             if (ResearchLogic.hasInfoUnlocked(player, entry)) {
                 colour = LINK_DISCOVERED;
             } else if (ResearchLogic.canUnlockInfo(player, entry)) {
@@ -411,6 +438,9 @@ public class GuiKnowledge extends GuiScreen {
             }
             this.drawHorizontalLine(childX, parentX, childY, colour);
             this.drawVerticalLine(parentX, childY, parentY, colour);
+            if (distant) {
+                continue;
+            }
 
             if (childX > parentX) {
                 this.drawTexturedModalRect(childX - 11 - 7, childY - 5, 114, 234, 7, 11);
@@ -581,15 +611,13 @@ public class GuiKnowledge extends GuiScreen {
     protected void drawSkillList() {
         GL11.glPushMatrix();
 
-        int skillWidth = 143;
         int skillHeight = 156;
-        int x = frameLeft() - skillWidth;
+        int x = frameLeft() - SKILL_PANEL_WIDTH;
         int y = frameTop();
         this.mc.getTextureManager().bindTexture(skillTex);
-        this.drawTexturedModalRect(x, y, 0, 0, skillWidth, skillHeight);
+        this.drawTexturedModalRect(x, y, 0, 0, SKILL_PANEL_WIDTH, skillHeight);
 
-        Skill[] skills = { SkillList.artisanry, SkillList.construction, SkillList.provisioning, SkillList.engineering,
-                SkillList.combat };
+        Skill[] skills = skills();
         for (int a = 0; a < skills.length; a++) {
             drawSkill(x + 20, y + 20 + a * 24, skills[a]);
         }
@@ -598,6 +626,33 @@ public class GuiKnowledge extends GuiScreen {
         }
 
         GL11.glPopMatrix();
+    }
+
+    private static Skill[] skills() {
+        return new Skill[] { SkillList.artisanry, SkillList.construction, SkillList.provisioning, SkillList.engineering,
+                SkillList.combat };
+    }
+
+    /** Over a skill in the panel: its level and experience towards the next. */
+    private void drawSkillTooltip(int mx, int my) {
+        int x = frameLeft() - SKILL_PANEL_WIDTH + 20;
+        int y = frameTop() + 20;
+        if (mx < x || mx >= x + 100 || my < y) {
+            return;
+        }
+        int row = (my - y) / 24;
+        Skill[] skills = skills();
+        if (row >= skills.length || skills[row] == null) {
+            return;
+        }
+        Skill skill = skills[row];
+        int[] xp = skill.getXP(player);
+        List<String> lines = new LinkedList<String>();
+        lines.add(skill.getDisplayName());
+        lines.add(I18n.format("skill.value", RPGElements.getLevel(player, skill)));
+        lines.add(I18n.format("knowledge.skillXP", xp[0], xp[1]));
+        this.drawHoveringText(lines, mx, my, this.fontRendererObj);
+        GL11.glDisable(GL11.GL_LIGHTING);
     }
 
     protected void drawSkill(int x, int y, Skill skill) {

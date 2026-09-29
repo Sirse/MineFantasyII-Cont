@@ -2398,3 +2398,4 @@ tc.research_page.MF2_THAUMIC_FORGING.1=Magic cannot forge a helmet for you. The 
 tc.research_name.MF2_REVEALING_HELM=Revealing Helmet
 tc.research_text.MF2_REVEALING_HELM=Sight through worked metal
 tc.research_page.MF2_REVEALING_HELM.1=A thaumium helmet holds an aura well enough to carry sight into it. Bound this way, it reveals nodes and shows aspects in the world, as a pair of goggles would, without giving up the protection a forged helmet is worth.<BR>Any forged helmet of thaumium will serve. A helmet that already carries an infusion will not: the binding has nowhere to go.
+knowledge.skillXP=Experience %1$s / %2$s

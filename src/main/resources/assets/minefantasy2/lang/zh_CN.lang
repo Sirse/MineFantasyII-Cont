@@ -2396,3 +2396,4 @@ minefantasy2.recipe.reason.carbon=%s 份碳，需要恰好 %s 份
 minefantasy2.recipe.reason.bloom_present=请先取出矿块
 minefantasy2.recipe.reason.not_built=熔炉尚未建成
 minefantasy2.recipe.reason.shadowed=被上方的配方覆盖
+knowledge.skillXP=经验 %1$s / %2$s

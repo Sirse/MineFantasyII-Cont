@@ -91,3 +91,4 @@ knowledge.cheeseroll.1=Cheese goes well with bread. Put some cheese in a roll to
 knowledge.armourpro=Armour Proficiency
 knowledge.armourpro.1=After all this time, your core has become stronger.^Armour penalty to stamina cost is halved.
 knowledge.kitchen_bench.2=Rolling dough and chopping meat leaves a mess, and a filthy bench will not craft at all.^Right-click it with any container of water to scrub it down. Each container washes away a good part of the grime and is emptied in the process.^The more practised the cook, the slower the bench gets dirty.
+knowledge.skillXP=Experience %1$s / %2$s
