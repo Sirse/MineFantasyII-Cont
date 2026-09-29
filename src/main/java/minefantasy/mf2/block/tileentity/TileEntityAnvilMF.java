@@ -6,10 +6,7 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
@@ -22,8 +19,6 @@ import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
-import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -33,11 +28,7 @@ import minefantasy.mf2.api.recipe.Diagnosis;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.container.ContainerAnvilMF;
-import minefantasy.mf2.entity.EntityItemUnbreakable;
-import minefantasy.mf2.item.armour.ItemArmourMF;
-import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
-import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
 
 public class TileEntityAnvilMF extends TileEntityStation
         implements GridProject.Bench, CraftBench, IQualityBalance, Diagnosis.Source {
@@ -252,23 +243,8 @@ public class TileEntityAnvilMF extends TileEntityStation
             return;
         }
         if (this.canCraft()) {
-            ItemStack result = modifySpecials(project.getProduct());
-            if (result == null) {
-                return;
-            }
-
-            if (result.getItem() instanceof ItemArmourMF) {
-                result = modifyArmour(result);
-            }
-
-            if (result.getMaxStackSize() == 1 && !lastPlayerHit.isEmpty()) {
-                getNBT(result).setString("MF_CraftedByName", lastPlayerHit);
-            }
-
-            int temp = this.averageTemp();
-            if (project.require(MFRecipeKeys.HOT_OUTPUT, false) && temp > 0) {
-                result = ItemHeated.createHotItem(result, temp);
-            }
+            ItemStack result = AnvilFinish
+                    .finish(this, project.getProduct(), lastPlayerHit, project.require(MFRecipeKeys.HOT_OUTPUT, false));
 
             addXP(lastHit);
             // The grid pays first: nothing is produced if it no longer holds what the project takes
@@ -310,28 +286,6 @@ public class TileEntityAnvilMF extends TileEntityStation
         skillUsed.addXP(smith, (int) baseXP + 1);
     }
 
-    private ItemStack modifyArmour(ItemStack result) {
-        ItemArmourMF item = (ItemArmourMF) result.getItem();
-        boolean canColour = item.canColour();
-        int colour = -1;
-        for (int a = 0; a < getSizeInventory() - 1; a++) {
-            ItemStack slot = getStackInSlot(a);
-            if (slot != null && slot.getItem() instanceof ItemArmor) {
-                ItemArmor slotitem = (ItemArmor) slot.getItem();
-                if (canColour && slotitem.hasColor(slot)) {
-                    colour = slotitem.getColor(slot);
-                }
-                if (result.isItemStackDamageable()) {
-                    result.setItemDamage(slot.getItemDamage());
-                }
-            }
-        }
-        if (colour != -1 && canColour) {
-            item.func_82813_b(result, colour);
-        }
-        return result;
-    }
-
     /**
      * A forge within four blocks holding a dragon heart, for a player who has learned dragonforging; null for none. The
      * craft that finds it takes that one heart.
@@ -351,126 +305,6 @@ public class TileEntityAnvilMF extends TileEntityStation
             }
         }
         return null;
-    }
-
-    private ItemStack modifySpecials(ItemStack result) {
-        boolean hasHeart = false;
-        boolean isTool = result.getMaxStackSize() == 1 && result.isItemStackDamageable();
-        EntityPlayer player = worldObj.getPlayerEntityByName(lastPlayerHit);
-
-        Item DF = SpecialForging.getDragonCraft(result);
-
-        TileEntityForge forge = DF != null ? heartedForge(player) : null;
-        if (forge != null) {
-            // DRAGONFORGE: one heart per craft, however many forges nearby hold one
-            hasHeart = true;
-            forge.dragonHeartPower = 0;
-            worldObj.createExplosion(player, forge.xCoord, forge.yCoord, forge.zCoord, 1F, false);
-            PlayerTickHandlerMF.spawnDragon(player);
-            PlayerTickHandlerMF.addDragonEnemyPts(player, 2);
-        }
-        if (hasHeart) {
-            NBTBase nbt = !(result.hasTagCompound()) ? null : result.getTagCompound().copy();
-            result = new ItemStack(DF, result.stackSize, result.getItemDamage());
-            if (nbt != null) {
-                result.setTagCompound((NBTTagCompound) nbt);
-            }
-        } else {
-            Item special = SpecialForging
-                    .getSpecialCraft(SpecialForging.getItemDesign(inventory[getSizeInventory() - 1]), result);
-            if (special != null) {
-                NBTBase nbt = !(result.hasTagCompound()) ? null : result.getTagCompound().copy();
-                result = new ItemStack(special, result.stackSize, result.getItemDamage());
-                if (nbt != null) {
-                    result.setTagCompound((NBTTagCompound) nbt);
-                }
-            }
-        }
-
-        if (isPerfectItem() && !isMythicRecipe()) {
-            grade(result, ItemQuality.Grade.SUPERIOR);
-            if (CustomToolHelper.isMythic(result)) {
-                ToolHelper.setUnbreakable(result, true);
-                result.getTagCompound().setBoolean(EntityItemUnbreakable.persistNBT, true);
-            } else {
-                ItemQuality.set(result, ItemQuality.MAX);
-            }
-            return result;
-        }
-        if (isTool) {
-            result = modifyQualityComponents(result);
-        }
-        return damageItem(result);
-    }
-
-    private ItemStack modifyQualityComponents(ItemStack result) {
-        float totalPts = 0F;
-        int totalItems = 0;
-        for (ItemStack item : inventory) {
-            ItemQuality.Grade grade = ItemQuality.getGrade(item);
-            if (grade != ItemQuality.Grade.ORDINARY) {
-                ++totalItems;
-                totalPts += grade == ItemQuality.Grade.INFERIOR ? -50F : 100F;
-            }
-        }
-        if (totalItems > 0 && totalPts > 0) {
-            totalPts /= totalItems;
-            ItemQuality.set(result, ItemQuality.get(result) + totalPts);
-            if (totalPts <= -85F) {
-                grade(result, ItemQuality.Grade.INFERIOR);
-            }
-            if (totalPts >= 80) {
-                grade(result, ItemQuality.Grade.SUPERIOR);
-            }
-        }
-        return result;
-    }
-
-    private int averageTemp() {
-        float totalTemp = 0;
-        int itemCount = 0;
-        for (int a = 0; a < getSizeInventory() - 1; a++) {
-            ItemStack item = getStackInSlot(a);
-            if (item != null && item.getItem() instanceof IHotItem) {
-                ++itemCount;
-                totalTemp += Heatable.getTemp(item);
-            }
-        }
-        if (totalTemp > 0 && itemCount > 0) {
-            return (int) (totalTemp / itemCount);
-        }
-        return 0;
-    }
-
-    private NBTTagCompound getNBT(ItemStack item) {
-        if (!item.hasTagCompound()) {
-            item.setTagCompound(new NBTTagCompound());
-        }
-        return item.getTagCompound();
-    }
-
-    public boolean hasItems(EntityPlayer user, ItemStack[] items) {
-        for (ItemStack check : items) {
-            if (!hasItems(user, check)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public boolean hasItems(EntityPlayer user, ItemStack item) {
-        return hasItems(user, item, item.stackSize);
-    }
-
-    public boolean hasItems(EntityPlayer user, ItemStack item, int number) {
-        int count = 0;
-        for (int a = 0; a < user.inventory.getSizeInventory(); a++) {
-            ItemStack slot = user.inventory.getStackInSlot(a);
-            if (slot != null && slot.isItemEqual(item)) {
-                count += slot.stackSize;
-            }
-        }
-        return count >= number;
     }
 
     public void syncData() {
@@ -711,10 +545,6 @@ public class TileEntityAnvilMF extends TileEntityStation
     }
 
     public boolean canCraft() {
-        if (this.isMythicRecipe() && !this.isMythicReady()) {
-            return false;
-        }
-
         if (progressMax > 0 && recipe instanceof ItemStack) {
             return this.canFitResult(recipe);
         }
@@ -739,14 +569,6 @@ public class TileEntityAnvilMF extends TileEntityStation
             return 0;
         }
         return (int) Math.ceil((i * progress) / progressMax);
-    }
-
-    private boolean isMythicRecipe() {
-        return false;// this.hammerTierRequired >= 6;
-    }
-
-    private boolean isMythicReady() {
-        return true;
     }
 
     public String getTextureName() {
@@ -774,54 +596,8 @@ public class TileEntityAnvilMF extends TileEntityStation
         return thresholdPosition / 3.5F;
     }
 
-    private float getAbsoluteBalance() {
+    float getAbsoluteBalance() {
         return qualityBalance < 0 ? -qualityBalance : qualityBalance;
-    }
-
-    private float getItemDamage() {
-        int threshold = (int) (100F * thresholdPosition / 2F);
-        int total = (int) (100F * getAbsoluteBalance() - threshold);
-
-        if (total > threshold) {
-            float percent = ((float) total - (float) threshold) / (100F - threshold);
-            return percent;
-        }
-        return 0F;
-    }
-
-    private boolean isPerfectItem() {
-        int threshold = (int) (100F * getSuperThresholdPosition() / 2F);
-        int total = (int) (100F * getAbsoluteBalance() - threshold);
-
-        return total <= threshold;
-    }
-
-    private ItemStack damageItem(ItemStack item) {
-        float itemdam = getItemDamage();
-        if (itemdam > 0.5F) {
-            grade(item, ItemQuality.Grade.INFERIOR);
-            float q = 100F * (0.75F - (itemdam - 0.5F));
-            ItemQuality.set(item, Math.max(10F, q));
-        }
-        float damage = itemdam * item.getMaxDamage();
-        if (item.isItemStackDamageable()) {
-            if (damage > 0) {
-                item.setItemDamage((int) (damage));
-                if (isMythicRecipe()) {
-                    grade(item, ItemQuality.Grade.INFERIOR);
-                }
-            } else if (isMythicRecipe()) {
-                ToolHelper.setUnbreakable(item, true);
-            }
-        }
-        return item;
-    }
-
-    /** Grades a forged item; only one that wears down has a grade. */
-    private void grade(ItemStack item, ItemQuality.Grade grade) {
-        if (item != null && item.isItemStackDamageable()) {
-            ItemQuality.setGrade(item, grade);
-        }
     }
 
     private void updateThreshold() {
@@ -831,7 +607,7 @@ public class TileEntityAnvilMF extends TileEntityStation
         }
 
         float baseThreshold = worldObj.difficultySetting.getDifficultyId() >= 2 ? 7.5F : 10F;
-        thresholdPosition = (isMythicRecipe() ? 0.05F : baseThreshold / 100F) * modifier;
+        thresholdPosition = (baseThreshold / 100F) * modifier;
     }
 
     public void upset(EntityPlayer user) {
