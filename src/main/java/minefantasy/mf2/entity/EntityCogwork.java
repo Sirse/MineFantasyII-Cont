@@ -1,13 +1,11 @@
 package minefantasy.mf2.entity;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,17 +20,14 @@ import net.minecraftforge.common.ForgeHooks;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.IPowerArmour;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigArmour;
-import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.ClientProxyMF;
 import minefantasy.mf2.network.packet.CogworkControlPacket;
-import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
 
@@ -163,42 +158,12 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
                     ((EntityLivingBase) riddenByEntity).setAir(300);
                 }
 
-                if (ticksExisted % 20 == 0) {
-                    for (int a = 0; a < 4; a++) {
-                        if (!allowEquipment((EntityLivingBase) riddenByEntity)) {
-                            riddenByEntity.mountEntity(null);
-                            break;
-                        }
-                    }
+                if (ticksExisted % 20 == 0 && !allowEquipment((EntityLivingBase) riddenByEntity)) {
+                    riddenByEntity.mountEntity(null);
                 }
             }
 
-            // DAMAGE
-            if (this.motionX * this.motionX + this.motionZ * this.motionZ > 2.500000277905201E-7D
-                    && this.rand.nextInt(5) == 0) {
-                int i = MathHelper.floor_double(this.posX);
-                int j = MathHelper.floor_double(this.posY - 0.20000000298023224D - this.yOffset);
-                int k = MathHelper.floor_double(this.posZ);
-                Block block = this.worldObj.getBlock(i, j, k);
-
-                if (block.getMaterial() != Material.air) {
-                    this.worldObj.spawnParticle(
-                            "blockcrack_" + Block.getIdFromBlock(block) + "_" + this.worldObj.getBlockMetadata(i, j, k),
-                            this.posX + (this.rand.nextFloat() - 0.5D) * this.width,
-                            this.boundingBox.minY + 0.1D,
-                            this.posZ + (this.rand.nextFloat() - 0.5D) * this.width,
-                            4.0D * (this.rand.nextFloat() - 0.5D),
-                            0.5D,
-                            (this.rand.nextFloat() - 0.5D) * 4.0D);
-                }
-                if (!worldObj.isRemote && ConfigArmour.cogworkGrief
-                        && worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing")
-                        && !isProtectedBlock(i, j, k)) {
-                    damageBlock(block, i, j, k, worldObj.getBlockMetadata(i, j, k));
-                    block = this.worldObj.getBlock(i, j + 1, k);
-                    damageSurface(block, i, j + 1, k, worldObj.getBlockMetadata(i, j, k));
-                }
-            }
+            CogworkTrampling.tread(this);
         } else {
             motionX = motionZ = 0;
             this.setMoveForward(0F);
@@ -225,57 +190,12 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     /**
-     * Bukkit protection plugins may forbid the rider from breaking blocks under the suit
-     */
-    private boolean isProtectedBlock(int x, int y, int z) {
-        if (!MineFantasyII.isBukkitServer() || !(riddenByEntity instanceof EntityPlayer)) {
-            return false;
-        }
-        return BukkitUtils.cantBreakBlock((EntityPlayer) riddenByEntity, x, y, z);
-    }
-
-    /**
      * Rate of constant fuel droppage
      *
      * @return
      */
     private float getFuelDecay() {
         return getFuelCost() * (isSprinting() ? 3.0F : 1.0F);
-    }
-
-    private void damageBlock(Block block, int x, int y, int z, int blockMetadata) {
-        if (block == Blocks.grass || block == Blocks.farmland) {
-            worldObj.setBlock(x, y, z, Blocks.dirt, 0, 2);
-        }
-        if (block.getMaterial() == Material.glass) {
-            worldObj.setBlockToAir(x, y, z);
-            this.worldObj
-                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
-        }
-        if (block == Blocks.ice) {
-            worldObj.setBlock(x, y, z, Blocks.water, 0, 2);
-            this.worldObj
-                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.glass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
-        }
-        if (block.getMaterial() == Material.leaves) {
-            worldObj.setBlockToAir(x, y, z);
-            this.worldObj
-                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
-        }
-    }
-
-    private void damageSurface(Block block, int x, int y, int z, int blockMetadata) {
-        if (block.getBlockHardness(worldObj, x, y, z) == 0
-                && (block.getMaterial() == Material.vine || block.getMaterial() == Material.plants)) {
-            worldObj.setBlockToAir(x, y, z);
-            this.worldObj
-                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.grass", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
-        }
-        if (block == Blocks.snow_layer) {
-            worldObj.setBlockToAir(x, y, z);
-            this.worldObj
-                    .playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "dig.cloth", 1.0F, 0.9F + (rand.nextFloat() * 0.2F));
-        }
     }
 
     @Override
@@ -408,91 +328,15 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
 
         ItemStack item = user.getHeldItem();
         if (item != null) {
-            float fuel_item = PowerArmour.getFuelValue(item);
-            if (fuel_item > 0) {
-                float fuel = getFuel();
-                float max = getMaxFuel();
-                if (fuel < max) {
-                    fuel += Math.max(0F, fuel_item * ConfigArmour.cogworkFuelUnits);
-                    if (fuel > max) {
-                        fuel = max;
-                    }
-                    setFuel(fuel);
-
-                    if (!user.capabilities.isCreativeMode) {
-                        --item.stackSize;
-
-                        ItemStack container = item.getItem().getContainerItem(item);
-                        if (container != null) {
-                            if (item.stackSize >= 1) {
-                                if (!user.inventory.addItemStackToInventory(container)) {
-                                    user.entityDropItem(container, 0F);
-                                }
-                            }
-                        }
-                        if (item.stackSize <= 0) {
-                            user.setCurrentItemOrArmor(0, container);
-                        }
-                    }
-                }
+            if (CogworkService.refuel(this, user, item)) {
                 return true;
             }
             if (this.riddenByEntity != null) {
                 return false;
             }
-            if (this.isUnderRepairFrame()) {
-                if (getPlating() == null && item.getItem() == ComponentListMF.cogwork_armour) {
-                    CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(item);
-                    if (material != null) {
-                        this.playSound("mob.horse.armor", 1.0F, 1.0F);
-                        int boltCount = this.getBolts();
-                        if (boltCount < maxBolts) {
-                            if (!user.isSwingInProgress && user.capabilities.isCreativeMode
-                                    || user.inventory.consumeInventoryItem(ComponentListMF.bolt)) {
-                                ++boltCount;
-                                setBolts(boltCount);
-                            }
-                            user.swingItem();
-                            return true;
-                        }
-                        this.setCustomMaterial(material.name);
-                        float damagePercent = 1F - ((float) item.getItemDamage() / (float) item.getMaxDamage());
-                        this.setHealth(getMaxHealth() * damagePercent);
-                        if (!user.capabilities.isCreativeMode) {
-                            --item.stackSize;
-                            if (item.stackSize <= 0) {
-                                user.setCurrentItemOrArmor(0, null);
-                            }
-                        }
-                        user.swingItem();
-                        return true;
-                    }
-                }
-                if (this.getPlating() != null && ToolHelper.getCrafterTool(item).equalsIgnoreCase("spanner")) {
-                    this.playSound("mob.horse.armor", 1.2F, 1.0F);
-                    user.swingItem();
-                    int boltCount = this.getBolts();
-                    if (boltCount > 0) {
-                        if (!worldObj.isRemote) {
-                            ItemStack bolt = new ItemStack(ComponentListMF.bolt, boltCount);
-                            if (!user.capabilities.isCreativeMode && !user.inventory.addItemStackToInventory(bolt)) {
-                                this.entityDropItem(bolt, 0.0F);
-                            }
-                        }
-                        setBolts(0);
-                    }
-                    float damagePercent = 1F - (getHealth() / getMaxHealth());
-                    if (!worldObj.isRemote) {
-                        ItemStack armour = ComponentListMF.cogwork_armour
-                                .createComm(getPlating().name, 1, damagePercent);
-                        if (!user.capabilities.isCreativeMode && !user.inventory.addItemStackToInventory(armour)) {
-                            this.entityDropItem(armour, 0.0F);
-                        }
-                    }
-                    this.playSound("mob.irongolem.hit", 1.0F, 1.0F);
-                    this.setCustomMaterial("");
-                    return true;
-                }
+            if (this.isUnderRepairFrame()
+                    && (CogworkService.plate(this, user, item) || CogworkService.unplate(this, user, item))) {
+                return true;
             }
         }
         if (user.ridingEntity == null) {
@@ -509,7 +353,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         return false;
     }
 
-    private float getMaxFuel() {
+    float getMaxFuel() {
         return base_fuel_minutes * 1200F;
     }
 
