@@ -31,7 +31,7 @@ public class BasicRecipesMF {
 
     public static void init() {
         addFoodOutput();
-        TempRecipesMF.init();// TODO remove temp recipes
+        BlockRecipesMF.init();
         ForgingRecipes.init();
         CarpenterRecipes.init();
         SmeltingRecipesMF.init();

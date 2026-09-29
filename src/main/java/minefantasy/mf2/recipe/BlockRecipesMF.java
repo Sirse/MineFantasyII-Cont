@@ -13,7 +13,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
-public class TempRecipesMF {
+public class BlockRecipesMF {
 
     public static void init() {
         ArrayList<CustomMaterial> wood = CustomMaterial.getList("wood");

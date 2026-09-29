@@ -32,6 +32,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.config.ConfigTools;
@@ -75,7 +76,7 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
                 {
                     for (int z1 = -range; z1 <= range; z1++) {
                         if (getDistance(x + x1, y, z + z1, x, y, z) <= range * 1 + 0.5D) {
-                            ForgeDirection FD = getFDFor(user);
+                            ForgeDirection FD = Heading.look(user);
                             int blockX = x + x1 + FD.offsetX;
                             int blockY = y + FD.offsetY;
                             int blockZ = z + z1 + FD.offsetZ;
@@ -121,10 +122,6 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
         double var9 = posY - y;
         double var11 = posZ - z;
         return MathHelper.sqrt_double(var7 * var7 + var9 * var9 + var11 * var11);
-    }
-
-    private ForgeDirection getFDFor(EntityLivingBase user) {
-        return ForgeDirection.UNKNOWN;// TODO: FD
     }
 
     @Override

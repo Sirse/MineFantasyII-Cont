@@ -376,17 +376,6 @@ public class TacticalManager {
         return resistBase(user, source);
     }
 
-    /**
-     * Returns if a target should not be set
-     *
-     * @param entity the attacker
-     * @param target the target chosen
-     */
-    public static boolean shouldNotAttack(Entity attacker, EntityLivingBase target) {
-        // TODO aggro
-        return false;
-    }
-
     public static void throwPlayerOffBalance(EntityPlayer entityPlayer, float balance, boolean throwDown) {
         float amplify = 30.0F;
 

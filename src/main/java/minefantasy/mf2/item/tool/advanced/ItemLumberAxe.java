@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.weapon.IRackItem;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
@@ -137,7 +138,7 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
             for (int x1 = -2; x1 <= 2; x1++) {
                 for (int y1 = -2; y1 <= 2; y1++) {
                     for (int z1 = -2; z1 <= 2; z1++) {
-                        ForgeDirection FD = getFDFor(user);
+                        ForgeDirection FD = Heading.look(user);
                         int blockX = x + x1 + FD.offsetX;
                         int blockY = y + y1 + FD.offsetY;
                         int blockZ = z + z1 + FD.offsetZ;
@@ -170,10 +171,6 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
                 }
             }
         }
-    }
-
-    private ForgeDirection getFDFor(EntityLivingBase user) {
-        return ForgeDirection.UNKNOWN;// TODO: FD
     }
 
 }

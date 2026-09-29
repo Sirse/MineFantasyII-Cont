@@ -31,6 +31,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.config.ConfigTools;
@@ -72,7 +73,7 @@ public class ItemHvyPick extends ItemPickaxe implements IToolMaterial {
             for (int x1 = -1; x1 <= 1; x1++) {
                 for (int y1 = -1; y1 <= 1; y1++) {
                     for (int z1 = -1; z1 <= 1; z1++) {
-                        ForgeDirection FD = getFDFor(user);
+                        ForgeDirection FD = Heading.look(user);
                         int blockX = x + x1 + FD.offsetX;
                         int blockY = y + y1 + FD.offsetY;
                         int blockZ = z + z1 + FD.offsetZ;
@@ -107,10 +108,6 @@ public class ItemHvyPick extends ItemPickaxe implements IToolMaterial {
             }
         }
         return super.onBlockDestroyed(item, world, block, x, y, z, user);
-    }
-
-    private ForgeDirection getFDFor(EntityLivingBase user) {
-        return ForgeDirection.UNKNOWN;// TODO: FD
     }
 
     @Override
