@@ -2,6 +2,7 @@ package minefantasy.mf2.block.tileentity.blastfurnace;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
@@ -102,7 +103,15 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         startFire(0, 0, -1);
     }
 
-    private void dropItem(ItemStack result) {
+    /**
+     * Without a crucible below, Hardcore Ingots keeps a third of what the furnace smelts; the rest is lost.
+     */
+    public static boolean keepsLeftover(Random rand) {
+        return !ConfigHardcore.HCCreduceIngots || rand.nextInt(3) == 0;
+    }
+
+    /** Puts a smelted result into the crucible below; what does not fit goes out into the world. */
+    public void dropItem(ItemStack result) {
         TileEntity under = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
         if (under != null && under instanceof TileEntityCrucible) {
             TileEntityCrucible crucible = (TileEntityCrucible) under;
@@ -128,7 +137,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
         // The input is already consumed at this point, so the leftover has to reach the world. Hardcore Ingots is a
         // reduction on top of that, not the only path that produces anything.
-        if (!ConfigHardcore.HCCreduceIngots || rand.nextInt(3) == 0) {
+        if (keepsLeftover(rand)) {
             EntityItem entity = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, result);
             worldObj.spawnEntityInWorld(entity);
         }
