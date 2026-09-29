@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,7 +13,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -22,13 +20,13 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
-public class BlockBFH extends BlockContainer {
+public class BlockBFH extends BlockStation<TileEntityBlastFH> {
 
     private static boolean keepInventory;
     public IIcon bottomTex;
@@ -37,7 +35,7 @@ public class BlockBFH extends BlockContainer {
     private Random rand = new Random();
 
     public BlockBFH(boolean isActive) {
-        super(Material.anvil);
+        super(Material.anvil, TileEntityBlastFH.class);
         this.isActive = isActive;
         GameRegistry.registerBlock(this, isActive ? "MF_BlastHeaterActive" : "MF_BlastHeater");
         setBlockName("blastfurnheater");
@@ -94,29 +92,10 @@ public class BlockBFH extends BlockContainer {
         return new TileEntityBlastFH();
     }
 
-    private TileEntityBlastFH getTile(IBlockAccess world, int x, int y, int z) {
-        return (TileEntityBlastFH) world.getTileEntity(x, y, z);
-    }
-
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbour) {
         TileEntityBlastFH tile = getTile(world, x, y, z);
         if (tile != null) tile.updateBuild();
-    }
-
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepInventory) return;
-
-        TileEntityBlastFH tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            InventorySlots.spill(world, x, y, z, tile);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
     }
 
     @Override
@@ -159,4 +138,8 @@ public class BlockBFH extends BlockContainer {
         return Item.getItemFromBlock(BlockListMF.blast_heater);
     }
 
+    @Override
+    protected boolean keepsContents() {
+        return keepInventory;
+    }
 }

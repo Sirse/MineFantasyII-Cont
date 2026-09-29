@@ -4,7 +4,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,9 +18,10 @@ import minefantasy.mf2.api.refine.ISmokeCarrier;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
+import minefantasy.mf2.block.tileentity.TileEntityStation;
 import minefantasy.mf2.util.MFLogUtil;
 
-public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedInventory, ISmokeCarrier {
+public class TileEntityBlastFC extends TileEntityStation implements ISidedInventory, ISmokeCarrier {
 
     public int ticksExisted;
     public boolean isBuilt = false;
@@ -171,61 +171,10 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
         items = InventorySlots.read(nbt, "Items", items.length);
     }
 
-    // INVENTORY
-    public void onInventoryChanged() {}
-
-    @Override
-    public int getSizeInventory() {
-        return items.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return items[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(items, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(items, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        items[slot] = item;
-    }
-
     @Override
     public String getInventoryName() {
         return "gui.blastfurnace.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -283,5 +232,10 @@ public class TileEntityBlastFC extends TileEntity implements IInventory, ISidedI
             }
             return true;
         }
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return items;
     }
 }

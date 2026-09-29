@@ -5,16 +5,12 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.crafting.GridRecipe;
@@ -41,11 +37,9 @@ import minefantasy.mf2.item.armour.ItemArmourMF;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.mechanics.PlayerTickHandlerMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.StationStatePacket;
 
-public class TileEntityAnvilMF extends TileEntity
-        implements GridProject.Bench, StationStatePacket.Shown, IInventory, IQualityBalance, Diagnosis.Source {
+public class TileEntityAnvilMF extends TileEntityStation
+        implements GridProject.Bench, CraftBench, IQualityBalance, Diagnosis.Source {
 
     private final Random rand = new Random();
     public int tier;
@@ -138,64 +132,8 @@ public class TileEntityAnvilMF extends TileEntity
     }
 
     @Override
-    public int getSizeInventory() {
-        return inventory.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inventory[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        ItemStack taken = InventorySlots.take(inventory, slot, num);
-        if (taken != null) {
-            onInventoryChanged();
-        }
-        return taken;
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inventory, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        inventory[slot] = item;
-        onInventoryChanged();
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.anvilmf.name";
-    }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack item) {
-        return true;
     }
 
     @Override
@@ -539,17 +477,8 @@ public class TileEntityAnvilMF extends TileEntity
         return count >= number;
     }
 
-    /** Sends the state to the watchers, if it changed since they got it last. */
     public void syncData() {
-        if (worldObj.isRemote) return;
-        NBTTagCompound state = describe();
-        if (craft.changed(state)) {
-            NetworkUtils.sendToWatchers(
-                    new StationStatePacket(this, state).generatePacket(),
-                    worldObj,
-                    this.xCoord,
-                    this.zCoord);
-        }
+        sendState(false);
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
@@ -753,19 +682,11 @@ public class TileEntityAnvilMF extends TileEntity
     }
 
     /**
-     * Sent by the game when a player starts watching this chunk. syncData only fires when something changes, so without
-     * this a returning player saw "No Project Set" over a laid-out recipe until the next hit or grid change.
-     */
-    @Override
-    public Packet getDescriptionPacket() {
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
-    }
-
-    /**
      * What watchers are shown of the station: the description packet and the state packet carry the same, and
      * {@link #show} reads it back.
      */
-    private NBTTagCompound describe() {
+    @Override
+    protected NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
         CraftHud.write(nbt, progress, progressMax, toolTypeRequired, researchRequired, recipe);
         nbt.setFloat("QualityBalance", qualityBalance);
@@ -775,11 +696,6 @@ public class TileEntityAnvilMF extends TileEntity
         nbt.setInteger(CraftHud.TOOL_TIER, hammerTierRequired);
         nbt.setInteger("AnvilTier", anvilTierRequired);
         return nbt;
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        show(packet.func_148857_g());
     }
 
     @Override
@@ -974,5 +890,35 @@ public class TileEntityAnvilMF extends TileEntity
     @Override
     public CraftPlan currentProject() {
         return project;
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inventory;
+    }
+
+    @Override
+    public Role role(int slot) {
+        return slot == getSizeInventory() - 1 ? Role.OUTPUT : Role.INPUT;
+    }
+
+    @Override
+    public float getProgress() {
+        return progress;
+    }
+
+    @Override
+    public float getProgressMax() {
+        return progressMax;
+    }
+
+    @Override
+    public int getBenchTierNeeded() {
+        return getAnvilTierNeeded();
+    }
+
+    @Override
+    public boolean isBenchSufficient() {
+        return tier >= getAnvilTierNeeded();
     }
 }

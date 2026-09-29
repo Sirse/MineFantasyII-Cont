@@ -5,14 +5,9 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
@@ -30,10 +25,8 @@ import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.crafting.BlockEngineerTanner;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TannerPacket;
 
-public class TileEntityTanningRack extends TileEntity implements IInventory, Diagnosis.Source {
+public class TileEntityTanningRack extends TileEntityStation implements Diagnosis.Source {
 
     public ItemStack[] items = new ItemStack[2];
     public float progress;
@@ -191,9 +184,11 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         return false;
     }
 
+    /** The lever was pulled: the swing goes out once, then plays on its own on every side. */
     private void syncAnimation() {
-        if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new TannerPacket(this).generatePacket(), worldObj, xCoord, zCoord);
+        NBTTagCompound moment = new NBTTagCompound();
+        moment.setFloat("Swing", acTime);
+        sendMoment(moment);
     }
 
     public boolean isAutomated() {
@@ -342,77 +337,9 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         sendState(false);
     }
 
-    /** Re-sends the description packet below to everyone watching */
-    /**
-     * Sends the rack to the watchers if it changed since they got it last, or always: after an interaction a client may
-     * have guessed wrong even though nothing changed here.
-     */
-    private void sendState(boolean always) {
-        if (worldObj != null && !worldObj.isRemote && (craft.changed(describe()) || always)) {
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
-        }
-    }
-
-    /** The saved state, so a player who starts watching the rack sees what is on it */
-    @Override
-    public Packet getDescriptionPacket() {
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
-    }
-
-    /** What watchers are shown of the rack: all of its save. */
-    private NBTTagCompound describe() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        writeToNBT(nbt);
-        return nbt;
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        // readFromNBT only fills the slots it finds, so clear first or a removed hide would linger. The lever
-        // animation comes with TannerPacket and keeps its own timing.
-        float animation = acTime;
-        float prevAnimation = prevAcTime;
-        items = new ItemStack[items.length];
-        readFromNBT(packet.func_148857_g());
-        acTime = animation;
-        prevAcTime = prevAnimation;
-    }
-
-    @Override
-    public int getSizeInventory() {
-        return items.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return items[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(items, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(items, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        items[slot] = item;
-    }
-
     @Override
     public String getInventoryName() {
         return "tile.tanner.name";
-    }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
     }
 
     @Override
@@ -421,22 +348,44 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
-
-    @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
         return false;
     }
 
     private boolean isShabbyRack() {
         return worldObj.getBlock(xCoord, yCoord, zCoord) == BlockListMF.tanner;
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return items;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        writeToNBT(state);
+        // The swing runs down on its own every tick; carried, it would make every tick a new state
+        state.removeTag("acTime");
+        return state;
+    }
+
+    /** readFromNBT only fills the slots it finds, so they are cleared first, or a removed hide would linger. */
+    @Override
+    public void show(NBTTagCompound state) {
+        if (state.hasKey("Swing")) {
+            acTime = prevAcTime = state.getFloat("Swing");
+            return;
+        }
+        float swing = acTime;
+        items = new ItemStack[items.length];
+        readFromNBT(state);
+        acTime = prevAcTime = swing;
+    }
+
+    @Override
+    public Role role(int slot) {
+        // Slot 1 only shows what the hide becomes; it is no item to take
+        return slot == 0 ? Role.WORK : Role.NONE;
     }
 }

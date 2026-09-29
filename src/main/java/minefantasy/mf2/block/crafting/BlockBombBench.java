@@ -3,17 +3,13 @@ package minefantasy.mf2.block.crafting;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -23,18 +19,18 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.block.tileentity.InventorySlots;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.tileentity.TileEntityBombBench;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
-public class BlockBombBench extends BlockContainer {
+public class BlockBombBench extends BlockStation<TileEntityBombBench> {
 
     public static int bomb_RI = 102;
     private Random rand = new Random();
 
     public BlockBombBench() {
-        super(Material.wood);
+        super(Material.wood, TileEntityBombBench.class);
         GameRegistry.registerBlock(this, "MF_BombCrafter");
         setBlockName("bombBench");
         this.setStepSound(Block.soundTypeStone);
@@ -52,16 +48,6 @@ public class BlockBombBench extends BlockContainer {
     @Override
     public boolean isOpaqueCube() {
         return false;
-    }
-
-    /**
-     * Called when the block is placed in the world.
-     */
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-
-        world.setBlockMetadataWithNotify(x, y, z, direction, 2);
     }
 
     /**
@@ -99,23 +85,6 @@ public class BlockBombBench extends BlockContainer {
         return new TileEntityBombBench();
     }
 
-    private TileEntityBombBench getTile(World world, int x, int y, int z) {
-        return (TileEntityBombBench) world.getTileEntity(x, y, z);
-    }
-
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntityBombBench tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            InventorySlots.spill(world, x, y, z, tile);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
-    }
-
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
@@ -134,5 +103,10 @@ public class BlockBombBench extends BlockContainer {
     @Override
     public int getRenderType() {
         return bomb_RI;
+    }
+
+    @Override
+    protected boolean facesPlacer() {
+        return true;
     }
 }

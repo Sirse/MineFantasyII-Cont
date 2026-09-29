@@ -5,13 +5,8 @@ import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentTranslation;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
@@ -20,10 +15,8 @@ import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchArtefacts;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.ResearchTablePacket;
 
-public class TileEntityResearch extends TileEntity implements IInventory, IBasicMetre {
+public class TileEntityResearch extends TileEntityStation implements IBasicMetre {
 
     public float progress;
     public float maxProgress;
@@ -31,9 +24,6 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     private ItemStack[] items = new ItemStack[1];
     private Random rand = new Random();
     private int ticksExisted;
-    private int lastSyncedId = Integer.MIN_VALUE;
-    private float lastSyncedProgress = Float.NaN;
-    private float lastSyncedMaxProgress = Float.NaN;
 
     public static ArrayList<String> getInfo(ItemStack item) {
         if (item == null) {
@@ -195,20 +185,7 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     }
 
     public void syncData() {
-        if (worldObj.isRemote) return;
-
-        boolean changed = researchID != lastSyncedId || progress != lastSyncedProgress
-                || maxProgress != lastSyncedMaxProgress;
-
-        if (!changed) {
-            return;
-        }
-
-        lastSyncedId = researchID;
-        lastSyncedProgress = progress;
-        lastSyncedMaxProgress = maxProgress;
-
-        NetworkUtils.sendToWatchers(new ResearchTablePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        sendState(false);
     }
 
     @Override
@@ -220,22 +197,6 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
         nbt.setFloat("progress", progress);
         nbt.setFloat("maxProgress", maxProgress);
         InventorySlots.write(nbt, "Items", items);
-    }
-
-    /**
-     * The saved state, sent when a player starts watching the table. The research packet only goes out when progress
-     * moves, so a returning player otherwise saw an empty meter until it did.
-     */
-    @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        writeToNBT(nbt);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        readFromNBT(packet.func_148857_g());
     }
 
     @Override
@@ -250,55 +211,9 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     }
 
     @Override
-    public int getSizeInventory() {
-        return items.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return items[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        return InventorySlots.take(items, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(items, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        items[slot] = item;
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.research.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -321,5 +236,33 @@ public class TileEntityResearch extends TileEntity implements IInventory, IBasic
     @Override
     public String getLocalisedName() {
         return "";
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return items;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setInteger("ResearchID", researchID);
+        state.setFloat("Progress", progress);
+        state.setFloat("MaxProgress", Math.max(0, maxProgress));
+        InventorySlots.write(state, "Items", items);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        researchID = state.getInteger("ResearchID");
+        progress = state.getFloat("Progress");
+        maxProgress = state.getFloat("MaxProgress");
+        items = InventorySlots.read(state, "Items", items.length);
+    }
+
+    @Override
+    public Role role(int slot) {
+        return Role.WORK;
     }
 }

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,8 +25,8 @@ import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityForge;
 import minefantasy.mf2.item.armour.ItemApron;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -36,7 +35,7 @@ import minefantasy.mf2.item.tool.ItemLighterMF;
 import minefantasy.mf2.item.tool.crafting.ItemTongs;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
-public class BlockForge extends BlockContainer {
+public class BlockForge extends BlockStation<TileEntityForge> {
 
     public static int forge_RI = 104;
     private static boolean keepInventory;
@@ -46,7 +45,7 @@ public class BlockForge extends BlockContainer {
     private Random rand = new Random();
 
     public BlockForge(String tex, int tier, boolean isActive) {
-        super(tier == 1 ? Material.iron : Material.rock);
+        super(tier == 1 ? Material.iron : Material.rock, TileEntityForge.class);
         this.tier = tier;
         this.type = tex;
         this.isActive = isActive;
@@ -61,13 +60,13 @@ public class BlockForge extends BlockContainer {
         this.setLightOpacity(0);
     }
 
-    private static TileEntityForge getTile(IBlockAccess world, int x, int y, int z) {
+    private static TileEntityForge stationAt(IBlockAccess world, int x, int y, int z) {
         return (TileEntityForge) world.getTileEntity(x, y, z);
     }
 
     public static void updateFurnaceBlockState(boolean state, World world, int x, int y, int z) {
         int l = world.getBlockMetadata(x, y, z);
-        TileEntityForge tileentity = getTile(world, x, y, z);
+        TileEntityForge tileentity = stationAt(world, x, y, z);
         keepInventory = true;
         Block block = world.getBlock(x, y, z);
 
@@ -110,21 +109,6 @@ public class BlockForge extends BlockContainer {
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepInventory) return;
-
-        TileEntityForge tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            InventorySlots.spill(world, x, y, z, tile);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
         return BlockListMF.crucible.getIcon(side, meta);
@@ -134,7 +118,7 @@ public class BlockForge extends BlockContainer {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
             float yOffset, float zOffset) {
         ItemStack held = user.getHeldItem();
-        TileEntityForge tile = getTile(world, x, y, z);
+        TileEntityForge tile = stationAt(world, x, y, z);
         if (tile != null) {
             if (tile.isLit() && !ItemApron.isUserProtected(user)) {
                 user.setFire(5);
@@ -295,4 +279,8 @@ public class BlockForge extends BlockContainer {
         }
     }
 
+    @Override
+    protected boolean keepsContents() {
+        return keepInventory;
+    }
 }

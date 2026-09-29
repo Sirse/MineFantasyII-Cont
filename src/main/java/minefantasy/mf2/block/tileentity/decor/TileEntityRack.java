@@ -1,7 +1,5 @@
 package minefantasy.mf2.block.tileentity.decor;
 
-import java.util.List;
-
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -10,14 +8,11 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.helpers.BlockPositionHelper;
 import minefantasy.mf2.api.weapon.IRackItem;
 import minefantasy.mf2.block.tileentity.InventorySlots;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TileInventoryPacket;
 
 public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
 
@@ -95,21 +90,7 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     }
 
     public void syncItems() {
-        if (!worldObj.isRemote) {
-            List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities;
-
-            NetworkUtils.sendToWatchers(
-                    new TileInventoryPacket(this, this).generatePacket(),
-                    worldObj,
-                    this.xCoord,
-                    this.zCoord);
-            super.sendPacketToClient();
-            /*
-             * for (int i = 0; i < players.size(); i++) { EntityPlayer player = players.get(i); ((WorldServer)
-             * worldObj).getEntityTracker().func_151248_b(player, new TileInventoryPacket(this, this).generatePacket());
-             * super.sendPacketToClient(player); }
-             */
-        }
+        sendState(false);
     }
 
     @Override
@@ -221,5 +202,18 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
                 }
             }
         }
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = super.describe();
+        InventorySlots.write(state, "Items", inv);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        super.show(state);
+        inv = InventorySlots.read(state, "Items", inv.length);
     }
 }

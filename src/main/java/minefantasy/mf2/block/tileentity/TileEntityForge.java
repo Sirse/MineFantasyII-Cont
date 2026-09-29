@@ -4,8 +4,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -25,10 +23,8 @@ import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.refining.BlockForge;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.ForgePacket;
 
-public class TileEntityForge extends TileEntity implements IInventory, IBasicMetre, IHeatSource, IBellowsUseable {
+public class TileEntityForge extends TileEntityStation implements IBasicMetre, IHeatSource, IBellowsUseable {
 
     public static final float maxTemperature = 5000;
     public float fuel;
@@ -256,63 +252,8 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     @Override
-    public int getSizeInventory() {
-        return inv.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inv[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(inv, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inv, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        inv[slot] = item;
-    }
-
-    public void onInventoryChanged() {}
-
-    @Override
     public String getInventoryName() {
         return "gui.forge.name";
-    }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack item) {
-        return true;
     }
 
     public BlockForge getActiveBlock() {
@@ -452,16 +393,7 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
     }
 
     private void syncData() {
-
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new ForgePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new ForgePacket(this).generatePacket()); }
-         */
+        sendState(false);
     }
 
     public void onUsedWithBellows(float powerLevel) {
@@ -576,5 +508,37 @@ public class TileEntityForge extends TileEntity implements IInventory, IBasicMet
         int mx = (int) (temperature * 1.2F);
         int mn = (int) (temperature * 0.8F);
         return Functions.getIntervalWave1_i(ticksExisted, 400, mx, mn);
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inv;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setFloat("Fuel", Math.min(fuel, maxFuel));
+        state.setFloat("MaxFuel", maxFuel);
+        state.setFloat("Temperature", temperature);
+        state.setFloat("FuelTemperature", fuelTemperature);
+        state.setInteger("Heat", getHeat());
+        state.setInteger("Workable", getWorkableState());
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        fuel = state.getFloat("Fuel");
+        maxFuel = state.getFloat("MaxFuel");
+        temperature = state.getFloat("Temperature");
+        fuelTemperature = state.getFloat("FuelTemperature");
+        exactTemperature = state.getInteger("Heat");
+        workableState = state.getInteger("Workable");
+    }
+
+    @Override
+    public Role role(int slot) {
+        return Role.WORK;
     }
 }

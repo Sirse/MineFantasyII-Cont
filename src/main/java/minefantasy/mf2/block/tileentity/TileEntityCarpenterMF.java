@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.crafting.GridRecipe;
@@ -30,12 +25,10 @@ import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.container.ContainerCarpenterMF;
 import minefantasy.mf2.item.armour.ItemArmourMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.StationStatePacket;
 import minefantasy.mf2.util.MFLogUtil;
 
-public class TileEntityCarpenterMF extends TileEntity
-        implements GridProject.Bench, StationStatePacket.Shown, IInventory, Diagnosis.Source {
+public class TileEntityCarpenterMF extends TileEntityStation
+        implements GridProject.Bench, CraftBench, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -109,61 +102,8 @@ public class TileEntityCarpenterMF extends TileEntity
     }
 
     @Override
-    public int getSizeInventory() {
-        return inventory.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inventory[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(inventory, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inventory, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        inventory[slot] = item;
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.carpentermf.name";
-    }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
-
-    @Override
-    public boolean isItemValidForSlot(int slot, ItemStack item) {
-        return true;
     }
 
     @Override
@@ -335,17 +275,8 @@ public class TileEntityCarpenterMF extends TileEntity
         return item.getTagCompound();
     }
 
-    /** Sends the state to the watchers, if it changed since they got it last. */
     public void syncData() {
-        if (worldObj.isRemote) return;
-        NBTTagCompound state = describe();
-        if (craft.changed(state)) {
-            NetworkUtils.sendToWatchers(
-                    new StationStatePacket(this, state).generatePacket(),
-                    worldObj,
-                    this.xCoord,
-                    this.zCoord);
-        }
+        sendState(false);
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
@@ -538,29 +469,16 @@ public class TileEntityCarpenterMF extends TileEntity
     }
 
     /**
-     * Sent by the game when a player starts watching this chunk. syncData only fires when something changes, so without
-     * this a returning player saw "No Project Set" over a laid-out recipe until the next hit or grid change.
-     */
-    @Override
-    public Packet getDescriptionPacket() {
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, describe());
-    }
-
-    /**
      * What watchers are shown of the station: the description packet and the state packet carry the same, and
      * {@link #show} reads it back.
      */
-    private NBTTagCompound describe() {
+    @Override
+    protected NBTTagCompound describe() {
         NBTTagCompound nbt = new NBTTagCompound();
         CraftHud.write(nbt, progress, progressMax, toolTypeRequired, researchRequired, recipe);
         nbt.setInteger(CraftHud.TOOL_TIER, hammerTierRequired);
         nbt.setInteger("CarpenterTier", CarpenterTierRequired);
         return nbt;
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        show(packet.func_148857_g());
     }
 
     @Override
@@ -631,5 +549,31 @@ public class TileEntityCarpenterMF extends TileEntity
     @Override
     public CraftPlan currentProject() {
         return project;
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inventory;
+    }
+
+    @Override
+    public Role role(int slot) {
+        // The output, then the slots the containers come back to
+        return slot >= getSizeInventory() - 5 ? Role.OUTPUT : Role.INPUT;
+    }
+
+    @Override
+    public float getProgress() {
+        return progress;
+    }
+
+    @Override
+    public float getProgressMax() {
+        return progressMax;
+    }
+
+    @Override
+    public int getBenchTierNeeded() {
+        return getCarpenterTierNeeded();
     }
 }

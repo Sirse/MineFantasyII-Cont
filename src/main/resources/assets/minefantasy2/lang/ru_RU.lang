@@ -391,6 +391,7 @@ tooltype.brush=Кисть
 
 tooltype.anvil=Наковальня
 tooltype.carpenter=Плотницкий верстак
+tooltype.kitchenbench=Кухонный стол
 
 attribute.weapon.penetrateArmor=Проникновение
 attribute.weapon.daze=Оглушение

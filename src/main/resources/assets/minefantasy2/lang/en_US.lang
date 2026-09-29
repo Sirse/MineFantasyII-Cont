@@ -273,6 +273,7 @@ tooltype.brush=Paint Brush
 
 tooltype.anvil=Anvil
 tooltype.carpenter=Carpenter Bench
+tooltype.kitchenbench=Kitchen Bench
 
 attribute.weapon.penetrateArmor=Armor Penetration
 attribute.weapon.daze=Daze

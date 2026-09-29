@@ -4,13 +4,8 @@ import java.util.Random;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -33,20 +28,16 @@ import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.item.heatable.ItemHeated;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BloomeryPacket;
 
-public class TileEntityBloomery extends TileEntity implements IInventory, Diagnosis.Source {
+public class TileEntityBloomery extends TileEntityStation implements Diagnosis.Source {
 
     public float progress, progressMax;
     /**
-     * Client-side render flag, fed by BloomeryPacket and getDescriptionPacket. On the server the truth is the bloom
-     * slot, so always read it through {@link #hasBloom()} rather than touching this directly.
+     * Client-side render flag, fed by the described state. On the server the truth is the bloom slot, so always read it
+     * through {@link #hasBloom()} rather than touching this directly.
      */
     public boolean hasBloom;
     public boolean isActive;
-    private boolean lastSyncedActive;
-    private boolean lastSyncedBloom;
     private ItemStack[] inv = new ItemStack[3];
     private Random rand = new Random();
 
@@ -160,40 +151,12 @@ public class TileEntityBloomery extends TileEntity implements IInventory, Diagno
             }
         }
         if (!worldObj.isRemote) {
-            // BloomeryPacket only carries these two flags, so sync exactly when one of them flips. Clients entering
-            // tracking range get their initial state from getDescriptionPacket instead of a periodic heartbeat.
-            boolean bloom = hasBloom();
-            if (isActive != lastSyncedActive || bloom != lastSyncedBloom) {
-                lastSyncedActive = isActive;
-                lastSyncedBloom = bloom;
-                syncData();
-            }
+            sendState(false);
         }
     }
 
-    /**
-     * Vanilla pushes this to every player entering tracking range, so no periodic resync polling is needed. Only the
-     * render flags travel here; the inventory stays server-side.
-     */
-    @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setBoolean("hasBloom", hasBloom());
-        nbt.setBoolean("isActive", isActive);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 1, nbt);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        NBTTagCompound nbt = packet.func_148857_g();
-        hasBloom = nbt.getBoolean("hasBloom");
-        isActive = nbt.getBoolean("isActive");
-    }
-
     public void syncData() {
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new BloomeryPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        sendState(false);
     }
 
     /**
@@ -318,55 +281,9 @@ public class TileEntityBloomery extends TileEntity implements IInventory, Diagno
     }
 
     @Override
-    public int getSizeInventory() {
-        return inv.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inv[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        return InventorySlots.take(inv, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inv, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        inv[slot] = item;
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.bloomery.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -410,5 +327,29 @@ public class TileEntityBloomery extends TileEntity implements IInventory, Diagno
     @SideOnly(Side.CLIENT)
     public String getTextureName() {
         return "bloomery_basic";
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inv;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setBoolean("hasBloom", hasBloom());
+        state.setBoolean("isActive", isActive);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        hasBloom = state.getBoolean("hasBloom");
+        isActive = state.getBoolean("isActive");
+    }
+
+    @Override
+    public Role role(int slot) {
+        return slot == 2 ? Role.OUTPUT : Role.INPUT;
     }
 }

@@ -2,27 +2,22 @@ package minefantasy.mf2.block.crafting;
 
 import java.util.Random;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.block.tileentity.InventorySlots;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.tileentity.TileEntityRoast;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockRoast extends BlockContainer {
+public class BlockRoast extends BlockStation<TileEntityRoast> {
 
     public static int roast_RI = 113;
     public String tex;
@@ -31,7 +26,7 @@ public class BlockRoast extends BlockContainer {
     private int tier;
 
     public BlockRoast(int tier, String tex, boolean isOven) {
-        super(Material.rock);
+        super(Material.rock, TileEntityRoast.class);
         this.isOven = isOven;
         this.tex = tex;
         this.tier = tier;
@@ -55,17 +50,6 @@ public class BlockRoast extends BlockContainer {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int dir = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-
-        world.setBlockMetadataWithNotify(x, y, z, dir, 2);
-    }
-
-    public TileEntityRoast getTile(World world, int x, int y, int z) {
-        return (TileEntityRoast) world.getTileEntity(x, y, z);
-    }
-
-    @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
             float yOffset, float zOffset) {
         TileEntityRoast tile = getTile(world, x, y, z);
@@ -73,19 +57,6 @@ public class BlockRoast extends BlockContainer {
             return tile.interact(user);
         }
         return true;
-    }
-
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntityRoast tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            InventorySlots.spill(world, x, y, z, tile, 0, 1);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
     }
 
     @Override
@@ -117,5 +88,16 @@ public class BlockRoast extends BlockContainer {
     @Override
     public int getRenderType() {
         return isOven ? roast_RI : super.getRenderType();
+    }
+
+    @Override
+    protected boolean facesPlacer() {
+        return true;
+    }
+
+    /** Only the food on the spit is an item; the rest is what the spit shows. */
+    @Override
+    protected int spilledSlots(TileEntityRoast station) {
+        return 1;
     }
 }

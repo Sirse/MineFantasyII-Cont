@@ -1,11 +1,8 @@
 package minefantasy.mf2.block.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,10 +17,8 @@ import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.item.list.ComponentListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.QuernPacket;
 
-public class TileEntityQuern extends TileEntity implements IInventory, ISidedInventory, Diagnosis.Source {
+public class TileEntityQuern extends TileEntityStation implements Diagnosis.Source {
 
     public int turnAngle;
     private ItemStack[] inv = new ItemStack[3]; // 0 input, 1 pot, 2 output
@@ -135,8 +130,7 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     }
 
     private void syncAnimation() {
-        if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new QuernPacket(this).generatePacket(), worldObj, xCoord, zCoord);
+        sendState(false);
     }
 
     public boolean onRevolutionComplete() {
@@ -157,55 +151,9 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     }
 
     @Override
-    public int getSizeInventory() {
-        return inv.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inv[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        return InventorySlots.take(inv, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inv, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        inv[slot] = item;
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.quern.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -237,17 +185,26 @@ public class TileEntityQuern extends TileEntity implements IInventory, ISidedInv
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[] { 0, 1, 2 };
+    protected ItemStack[] slots() {
+        return inv;
     }
 
     @Override
-    public boolean canInsertItem(int slot, ItemStack item, int side) {
-        return isItemValidForSlot(slot, item);
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setInteger("TurnAngle", turnAngle);
+        state.setInteger("PostUseTicks", postUseTicks);
+        return state;
     }
 
     @Override
-    public boolean canExtractItem(int slot, ItemStack item, int side) {
-        return slot == 2;
+    public void show(NBTTagCompound state) {
+        turnAngle = Math.max(0, state.getInteger("TurnAngle"));
+        postUseTicks = Math.max(0, state.getInteger("PostUseTicks"));
+    }
+
+    @Override
+    public Role role(int slot) {
+        return slot == 2 ? Role.OUTPUT : Role.INPUT;
     }
 }

@@ -8,10 +8,8 @@ import net.minecraft.tileentity.TileEntity;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockComponent;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.StorageBlockPacket;
 
-public class TileEntityComponent extends TileEntity {
+public class TileEntityComponent extends TileEntityShown {
 
     public ItemStack item;
     public int stackSize, max;
@@ -122,9 +120,7 @@ public class TileEntityComponent extends TileEntity {
     }
 
     public void syncData() {
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new StorageBlockPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        sendState(false);
     }
 
     public boolean isFull() {
@@ -174,5 +170,17 @@ public class TileEntityComponent extends TileEntity {
             return stackSize > 16 ? 1.0F : 0.5F;
         }
         return 1.0F;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        writeToNBT(state);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        readFromNBT(state);
     }
 }

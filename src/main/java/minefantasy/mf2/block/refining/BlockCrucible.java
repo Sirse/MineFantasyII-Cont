@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -23,15 +22,15 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.item.ItemFilledMould;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockCrucible extends BlockContainer {
+public class BlockCrucible extends BlockStation<TileEntityCrucible> {
 
     private static boolean keepInventory;
     public final boolean isActive;
@@ -42,7 +41,7 @@ public class BlockCrucible extends BlockContainer {
     private IIcon sideTex, topTex;
 
     public BlockCrucible(String tex, int tier, boolean isActive) {
-        super(Material.rock);
+        super(Material.rock, TileEntityCrucible.class);
         this.tier = tier;
         this.type = tex;
         this.isActive = isActive;
@@ -54,13 +53,13 @@ public class BlockCrucible extends BlockContainer {
         this.setCreativeTab(CreativeTabMF.tabUtil);
     }
 
-    private static TileEntityCrucible getTile(IBlockAccess world, int x, int y, int z) {
+    private static TileEntityCrucible stationAt(IBlockAccess world, int x, int y, int z) {
         return (TileEntityCrucible) world.getTileEntity(x, y, z);
     }
 
     public static void updateFurnaceBlockState(boolean state, World world, int x, int y, int z) {
         int l = world.getBlockMetadata(x, y, z);
-        TileEntityCrucible tileentity = getTile(world, x, y, z);
+        TileEntityCrucible tileentity = stationAt(world, x, y, z);
         keepInventory = true;
         Block block = world.getBlock(x, y, z);
 
@@ -127,23 +126,6 @@ public class BlockCrucible extends BlockContainer {
     }
 
     @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepInventory) return;
-
-        TileEntityCrucible tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            int size = (!isAuto && ConfigHardcore.HCCreduceIngots) ? tile.getSizeInventory() - 1
-                    : tile.getSizeInventory();
-            InventorySlots.spill(world, x, y, z, tile, 0, size);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
-    }
-
-    @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
         return side == 1 ? topTex : sideTex;
@@ -152,7 +134,7 @@ public class BlockCrucible extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
             float yOffset, float zOffset) {
-        TileEntityCrucible tile = getTile(world, x, y, z);
+        TileEntityCrucible tile = stationAt(world, x, y, z);
         if (tile != null) {
             ItemStack held = user.getHeldItem();
             if (held != null && held.getItem() == ComponentListMF.artefacts && held.getItemDamage() == 3) {
@@ -216,5 +198,16 @@ public class BlockCrucible extends BlockContainer {
     @Override
     public Item getItemDropped(int meta, Random rand, int fort) {
         return Item.getItemFromBlock(getInactiveBlock(tier, isAuto));
+    }
+
+    @Override
+    protected boolean keepsContents() {
+        return keepInventory;
+    }
+
+    /** With Hardcore Ingots a broken crucible loses what it has already melted. */
+    @Override
+    protected int spilledSlots(TileEntityCrucible station) {
+        return !isAuto && ConfigHardcore.HCCreduceIngots ? station.getSizeInventory() - 1 : station.getSizeInventory();
     }
 }

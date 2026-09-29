@@ -7,10 +7,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.refine.IBellowsUseable;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BellowsPacket;
 
-public class TileEntityBellows extends TileEntity {
+public class TileEntityBellows extends TileEntityShown {
 
     public int direction;
     public int prevPress = 0;
@@ -57,9 +55,11 @@ public class TileEntityBellows extends TileEntity {
         if (press < 0) press = 0;
     }
 
+    /** The press starts: it goes out once, then runs down on its own on every side. */
     private void sendPacketToClients() {
-        if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new BellowsPacket(this).generatePacket(), worldObj, xCoord, zCoord);
+        NBTTagCompound moment = new NBTTagCompound();
+        moment.setFloat("Press", press);
+        sendMoment(moment);
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
@@ -120,5 +120,10 @@ public class TileEntityBellows extends TileEntity {
             return (IBellowsUseable) tile;
         }
         return null;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        press = Math.max(0, (int) state.getFloat("Press"));
     }
 }

@@ -174,18 +174,6 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
         return 5;
     }
 
-    public void sync() {
-        /*
-         * TODO Custom Tex MineFantasyII.debugMsg("Block For Chimney = " + maskBlock.getUnlocalizedName() + " R = " +
-         * worldObj.isRemote); if(!worldObj.isRemote) { MineFantasyII.debugMsg("Syncing Chimney " + xCoord + ", " +
-         * yCoord + ", " + zCoord); List<EntityPlayer> players = ((WorldServer)worldObj).playerEntities; for(int i = 0;
-         * i < players.size(); i++) { EntityPlayer player = players.get(i);
-         * ((WorldServer)worldObj).getEntityTracker().func_151248_b(player, new ChimneyPacket(this).generatePacket()); }
-         * } MineFantasyII.debugMsg("Syncing Render " + xCoord + ", " + yCoord + ", " + zCoord);
-         * worldObj.markBlockRangeForRenderUpdate(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-         */
-    }
-
     public BlockChimney getActiveBlock() {
         if (worldObj == null) return null;
 

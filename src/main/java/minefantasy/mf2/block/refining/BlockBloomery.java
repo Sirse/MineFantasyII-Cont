@@ -3,27 +3,25 @@ package minefantasy.mf2.block.refining;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityBloomery;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.tool.ItemLighterMF;
 
-public class BlockBloomery extends BlockContainer {
+public class BlockBloomery extends BlockStation<TileEntityBloomery> {
 
     public static int bloomery_RI = 109;
     public IIcon bottomTex;
@@ -31,7 +29,7 @@ public class BlockBloomery extends BlockContainer {
     private Random rand = new Random();
 
     public BlockBloomery() {
-        super(Material.rock);
+        super(Material.rock, TileEntityBloomery.class);
         GameRegistry.registerBlock(this, "MF_Bloomery");
         setBlockName("bloomery");
         this.setStepSound(Block.soundTypeStone);
@@ -53,24 +51,6 @@ public class BlockBloomery extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityBloomery();
-    }
-
-    private TileEntityBloomery getTile(IBlockAccess world, int x, int y, int z) {
-        return (TileEntityBloomery) world.getTileEntity(x, y, z);
-    }
-
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntityBloomery tile = getTile(world, x, y, z);
-
-        if (tile != null) {
-            // breaking does not retrieve the result
-            InventorySlots.spill(world, x, y, z, tile, 0, tile.getSizeInventory() - 1);
-
-            world.func_147453_f(x, y, z, block);
-        }
-
-        super.breakBlock(world, x, y, z, block, meta);
     }
 
     @Override
@@ -128,4 +108,9 @@ public class BlockBloomery extends BlockContainer {
         return bloomery_RI;
     }
 
+    /** Breaking does not retrieve the bloom. */
+    @Override
+    protected int spilledSlots(TileEntityBloomery station) {
+        return station.getSizeInventory() - 1;
+    }
 }

@@ -15,8 +15,6 @@ import minefantasy.mf2.api.tool.IStorageBlock;
 import minefantasy.mf2.block.decor.BlockAmmoBox;
 import minefantasy.mf2.item.ItemBandage;
 import minefantasy.mf2.item.gadget.ItemSyringe;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.AmmoBoxPacket;
 
 public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetre {
 
@@ -218,8 +216,7 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
         if (worldObj.isRemote) return;
         // Validate current contents before sync
         setContentsValidated(ammo, stock);
-
-        NetworkUtils.sendToWatchers(new AmmoBoxPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        sendState(false);
     }
 
     /**
@@ -294,5 +291,27 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
             }
         }
         return storageSize;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = super.describe();
+        state.setInteger("Stock", stock);
+        if (ammo != null) {
+            state.setTag("Ammo", ammo.writeToNBT(new NBTTagCompound()));
+        }
+        state.setInteger("Angle", angle);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        super.show(state);
+        ItemStack shown = state.hasKey("Ammo") ? ItemStack.loadItemStackFromNBT(state.getCompoundTag("Ammo")) : null;
+        boolean changed = setContentsValidated(shown, state.getInteger("Stock"));
+        angle = ((state.getInteger("Angle") % 360) + 360) % 360;
+        if (changed && worldObj != null) {
+            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        }
     }
 }

@@ -30,27 +30,11 @@ public class PacketHandlerMF {
         packetList.put(StationStatePacket.packetName, new StationStatePacket());
         packetList.put(KnowledgePacket.packetName, new KnowledgePacket());
         packetList.put(ResearchRequest.packetName, new ResearchRequest());
-        packetList.put(ChimneyPacket.packetName, new ChimneyPacket());
         packetList.put(SkillPacket.packetName, new SkillPacket());
         packetList.put(LevelupPacket.packetName, new LevelupPacket());
-        packetList.put(ForgePacket.packetName, new ForgePacket());
-        packetList.put(ResearchTablePacket.packetName, new ResearchTablePacket());
-        packetList.put(TroughPacket.packetName, new TroughPacket());
-        packetList.put(BombBenchPacket.packetName, new BombBenchPacket());
-        packetList.put(TannerPacket.packetName, new TannerPacket());
-        packetList.put(BellowsPacket.packetName, new BellowsPacket());
-        packetList.put(QuernPacket.packetName, new QuernPacket());
-        packetList.put(BombPressPacket.packetName, new BombPressPacket());
-        packetList.put(BloomeryPacket.packetName, new BloomeryPacket());
-        packetList.put(CrossbowBenchPacket.packetName, new CrossbowBenchPacket());
-        packetList.put(TileInventoryPacket.packetName, new TileInventoryPacket());
-        packetList.put(BigFurnacePacket.packetName, new BigFurnacePacket());
         packetList.put(DodgeCommand.packetName, new DodgeCommand());
         packetList.put(RackCommand.packetName, new RackCommand());
-        packetList.put(AmmoBoxPacket.packetName, new AmmoBoxPacket());
-        packetList.put(WoodDecorPacket.packetName, new WoodDecorPacket());
         packetList.put(CogworkControlPacket.packetName, new CogworkControlPacket());
-        packetList.put(StorageBlockPacket.packetName, new StorageBlockPacket());
         packetList.put(ExtendedReachPacket.packetName, new ExtendedReachPacket());
     }
 

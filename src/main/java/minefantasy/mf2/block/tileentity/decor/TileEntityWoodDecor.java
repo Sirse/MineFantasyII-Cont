@@ -2,14 +2,12 @@ package minefantasy.mf2.block.tileentity.decor;
 
 import net.minecraft.block.Block;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockWoodDecor;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.WoodDecorPacket;
+import minefantasy.mf2.block.tileentity.TileEntityShown;
 
-public abstract class TileEntityWoodDecor extends TileEntity {
+public abstract class TileEntityWoodDecor extends TileEntityShown {
 
     private String tex;
     private CustomMaterial material;
@@ -78,7 +76,15 @@ public abstract class TileEntityWoodDecor extends TileEntity {
         return tex;
     }
 
-    public void sendPacketToClient() {
-        NetworkUtils.sendToWatchers(new WoodDecorPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setString("Material", getMaterialName());
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        trySetMaterial(state.getString("Material"));
     }
 }

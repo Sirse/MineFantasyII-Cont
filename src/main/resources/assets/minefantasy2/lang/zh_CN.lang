@@ -273,6 +273,7 @@ tooltype.brush=油漆刷
 
 tooltype.anvil=砧
 tooltype.carpenter=木匠工作台
+tooltype.kitchenbench=厨房工作台
 
 attribute.weapon.penetrateArmor=破甲
 attribute.weapon.daze=眩晕

@@ -3,15 +3,12 @@ package minefantasy.mf2.block.refining;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
@@ -19,19 +16,14 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockBigFurnace extends BlockContainer {
+public class BlockBigFurnace extends BlockStation<TileEntityBigFurnace> {
 
     public static int furn_RI = 114;
-    /**
-     * This flag is used to prevent the furnace inventory to be dropped upon block removal, is used internally when the
-     * furnace block changes from idle to active and vice-versa.
-     */
-    private static boolean keepFurnaceInventory = false;
     public final boolean isHeater;
     public final int tier;
     /**
@@ -40,7 +32,7 @@ public class BlockBigFurnace extends BlockContainer {
     private Random rand = new Random();
 
     public BlockBigFurnace(String name, boolean isHeater, int tier) {
-        super(Material.rock);
+        super(Material.rock, TileEntityBigFurnace.class);
         this.isHeater = isHeater;
         this.tier = tier;
         this.setCreativeTab(CreativeTabMF.tabUtil);
@@ -113,33 +105,13 @@ public class BlockBigFurnace extends BlockContainer {
         return new TileEntityBigFurnace();
     }
 
-    /**
-     * Called when the block is placed in the world.
-     */
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack item) {
-        int dir = MathHelper.floor_double(entity.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-
-        world.setBlockMetadataWithNotify(x, y, z, dir, 2);
-    }
-
-    /**
-     * Called whenever the block is removed.
-     */
-    @Override
-    public void breakBlock(World world, int x, int y, int z, Block i1, int i2) {
-        if (!keepFurnaceInventory) {
-            TileEntityBigFurnace tile = (TileEntityBigFurnace) world.getTileEntity(x, y, z);
-
-            if (tile != null) {
-                InventorySlots.spill(world, x, y, z, tile);
-            }
-        }
-
-        super.breakBlock(world, x, y, z, i1, i2);
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public void registerBlockIcons(IIconRegister reg) {}
+
+    @Override
+    protected boolean facesPlacer() {
+        return true;
+    }
+
 }

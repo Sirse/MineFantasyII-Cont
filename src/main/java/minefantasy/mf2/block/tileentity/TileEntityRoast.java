@@ -6,13 +6,9 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.relauncher.Side;
@@ -26,10 +22,8 @@ import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.block.crafting.BlockRoast;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TileInventoryPacket;
 
-public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser {
+public class TileEntityRoast extends TileEntityStation implements IHeatUser {
 
     /**
      * Enable high temperatures ruin cooking
@@ -236,24 +230,6 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         return "";
     }
 
-    /**
-     * The saved state, sent when a player starts watching the spit. The inventory packet only goes out on changes, so a
-     * returning player otherwise saw an empty spit until the food next changed.
-     */
-    @Override
-    public Packet getDescriptionPacket() {
-        NBTTagCompound nbt = new NBTTagCompound();
-        writeToNBT(nbt);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
-    }
-
-    @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        // readFromNBT only fills the slots it finds, so clear first or taken food would linger
-        items = new ItemStack[items.length];
-        readFromNBT(packet.func_148857_g());
-    }
-
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
@@ -274,61 +250,15 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         InventorySlots.write(nbt, "Items", items);
     }
 
-    // INVENTORY
-    public void onInventoryChanged() {}
-
-    @Override
-    public int getSizeInventory() {
-        return items.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return items[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(items, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(items, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        items[slot] = item;
-    }
-
     @Override
     public String getInventoryName() {
         return "tile.roast.name";
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
     public int getInventoryStackLimit() {
         return 1;
     }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -340,24 +270,8 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
         return true;
     }
 
-    /** Sends the station to the watchers, if it changed since they got it last. */
     private void sendPacketToClients() {
-        if (worldObj.isRemote) return;
-        NBTTagCompound state = new NBTTagCompound();
-        writeToNBT(state);
-        if (!craft.changed(state)) return;
-
-        NetworkUtils.sendToWatchers(
-                new TileInventoryPacket(this, this).generatePacket(),
-                worldObj,
-                this.xCoord,
-                this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new TileInventoryPacket(this, this).generatePacket()); }
-         */
+        sendState(false);
     }
 
     @SideOnly(Side.CLIENT)
@@ -382,5 +296,29 @@ public class TileEntityRoast extends TileEntity implements IInventory, IHeatUser
     public int getBlockMetadata() {
         if (worldObj == null) return 0;
         return super.getBlockMetadata();
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return items;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        writeToNBT(state);
+        return state;
+    }
+
+    /** readFromNBT only fills the slots it finds, so they are cleared first, or taken food would linger. */
+    @Override
+    public void show(NBTTagCompound state) {
+        items = new ItemStack[items.length];
+        readFromNBT(state);
+    }
+
+    @Override
+    public Role role(int slot) {
+        return Role.WORK;
     }
 }

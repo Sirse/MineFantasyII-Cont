@@ -7,8 +7,6 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.TroughPacket;
 
 public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBlock {
 
@@ -116,10 +114,19 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
     }
 
     public void syncData() {
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new TroughPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
-        super.sendPacketToClient();
+        sendState(false);
     }
 
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = super.describe();
+        state.setInteger("Fill", fill);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        super.show(state);
+        fill = Math.max(0, Math.min(state.getInteger("Fill"), getCapacity()));
+    }
 }

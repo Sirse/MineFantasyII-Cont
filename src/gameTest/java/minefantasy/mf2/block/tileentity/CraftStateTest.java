@@ -4,6 +4,8 @@ import static minefantasy.mf2.block.tileentity.Stations.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -47,15 +49,35 @@ public class CraftStateTest {
         helper.succeed();
     }
 
+    /** A block whose state is one number. */
+    private static final class Counter extends TileEntityShown {
+
+        float value;
+
+        @Override
+        protected NBTTagCompound describe() {
+            NBTTagCompound state = new NBTTagCompound();
+            state.setFloat("Value", value);
+            return state;
+        }
+    }
+
     @GameTest
     public static void anUnchangedStateIsSentOnce(GameTestHelper helper) throws Exception {
-        CraftState state = new CraftState();
-        NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setFloat("Progress", 1F);
-        assertTrue(state.changed(nbt));
-        assertFalse(state.changed((NBTTagCompound) nbt.copy()));
-        nbt.setFloat("Progress", 2F);
-        assertTrue("the kept copy followed the station's tag", state.changed(nbt));
+        Stations.begin(helper);
+        try {
+            Counter counter = place(new Counter());
+            counter.value = 1F;
+            assertTrue("a new state was not due", unsent(counter));
+            counter.sendState(false);
+            assertFalse("the sent state was not kept", unsent(counter));
+            counter.sendState(false);
+            assertFalse(unsent(counter));
+            counter.value = 2F;
+            assertTrue("the kept copy followed the block's state", unsent(counter));
+        } finally {
+            Stations.end();
+        }
         helper.succeed();
     }
 
@@ -63,10 +85,11 @@ public class CraftStateTest {
 
     // region stations
 
-    /** Whether the station's shown state differs from what its watchers last got. */
-    private static boolean unsent(Object station) throws Exception {
-        CraftState craft = (CraftState) get(station, "craft");
-        return craft.changed((NBTTagCompound) call(station, "describe", new Class<?>[0]));
+    /** Whether the block's shown state differs from what its watchers last got. */
+    private static boolean unsent(TileEntityShown shown) throws Exception {
+        Field sent = TileEntityShown.class.getDeclaredField("sent");
+        sent.setAccessible(true);
+        return !shown.describe().equals(sent.get(shown));
     }
 
     @GameTest
@@ -149,10 +172,7 @@ public class CraftStateTest {
             spit.progress = 4;
             spit.updateRecipe();
             assertEquals("a recheck of the same food restarted it", 4F, spit.progress, 0F);
-            CraftState craft = (CraftState) get(spit, "craft");
-            NBTTagCompound shown = new NBTTagCompound();
-            spit.writeToNBT(shown);
-            assertFalse("the spit did not send its food", craft.changed(shown));
+            assertFalse("the spit did not send its food", unsent(spit));
         } finally {
             Stations.end();
         }

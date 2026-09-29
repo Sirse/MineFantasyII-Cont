@@ -7,7 +7,6 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
@@ -40,11 +39,9 @@ import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.refining.BlockBigFurnace;
 import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BigFurnacePacket;
 
-public class TileEntityBigFurnace extends TileEntity
-        implements IBellowsUseable, IInventory, ISidedInventory, Diagnosis.Source {
+public class TileEntityBigFurnace extends TileEntityStation
+        implements IBellowsUseable, ISidedInventory, Diagnosis.Source {
 
     /** Smelting without a furnace recipe, by vanilla's furnace list. */
     private static final RecipeId VANILLA = RecipeId.of("minefantasy2", "big_furnace/vanilla");
@@ -73,8 +70,6 @@ public class TileEntityBigFurnace extends TileEntity
     private int ticksExisted;
     private int ticksSinceSync;
     private boolean wasBurning;
-    private int lastSyncedBurn = -1;
-    private int lastSyncedDoorAngle = -1;
 
     public TileEntityBigFurnace() {
         super();
@@ -466,19 +461,6 @@ public class TileEntityBigFurnace extends TileEntity
          */
     }
 
-    @Override
-    public int getSizeInventory() {
-        return inv.length;
-    }
-
-    public ItemStack getStackInSlot(int i) {
-        return inv[i];
-    }
-
-    public ItemStack decrStackSize(int i, int j) {
-        return InventorySlots.take(inv, i, j);
-    }
-
     @SideOnly(Side.CLIENT)
     public int getBurnTimeRemainingScaled(int height) {
         if (this.maxFuel == 0) {
@@ -502,13 +484,6 @@ public class TileEntityBigFurnace extends TileEntity
         int size = (int) (height / TileEntityForge.maxTemperature * this.maxHeat);
 
         return Math.min(size, height);
-    }
-
-    public void setInventorySlotContents(int i, ItemStack itemstack) {
-        inv[i] = itemstack;
-        if (itemstack != null && itemstack.stackSize > getInventoryStackLimit()) {
-            itemstack.stackSize = getInventoryStackLimit();
-        }
     }
 
     public String getInvName() {
@@ -570,10 +545,6 @@ public class TileEntityBigFurnace extends TileEntity
         InventorySlots.write(nbt, "Items", inv);
     }
 
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
     public boolean isBurning() {
         if (worldObj == null) {
             return false;
@@ -612,13 +583,6 @@ public class TileEntityBigFurnace extends TileEntity
         return (int) Math.ceil(ForgeItemHandler.getForgeFuel(itemstack) / 8);
     }
 
-    public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-        if (worldObj.getTileEntity(xCoord, yCoord, zCoord) != this) {
-            return false;
-        }
-        return entityplayer.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
-    }
-
     public void openChest() {
         if (numUsers == 0) {
             this.worldObj.playSoundEffect(
@@ -645,30 +609,8 @@ public class TileEntityBigFurnace extends TileEntity
         }
     }
 
-    @Override
-    public ItemStack getStackInSlotOnClosing(int var1) {
-        return InventorySlots.takeAll(inv, var1);
-    }
-
     private void sendPacketToClients() {
-        if (worldObj.isRemote) {
-            return;
-        }
-
-        int burn = isBurning() ? 1 : 0;
-        // Only the burning state and the door angle are rendered outside the GUI. fuel and progress change every
-        // tick while the machine runs, and GuiBigFurnace already gets them through ContainerBigFurnace.trackInt,
-        // so they ride along in the payload for late watchers but no longer trigger a broadcast of their own.
-        boolean changed = doorAngle != lastSyncedDoorAngle || burn != lastSyncedBurn;
-
-        if (!changed && ticksExisted % 40 != 0) {
-            return;
-        }
-
-        lastSyncedDoorAngle = doorAngle;
-        lastSyncedBurn = burn;
-
-        NetworkUtils.sendToWatchers(new BigFurnacePacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
+        sendState(false);
     }
 
     public int getBlockMetadata() {
@@ -945,20 +887,25 @@ public class TileEntityBigFurnace extends TileEntity
     }
 
     @Override
-    public boolean hasCustomInventoryName() {
-        // TODO Auto-generated method stub
-        return false;
+    protected ItemStack[] slots() {
+        return inv;
+    }
+
+    /**
+     * Only the door and the fire show outside the window; fuel and progress change every tick while the furnace runs,
+     * and the window gets them through its container.
+     */
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setInteger("DoorAngle", doorAngle);
+        state.setBoolean("Burning", isBurning());
+        return state;
     }
 
     @Override
-    public void openInventory() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void closeInventory() {
-        // TODO Auto-generated method stub
-
+    public void show(NBTTagCompound state) {
+        doorAngle = state.getInteger("DoorAngle");
+        isBurningClient = state.getBoolean("Burning");
     }
 }

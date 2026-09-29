@@ -7,9 +7,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEndPortalFrame;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,7 +28,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.refining.BlockCrucible;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 
-public class TileEntityCrucible extends TileEntity implements IInventory, ISidedInventory, IHeatUser {
+public class TileEntityCrucible extends TileEntityStation implements ISidedInventory, IHeatUser {
 
     // Constants
     private static final int GRID_SLOT_COUNT = 9;
@@ -333,37 +331,6 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
         recipeCacheDirty = true;
     }
 
-    @Override
-    public int getSizeInventory() {
-        return inventory.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inventory[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        ItemStack taken = InventorySlots.take(inventory, slot, num);
-        onInventoryChanged();
-        return taken;
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inventory, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        inventory[slot] = item;
-        if (item != null && item.stackSize > this.getInventoryStackLimit()) {
-            item.stackSize = this.getInventoryStackLimit();
-        }
-        onInventoryChanged();
-    }
-
     public void onInventoryChanged() {
         if (worldObj == null) {
             // Called from readFromNBT before the tile is added to the world
@@ -380,27 +347,6 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     public String getInventoryName() {
         return "gui.crucible.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -436,5 +382,10 @@ public class TileEntityCrucible extends TileEntity implements IInventory, ISided
     @Override
     public boolean canAccept(TileEntity tile) {
         return tile instanceof TileEntityForge;
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inventory;
     }
 }

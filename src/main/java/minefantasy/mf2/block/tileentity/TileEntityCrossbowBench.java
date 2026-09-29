@@ -3,11 +3,8 @@ package minefantasy.mf2.block.tileentity;
 import java.util.Random;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
@@ -15,10 +12,8 @@ import minefantasy.mf2.api.crafting.engineer.ICrossbowPart;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.CrossbowBenchPacket;
 
-public class TileEntityCrossbowBench extends TileEntity implements IInventory, ISidedInventory, IBasicMetre {
+public class TileEntityCrossbowBench extends TileEntityStation implements IBasicMetre {
 
     public float progress;
     public float maxProgress = 25F;
@@ -29,9 +24,6 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     private ItemStack[] inv = new ItemStack[5];
     private Random rand = new Random();
     private int ticksExisted;
-    private float lastSyncedProgress = Float.NaN;
-    private float lastSyncedMaxProgress = Float.NaN;
-    private boolean lastSyncedRecipe;
 
     private static ICrossbowPart getCrossbowPart(ItemStack item) {
         if (item != null && item.getItem() instanceof ICrossbowPart) {
@@ -54,16 +46,7 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
         if (worldObj.isRemote) {
             return;
         }
-        // hasRecipe stays true until the next craft attempt, so keying the broadcast on it alone resent an
-        // unchanged state every tick. The periodic resend stays for players who start watching the chunk later.
-        boolean changed = progress != lastSyncedProgress || maxProgress != lastSyncedMaxProgress
-                || hasRecipe != lastSyncedRecipe;
-        if (changed || ticksExisted % 100 == 0) {
-            lastSyncedProgress = progress;
-            lastSyncedMaxProgress = maxProgress;
-            lastSyncedRecipe = hasRecipe;
-            syncData();
-        }
+        sendState(false);
     }
 
     public boolean tryCraft(EntityPlayer user) {
@@ -120,20 +103,10 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     }
 
     public void syncData() {
-        if (worldObj.isRemote) return;
-
-        NetworkUtils.sendToWatchers(new CrossbowBenchPacket(this).generatePacket(), worldObj, this.xCoord, this.zCoord);
-
-        /*
-         * List<EntityPlayer> players = ((WorldServer) worldObj).playerEntities; for (int i = 0; i < players.size();
-         * i++) { EntityPlayer player = players.get(i); ((WorldServer)
-         * worldObj).getEntityTracker().func_151248_b(player, new CrossbowBenchPacket(this).generatePacket()); }
-         */
+        sendState(false);
     }
 
     // INVENORY
-
-    public void onInventoryChanged() {}
 
     private ItemStack findResult() {
         ICrossbowPart stock = getCrossbowPart(inv[0]);
@@ -147,57 +120,9 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     }
 
     @Override
-    public int getSizeInventory() {
-        return inv.length;
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return inv[slot];
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int num) {
-        onInventoryChanged();
-        return InventorySlots.take(inv, slot, num);
-    }
-
-    @Override
-    public ItemStack getStackInSlotOnClosing(int slot) {
-        return InventorySlots.takeAll(inv, slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack item) {
-        onInventoryChanged();
-        inv[slot] = item;
-    }
-
-    @Override
     public String getInventoryName() {
         return "gui.crossbowcraftmf.name";
     }
-
-    @Override
-    public boolean hasCustomInventoryName() {
-        return false;
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUseableByPlayer(EntityPlayer user) {
-        return user.getDistance(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) < 8D;
-    }
-
-    @Override
-    public void openInventory() {}
-
-    @Override
-    public void closeInventory() {}
 
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack item) {
@@ -237,21 +162,6 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     }
 
     @Override
-    public int[] getAccessibleSlotsFromSide(int side) {
-        return new int[] { 0, 1, 2, 3, 4 };
-    }
-
-    @Override
-    public boolean canInsertItem(int slot, ItemStack item, int side) {
-        return this.isItemValidForSlot(slot, item);
-    }
-
-    @Override
-    public boolean canExtractItem(int slot, ItemStack item, int side) {
-        return slot == 4;
-    }
-
-    @Override
     public int getMetreScale(int size) {
         return (int) Math.min(size, size / maxProgress * progress);
     }
@@ -264,5 +174,31 @@ public class TileEntityCrossbowBench extends TileEntity implements IInventory, I
     @Override
     public String getLocalisedName() {
         return StatCollector.translateToLocal("tile.crossbowBench.name");
+    }
+
+    @Override
+    protected ItemStack[] slots() {
+        return inv;
+    }
+
+    @Override
+    protected NBTTagCompound describe() {
+        NBTTagCompound state = new NBTTagCompound();
+        state.setFloat("Progress", progress);
+        state.setFloat("MaxProgress", maxProgress);
+        state.setBoolean("HasRecipe", hasRecipe);
+        return state;
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        progress = state.getFloat("Progress");
+        maxProgress = state.getFloat("MaxProgress");
+        hasRecipe = state.getBoolean("HasRecipe");
+    }
+
+    @Override
+    public Role role(int slot) {
+        return slot == 4 ? Role.OUTPUT : Role.INPUT;
     }
 }

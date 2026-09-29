@@ -1,49 +1,30 @@
 package minefantasy.mf2.client.gui;
 
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
-
-import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityResearch;
 import minefantasy.mf2.container.ContainerResearch;
 
 @SideOnly(Side.CLIENT)
-public class GuiResearchBlock extends GuiContainer {
+public class GuiResearchBlock extends GuiStation {
 
-    private TileEntityResearch tile;
+    private final TileEntityResearch tile;
 
     public GuiResearchBlock(InventoryPlayer user, TileEntityResearch tile) {
-        super(new ContainerResearch(user, tile));
-        this.ySize = 158;
-        this.xSize = 178;
+        super(new ContainerResearch(user, tile), 178, 158);
         this.tile = tile;
     }
 
-    /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the items)
-     */
     @Override
-    protected void drawGuiContainerForegroundLayer(int x, int y) {}
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float f, int x, int y) {
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/research.png"));
-        int xPoint = (this.width - this.xSize) / 2;
-        int yPoint = (this.height - this.ySize) / 2;
-        this.drawTexturedModalRect(xPoint, yPoint, 0, 0, this.xSize, this.ySize);
-
-        int scale = tile.getMetreScale(161);
-        this.drawTexturedModalRect(xPoint + 10, yPoint + 33, 0, 158, scale, 3);
-        fontRendererObj.drawString(tile.getLocalisedName(), xPoint + 9, yPoint + 11, 0);
+    protected String texture() {
+        return "textures/gui/knowledge/research.png";
     }
 
     @Override
-    public void drawScreen(int x, int y, float f) {
-        super.drawScreen(x, y, f);
+    protected void drawGauges(int left, int top) {
+        drawTexturedModalRect(left + 10, top + 33, 0, 158, tile.getMetreScale(161), 3);
+        fontRendererObj.drawString(tile.getLocalisedName(), left + 9, top + 11, 0);
     }
 }

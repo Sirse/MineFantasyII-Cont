@@ -1,12 +1,10 @@
 package minefantasy.mf2.block.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
-import minefantasy.mf2.network.NetworkUtils;
-import minefantasy.mf2.network.packet.BombPressPacket;
-
-public class TileEntityBombPress extends TileEntity {
+public class TileEntityBombPress extends TileEntityShown {
 
     public float prevAnimation = 0F;
     public float animation = 0F;
@@ -37,8 +35,15 @@ public class TileEntityBombPress extends TileEntity {
         }
     }
 
+    /** The press starts: it goes out once, then runs down on its own on every side. */
     private void syncAnimation() {
-        if (worldObj.isRemote) return;
-        NetworkUtils.sendToWatchers(new BombPressPacket(this).generatePacket(), worldObj, xCoord, zCoord);
+        NBTTagCompound moment = new NBTTagCompound();
+        moment.setFloat("Press", animation);
+        sendMoment(moment);
+    }
+
+    @Override
+    public void show(NBTTagCompound state) {
+        animation = Math.max(0F, state.getFloat("Press"));
     }
 }
