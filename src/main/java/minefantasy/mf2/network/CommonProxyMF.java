@@ -145,6 +145,7 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
         MinecraftForge.EVENT_BUS.register(new CombatMechanics());
         MinecraftForge.EVENT_BUS.register(new MonsterUpgrader());
         MinecraftForge.EVENT_BUS.register(new ArrowHandlerMF());
+        MinecraftForge.EVENT_BUS.register(new HeavyHarvest());
     }
 
     public EntityPlayer getClientPlayer() {

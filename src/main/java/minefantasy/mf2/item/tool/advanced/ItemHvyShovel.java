@@ -9,8 +9,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,10 +17,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemSpade;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -32,12 +28,10 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.mechanics.ProtectionHelper;
+import minefantasy.mf2.mechanics.HeavyHarvest;
 
 /**
  * @author Anonymous Productions
@@ -66,62 +60,33 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
         setMaxDamage(material.getMaxUses());
     }
 
+    /** Scrapes the open ground within two blocks around, level with the block hit. */
     @Override
-    public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-            EntityLivingBase user) {
-        if (!world.isRemote && ForgeHooks.isToolEffective(item, block, world.getBlockMetadata(x, y, z))
-                && ItemLumberAxe.canAcceptCost(user)) {
+    public boolean onBlockStartBreak(ItemStack item, int x, int y, int z, EntityPlayer player) {
+        World world = player.worldObj;
+        if (HeavyHarvest.breaksMore(player)
+                && ForgeHooks.isToolEffective(item, world.getBlock(x, y, z), world.getBlockMetadata(x, y, z))
+                && ItemLumberAxe.canAcceptCost(player)) {
+            float hit = HeavyHarvest.strength(player, world, x, y, z);
             int range = 2;
             for (int x1 = -range; x1 <= range; x1++) {
-                {
-                    for (int z1 = -range; z1 <= range; z1++) {
-                        if (getDistance(x + x1, y, z + z1, x, y, z) <= range * 1 + 0.5D) {
-                            ForgeDirection FD = Heading.look(user);
-                            int blockX = x + x1 + FD.offsetX;
-                            int blockY = y + FD.offsetY;
-                            int blockZ = z + z1 + FD.offsetZ;
-
-                            if (!(x1 + FD.offsetX == 0 && FD.offsetY == 0 && z1 + FD.offsetZ == 0)) {
-                                Block newblock = world.getBlock(blockX, blockY, blockZ);
-                                Block above = world.getBlock(blockX, blockY + 1, blockZ);
-                                int m = world.getBlockMetadata(blockX, blockY, blockZ);
-
-                                if ((above == null || !above.getMaterial().isSolid()) && newblock != null
-                                        && user instanceof EntityPlayer
-                                        && ForgeHooks.canHarvestBlock(newblock, (EntityPlayer) user, m)
-                                        && ForgeHooks.isToolEffective(item, newblock, m)) {
-                                    if (!ProtectionHelper
-                                            .canBreak((EntityPlayer) user, world, blockX, blockY, blockZ)) {
-                                        continue;
-                                    }
-
-                                    if (rand.nextFloat() * 100F < (100F - ConfigTools.hvyDropChance)) {
-                                        newblock.dropBlockAsItem(
-                                                world,
-                                                blockX,
-                                                blockY,
-                                                blockZ,
-                                                m,
-                                                EnchantmentHelper.getFortuneModifier(user));
-                                    }
-                                    world.setBlockToAir(blockX, blockY, blockZ);
-                                    item.damageItem(1, user);
-                                    ItemLumberAxe.tirePlayer(user, 1F);
-                                }
-                            }
-                        }
+                for (int z1 = -range; z1 <= range; z1++) {
+                    if ((x1 == 0 && z1 == 0) || x1 * x1 + z1 * z1 > (range + 0.5D) * (range + 0.5D)) {
+                        continue;
+                    }
+                    int blockX = x + x1, blockZ = z + z1;
+                    Block ground = world.getBlock(blockX, y, blockZ);
+                    if (world.getBlock(blockX, y + 1, blockZ).getMaterial().isSolid()
+                            || !ForgeHooks.isToolEffective(item, ground, world.getBlockMetadata(blockX, y, blockZ))) {
+                        continue;
+                    }
+                    if (HeavyHarvest.breakExtra(item, player, world, blockX, y, blockZ, hit)) {
+                        ItemLumberAxe.tirePlayer(player, 1F);
                     }
                 }
             }
         }
-        return super.onBlockDestroyed(item, world, block, x, y, z, user);
-    }
-
-    public double getDistance(double x, double y, double z, int posX, int posY, int posZ) {
-        double var7 = posX - x;
-        double var9 = posY - y;
-        double var11 = posZ - z;
-        return MathHelper.sqrt_double(var7 * var7 + var9 * var9 + var11 * var11);
+        return super.onBlockStartBreak(item, x, y, z, player);
     }
 
     @Override

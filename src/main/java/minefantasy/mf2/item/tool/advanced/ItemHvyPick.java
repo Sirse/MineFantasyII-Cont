@@ -9,8 +9,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -21,7 +19,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.util.ForgeDirection;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -31,12 +28,10 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
-import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.mechanics.ProtectionHelper;
+import minefantasy.mf2.mechanics.HeavyHarvest;
 
 /**
  * @author Anonymous Productions
@@ -65,49 +60,21 @@ public class ItemHvyPick extends ItemPickaxe implements IToolMaterial {
         setMaxDamage(material.getMaxUses());
     }
 
+    /** Breaks a flat three by three across the face that was hit, as long as the player has the stamina. */
     @Override
-    public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-            EntityLivingBase user) {
-        if (!world.isRemote && ForgeHooks.isToolEffective(item, block, world.getBlockMetadata(x, y, z))
-                && ItemLumberAxe.canAcceptCost(user)) {
-            for (int x1 = -1; x1 <= 1; x1++) {
-                for (int y1 = -1; y1 <= 1; y1++) {
-                    for (int z1 = -1; z1 <= 1; z1++) {
-                        ForgeDirection FD = Heading.look(user);
-                        int blockX = x + x1 + FD.offsetX;
-                        int blockY = y + y1 + FD.offsetY;
-                        int blockZ = z + z1 + FD.offsetZ;
-
-                        if (!(x1 + FD.offsetX == 0 && y1 + FD.offsetY == 0 && z1 + FD.offsetZ == 0)) {
-                            Block newblock = world.getBlock(blockX, blockY, blockZ);
-                            int m = world.getBlockMetadata(blockX, blockY, blockZ);
-
-                            if (newblock != null && user instanceof EntityPlayer
-                                    && ForgeHooks.canHarvestBlock(newblock, (EntityPlayer) user, m)
-                            /* && ForgeHooks.isToolEffective(item, newblock, m) */) {
-                                if (!ProtectionHelper.canBreak((EntityPlayer) user, world, blockX, blockY, blockZ)) {
-                                    continue;
-                                }
-
-                                if (rand.nextFloat() * 100F < (100F - ConfigTools.hvyDropChance)) {
-                                    newblock.dropBlockAsItem(
-                                            world,
-                                            blockX,
-                                            blockY,
-                                            blockZ,
-                                            m,
-                                            EnchantmentHelper.getFortuneModifier(user));
-                                }
-                                world.setBlockToAir(blockX, blockY, blockZ);
-                                item.damageItem(1, user);
-                                ItemLumberAxe.tirePlayer(user, 1F);
-                            }
-                        }
-                    }
+    public boolean onBlockStartBreak(ItemStack item, int x, int y, int z, EntityPlayer player) {
+        World world = player.worldObj;
+        if (HeavyHarvest.breaksMore(player)
+                && ForgeHooks.isToolEffective(item, world.getBlock(x, y, z), world.getBlockMetadata(x, y, z))
+                && ItemLumberAxe.canAcceptCost(player)) {
+            float hit = HeavyHarvest.strength(player, world, x, y, z);
+            for (int[] at : HeavyHarvest.square(player, x, y, z, 1)) {
+                if (HeavyHarvest.breakExtra(item, player, world, at[0], at[1], at[2], hit)) {
+                    ItemLumberAxe.tirePlayer(player, 1F);
                 }
             }
         }
-        return super.onBlockDestroyed(item, world, block, x, y, z, user);
+        return super.onBlockStartBreak(item, x, y, z, player);
     }
 
     @Override
