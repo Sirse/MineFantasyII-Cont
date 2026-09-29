@@ -94,6 +94,11 @@ public class StorageBoxTest {
         FakePlayer empty = holding(helper, null);
         assertTrue(box.interact(empty));
         assertEquals("an empty hand took the wrong amount", 64, box.stock);
+        ItemStack taken = empty.getHeldItem();
+        assertNotNull("the stack left the box but not into the hand", taken);
+        assertEquals(Items.bread, taken.getItem());
+        assertEquals("the hand got the wrong amount", 64, taken.stackSize);
+        assertEquals("bread made or lost", 128, box.stock + taken.stackSize);
         helper.succeed();
     }
 

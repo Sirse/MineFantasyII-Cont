@@ -15,6 +15,7 @@ import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.engineer.IBombComponent;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.SkillList;
@@ -120,9 +121,9 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
                 for (int a = 0; a < 4; a++) {
                     if (!(isArrow && a == 3)) {
                         ItemStack item = getStackInSlot(a);
-                        if (item != null && item.getItem().getContainerItem(item) != null) {
+                        ItemStack cont = SafeStacks.containerOf(item);
+                        if (cont != null) {
                             // START CONTAINER CODE
-                            ItemStack cont = item.getItem().getContainerItem(item);
                             ItemStack spare = getStackInSlot(5);
                             if (spare == null) {
                                 setInventorySlotContents(5, cont);

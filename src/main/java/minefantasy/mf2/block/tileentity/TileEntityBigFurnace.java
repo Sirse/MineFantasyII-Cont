@@ -27,6 +27,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -406,9 +407,7 @@ public class TileEntityBigFurnace extends TileEntity
                 maxHeat = getItemHeat(inv[0]);
                 // One unit is burned, so only one container comes back. Replacing the whole stack with a single
                 // container destroyed the rest of it.
-                ItemStack single = inv[0].copy();
-                single.stackSize = 1;
-                ItemStack cont = single.getItem().getContainerItem(single);
+                ItemStack cont = SafeStacks.containerOf(inv[0]);
 
                 decrStackSize(0, 1);
                 if (cont != null) {

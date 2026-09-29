@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.block.decor.BlockAmmoBox;
 
 public class AmmoMechanicsMF {
@@ -118,7 +119,8 @@ public class AmmoMechanicsMF {
             return null;
         }
         if (bow.getTagCompound().hasKey(savedAmmoNBT)) {
-            return ItemStack.loadItemStackFromNBT(bow.getTagCompound().getCompoundTag(savedAmmoNBT));
+            return SafeStacks
+                    .withinAStack(ItemStack.loadItemStackFromNBT(bow.getTagCompound().getCompoundTag(savedAmmoNBT)));
         }
         return null;
     }

@@ -21,6 +21,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.hunger.HungerSystemMF;
 import minefantasy.mf2.item.ClientItemsMF;
@@ -308,7 +309,8 @@ public class ItemFoodMF extends ItemFood {
 
     protected ItemStack getLeftOver(ItemStack food) {
         if (food.hasTagCompound() && food.getTagCompound().hasKey(leftOverNbt)) {
-            return ItemStack.loadItemStackFromNBT(food.getTagCompound().getCompoundTag(leftOverNbt));
+            return SafeStacks
+                    .withinAStack(ItemStack.loadItemStackFromNBT(food.getTagCompound().getCompoundTag(leftOverNbt)));
         }
         if (leftOver != null) {
             return new ItemStack(leftOver);

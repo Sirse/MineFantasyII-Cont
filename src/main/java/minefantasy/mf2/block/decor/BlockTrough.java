@@ -72,7 +72,8 @@ public class BlockTrough extends BlockWoodDecor {
         TileEntityTrough tile = getTile(world, x, y, z);
         if (tile != null) {
             if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_fill)) {
-                tile.fill = item.getTagCompound().getInteger(NBT_fill);
+                // The tag may not be one this block wrote: keep the level within the trough
+                tile.fill = Math.max(0, Math.min(tile.getCapacity(), item.getTagCompound().getInteger(NBT_fill)));
             }
         }
         super.onBlockPlacedBy(world, x, y, z, user, item);

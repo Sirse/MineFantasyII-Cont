@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
+import minefantasy.mf2.api.helpers.SafeStacks;
+
 /**
  * The whole of one craft as the station worked it out: the recipe chosen, the requirements actually in force (which a
  * material-driven recipe computes from its parts rather than taking from the recipe), what each input slot loses, what
@@ -334,13 +336,10 @@ public final class CraftPlan {
                 }
                 case CONTAINER: {
                     takes.add(new Take(slot, expected, n, n, null));
-                    if (current.getItem().hasContainerItem(current)) {
-                        ItemStack container = current.getItem().getContainerItem(current);
-                        if (container != null) {
-                            container = container.copy();
-                            container.stackSize = n;
-                            giveBack(slot, container);
-                        }
+                    ItemStack container = SafeStacks.containerOf(current);
+                    if (container != null) {
+                        container.stackSize = n;
+                        giveBack(slot, container);
                     }
                     break;
                 }
@@ -369,15 +368,10 @@ public final class CraftPlan {
             ItemStack expected = shownAs.copy();
             expected.stackSize = 1;
             takes.add(new Take(slot, expected, amount, amount, check));
-            ItemStack single = current.copy();
-            single.stackSize = 1;
-            if (single.getItem().hasContainerItem(single)) {
-                ItemStack container = single.getItem().getContainerItem(single);
-                if (container != null) {
-                    container = container.copy();
-                    container.stackSize = amount;
-                    giveBack(slot, container);
-                }
+            ItemStack container = SafeStacks.containerOf(current);
+            if (container != null) {
+                container.stackSize = amount;
+                giveBack(slot, container);
             }
             return this;
         }

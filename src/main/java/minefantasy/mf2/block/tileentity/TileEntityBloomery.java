@@ -310,7 +310,8 @@ public class TileEntityBloomery extends TileEntity implements IInventory, Diagno
     }
 
     public boolean hasBloom() {
-        if (worldObj.isRemote) {
+        // No world when a tile is written on its own, as mods that copy blocks do: the inventory is the truth then too
+        if (worldObj != null && worldObj.isRemote) {
             return hasBloom;
         }
         return inv[2] != null;

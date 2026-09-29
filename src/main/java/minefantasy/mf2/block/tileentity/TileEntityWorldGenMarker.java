@@ -55,8 +55,8 @@ public class TileEntityWorldGenMarker extends TileEntity {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        className = nbt.getString("ClassDirectory");
-        type = nbt.getString("SubType");
+        className = nbt.hasKey("ClassDirectory") ? nbt.getString("ClassDirectory") : null;
+        type = nbt.hasKey("SubType") ? nbt.getString("SubType") : null;
         length = nbt.getInteger("LengthPosition");
         deviation = nbt.getInteger("Deviation");
         prevID = nbt.getInteger("prevID");
@@ -67,8 +67,10 @@ public class TileEntityWorldGenMarker extends TileEntity {
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        nbt.setString("ClassDirectory", className);
-        nbt.setString("SubType", type);
+        // Null for a marker placed by hand (a command, the creative menu); NBTTagString refuses null and would fail the
+        // whole chunk save
+        if (className != null) nbt.setString("ClassDirectory", className);
+        if (type != null) nbt.setString("SubType", type);
         nbt.setInteger("LengthPosition", length);
         nbt.setInteger("prevID", prevID);
         nbt.setInteger("prevMeta", prevMeta);

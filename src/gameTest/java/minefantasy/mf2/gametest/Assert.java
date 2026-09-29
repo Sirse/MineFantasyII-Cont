@@ -80,7 +80,9 @@ public final class Assert {
     }
 
     public static void assertEquals(String message, double expected, double actual, double delta) {
-        if (Math.abs(expected - actual) > delta) {
+        // Written so NaN fails: any comparison with NaN is false, so "difference > delta" would let it through
+        boolean same = Double.compare(expected, actual) == 0 || Math.abs(expected - actual) <= delta;
+        if (!same) {
             fail(message + ": expected <" + expected + "> but was <" + actual + ">");
         }
     }
