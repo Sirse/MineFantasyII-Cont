@@ -2,7 +2,6 @@ package minefantasy.mf2.item.gadget;
 
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
@@ -10,6 +9,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.block.decor.BlockComponent;
 import minefantasy.mf2.item.ItemComponentMF;
@@ -115,13 +115,7 @@ public class ItemJug extends ItemComponentMF {
         if (!world.isRemote) {
             world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
             item.stackSize--;
-            EntityItem resultItem = new EntityItem(
-                    world,
-                    player.posX,
-                    player.posY,
-                    player.posZ,
-                    new ItemStack(FoodListMF.jug_water));
-            world.spawnEntityInWorld(resultItem);
+            Drops.spawn(world, player.posX, player.posY, player.posZ, new ItemStack(FoodListMF.jug_water), 0);
         }
     }
 

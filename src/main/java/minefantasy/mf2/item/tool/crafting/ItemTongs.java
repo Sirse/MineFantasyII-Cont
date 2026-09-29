@@ -10,7 +10,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -32,6 +31,7 @@ import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.ISmithTongs;
@@ -115,10 +115,7 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
                     }
                     if (cooled != null && !world.isRemote) {
                         if (world.isAirBlock(i, j + 1, k)) {
-                            EntityItem entity = new EntityItem(world, i + 0.5, j + 1, k + 0.5, cooled);
-                            entity.delayBeforeCanPickup = 20;
-                            entity.motionX = entity.motionY = entity.motionZ = 0F;
-                            world.spawnEntityInWorld(entity);
+                            Drops.still(world, i + 0.5, j + 1, k + 0.5, cooled, 20);
                         } else {
                             player.entityDropItem(cooled, 0);
                         }

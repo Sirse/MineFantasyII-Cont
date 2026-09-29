@@ -8,7 +8,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -22,6 +21,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
@@ -167,9 +167,7 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
                 } else {
                     --held.stackSize;
                     if (!world.isRemote) {
-                        EntityItem drop = new EntityItem(world, user.posX, user.posY, user.posZ, mould);
-                        drop.delayBeforeCanPickup = 0;
-                        world.spawnEntityInWorld(drop);
+                        Drops.spawn(world, user.posX, user.posY, user.posZ, mould, 0);
                     }
                 }
                 return true;

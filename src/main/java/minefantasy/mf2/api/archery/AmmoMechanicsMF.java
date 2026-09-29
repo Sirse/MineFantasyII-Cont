@@ -6,7 +6,6 @@ import java.util.List;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.block.decor.BlockAmmoBox;
 
@@ -191,7 +191,7 @@ public class AmmoMechanicsMF {
                 stock -= stackSize;
                 ItemStack newdrop = drop.copy();
                 newdrop.stackSize = stackSize;
-                entityDropItem(world, x, y, z, newdrop);
+                Drops.spawn(world, x, y, z, newdrop, 10);
             }
         }
     }
@@ -203,11 +203,11 @@ public class AmmoMechanicsMF {
         ItemStack ammo = AmmoMechanicsMF.getAmmo(firearm);
         ItemStack loaded = AmmoMechanicsMF.getArrowOnBow(firearm);
         if (ammo != null) {
-            entityDropItem(world, x, y, z, ammo);
+            Drops.spawn(world, x, y, z, ammo, 10);
             AmmoMechanicsMF.setAmmo(firearm, null);
         }
         if (loaded != null) {
-            entityDropItem(world, x, y, z, loaded);
+            Drops.spawn(world, x, y, z, loaded, 10);
             AmmoMechanicsMF.putAmmoOnFirearm(firearm, null);
         }
     }
@@ -218,17 +218,6 @@ public class AmmoMechanicsMF {
     public static void dropContents(World world, ItemStack firearm, EntityLivingBase user) {
         dropAmmo(world, firearm, user.posX, user.posY + user.getEyeHeight(), user.posZ);
         dropAmmoCrate(world, firearm, user.posX, user.posY + user.getEyeHeight(), user.posZ);
-    }
-
-    private static EntityItem entityDropItem(World world, double x, double y, double z, ItemStack item) {
-        if (item.stackSize != 0 && item.getItem() != null) {
-            EntityItem entityitem = new EntityItem(world, x, y, z, item);
-            entityitem.delayBeforeCanPickup = 10;
-            world.spawnEntityInWorld(entityitem);
-            return entityitem;
-        } else {
-            return null;
-        }
     }
 
     public static void damageContainer(ItemStack item, EntityPlayer user) {

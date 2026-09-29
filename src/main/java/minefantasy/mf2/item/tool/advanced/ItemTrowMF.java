@@ -13,7 +13,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -33,6 +32,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.mining.RandomDigs;
 import minefantasy.mf2.api.tier.IToolMaterial;
@@ -88,7 +88,7 @@ public class ItemTrowMF extends ItemSpade implements IToolMaterial {
                     if (newdrop != null) {
                         if (newdrop.stackSize < 1) newdrop.stackSize = 1;
 
-                        dropItem(world, x, y, z, newdrop);
+                        Drops.fromBlock(world, x, y, z, newdrop);
                     }
                 }
             }
@@ -104,16 +104,8 @@ public class ItemTrowMF extends ItemSpade implements IToolMaterial {
             if (enc > 0) {
                 loot = rand.nextInt(enc);
             }
-            dropItem(world, x, y, z, new ItemStack(Items.flint, 1 + loot));
+            Drops.fromBlock(world, x, y, z, new ItemStack(Items.flint, 1 + loot));
         }
-    }
-
-    private void dropItem(World world, int x, int y, int z, ItemStack drop) {
-        if (world.isRemote) return;
-
-        EntityItem dropItem = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, drop);
-        dropItem.delayBeforeCanPickup = 10;
-        world.spawnEntityInWorld(dropItem);
     }
 
     @Override

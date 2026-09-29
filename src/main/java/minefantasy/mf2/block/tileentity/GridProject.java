@@ -2,7 +2,6 @@ package minefantasy.mf2.block.tileentity;
 
 import java.util.List;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -11,6 +10,7 @@ import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 
@@ -64,14 +64,13 @@ final class GridProject {
             if (stack == null || stack.stackSize <= 0 || station.getWorldObj() == null) {
                 continue;
             }
-            EntityItem entity = new EntityItem(
+            Drops.spawn(
                     station.getWorldObj(),
                     station.xCoord + 0.5D,
                     station.yCoord + 1.1D,
                     station.zCoord + 0.5D,
-                    stack.copy());
-            entity.delayBeforeCanPickup = 10;
-            station.getWorldObj().spawnEntityInWorld(entity);
+                    stack.copy(),
+                    10);
         }
     }
 

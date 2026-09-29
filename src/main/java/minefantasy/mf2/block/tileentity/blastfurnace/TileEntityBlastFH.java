@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -13,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
@@ -138,8 +138,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         // The input is already consumed at this point, so the leftover has to reach the world. Hardcore Ingots is a
         // reduction on top of that, not the only path that produces anything.
         if (keepsLeftover(rand)) {
-            EntityItem entity = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, result);
-            worldObj.spawnEntityInWorld(entity);
+            Drops.spawn(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, result, 0);
         }
     }
 

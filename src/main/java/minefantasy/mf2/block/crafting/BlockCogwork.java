@@ -7,12 +7,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -92,7 +92,7 @@ public class BlockCogwork extends BlockDirectional {
     }
 
     private int getAngleFor(EntityPlayer user) {
-        int l = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 2.5D) & 3;
+        int l = Heading.towards(user);
         return l * 90;
     }
 
@@ -111,7 +111,7 @@ public class BlockCogwork extends BlockDirectional {
      */
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack placed) {
-        int l = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 2.5D) & 3;
+        int l = Heading.towards(user);
         world.setBlockMetadataWithNotify(x, y, z, l, 2);
     }
 

@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -134,19 +135,11 @@ public class StaminaBar {
     }
 
     public static int getBonusStaminaRegenTicks(EntityLivingBase user) {
-        if (user.getEntityData() != null) {
-            if (!user.getEntityData().hasKey(staminaRegenTicksName)) {
-                setBonusStaminaRegenTicks(user, 0);
-            }
-            return user.getEntityData().getInteger(staminaRegenTicksName);
-        }
-        return 0;
+        return Cooldowns.left(user, staminaRegenTicksName);
     }
 
     public static void setBonusStaminaRegenTicks(EntityLivingBase user, int value) {
-        if (user.getEntityData() != null) {
-            user.getEntityData().setInteger(staminaRegenTicksName, value);
-        }
+        Cooldowns.set(user, staminaRegenTicksName, value);
     }
 
     public static float getRegenBonus(EntityLivingBase user) {
@@ -184,49 +177,33 @@ public class StaminaBar {
     }
 
     public static int getBonusStaminaTicks(EntityLivingBase user) {
-        if (user.getEntityData() != null) {
-            if (!user.getEntityData().hasKey(staminaBonusTicksName)) {
-                setBonusStaminaTicks(user, 0);
-            }
-            return user.getEntityData().getInteger(staminaBonusTicksName);
-        }
-        return 0;
+        return Cooldowns.left(user, staminaBonusTicksName);
     }
 
     public static void setBonusStaminaTicks(EntityLivingBase user, int value) {
-        if (user.getEntityData() != null) {
-            user.getEntityData().setInteger(staminaBonusTicksName, value);
-        }
+        Cooldowns.set(user, staminaBonusTicksName, value);
     }
 
     public static void tickBonus(EntityLivingBase user) {
         if (user.worldObj.isRemote) return;
 
-        int currentTicks = getBonusStaminaTicks(user);
-        currentTicks--;
-        if (currentTicks <= 0) {
-            setBonusStaminaTicks(user, 0);
+        Cooldowns.tick(user, staminaBonusTicksName);
+        if (getBonusStaminaTicks(user) <= 0) {
             setBonusStamina(user, 0);
 
             if (getStaminaValue(user) > getTotalMaxStamina(user)) {
                 setStaminaValue(user, getTotalMaxStamina(user));
             }
-            return;
         }
-        setBonusStaminaTicks(user, currentTicks);
     }
 
     public static void tickBonusRegen(EntityLivingBase user) {
         if (user.worldObj.isRemote) return;
 
-        int currentTicks = getBonusStaminaRegenTicks(user);
-        currentTicks--;
-        if (currentTicks <= 0) {
-            setBonusStaminaRegenTicks(user, 0);
+        Cooldowns.tick(user, staminaRegenTicksName);
+        if (getBonusStaminaRegenTicks(user) <= 0) {
             setBonusStaminaRegen(user, 0);
-            return;
         }
-        setBonusStaminaRegenTicks(user, currentTicks);
     }
 
     /**

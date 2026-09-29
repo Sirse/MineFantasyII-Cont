@@ -12,7 +12,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -20,6 +19,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
@@ -72,33 +72,13 @@ public class BlockComponent extends BlockTiled<TileEntityComponent> {
             int j = movingobjectposition.blockY;
             int k = movingobjectposition.blockZ;
 
-            if (movingobjectposition.sideHit == 0) {
-                --j;
-            }
-
-            if (movingobjectposition.sideHit == 1) {
-                ++j;
-            }
-
-            if (movingobjectposition.sideHit == 2) {
-                --k;
-            }
-
-            if (movingobjectposition.sideHit == 3) {
-                ++k;
-            }
-
-            if (movingobjectposition.sideHit == 4) {
-                --i;
-            }
-
-            if (movingobjectposition.sideHit == 5) {
-                ++i;
-            }
+            ForgeDirection side = ForgeDirection.getOrientation(movingobjectposition.sideHit);
+            i += side.offsetX;
+            j += side.offsetY;
+            k += side.offsetZ;
 
             if (user.canPlayerEdit(i, j, k, movingobjectposition.sideHit, item)) {
-                int l = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-                return placeComponent(user, item, user.worldObj, i, j, k, type, tex, l);
+                return placeComponent(user, item, user.worldObj, i, j, k, type, tex, Heading.of(user));
             }
         }
         return 0;

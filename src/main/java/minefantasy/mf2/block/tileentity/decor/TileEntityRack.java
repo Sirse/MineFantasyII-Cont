@@ -1,6 +1,5 @@
 package minefantasy.mf2.block.tileentity.decor;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemArmor;
@@ -11,6 +10,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.helpers.BlockPositionHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.weapon.IRackItem;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 
@@ -196,8 +196,7 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
             for (int x = 0; x < getSizeInventory(); x++) {
                 ItemStack item = this.getStackInSlot(x);
                 if (item != null && !canHang(item, x)) {
-                    EntityItem drop = new EntityItem(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, item);
-                    worldObj.spawnEntityInWorld(drop);
+                    Drops.spawn(worldObj, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, item, 0);
                     setInventorySlotContents(x, null);
                 }
             }

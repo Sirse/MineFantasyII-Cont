@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumRarity;
@@ -30,6 +29,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.weapon.IDamageType;
@@ -135,13 +135,7 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
 
     protected void dropBlockAsItem_do(World world, int x, int y, int z, ItemStack drop) {
         if (!world.isRemote && world.getGameRules().getGameRuleBooleanValue("doTileDrops")) {
-            float var6 = 0.7F;
-            double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-            double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-            double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-            EntityItem var13 = new EntityItem(world, x + var7, y + var9, z + var11, drop);
-            var13.delayBeforeCanPickup = 10;
-            world.spawnEntityInWorld(var13);
+            Drops.scattered(world, x, y, z, drop);
         }
     }
 

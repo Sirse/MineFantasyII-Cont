@@ -11,7 +11,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -29,6 +28,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tool.IHuntingItem;
 import minefantasy.mf2.api.tool.IToolMF;
@@ -77,18 +77,7 @@ public class ItemKnifeMF extends ItemWeaponMF implements IToolMF, IHuntingItem {
                                 z,
                                 EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, itemstack));
                         for (ItemStack stack : drops) {
-                            float f = 0.7F;
-                            double d = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-                            double d1 = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-                            double d2 = (double) (rand.nextFloat() * f) + (double) (1.0F - f) * 0.5D;
-                            EntityItem entityitem = new EntityItem(
-                                    player.worldObj,
-                                    (double) x + d,
-                                    (double) y + d1,
-                                    (double) z + d2,
-                                    stack);
-                            entityitem.delayBeforeCanPickup = 10;
-                            player.worldObj.spawnEntityInWorld(entityitem);
+                            Drops.scattered(player.worldObj, x, y, z, stack);
                         }
 
                         itemstack.damageItem(1, player);

@@ -2,7 +2,6 @@ package minefantasy.mf2.item;
 
 import java.util.List;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,6 +11,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 public class ItemFilledMould extends ItemComponentMF {
@@ -91,11 +91,11 @@ public class ItemFilledMould extends ItemComponentMF {
                     if (!world.isRemote) {
                         ItemStack mould = new ItemStack(ComponentListMF.ingot_mould);
                         if (!world.getBlock(i, j + 1, k).getMaterial().isSolid()) {
-                            dropItem(world, i, j + 1, k, drop);
-                            dropItem(world, i, j + 1, k, mould);
+                            Drops.still(world, i + 0.5, j + 1.5, k + 0.5, drop, 20);
+                            Drops.still(world, i + 0.5, j + 1.5, k + 0.5, mould, 20);
                         } else {
-                            dropItem(world, player.posX, player.posY, player.posZ, drop, false);
-                            dropItem(world, player.posX, player.posY, player.posZ, mould, false);
+                            Drops.toPlayer(player, drop);
+                            Drops.toPlayer(player, mould);
                         }
                     }
 
@@ -106,16 +106,4 @@ public class ItemFilledMould extends ItemComponentMF {
             return item;
         }
     }
-
-    private void dropItem(World world, int i, int j, int k, ItemStack drop) {
-        dropItem(world, i + 0.5, j + 0.5, k + 0.5, drop, true);
-    }
-
-    private void dropItem(World world, double i, double j, double k, ItemStack drop, boolean delay) {
-        EntityItem entity = new EntityItem(world, i, j, k, drop);
-        if (delay) entity.delayBeforeCanPickup = 20;
-        entity.motionX = entity.motionY = entity.motionZ = 0F;
-        world.spawnEntityInWorld(entity);
-    }
-
 }

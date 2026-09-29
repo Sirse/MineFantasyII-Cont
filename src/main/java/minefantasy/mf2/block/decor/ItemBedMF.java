@@ -3,11 +3,11 @@ package minefantasy.mf2.block.decor;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
@@ -34,7 +34,7 @@ public class ItemBedMF extends Item {
         } else {
             ++p_77648_5_;
             BlockBedMF blockbed = (BlockBedMF) BlockListMF.bedroll;
-            int i1 = MathHelper.floor_double(p_77648_2_.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
+            int i1 = Heading.of(p_77648_2_);
             byte b0 = 0;
             byte b1 = 0;
 

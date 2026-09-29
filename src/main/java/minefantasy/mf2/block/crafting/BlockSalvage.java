@@ -19,6 +19,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.crafting.Salvage;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -153,19 +154,9 @@ public class BlockSalvage extends Block {
             ItemStack drop = (ItemStack) iterator.next();
             if (drop != null)// && !user.inventory.addItemStackToInventory(drop))
             {
-                entityDropItem(world, x, y, z, drop);
+                Drops.spawn(world, x + 0.5D, y + 1.25D, z + 0.5D, drop, 10);
             }
         }
-    }
-
-    public EntityItem entityDropItem(World world, int x, int y, int z, ItemStack item) {
-        if (item.stackSize != 0 && item.getItem() != null) {
-            EntityItem entityitem = new EntityItem(world, x + 0.5D, y + 1.25D, z + 0.5D, item);
-            entityitem.delayBeforeCanPickup = 10;
-            world.spawnEntityInWorld(entityitem);
-            return entityitem;
-        }
-        return null;
     }
 
     private EntityItem getDrop(World world, int x, int y, int z) {

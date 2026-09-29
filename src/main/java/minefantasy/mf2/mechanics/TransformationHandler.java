@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -17,6 +16,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipe;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.util.BukkitUtils;
@@ -167,10 +167,15 @@ public class TransformationHandler {
     }
 
     private void dropStack(World world, int x, int y, int z, ItemStack stack) {
-        EntityItem entityitem = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, stack);
-        entityitem.motionX = (rand.nextDouble() - 0.5D) * 0.1D;
-        entityitem.motionY = 0.2D;
-        entityitem.motionZ = (rand.nextDouble() - 0.5D) * 0.1D;
-        world.spawnEntityInWorld(entityitem);
+        Drops.spawn(
+                world,
+                x + 0.5D,
+                y + 0.5D,
+                z + 0.5D,
+                stack,
+                0,
+                (rand.nextDouble() - 0.5D) * 0.1D,
+                0.2D,
+                (rand.nextDouble() - 0.5D) * 0.1D);
     }
 }

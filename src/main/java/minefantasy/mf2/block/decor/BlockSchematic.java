@@ -41,29 +41,10 @@ public class BlockSchematic extends Block {
             int j = movingobjectposition.blockY;
             int k = movingobjectposition.blockZ;
 
-            if (movingobjectposition.sideHit == 0) {
-                --j;
-            }
-
-            if (movingobjectposition.sideHit == 1) {
-                ++j;
-            }
-
-            if (movingobjectposition.sideHit == 2) {
-                --k;
-            }
-
-            if (movingobjectposition.sideHit == 3) {
-                ++k;
-            }
-
-            if (movingobjectposition.sideHit == 4) {
-                --i;
-            }
-
-            if (movingobjectposition.sideHit == 5) {
-                ++i;
-            }
+            ForgeDirection side = ForgeDirection.getOrientation(movingobjectposition.sideHit);
+            i += side.offsetX;
+            j += side.offsetY;
+            k += side.offsetZ;
 
             if (user.canPlayerEdit(i, j, k, movingobjectposition.sideHit, item)) {
                 return placeSchematic(item.getItemDamage(), user, item, user.worldObj, i, j, k);

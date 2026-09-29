@@ -2,17 +2,16 @@ package minefantasy.mf2.block.tileentity;
 
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -244,7 +243,7 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
                 }
                 drop.stackSize = 1;
                 drop = ItemHeated.createHotItem(drop, 1200);
-                entityDropItem(worldObj, xCoord, yCoord, zCoord, drop);
+                Drops.still(worldObj, xCoord + 0.5D, yCoord + 1.25D, zCoord + 0.5D, drop, 10);
                 syncData();
             }
             worldObj.playSoundEffect(
@@ -258,18 +257,6 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
             return true;
         }
         return false;
-    }
-
-    public EntityItem entityDropItem(World world, int x, int y, int z, ItemStack item) {
-        if (item.stackSize != 0 && item.getItem() != null) {
-            EntityItem entityitem = new EntityItem(world, x + 0.5D, y + 1.25F, z + 0.5D, item);
-            entityitem.delayBeforeCanPickup = 10;
-            world.spawnEntityInWorld(entityitem);
-            entityitem.motionX = entityitem.motionY = entityitem.motionZ = 0;
-            return entityitem;
-        } else {
-            return null;
-        }
     }
 
     public boolean hasBloom() {

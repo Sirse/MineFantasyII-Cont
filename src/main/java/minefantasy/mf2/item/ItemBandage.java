@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -120,7 +121,7 @@ public class ItemBandage extends Item {
                         }
                     }
                 }
-                toHeal.getEntityData().setInteger(EventManagerMF.injuredNBT, 0);
+                Cooldowns.set(toHeal, EventManagerMF.injuredNBT, 0);
             }
         }
         return item;

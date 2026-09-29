@@ -2,12 +2,13 @@ package minefantasy.mf2.block.tileentity;
 
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
+
+import minefantasy.mf2.api.helpers.Drops;
 
 /**
  * The slot handling every station inventory repeats: taking from a slot, emptying it, saving the slots, and throwing
@@ -102,11 +103,16 @@ public final class InventorySlots {
         while (stack.stackSize > 0) {
             // Another mod's item may claim a stack limit of zero or less; a piece of at least one still ends the loop
             ItemStack piece = stack.splitStack(Math.max(1, Math.min(stack.stackSize, stack.getMaxStackSize())));
-            EntityItem entity = new EntityItem(world, x + dx, y + dy, z + dz, piece);
-            entity.motionX = rand.nextGaussian() * 0.05F;
-            entity.motionY = rand.nextGaussian() * 0.05F + 0.2F;
-            entity.motionZ = rand.nextGaussian() * 0.05F;
-            world.spawnEntityInWorld(entity);
+            Drops.spawn(
+                    world,
+                    x + dx,
+                    y + dy,
+                    z + dz,
+                    piece,
+                    0,
+                    rand.nextGaussian() * 0.05F,
+                    rand.nextGaussian() * 0.05F + 0.2F,
+                    rand.nextGaussian() * 0.05F);
         }
     }
 }

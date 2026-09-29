@@ -12,7 +12,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.*;
 import net.minecraft.util.IIcon;
@@ -28,6 +27,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.mining.RandomOre;
 import minefantasy.mf2.api.tier.IToolMaterial;
@@ -80,7 +80,7 @@ public class ItemHandpick extends ItemPickaxe implements IToolMaterial {
                     if (isOre(block, meta) && !drop.isItemEqual(new ItemStack(block, 1, meta))
                             && !(drop.getItem() instanceof ItemBlock)
                             && world.rand.nextFloat() < getDoubleDropChance()) {
-                        dropItem(world, x, y, z, drop.copy());
+                        Drops.fromBlock(world, x, y, z, drop.copy());
                     }
                 }
             }
@@ -98,7 +98,7 @@ public class ItemHandpick extends ItemPickaxe implements IToolMaterial {
                     if (newdrop != null) {
                         if (newdrop.stackSize < 1) newdrop.stackSize = 1;
 
-                        dropItem(world, x, y, z, newdrop);
+                        Drops.fromBlock(world, x, y, z, newdrop);
                     }
                 }
             }
@@ -117,14 +117,6 @@ public class ItemHandpick extends ItemPickaxe implements IToolMaterial {
             }
         }
         return false;
-    }
-
-    private void dropItem(World world, int x, int y, int z, ItemStack drop) {
-        if (world.isRemote) return;
-
-        EntityItem dropItem = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, drop);
-        dropItem.delayBeforeCanPickup = 10;
-        world.spawnEntityInWorld(dropItem);
     }
 
     private float getDoubleDropChance() {

@@ -29,7 +29,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.util.FakePlayer;
@@ -53,6 +52,7 @@ import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.helpers.Cooldowns;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
@@ -599,7 +599,7 @@ public class EventManagerMF {
 
         if (broken != null && ConfigHardcore.HCCallowRocks) {
             if (held == null && CustomStone.isStone(broken, event.blockMetadata)) {
-                entityDropItem(
+                Drops.fromBlock(
                         event.world,
                         event.x,
                         event.y,
@@ -608,7 +608,7 @@ public class EventManagerMF {
             }
             if (held != null && held.getItem() == ComponentListMF.sharp_rock && broken instanceof BlockLeavesBase) {
                 if (random.nextInt(5) == 0) {
-                    entityDropItem(
+                    Drops.fromBlock(
                             event.world,
                             event.x,
                             event.y,
@@ -616,7 +616,7 @@ public class EventManagerMF {
                             new ItemStack(Items.stick, random.nextInt(3) + 1));
                 }
                 if (random.nextInt(3) == 0) {
-                    entityDropItem(
+                    Drops.fromBlock(
                             event.world,
                             event.x,
                             event.y,
@@ -634,16 +634,6 @@ public class EventManagerMF {
                 player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 100, 1));
             }
         }
-    }
-
-    public EntityItem entityDropItem(World world, int x, int y, int z, ItemStack item) {
-        if (item.stackSize != 0 && item.getItem() != null) {
-            EntityItem entityitem = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, item);
-            entityitem.delayBeforeCanPickup = 10;
-            world.spawnEntityInWorld(entityitem);
-            return entityitem;
-        }
-        return null;
     }
 
     private void addKillTo(EntityPlayer hunter, String type) {

@@ -3,7 +3,6 @@ package minefantasy.mf2.block.food;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,6 +14,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.item.food.ItemFoodMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
@@ -182,8 +182,7 @@ public class BlockCakeMF extends Block {
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
         if (!this.canBlockStay(world, x, y, z)) {
             ItemStack item = new ItemStack(this, 1, damageDropped(world.getBlockMetadata(x, y, z)));
-            EntityItem drop = new EntityItem(world, x + 0.5D, y + 0.5D, z + 0.5D, item);
-            world.spawnEntityInWorld(drop);
+            Drops.spawn(world, x + 0.5D, y + 0.5D, z + 0.5D, item, 0);
             world.setBlockToAir(x, y, z);
         }
     }

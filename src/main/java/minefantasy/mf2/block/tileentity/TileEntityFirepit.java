@@ -4,7 +4,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -22,6 +21,7 @@ import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.Functions;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
@@ -255,19 +255,12 @@ public class TileEntityFirepit extends TileEntityShown implements IBasicMetre, I
                 }
                 boolean success = (rand.nextFloat() * 100) < chance;
                 ItemStack creation = success ? result.copy() : new ItemStack(FoodListMF.burnt_food);
-                dropItem(player, creation);
+                Drops.toPlayer(player, creation);
                 SkillList.provisioning.addXP(player, success ? 2 : 1);
                 return true;
             }
         }
         return false;
-    }
-
-    public void dropItem(EntityPlayer player, ItemStack item) {
-        EntityItem drop = new EntityItem(worldObj, player.posX, player.posY, player.posZ, item);
-        drop.delayBeforeCanPickup = 0;
-        drop.motionX = drop.motionY = drop.motionZ = 0;
-        worldObj.spawnEntityInWorld(drop);
     }
 
     public boolean hasBlockAbove() {

@@ -20,6 +20,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.tool.ILighter;
 import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.tileentity.InventorySlots;
@@ -87,7 +88,7 @@ public class BlockFirepit extends BlockTiled<TileEntityFirepit> {
                                 player.setCurrentItemOrArmor(0, contain);
                             } else player.setCurrentItemOrArmor(0, null);
                         } else if (contain != null) {
-                            firepit.dropItem(player, contain);
+                            Drops.toPlayer(player, contain);
                         }
                     }
                     return true;

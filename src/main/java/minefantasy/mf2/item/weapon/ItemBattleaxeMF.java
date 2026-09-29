@@ -10,6 +10,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.weapon.WeaponClass;
 import minefantasy.mf2.mechanics.EventManagerMF;
@@ -106,7 +107,7 @@ public class ItemBattleaxeMF extends ItemHeavyWeaponMF {
     @Override
     public void onProperHit(EntityLivingBase user, ItemStack weapon, Entity hit, float dam) {
         if (rand.nextFloat() < injuryChance) {
-            hit.getEntityData().setInteger(EventManagerMF.injuredNBT, 300 + rand.nextInt(1000));
+            Cooldowns.set(hit, EventManagerMF.injuredNBT, 300 + rand.nextInt(1000));
         }
         super.onProperHit(user, weapon, hit, dam);
     }
