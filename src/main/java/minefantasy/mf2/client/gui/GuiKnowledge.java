@@ -3,6 +3,7 @@ package minefantasy.mf2.client.gui;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiOptionButton;
@@ -107,10 +108,11 @@ public class GuiKnowledge extends GuiScreen {
     private final RenderItem itemRender = new RenderItem();
     private InformationBase selected = null;
     private InformationBase highlighted = null;
+    /** An entry asked for and not yet confirmed by the server; the book chimes once it is. */
+    private InformationBase purchased = null;
     private GuiButton categoryButton;
     private LinkedList<InformationBase> informationList = new LinkedList<InformationBase>();
     private EntityPlayer player;
-    private boolean canPurchase = false;
 
     public GuiKnowledge(EntityPlayer user) {
         this.player = user;
@@ -185,7 +187,6 @@ public class GuiKnowledge extends GuiScreen {
                 player.openGui(MineFantasyII.instance, 1, player.worldObj, 0, highlighted.ID, 0);
             } else if (highlighted.isEasy() && ResearchLogic.canPurchase(player, highlighted)) {
                 selected = highlighted;
-                setPurchaseAvailable(player);
             }
         }
         super.mouseClicked(x, y, button);
@@ -209,6 +210,7 @@ public class GuiKnowledge extends GuiScreen {
         if (pressed.id == BUTTON_PURCHASE && selected != null) {
             ((EntityClientPlayerMP) player).sendQueue
                     .addToSendQueue(new ResearchRequest(player, selected.ID).generatePacket());
+            purchased = selected;
             selected = null;
         }
         if (pressed.id == BUTTON_CANCEL && selected != null) {
@@ -244,7 +246,7 @@ public class GuiKnowledge extends GuiScreen {
         GuiButton purchase = (GuiButton) buttonList.get(2);
         GuiButton cancel = (GuiButton) buttonList.get(3);
         purchase.visible = selected != null;
-        purchase.enabled = selected != null && canPurchase;
+        purchase.enabled = selected != null && selected.hasSkillsUnlocked(player);
         cancel.visible = selected != null;
     }
 
@@ -292,6 +294,11 @@ public class GuiKnowledge extends GuiScreen {
     /** Glides the view towards where it was dragged or zoomed. */
     @Override
     public void updateScreen() {
+        if (purchased != null && ResearchLogic.hasInfoUnlocked(player, purchased)) {
+            purchased = null;
+            this.mc.getSoundHandler()
+                    .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("random.levelup"), 1.0F));
+        }
         prevViewX = viewX;
         prevViewY = viewY;
         double dx = targetViewX - viewX;
@@ -489,6 +496,9 @@ public class GuiKnowledge extends GuiScreen {
     private void drawTooltip(InformationBase entry, int x, int y) {
         String title = entry.getDisplayName();
         boolean available = ResearchLogic.canUnlockInfo(player, entry);
+        String body;
+        int bodyColour;
+        String status = null;
 
         if (!available) {
             int depth = ResearchLogic.func_150874_c(player, entry);
@@ -498,42 +508,38 @@ public class GuiKnowledge extends GuiScreen {
             if (depth == HIDDEN_DEPTH) {
                 title = I18n.format("achievement.unknown");
             }
-            int width = Math.max(this.fontRendererObj.getStringWidth(title), 120);
-            String requires = new ChatComponentTranslation("achievement.requires", entry.parentInfo.getDisplayName())
-                    .getUnformattedText();
-            int height = this.fontRendererObj.splitStringWidth(requires, width);
-            this.drawGradientRect(
-                    x - 3,
-                    y - 3,
-                    x + width + 3,
-                    y + height + 12 + 3,
-                    TOOLTIP_BACKGROUND,
-                    TOOLTIP_BACKGROUND);
-            this.fontRendererObj.drawSplitString(requires, x, y + 12, width, TOOLTIP_REQUIRES);
+            // A root entry has no parent to name; it is locked by its skills alone
+            body = entry.parentInfo == null ? ""
+                    : new ChatComponentTranslation("achievement.requires", entry.parentInfo.getDisplayName())
+                            .getUnformattedText();
+            bodyColour = TOOLTIP_REQUIRES;
         } else {
-            String description = entry.getDescription();
-            int width = Math.max(this.fontRendererObj.getStringWidth(title), 120);
-            // Available entries always carry a status line below the description
-            int height = this.fontRendererObj.splitStringWidth(description, width) + 12;
-            this.drawGradientRect(
-                    x - 3,
-                    y - 3,
-                    x + width + 3,
-                    y + height + 3 + 12,
-                    TOOLTIP_BACKGROUND,
-                    TOOLTIP_BACKGROUND);
-            this.fontRendererObj.drawSplitString(description, x, y + 12, width, TOOLTIP_DESCRIPTION);
-
+            body = entry.getDescription();
+            bodyColour = TOOLTIP_DESCRIPTION;
             if (ResearchLogic.hasInfoUnlocked(player, entry)) {
-                this.fontRendererObj
-                        .drawStringWithShadow(I18n.format("information.discovered"), x, y + height + 4, TOOLTIP_STATUS);
+                status = I18n.format("information.discovered");
             } else if (InformationBase.easyResearch) {
-                this.fontRendererObj.drawStringWithShadow(
-                        StatCollector.translateToLocal("information.buy"),
-                        x,
-                        y + height + 4,
-                        TOOLTIP_STATUS);
+                status = StatCollector.translateToLocal("information.buy");
             }
+        }
+
+        int width = Math.max(this.fontRendererObj.getStringWidth(title), 120);
+        int bodyHeight = body.isEmpty() ? 0 : this.fontRendererObj.splitStringWidth(body, width);
+        // Available entries keep a line below the description for their status, even when it is empty
+        int height = 12 + bodyHeight + (available ? 12 : 0);
+
+        // Keep the whole box on screen, flipping to the left of the mouse near the right edge
+        if (x + width + 3 > this.width) {
+            x = Math.max(3, x - width - 24);
+        }
+        y = MathHelper.clamp_int(y, 3, Math.max(3, this.height - height - 3));
+
+        this.drawGradientRect(x - 3, y - 3, x + width + 3, y + height + 3, TOOLTIP_BACKGROUND, TOOLTIP_BACKGROUND);
+        if (!body.isEmpty()) {
+            this.fontRendererObj.drawSplitString(body, x, y + 12, width, bodyColour);
+        }
+        if (status != null) {
+            this.fontRendererObj.drawStringWithShadow(status, x, y + 12 + bodyHeight + 4, TOOLTIP_STATUS);
         }
 
         int titleColour = available ? (entry.getSpecial() ? TITLE_AVAILABLE_SPECIAL : TITLE_AVAILABLE)
@@ -569,10 +575,6 @@ public class GuiKnowledge extends GuiScreen {
             mc.fontRenderer.drawStringWithShadow(requirements[a], x + 20, y + 32 + (a * 19), isUnlocked ? WHITE : red);
         }
         GL11.glColor3f(255, 255, 255);
-    }
-
-    private void setPurchaseAvailable(EntityPlayer user) {
-        canPurchase = selected != null && selected.hasSkillsUnlocked(user);
     }
 
     /** The panel left of the book with each skill's level and progress to the next. */
