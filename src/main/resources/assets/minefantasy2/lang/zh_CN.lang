@@ -331,7 +331,7 @@ item.coal_prep.name=精煤
 item.coke.name=焦炭
 item.blackpowder.name=黑火药
 item.blackpowder_advanced.name=高级黑火药
-item.bolt.name=螺栓
+item.bolt.name=弩箭
 item.flux_pot.name=优良熔剂
 item.coal_flux.name=含煤熔剂
 
@@ -427,7 +427,7 @@ item.mine_casing_obsidian.name=黑曜石地雷壳
 item.bomb_casing_crystal.name=水晶炸弹壳
 item.mine_casing_crystal.name=水晶地雷壳
 item.bomb_casing_arrow.name=箭头弹壳
-item.bomb_casing_bolt.name=螺栓弹壳
+item.bomb_casing_bolt.name=弩箭弹壳
 
 item.clay_brick.name=粘土砖
 item.kaolinite.name=高岭石
@@ -577,9 +577,9 @@ tile.oreCoalRich.name=富煤矿石
 tile.window.name=窗户
 tile.window_pane.name=窗板
 tile.mud_pavement.name=粗泥砖
-tile.mud_pavement_stair.name=粗泥砖台阶
+tile.mud_pavement_stair.name=粗泥砖楼梯
 tile.mud_brick.name=泥砖
-tile.mud_brick_stair.name=泥砖台阶
+tile.mud_brick_stair.name=泥砖楼梯
 tile.thatch.name=茅草
 tile.thatch_stair.name=茅草楼梯
 
@@ -623,11 +623,11 @@ tile.slate_pavement_stair.name=板岩铺路石楼梯
 tile.framed_glass.name=带框架的玻璃
 tile.framed_pane.name=带框架的玻璃板
 tile.firebricks.name=耐火石砖
-tile.firebrick_stair.name=耐火石砖台阶
+tile.firebrick_stair.name=耐火石砖楼梯
 tile.cobble_pavement.name=圆石铺路石
-tile.cobble_pavement_stair.name=圆石铺路石台阶
+tile.cobble_pavement_stair.name=圆石铺路石楼梯
 tile.cobble_brick.name=圆石砖
-tile.cobble_brick_stair.name=圆石砖台阶
+tile.cobble_brick_stair.name=圆石砖楼梯
 tile.clayWall.name=粘土墙板
 tile.ironbark_log.name=桉木
 tile.ebony_log.name=黑檀木
@@ -647,8 +647,8 @@ tile.yew_stair.name=紫衫木楼梯
 
 tile.nailed_planks.name=钉制木板
 tile.refined_planks.name=精致钉制木板
-tile.nailed_planks_stair.name=钉制木板台阶
-tile.refined_planks_stair.name=精致钉制木板台阶
+tile.nailed_planks_stair.name=钉制木板楼梯
+tile.refined_planks_stair.name=精致钉制木板楼梯
 
 tile.reinforced_stone_base.name=强化石头
 tile.reinforced_stone_engraved.name=錾制强化石头
@@ -658,8 +658,8 @@ tile.reinforced_stone_bricks_cracked.name=强化裂石砖
 tile.reinforced_stone_bricks_mossy.name=强化苔石砖
 
 tile.reinforced_stone_framed.name=加固强化石头
-tile.reinforced_stone_stair.name=强化石头台阶
-tile.reinforced_stone_brick_stair.name=强化石砖台阶
+tile.reinforced_stone_stair.name=强化石头楼梯
+tile.reinforced_stone_brick_stair.name=强化石砖楼梯
 
 tile.bronze_bars.name=青铜栅栏
 tile.iron_bars.name=铁栅栏

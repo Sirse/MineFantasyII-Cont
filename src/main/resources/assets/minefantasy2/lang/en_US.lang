@@ -427,7 +427,7 @@ item.mine_casing_obsidian.name=Obsidian Mine Casing
 item.bomb_casing_crystal.name=Crystal Bomb Casing
 item.mine_casing_crystal.name=Crystal Mine Casing
 item.bomb_casing_arrow.name=Arrow Bomb Casing
-item.bomb_casing_bolt.name=Quarrel Bomb Casing
+item.bomb_casing_bolt.name=Bolt Bomb Casing
 
 item.clay_brick.name=Clay Brick
 item.kaolinite.name=Kaolinite
@@ -477,7 +477,7 @@ bomb.component.filling=Filling
 bomb.component.bombcase=Bomb Case
 bomb.component.minecase=Mine Case
 bomb.component.arrow=Arrow Case
-bomb.component.bolt=Quarrel Case
+bomb.component.bolt=Bolt Case
 bomb.component.fuse=Fuse
 bomb.component.powder=Powder
 
@@ -492,7 +492,7 @@ item.bomb_basic.name=Basic Bomb
 item.bomb_shrapnel.name=Shrapnel Bomb
 item.bomb_fire.name=Incineration Bomb
 item.exploding_arrow.name=Bomb Arrow
-item.exploding_bolt.name=Explosive Quarrel
+item.exploding_bolt.name=Explosive Bolt
 
 item.mine_basic.name=Basic Mine
 item.mine_shrapnel.name=Shrapnel Mine
@@ -577,9 +577,9 @@ tile.oreCoalRich.name=Rich Coal Deposit
 tile.window.name=Window
 tile.window_pane.name=Window Pane
 tile.mud_pavement.name=Rough Mud Bricks
-tile.mud_pavement_stair.name=Rough Mud Brick Steps
+tile.mud_pavement_stair.name=Rough Mud Brick Stairs
 tile.mud_brick.name=Mud Bricks
-tile.mud_brick_stair.name=Mud Brick Steps
+tile.mud_brick_stair.name=Mud Brick Stairs
 tile.thatch.name=Thatch
 tile.thatch_stair.name=Thatch Stairs
 
@@ -623,11 +623,11 @@ tile.slate_pavement_stair.name=Slate Pavement Stairs
 tile.framed_glass.name=Framed Glass
 tile.framed_pane.name=Framed Glass Pane
 tile.firebricks.name=Fire Bricks
-tile.firebrick_stair.name=Fire Brick Steps
+tile.firebrick_stair.name=Fire Brick Stairs
 tile.cobble_pavement.name=Cobblestone Pavement
-tile.cobble_pavement_stair.name=Cobblestone Pavement Steps
+tile.cobble_pavement_stair.name=Cobblestone Pavement Stairs
 tile.cobble_brick.name=Cobblestone Bricks
-tile.cobble_brick_stair.name=Cobblestone Brick Steps
+tile.cobble_brick_stair.name=Cobblestone Brick Stairs
 tile.clayWall.name=Clay Wall Panel
 tile.ironbark_log.name=Ironbark Log
 tile.ebony_log.name=Ebony Log
@@ -658,8 +658,8 @@ tile.reinforced_stone_bricks_cracked.name=Worn Reinforced Stone Bricks
 tile.reinforced_stone_bricks_mossy.name=Mossy Reinforced Stone Bricks
 
 tile.reinforced_stone_framed.name=Framed Reinforced Stone
-tile.reinforced_stone_stair.name=Reinforced Stone Steps
-tile.reinforced_stone_brick_stair.name=Reinforced Stone Brick Steps
+tile.reinforced_stone_stair.name=Reinforced Stone Stairs
+tile.reinforced_stone_brick_stair.name=Reinforced Stone Brick Stairs
 
 tile.bronze_bars.name=Bronze Bars
 tile.iron_bars.name=Iron Bars
@@ -916,7 +916,7 @@ item.standard_bow.name=%1$s Bow
 item.standard_arrow.name=%1$s Arrow
 item.standard_arrow_bodkin.name=%1$s Bodkin Arrow
 item.standard_arrow_broad.name=%1$s Broadhead Arrow
-item.standard_bolt.name=%1$s Quarrel
+item.standard_bolt.name=%1$s Bolt
 
 item.standard_mallet.name=%1$s Mallet
 item.standard_spoon.name=%1$s Spoon
@@ -1417,7 +1417,7 @@ knowledge.plants.1=A common sight on the surface is a variety of tree and plantl
 knowledge.plants.2=Trees provide different types of wood, some better for certain purposes than others. This is a list of the trees found in the world.
 knowledge.yew.1=Yew trees can be found within many forests, sparsely spread, standing alone. The properties of yew are superior than common wood, but are the best in the creation of bows.
 
-knowledge.ironbark.1=Ironbark is a recognisable tree that can be found in the forests occasionally. The rough gray bark and orange inners make this tree stand out above the rest. Ironbark is a strong wood, excellent for creating durable items.
+knowledge.ironbark.1=Ironbark is a recognizable tree that can be found in the forests occasionally. The rough gray bark and orange inners make this tree stand out above the rest. Ironbark is a strong wood, excellent for creating durable items.
 
 knowledge.ebony.1=Ebony trees are huge and rare. These are found in moderate regions and provide extremely strong timber. Ebony trees are recognized by their size and dark brown to black wood. They produce the strongest wood available.
 
@@ -1529,7 +1529,7 @@ knowledge.smeltBlackSteel.1=Every material has its limits, and now you have foun
 knowledge.craftOrnate=Ornate Style
 knowledge.craftOrnate.desc=Worthy of cleansing
 
-knowledge.craftOrnate.1=With the proper materials and time, it is possible to create more decorative varients of weapon, tool and armor. Ornate items are far more powerful against the unholy such as undead.^An ornate crest is used to craft these. place a single crest in the output slot of anvils then craft an appropriate item. When crafting finishes: an ornate item will be crafted.
+knowledge.craftOrnate.1=With the proper materials and time, it is possible to create more decorative variants of weapon, tool and armor. Ornate items are far more powerful against the unholy such as undead.^An ornate crest is used to craft these. place a single crest in the output slot of anvils then craft an appropriate item. When crafting finishes: an ornate item will be crafted.
 
 knowledge.smeltDragonforge=Dragonforge Style
 knowledge.smeltDragonforge.desc=Crude and powerful

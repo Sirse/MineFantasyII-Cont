@@ -699,7 +699,7 @@ tile.mud_pavement_stair.name=Ступеньки из грубых грязевы
 tile.mud_brick.name=Грязевые кирпичи
 tile.mud_brick_stair.name=Ступеньки из грязевых кирпичей
 tile.thatch.name=Соломенная крыша
-tile.thatch_stair.name=Скат соломенной крыши
+tile.thatch_stair.name=Соломенные ступеньки
 
 tile.limestone.name=Известняк
 tile.limestone_cobblestone.name=Известняковый булыжник
