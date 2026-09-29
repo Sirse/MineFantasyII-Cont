@@ -8,7 +8,7 @@ import minefantasy.mf2.block.decor.BlockComponent;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.decor.BlockTrough;
 import minefantasy.mf2.block.refining.*;
-import minefantasy.mf2.mechanics.EventManagerMF;
+import minefantasy.mf2.client.TooltipEvents;
 
 @SideOnly(Side.CLIENT)
 public class ConfigClient extends ConfigurationBaseMF {
@@ -157,7 +157,7 @@ public class ConfigClient extends ConfigurationBaseMF {
         BlockChimney.pipe_RI = config.get(CATEGORY_BLOCK, "Smoke Pipe", -117).getInt();
         BlockComponent.component_RI = config.get(CATEGORY_BLOCK, "Component Storage", -118).getInt();
 
-        EventManagerMF.displayOreDict = config.get(
+        TooltipEvents.displayOreDict = config.get(
                 CATEGORY_DEBUG,
                 "Show Debug OreDict",
                 false,

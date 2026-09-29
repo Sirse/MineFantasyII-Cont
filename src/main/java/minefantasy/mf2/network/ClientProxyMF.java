@@ -25,8 +25,10 @@ import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.client.ItemUseSyncMF;
 import minefantasy.mf2.client.KnowledgePageRegistry;
+import minefantasy.mf2.client.TooltipEvents;
 import minefantasy.mf2.client.gui.*;
 import minefantasy.mf2.client.render.*;
+import minefantasy.mf2.client.render.CogworkRenderEvents;
 import minefantasy.mf2.client.render.block.*;
 import minefantasy.mf2.client.render.block.component.TileEntityComponentRenderer;
 import minefantasy.mf2.client.render.mob.*;
@@ -79,6 +81,8 @@ public class ClientProxyMF extends CommonProxyMF {
         super.registerTickHandlers();
         MinecraftForge.EVENT_BUS.register(new ExtendedReachMF());
         MinecraftForge.EVENT_BUS.register(new HudHandlerMF());
+        MinecraftForge.EVENT_BUS.register(new TooltipEvents());
+        MinecraftForge.EVENT_BUS.register(new CogworkRenderEvents());
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
         FMLCommonHandler.instance().bus().register(new ItemUseSyncMF());
 
