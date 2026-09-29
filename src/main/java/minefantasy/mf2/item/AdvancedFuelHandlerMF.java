@@ -25,7 +25,7 @@ public class AdvancedFuelHandlerMF implements IFuelHandler {
             return 0;
         }
         if (fuel.getItem() == ComponentListMF.coalDust) {
-            return 300;// 15s
+            return 400;// 20s
         }
         if (fuel.getItem() == ComponentListMF.coke) {
             return 2400;
