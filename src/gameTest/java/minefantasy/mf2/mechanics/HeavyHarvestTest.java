@@ -3,6 +3,7 @@ package minefantasy.mf2.mechanics;
 import static minefantasy.mf2.gametest.Assert.*;
 
 import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -130,6 +131,35 @@ public class HeavyHarvestTest {
             assertEquals("the axe took stone", Blocks.stone, at(helper, 3, 1, 2));
             return null;
         });
+        helper.succeed();
+    }
+
+    /** A pick about to break keeps its last use for the block hit, so that block still drops. */
+    @GameTest
+    public static void aWornPickKeepsItsLastUseForTheBlockHit(GameTestHelper helper) throws Exception {
+        withoutStaminaOrCrumbling(() -> {
+            fill(helper, Blocks.stone);
+            FakePlayer player = holding(helper, CustomToolListMF.standard_hvypick);
+            ItemStack pick = player.getHeldItem();
+            pick.setItemDamage(pick.getMaxDamage() - 1);
+            strike(helper, player, 2, 2, 2, 2);
+            assertSame("the pick broke on the blocks around", pick, player.getHeldItem());
+            assertEquals(Blocks.stone, at(helper, 1, 1, 2));
+            return null;
+        });
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void silkTouchGivesNoExperience(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, Blocks.diamond_ore);
+        TestPos at = helper.absolute(1, 1, 1);
+        FakePlayer player = holding(helper, CustomToolListMF.standard_hvypick);
+        assertTrue(
+                "diamond ore gave no experience",
+                ProtectionHelper.breakExperience(player, helper.getWorld(), at.x(), at.y(), at.z()) > 0);
+        player.getHeldItem().addEnchantment(Enchantment.silkTouch, 1);
+        assertEquals(0, ProtectionHelper.breakExperience(player, helper.getWorld(), at.x(), at.y(), at.z()));
         helper.succeed();
     }
 }

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -119,43 +118,49 @@ public class HeavyHarvest {
 
     /**
      * Breaks one more block as the player would, if they may and it is not much softer than the block hit. A heavy tool
-     * may crumble what it breaks, leaving nothing. Returns whether the block broke; the tool wears by one.
+     * may crumble what it breaks, leaving nothing. Returns whether the block broke; the tool wears by one, and keeps
+     * its last use for the block that was hit.
      */
     public static boolean breakExtra(ItemStack tool, EntityPlayer player, World world, int x, int y, int z,
             float hitStrength) {
         Block block = world.getBlock(x, y, z);
         int meta = world.getBlockMetadata(x, y, z);
-        if (block.isAir(world, x, y, z) || player.getHeldItem() != tool) {
+        if (block.isAir(world, x, y, z) || player.getHeldItem() != tool || lastUse(tool, player)) {
             return false;
         }
         float strength = strength(player, world, x, y, z);
         if (strength <= 0F || hitStrength / strength > MAX_STRENGTH_RATIO) {
             return false;
         }
-        if (!ForgeHooks.canHarvestBlock(block, player, meta) || !ProtectionHelper.canBreak(player, world, x, y, z)) {
+        if (!ForgeHooks.canHarvestBlock(block, player, meta)) {
             return false;
         }
+        int experience = ProtectionHelper.breakExperience(player, world, x, y, z);
+        if (experience < 0) {
+            return false;
+        }
+        // Settled before removal: blocks may keep their tile until harvested when told they will be
+        boolean harvest = !player.capabilities.isCreativeMode
+                && world.rand.nextFloat() * 100F >= ConfigTools.hvyDropChance;
         block.onBlockHarvested(world, x, y, z, meta, player);
-        if (!block.removedByPlayer(world, player, x, y, z, true)) {
+        if (!block.removedByPlayer(world, player, x, y, z, harvest)) {
             return false;
         }
         block.onBlockDestroyedByPlayer(world, x, y, z, meta);
         world.playAuxSFX(2001, x, y, z, Block.getIdFromBlock(block) + (meta << 12));
+        if (harvest) {
+            block.harvestBlock(world, player, x, y, z, meta);
+            block.dropXpOnBlockBreak(world, x, y, z, experience);
+        }
         if (!player.capabilities.isCreativeMode) {
-            if (world.rand.nextFloat() * 100F >= ConfigTools.hvyDropChance) {
-                block.harvestBlock(world, player, x, y, z, meta);
-                block.dropXpOnBlockBreak(
-                        world,
-                        x,
-                        y,
-                        z,
-                        block.getExpDrop(world, meta, EnchantmentHelper.getFortuneModifier(player)));
-            }
             tool.damageItem(1, player);
-            if (tool.stackSize <= 0) {
-                player.destroyCurrentEquippedItem();
-            }
         }
         return true;
+    }
+
+    /** Whether the tool has one use left, which the block that was hit still needs. */
+    private static boolean lastUse(ItemStack tool, EntityPlayer player) {
+        return !player.capabilities.isCreativeMode && tool.isItemStackDamageable()
+                && tool.getItemDamage() >= tool.getMaxDamage() - 1;
     }
 }

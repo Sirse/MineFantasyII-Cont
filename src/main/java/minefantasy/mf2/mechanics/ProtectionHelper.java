@@ -1,10 +1,13 @@
 package minefantasy.mf2.mechanics;
 
+import net.minecraft.block.Block;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.world.BlockEvent;
 
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.util.BukkitUtils;
@@ -26,22 +29,36 @@ public class ProtectionHelper {
      * is gone and restoring it when the break is denied.
      */
     public static boolean canBreak(EntityPlayer player, World world, int x, int y, int z) {
+        return breakExperience(player, world, x, y, z) >= 0;
+    }
+
+    /**
+     * The experience breaking the block would give, as the break event settles it (none under silk touch, and as other
+     * mods change it), or -1 when a protection plugin or mod denies the break.
+     */
+    public static int breakExperience(EntityPlayer player, World world, int x, int y, int z) {
         if (world == null || world.isRemote || player == null) {
-            return true;
+            return 0;
         }
         if (MineFantasyII.isBukkitServer() && BukkitUtils.cantBreakBlock(player, x, y, z)) {
-            return false;
+            return -1;
         }
-        if (!(player instanceof EntityPlayerMP)) {
-            return true;
+        if (player instanceof EntityPlayerMP) {
+            EntityPlayerMP playerMP = (EntityPlayerMP) player;
+            if (playerMP.playerNetServerHandler != null && playerMP.theItemInWorldManager != null) {
+                WorldSettings.GameType gameType = playerMP.theItemInWorldManager.getGameType();
+                BlockEvent.BreakEvent event = ForgeHooks.onBlockBreakEvent(world, gameType, playerMP, x, y, z);
+                return event.isCanceled() ? -1 : event.getExpToDrop();
+            }
         }
-        EntityPlayerMP playerMP = (EntityPlayerMP) player;
-        if (playerMP.playerNetServerHandler == null || playerMP.theItemInWorldManager == null) {
-            // Fake or partially initialised player: nothing to ask, and the hook would need a live connection
-            return true;
+        // Fake or partially initialised player: nothing to ask, and the hook would need a live connection; the
+        // experience is worked out as the event would
+        Block block = world.getBlock(x, y, z);
+        int meta = world.getBlockMetadata(x, y, z);
+        if (EnchantmentHelper.getSilkTouchModifier(player) && block.canSilkHarvest(world, player, x, y, z, meta)) {
+            return 0;
         }
-        WorldSettings.GameType gameType = playerMP.theItemInWorldManager.getGameType();
-        return !ForgeHooks.onBlockBreakEvent(world, gameType, playerMP, x, y, z).isCanceled();
+        return block.getExpDrop(world, meta, EnchantmentHelper.getFortuneModifier(player));
     }
 
     /**
