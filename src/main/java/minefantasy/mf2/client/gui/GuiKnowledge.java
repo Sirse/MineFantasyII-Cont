@@ -2,7 +2,6 @@ package minefantasy.mf2.client.gui;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.gui.GuiButton;
@@ -34,113 +33,149 @@ import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.network.packet.ResearchRequest;
 
+/**
+ * The research book: a map of every entry that can be dragged and zoomed, a purchase window for entries bought with
+ * skill, and the player's skills alongside.
+ */
 @SideOnly(Side.CLIENT)
 public class GuiKnowledge extends GuiScreen {
 
-    private static final int field_146572_y = InformationList.minDisplayColumn * 24 - 112;
-    private static final int field_146571_z = InformationList.minDisplayRow * 24 - 112;
-    private static final int field_146559_A = InformationList.maxDisplayColumn * 24 - 77;
-    private static final int field_146560_B = InformationList.maxDisplayRow * 24 - 77;
+    /** Grid step between entries on the map, in map pixels. */
+    private static final int CELL = 24;
+    /** Size of the book frame texture. */
+    private static final int FRAME_WIDTH = 256;
+    private static final int FRAME_HEIGHT = 202;
+    /** The map window inside the frame: where it starts and how big it is. */
+    private static final int MAP_LEFT = 16;
+    private static final int MAP_TOP = 17;
+    private static final int MAP_WIDTH = 224;
+    private static final int MAP_HEIGHT = 155;
+    /** How far the view can scroll, in map pixels. */
+    private static final int VIEW_MIN_X = InformationList.minDisplayColumn * CELL - 112;
+    private static final int VIEW_MIN_Y = InformationList.minDisplayRow * CELL - 112;
+    private static final int VIEW_MAX_X = InformationList.maxDisplayColumn * CELL - 77;
+    private static final int VIEW_MAX_Y = InformationList.maxDisplayRow * CELL - 77;
+    private static final float ZOOM_MIN = 1.0F;
+    private static final float ZOOM_MAX = 3.0F;
+    private static final float ZOOM_STEP = 0.25F;
+
+    /** How many locked parents deep an entry still shows: links, dim, dimmer, and dimmest with its name hidden. */
+    private static final int LINKS_DEPTH = 1;
+    private static final int DIM_DEPTH = 2;
+    private static final int HIDDEN_DEPTH = 3;
+
+    private static final int LINK_LOCKED = 0xFF000000;
+    private static final int LINK_DISCOVERED = 0xFFA0A0A0;
+    private static final int LINK_AVAILABLE = 0xFF00FF00;
+    private static final int TOOLTIP_BACKGROUND = 0xC0000000;
+    private static final int TOOLTIP_REQUIRES = 0xFF705050;
+    private static final int TOOLTIP_DESCRIPTION = 0xFFA0A0A0;
+    private static final int TOOLTIP_STATUS = 0xFF9090FF;
+    private static final int TITLE_AVAILABLE = 0xFFFFFFFF;
+    private static final int TITLE_AVAILABLE_SPECIAL = 0xFFFFFF80;
+    private static final int TITLE_LOCKED = 0xFF808080;
+    private static final int TITLE_LOCKED_SPECIAL = 0xFF808040;
+    private static final int FRAME_TITLE = 0x404040;
+    private static final int WHITE = 0xFFFFFF;
+
+    private static final int BUTTON_DONE = 1;
+    private static final int BUTTON_CATEGORY = 2;
+    private static final int BUTTON_PURCHASE = 3;
+    private static final int BUTTON_CANCEL = 4;
+
     private static final ResourceLocation screenTex = new ResourceLocation(
             "minefantasy2:textures/gui/knowledge/knowledge.png");
     private static final ResourceLocation buyTex = new ResourceLocation(
             "minefantasy2:textures/gui/knowledge/purchase.png");
     private static final ResourceLocation skillTex = new ResourceLocation(
             "minefantasy2:textures/gui/knowledge/skilllist.png");
-    protected static int field_146555_f = 256;
-    protected static int field_146557_g = 202;
-    protected static int field_146563_h;
-    protected static int field_146564_i;
-    protected static float field_146570_r = 1.0F;
-    protected static double field_146569_s;
-    protected static double field_146568_t;
-    protected static double field_146567_u;
-    protected static double field_146566_v;
-    protected static double field_146565_w;
-    protected static double field_146573_x;
-    private static int field_146554_D;
-    private static boolean allDiscovered = true;
+
+    // The view is kept between openings of the book: where it was last tick, where it is, and where it glides to
+    private static double prevViewX, prevViewY;
+    private static double viewX, viewY;
+    private static double targetViewX, targetViewY;
+    private static float zoom = 1.0F;
+    private static int lastMouseX, lastMouseY;
+    /** 0 while the button is up, 1 once a drag has started inside the map. */
+    private static int dragState;
     private static int currentPage = -1;
+
     public int buyWidth = 225;
     public int buyHeight = 72;
     int offsetByX = 70;
     int offsetByY = 0;
-    private RenderItem itemrender = new RenderItem();
+    private final RenderItem itemRender = new RenderItem();
     private InformationBase selected = null;
     private InformationBase highlighted = null;
-    private GuiButton button;
+    private GuiButton categoryButton;
     private LinkedList<InformationBase> informationList = new LinkedList<InformationBase>();
     private EntityPlayer player;
     private boolean canPurchase = false;
 
     public GuiKnowledge(EntityPlayer user) {
         this.player = user;
-        short short1 = 141;
-        short short2 = 141;
-        GuiKnowledge.field_146569_s = GuiKnowledge.field_146567_u = GuiKnowledge.field_146565_w = KnowledgeListMF.gettingStarted.displayColumn
-                * 24 - short1 / 2
-                - 12;
-        GuiKnowledge.field_146568_t = GuiKnowledge.field_146566_v = GuiKnowledge.field_146573_x = KnowledgeListMF.gettingStarted.displayRow
-                * 24 - short2 / 2;
+        int half = 141 / 2;
+        prevViewX = viewX = targetViewX = KnowledgeListMF.gettingStarted.displayColumn * CELL - half - 12;
+        prevViewY = viewY = targetViewY = KnowledgeListMF.gettingStarted.displayRow * CELL - half;
         informationList.clear();
-        for (Object achievement : InformationList.knowledgeList) {
-            if (!InformationPage.isInfoInPages((InformationBase) achievement)) {
-                informationList.add((InformationBase) achievement);
-            }
-        }
-        for (Object base : InformationList.knowledgeList.toArray()) {
-            if (!ResearchLogic.hasInfoUnlocked(user, (InformationBase) base)) {
-                allDiscovered = false;
-                break;
+        for (Object info : InformationList.knowledgeList) {
+            if (!InformationPage.isInfoInPages((InformationBase) info)) {
+                informationList.add((InformationBase) info);
             }
         }
     }
 
-    /**
-     * Adds the buttons (and other controls) to the screen in question.
-     */
+    private int frameLeft() {
+        return (this.width - FRAME_WIDTH) / 2 + offsetByX;
+    }
+
+    private int frameTop() {
+        return (this.height - FRAME_HEIGHT) / 2 + offsetByY;
+    }
+
+    private int purchaseLeft() {
+        return frameLeft() + (FRAME_WIDTH - buyWidth) / 2;
+    }
+
+    private int purchaseTop() {
+        return frameTop() + (FRAME_HEIGHT - buyHeight) / 2;
+    }
+
     @Override
     public void initGui() {
-        int i1 = (this.width - GuiKnowledge.field_146555_f) / 2 + offsetByX;
-        int j1 = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
-
         this.buttonList.clear();
         this.buttonList.add(
                 new GuiOptionButton(
-                        1,
+                        BUTTON_DONE,
                         this.width / 2 + 24,
                         this.height / 2 + 101,
                         80,
                         20,
-                        I18n.format("gui.done", new Object[0])));
+                        I18n.format("gui.done")));
         this.buttonList.add(
-                button = new GuiButton(
-                        2,
-                        (width - field_146555_f) / 2 + 24,
+                categoryButton = new GuiButton(
+                        BUTTON_CATEGORY,
+                        (width - FRAME_WIDTH) / 2 + 24,
                         height / 2 + 101,
                         125,
                         20,
                         InformationPage.getTitle(currentPage)));
-
-        int purchasex = i1 + (field_146555_f - buyWidth) / 2;
-        int purchasey = j1 + (field_146557_g - buyHeight) / 2;
-        // PURCHASE SCREEN
         this.buttonList.add(
                 new GuiOptionButton(
-                        3,
-                        purchasex + 19,
-                        purchasey + 47,
+                        BUTTON_PURCHASE,
+                        purchaseLeft() + 19,
+                        purchaseTop() + 47,
                         80,
                         20,
-                        I18n.format("gui.purchase", new Object[0])));
+                        I18n.format("gui.purchase")));
         this.buttonList.add(
                 new GuiOptionButton(
-                        4,
-                        purchasex + 125,
-                        purchasey + 47,
+                        BUTTON_CANCEL,
+                        purchaseLeft() + 125,
+                        purchaseTop() + 47,
                         80,
                         20,
-                        I18n.format("gui.cancel", new Object[0])));
+                        I18n.format("gui.cancel")));
     }
 
     @Override
@@ -158,32 +193,29 @@ public class GuiKnowledge extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton pressed) {
-        if (pressed.id == 1) {
+        if (pressed.id == BUTTON_DONE) {
             this.mc.displayGuiScreen((GuiScreen) null);
         }
 
-        if (selected == null && pressed.id == 2) {
+        if (selected == null && pressed.id == BUTTON_CATEGORY) {
             currentPage++;
 
             if (currentPage >= InformationPage.getInfoPages().size()) {
                 currentPage = -1;
             }
-            button.displayString = InformationPage.getTitle(currentPage);
+            categoryButton.displayString = InformationPage.getTitle(currentPage);
         }
 
-        if (pressed.id == 3 && selected != null) {
+        if (pressed.id == BUTTON_PURCHASE && selected != null) {
             ((EntityClientPlayerMP) player).sendQueue
                     .addToSendQueue(new ResearchRequest(player, selected.ID).generatePacket());
             selected = null;
         }
-        if (pressed.id == 4 && selected != null) {
+        if (pressed.id == BUTTON_CANCEL && selected != null) {
             selected = null;
         }
     }
 
-    /**
-     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
-     */
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
         if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
@@ -194,323 +226,123 @@ public class GuiKnowledge extends GuiScreen {
         }
     }
 
-    /**
-     * Draws the screen and all the components in it.
-     */
     @Override
-    public void drawScreen(int mx, int my, float f) {
-        {
-            int k;
+    public void drawScreen(int mx, int my, float partialTicks) {
+        handleDrag(mx, my);
+        handleZoom();
+        targetViewX = MathHelper.clamp_double(targetViewX, VIEW_MIN_X, VIEW_MAX_X - 1);
+        targetViewY = MathHelper.clamp_double(targetViewY, VIEW_MIN_Y, VIEW_MAX_Y - 1);
 
-            if (selected == null && Mouse.isButtonDown(0)) {
-                k = (this.width - GuiKnowledge.field_146555_f) / 2 + offsetByX;
-                int l = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
-                int i1 = k + 8;
-                int j1 = l + 17;
+        this.drawDefaultBackground();
+        this.renderMainPage(mx, my, partialTicks);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        this.drawOverlay();
+        GL11.glEnable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-                if ((GuiKnowledge.field_146554_D == 0 || GuiKnowledge.field_146554_D == 1) && mx >= i1
-                        && mx < i1 + 224
-                        && my >= j1
-                        && my < j1 + 155) {
-                    if (GuiKnowledge.field_146554_D == 0) {
-                        GuiKnowledge.field_146554_D = 1;
-                    } else {
-                        GuiKnowledge.field_146567_u -= (mx - GuiKnowledge.field_146563_h) * GuiKnowledge.field_146570_r;
-                        GuiKnowledge.field_146566_v -= (my - GuiKnowledge.field_146564_i) * GuiKnowledge.field_146570_r;
-                        GuiKnowledge.field_146565_w = GuiKnowledge.field_146569_s = GuiKnowledge.field_146567_u;
-                        GuiKnowledge.field_146573_x = GuiKnowledge.field_146568_t = GuiKnowledge.field_146566_v;
-                    }
+        GuiButton purchase = (GuiButton) buttonList.get(2);
+        GuiButton cancel = (GuiButton) buttonList.get(3);
+        purchase.visible = selected != null;
+        purchase.enabled = selected != null && canPurchase;
+        cancel.visible = selected != null;
+    }
 
-                    GuiKnowledge.field_146563_h = mx;
-                    GuiKnowledge.field_146564_i = my;
-                }
-            } else {
-                GuiKnowledge.field_146554_D = 0;
-            }
-
-            k = Mouse.getDWheel();
-            float f4 = GuiKnowledge.field_146570_r;
-
-            if (k < 0) {
-                GuiKnowledge.field_146570_r += 0.25F;
-            } else if (k > 0) {
-                GuiKnowledge.field_146570_r -= 0.25F;
-            }
-
-            GuiKnowledge.field_146570_r = MathHelper.clamp_float(GuiKnowledge.field_146570_r, 1.0F, 3.0F);
-
-            if (GuiKnowledge.field_146570_r != f4) {
-                float f6 = f4 - GuiKnowledge.field_146570_r;
-                float f5 = f4 * GuiKnowledge.field_146555_f;
-                float f1 = f4 * GuiKnowledge.field_146557_g;
-                float f2 = GuiKnowledge.field_146570_r * GuiKnowledge.field_146555_f;
-                float f3 = GuiKnowledge.field_146570_r * GuiKnowledge.field_146557_g;
-                GuiKnowledge.field_146567_u -= (f2 - f5) * 0.5F;
-                GuiKnowledge.field_146566_v -= (f3 - f1) * 0.5F;
-                GuiKnowledge.field_146565_w = GuiKnowledge.field_146569_s = GuiKnowledge.field_146567_u;
-                GuiKnowledge.field_146573_x = GuiKnowledge.field_146568_t = GuiKnowledge.field_146566_v;
-            }
-
-            if (GuiKnowledge.field_146565_w < field_146572_y) {
-                GuiKnowledge.field_146565_w = field_146572_y;
-            }
-
-            if (GuiKnowledge.field_146573_x < field_146571_z) {
-                GuiKnowledge.field_146573_x = field_146571_z;
-            }
-
-            if (GuiKnowledge.field_146565_w >= field_146559_A) {
-                GuiKnowledge.field_146565_w = field_146559_A - 1;
-            }
-
-            if (GuiKnowledge.field_146573_x >= field_146560_B) {
-                GuiKnowledge.field_146573_x = field_146560_B - 1;
-            }
-
-            this.drawDefaultBackground();
-            this.renderMainPage(mx, my, f);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            this.drawOverlay();
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+    /** Dragging inside the map moves the view with the mouse, scaled by the zoom. */
+    private void handleDrag(int mx, int my) {
+        if (selected != null || !Mouse.isButtonDown(0)) {
+            dragState = 0;
+            return;
         }
-        if (buttonList.get(2) != null) {
-            ((GuiButton) buttonList.get(2)).visible = selected != null;
-            ((GuiButton) buttonList.get(2)).enabled = selected != null && canPurchase;
-            ((GuiButton) buttonList.get(3)).visible = selected != null;
+        int left = frameLeft() + 8;
+        int top = frameTop() + MAP_TOP;
+        if (mx >= left && mx < left + MAP_WIDTH && my >= top && my < top + MAP_HEIGHT) {
+            if (dragState == 0) {
+                dragState = 1;
+            } else {
+                viewX -= (mx - lastMouseX) * zoom;
+                viewY -= (my - lastMouseY) * zoom;
+                targetViewX = prevViewX = viewX;
+                targetViewY = prevViewY = viewY;
+            }
+            lastMouseX = mx;
+            lastMouseY = my;
         }
     }
 
-    /**
-     * Called from the main game loop to update the screen.
-     */
+    /** The wheel zooms out and in, keeping the middle of the map where it is. */
+    private void handleZoom() {
+        int wheel = Mouse.getDWheel();
+        float oldZoom = zoom;
+        if (wheel < 0) {
+            zoom += ZOOM_STEP;
+        } else if (wheel > 0) {
+            zoom -= ZOOM_STEP;
+        }
+        zoom = MathHelper.clamp_float(zoom, ZOOM_MIN, ZOOM_MAX);
+
+        if (zoom != oldZoom) {
+            viewX -= (zoom - oldZoom) * FRAME_WIDTH * 0.5F;
+            viewY -= (zoom - oldZoom) * FRAME_HEIGHT * 0.5F;
+            targetViewX = prevViewX = viewX;
+            targetViewY = prevViewY = viewY;
+        }
+    }
+
+    /** Glides the view towards where it was dragged or zoomed. */
     @Override
     public void updateScreen() {
-        {
-            GuiKnowledge.field_146569_s = GuiKnowledge.field_146567_u;
-            GuiKnowledge.field_146568_t = GuiKnowledge.field_146566_v;
-            double d0 = GuiKnowledge.field_146565_w - GuiKnowledge.field_146567_u;
-            double d1 = GuiKnowledge.field_146573_x - GuiKnowledge.field_146566_v;
+        prevViewX = viewX;
+        prevViewY = viewY;
+        double dx = targetViewX - viewX;
+        double dy = targetViewY - viewY;
 
-            if (d0 * d0 + d1 * d1 < 4.0D) {
-                GuiKnowledge.field_146567_u += d0;
-                GuiKnowledge.field_146566_v += d1;
-            } else {
-                GuiKnowledge.field_146567_u += d0 * 0.85D;
-                GuiKnowledge.field_146566_v += d1 * 0.85D;
-            }
+        if (dx * dx + dy * dy < 4.0D) {
+            viewX += dx;
+            viewY += dy;
+        } else {
+            viewX += dx * 0.85D;
+            viewY += dy * 0.85D;
         }
     }
 
     protected void drawOverlay() {
-        int i = (this.width - GuiKnowledge.field_146555_f) / 2 + offsetByX;
-        int j = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
-
-        this.fontRendererObj.drawString(I18n.format("gui.information", new Object[0]), i + 15, j + 5, 4210752);
+        this.fontRendererObj.drawString(I18n.format("gui.information"), frameLeft() + 15, frameTop() + 5, FRAME_TITLE);
     }
 
-    protected void renderMainPage(int mx, int my, float f) {
-        int k = MathHelper.floor_double(
-                GuiKnowledge.field_146569_s + (GuiKnowledge.field_146567_u - GuiKnowledge.field_146569_s) * f);
-        int l = MathHelper.floor_double(
-                GuiKnowledge.field_146568_t + (GuiKnowledge.field_146566_v - GuiKnowledge.field_146568_t) * f);
+    protected void renderMainPage(int mx, int my, float partialTicks) {
+        int scrollX = MathHelper.floor_double(prevViewX + (viewX - prevViewX) * partialTicks);
+        int scrollY = MathHelper.floor_double(prevViewY + (viewY - prevViewY) * partialTicks);
+        scrollX = MathHelper.clamp_int(scrollX, VIEW_MIN_X, VIEW_MAX_X - 1);
+        scrollY = MathHelper.clamp_int(scrollY, VIEW_MIN_Y, VIEW_MAX_Y - 1);
 
-        if (k < field_146572_y) {
-            k = field_146572_y;
-        }
+        int mapX = frameLeft() + MAP_LEFT;
+        int mapY = frameTop() + MAP_TOP;
+        List<InformationBase> entries = currentPage == -1 ? informationList
+                : InformationPage.getInfoPage(currentPage).getInfoList();
 
-        if (l < field_146571_z) {
-            l = field_146571_z;
-        }
-
-        if (k >= field_146559_A) {
-            k = field_146559_A - 1;
-        }
-
-        if (l >= field_146560_B) {
-            l = field_146560_B - 1;
-        }
-
-        int i1 = (this.width - GuiKnowledge.field_146555_f) / 2 + offsetByX;
-        int j1 = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
-        int k1 = i1 + 16;
-        int l1 = j1 + 17;
         this.zLevel = 0.0F;
         GL11.glDepthFunc(GL11.GL_GEQUAL);
         GL11.glPushMatrix();
-        GL11.glTranslatef(k1, l1, -200.0F);
-        GL11.glScalef(1.0F / GuiKnowledge.field_146570_r, 1.0F / GuiKnowledge.field_146570_r, 0.0F);
+        GL11.glTranslatef(mapX, mapY, -200.0F);
+        GL11.glScalef(1.0F / zoom, 1.0F / zoom, 0.0F);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         GL11.glEnable(GL11.GL_COLOR_MATERIAL);
 
-        int i2 = k + 288 >> 4;
-        int j2 = l + 288 >> 4;
-        int k2 = (k + 288) % 16;
-        int l2 = (l + 288) % 16;
-        boolean flag = true;
-        boolean flag1 = true;
-        boolean flag2 = true;
-        boolean flag3 = true;
-        boolean flag4 = true;
-        Random random = new Random();
-        float f1 = 16.0F / GuiKnowledge.field_146570_r;
-        float f2 = 16.0F / GuiKnowledge.field_146570_r;
-        int i3;
-        int j3;
-        int k3;
-
-        for (i3 = 0; i3 * f1 - l2 < 155.0F; ++i3) {
-            float f3 = 0.6F - (j2 + i3) / 25.0F * 0.3F;
-            GL11.glColor4f(f3, f3, f3, 1.0F);
-
-            for (j3 = 0; j3 * f2 - k2 < 224.0F; ++j3) {
-                IIcon iicon = Blocks.planks.getIcon(0, 0);
-
-                this.mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
-                this.drawTexturedModelRectFromIcon(j3 * 16 - k2, i3 * 16 - l2, iicon, 16, 16);
-            }
-        }
-
+        drawBackground(scrollX, scrollY);
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDepthFunc(GL11.GL_LEQUAL);
-        this.mc.getTextureManager().bindTexture(screenTex);
-        int researchVisibility;
-        int j4;
-        int l4;
-
-        List<InformationBase> achievementList = (currentPage == -1 ? informationList
-                : InformationPage.getInfoPage(currentPage).getInfoList());
-        for (i3 = 0; i3 < achievementList.size(); ++i3) {
-            InformationBase achievement1 = achievementList.get(i3);
-
-            if (achievement1.parentInfo != null && achievementList.contains(achievement1.parentInfo)) {
-                j3 = achievement1.displayColumn * 24 - k + 11;
-                k3 = achievement1.displayRow * 24 - l + 11;
-                l4 = achievement1.parentInfo.displayColumn * 24 - k + 11;
-                int l3 = achievement1.parentInfo.displayRow * 24 - l + 11;
-                boolean flag5 = ResearchLogic.hasInfoUnlocked(player, achievement1);
-                boolean flag6 = ResearchLogic.canUnlockInfo(player, achievement1);
-                researchVisibility = ResearchLogic.func_150874_c(player, achievement1);
-
-                if (researchVisibility <= getVisibleRange()[0]) {
-                    j4 = -16777216;
-
-                    if (flag5) {
-                        j4 = -6250336;
-                    } else if (flag6) {
-                        j4 = -16711936;
-                    }
-
-                    this.drawHorizontalLine(j3, l4, k3, j4);
-                    this.drawVerticalLine(l4, k3, l3, j4);
-
-                    if (j3 > l4) {
-                        this.drawTexturedModalRect(j3 - 11 - 7, k3 - 5, 114, 234, 7, 11);
-                    } else if (j3 < l4) {
-                        this.drawTexturedModalRect(j3 + 11, k3 - 5, 107, 234, 7, 11);
-                    } else if (k3 > l3) {
-                        this.drawTexturedModalRect(j3 - 5, k3 - 11 - 7, 96, 234, 11, 7);
-                    } else if (k3 < l3) {
-                        this.drawTexturedModalRect(j3 - 5, k3 + 11, 96, 241, 11, 7);
-                    }
-                }
-            }
-        }
-
-        InformationBase achievement = null;
-        RenderItem renderitem = new RenderItem();
-        float f4 = (mx - k1) * GuiKnowledge.field_146570_r;
-        float f5 = (my - l1) * GuiKnowledge.field_146570_r;
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
-        int i5;
-        int j5;
-
-        for (l4 = 0; l4 < achievementList.size(); ++l4) {
-            InformationBase achievement2 = achievementList.get(l4);
-            i5 = achievement2.displayColumn * 24 - k;
-            j5 = achievement2.displayRow * 24 - l;
-
-            if (i5 >= -24 && j5 >= -24
-                    && i5 <= 224.0F * GuiKnowledge.field_146570_r
-                    && j5 <= 155.0F * GuiKnowledge.field_146570_r) {
-                researchVisibility = ResearchLogic.func_150874_c(player, achievement2);
-                float f6;
-
-                if (ResearchLogic.hasInfoUnlocked(player, achievement2)) {
-                    f6 = 0.75F;
-                    GL11.glColor4f(f6, f6, f6, 1.0F);
-                } else if (ResearchLogic.canUnlockInfo(player, achievement2)) {
-                    f6 = 1.0F;
-                    GL11.glColor4f(0.5F, 1.0F, 0.5F, 1.0F);
-                } else if (researchVisibility < getVisibleRange()[1]) {
-                    f6 = 0.3F;
-                    GL11.glColor4f(f6, f6, f6, 1.0F);
-                } else if (researchVisibility == getVisibleRange()[1]) {
-                    f6 = 0.2F;
-                    GL11.glColor4f(f6, f6, f6, 1.0F);
-                } else {
-                    if (researchVisibility != getVisibleRange()[2]) {
-                        continue;
-                    }
-
-                    f6 = 0.1F;
-                    GL11.glColor4f(f6, f6, f6, 1.0F);
-                }
-
-                this.mc.getTextureManager().bindTexture(screenTex);
-
-                GL11.glEnable(GL11.GL_BLEND);// Forge: Specifically enable blend because it is needed here. And we fix
-                // Generic RenderItem's leakage of it.
-                if (achievement2.getSpecial()) {
-                    this.drawTexturedModalRect(i5 - 2, j5 - 2, 26, 202, 26, 26);
-                } else if (achievement2.getPerk()) {
-                    this.drawTexturedModalRect(i5 - 2, j5 - 2, 52, 202, 26, 26);
-                } else {
-                    this.drawTexturedModalRect(i5 - 2, j5 - 2, 0, 202, 26, 26);
-                }
-                GL11.glDisable(GL11.GL_BLEND); // Forge: Cleanup states we set.
-
-                if (!ResearchLogic.canUnlockInfo(player, achievement2)) {
-                    f6 = 0.1F;
-                    GL11.glColor4f(f6, f6, f6, 1.0F);
-                    renderitem.renderWithColor = false;
-                }
-
-                GL11.glDisable(GL11.GL_LIGHTING); // Forge: Make sure Lighting is disabled. Fixes MC-33065
-                GL11.glEnable(GL11.GL_CULL_FACE);
-                renderitem.renderItemAndEffectIntoGUI(
-                        this.mc.fontRenderer,
-                        this.mc.getTextureManager(),
-                        achievement2.theItemStack,
-                        i5 + 3,
-                        j5 + 3);
-                GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                GL11.glDisable(GL11.GL_LIGHTING);
-
-                if (!ResearchLogic.canUnlockInfo(player, achievement2)) {
-                    renderitem.renderWithColor = true;
-                }
-
-                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-                if (f4 >= i5 && f4 <= i5 + 22 && f5 >= j5 && f5 <= j5 + 22) {
-                    achievement = achievement2;
-                }
-            }
-        }
+        drawLinks(entries, scrollX, scrollY);
+        InformationBase hovered = drawEntries(entries, scrollX, scrollY, (mx - mapX) * zoom, (my - mapY) * zoom);
 
         GL11.glDisable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glPopMatrix();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.mc.getTextureManager().bindTexture(screenTex);
-        this.drawTexturedModalRect(i1, j1, 0, 0, GuiKnowledge.field_146555_f, GuiKnowledge.field_146557_g);
+        this.drawTexturedModalRect(frameLeft(), frameTop(), 0, 0, FRAME_WIDTH, FRAME_HEIGHT);
 
         this.zLevel = 0.0F;
         GL11.glDepthFunc(GL11.GL_LEQUAL);
@@ -518,80 +350,14 @@ public class GuiKnowledge extends GuiScreen {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
 
         if (selected != null) {
-            int purchasex = i1 + (field_146555_f - buyWidth) / 2;
-            int purchasey = j1 + (field_146557_g - buyHeight) / 2;
-            renderPurchaseScreen(purchasex, purchasey, mx, my);
+            renderPurchaseScreen(purchaseLeft(), purchaseTop());
         }
         drawSkillList();
-        super.drawScreen(mx, my, f);
+        super.drawScreen(mx, my, partialTicks);
 
-        highlighted = achievement;
-        if (selected == null && achievement != null) {
-            String s1 = achievement.getDisplayName();
-            String s2 = achievement.getDescription();
-            i5 = mx + 12;
-            j5 = my - 4;
-            researchVisibility = ResearchLogic.func_150874_c(player, achievement);
-
-            if (!ResearchLogic.canUnlockInfo(player, achievement)) {
-                String s;
-                int k4;
-
-                if (researchVisibility == 3) {
-                    s1 = I18n.format("achievement.unknown", new Object[0]);
-                    j4 = Math.max(this.fontRendererObj.getStringWidth(s1), 120);
-                    s = (new ChatComponentTranslation(
-                            "achievement.requires",
-                            new Object[] { achievement.parentInfo.getDisplayName() })).getUnformattedText();
-                    k4 = this.fontRendererObj.splitStringWidth(s, j4);
-                    this.drawGradientRect(i5 - 3, j5 - 3, i5 + j4 + 3, j5 + k4 + 12 + 3, -1073741824, -1073741824);
-                    this.fontRendererObj.drawSplitString(s, i5, j5 + 12, j4, -9416624);
-                } else if (researchVisibility < 3) {
-                    j4 = Math.max(this.fontRendererObj.getStringWidth(s1), 120);
-                    s = (new ChatComponentTranslation(
-                            "achievement.requires",
-                            new Object[] { achievement.parentInfo.getDisplayName() })).getUnformattedText();
-                    k4 = this.fontRendererObj.splitStringWidth(s, j4);
-                    this.drawGradientRect(i5 - 3, j5 - 3, i5 + j4 + 3, j5 + k4 + 12 + 3, -1073741824, -1073741824);
-                    this.fontRendererObj.drawSplitString(s, i5, j5 + 12, j4, -9416624);
-                } else {
-                    s1 = null;
-                }
-            } else {
-                j4 = Math.max(this.fontRendererObj.getStringWidth(s1), 120);
-                int k5 = this.fontRendererObj.splitStringWidth(s2, j4);
-
-                if (ResearchLogic.hasInfoUnlocked(player, achievement)
-                        || ResearchLogic.canUnlockInfo(player, achievement)) {
-                    k5 += 12;
-                }
-
-                this.drawGradientRect(i5 - 3, j5 - 3, i5 + j4 + 3, j5 + k5 + 3 + 12, -1073741824, -1073741824);
-                this.fontRendererObj.drawSplitString(s2, i5, j5 + 12, j4, -6250336);
-
-                if (ResearchLogic.hasInfoUnlocked(player, achievement)) {
-                    this.fontRendererObj.drawStringWithShadow(
-                            I18n.format("information.discovered", new Object[0]),
-                            i5,
-                            j5 + k5 + 4,
-                            -7302913);
-                } else if (InformationBase.easyResearch && ResearchLogic.canUnlockInfo(player, achievement)) {
-                    this.fontRendererObj.drawStringWithShadow(
-                            StatCollector.translateToLocal("information.buy"),
-                            i5,
-                            j5 + k5 + 4,
-                            -7302913);
-                }
-            }
-
-            if (s1 != null) {
-                this.fontRendererObj.drawStringWithShadow(
-                        s1,
-                        i5,
-                        j5,
-                        ResearchLogic.canUnlockInfo(player, achievement) ? (achievement.getSpecial() ? -128 : -1)
-                                : (achievement.getSpecial() ? -8355776 : -8355712));
-            }
+        highlighted = hovered;
+        if (selected == null && hovered != null) {
+            drawTooltip(hovered, mx + 12, my - 4);
         }
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -599,102 +365,244 @@ public class GuiKnowledge extends GuiScreen {
         RenderHelper.disableStandardItemLighting();
     }
 
+    /** Planks under the map, darker further down. */
+    private void drawBackground(int scrollX, int scrollY) {
+        int row0 = scrollY + 288 >> 4;
+        int shiftX = (scrollX + 288) % 16;
+        int shiftY = (scrollY + 288) % 16;
+        float tile = 16.0F / zoom;
+        IIcon planks = Blocks.planks.getIcon(0, 0);
+        this.mc.getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+
+        for (int row = 0; row * tile - shiftY < MAP_HEIGHT; ++row) {
+            float shade = 0.6F - (row0 + row) / 25.0F * 0.3F;
+            GL11.glColor4f(shade, shade, shade, 1.0F);
+            for (int col = 0; col * tile - shiftX < MAP_WIDTH; ++col) {
+                this.drawTexturedModelRectFromIcon(col * 16 - shiftX, row * 16 - shiftY, planks, 16, 16);
+            }
+        }
+    }
+
+    /** Lines from each entry to its parent, with an arrow at the child, for entries close enough to known ones. */
+    private void drawLinks(List<InformationBase> entries, int scrollX, int scrollY) {
+        this.mc.getTextureManager().bindTexture(screenTex);
+        for (InformationBase entry : entries) {
+            if (entry.parentInfo == null || !entries.contains(entry.parentInfo)
+                    || ResearchLogic.func_150874_c(player, entry) > LINKS_DEPTH) {
+                continue;
+            }
+            int childX = entry.displayColumn * CELL - scrollX + 11;
+            int childY = entry.displayRow * CELL - scrollY + 11;
+            int parentX = entry.parentInfo.displayColumn * CELL - scrollX + 11;
+            int parentY = entry.parentInfo.displayRow * CELL - scrollY + 11;
+
+            int colour = LINK_LOCKED;
+            if (ResearchLogic.hasInfoUnlocked(player, entry)) {
+                colour = LINK_DISCOVERED;
+            } else if (ResearchLogic.canUnlockInfo(player, entry)) {
+                colour = LINK_AVAILABLE;
+            }
+            this.drawHorizontalLine(childX, parentX, childY, colour);
+            this.drawVerticalLine(parentX, childY, parentY, colour);
+
+            if (childX > parentX) {
+                this.drawTexturedModalRect(childX - 11 - 7, childY - 5, 114, 234, 7, 11);
+            } else if (childX < parentX) {
+                this.drawTexturedModalRect(childX + 11, childY - 5, 107, 234, 7, 11);
+            } else if (childY > parentY) {
+                this.drawTexturedModalRect(childX - 5, childY - 11 - 7, 96, 234, 11, 7);
+            } else if (childY < parentY) {
+                this.drawTexturedModalRect(childX - 5, childY + 11, 96, 241, 11, 7);
+            }
+        }
+    }
+
     /**
-     * Returns true if this GUI should pause the game when it is displayed in single-player
+     * Draws each entry in view with its frame and item, shaded by how far it is from being known. Returns the entry
+     * under the mouse, given in map pixels.
      */
+    private InformationBase drawEntries(List<InformationBase> entries, int scrollX, int scrollY, float mouseX,
+            float mouseY) {
+        InformationBase hovered = null;
+        RenderHelper.enableGUIStandardItemLighting();
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+
+        for (InformationBase entry : entries) {
+            int x = entry.displayColumn * CELL - scrollX;
+            int y = entry.displayRow * CELL - scrollY;
+            if (x < -CELL || y < -CELL || x > MAP_WIDTH * zoom || y > MAP_HEIGHT * zoom) {
+                continue;
+            }
+            boolean available = ResearchLogic.canUnlockInfo(player, entry);
+            int depth = ResearchLogic.func_150874_c(player, entry);
+            if (ResearchLogic.hasInfoUnlocked(player, entry)) {
+                GL11.glColor4f(0.75F, 0.75F, 0.75F, 1.0F);
+            } else if (available) {
+                GL11.glColor4f(0.5F, 1.0F, 0.5F, 1.0F);
+            } else if (depth < DIM_DEPTH) {
+                GL11.glColor4f(0.3F, 0.3F, 0.3F, 1.0F);
+            } else if (depth == DIM_DEPTH) {
+                GL11.glColor4f(0.2F, 0.2F, 0.2F, 1.0F);
+            } else if (depth == HIDDEN_DEPTH) {
+                GL11.glColor4f(0.1F, 0.1F, 0.1F, 1.0F);
+            } else {
+                continue;
+            }
+
+            this.mc.getTextureManager().bindTexture(screenTex);
+            // Forge: blend is needed here, and RenderItem leaks it otherwise
+            GL11.glEnable(GL11.GL_BLEND);
+            int frameU = entry.getSpecial() ? 26 : entry.getPerk() ? 52 : 0;
+            this.drawTexturedModalRect(x - 2, y - 2, frameU, 202, 26, 26);
+            GL11.glDisable(GL11.GL_BLEND);
+
+            if (!available) {
+                GL11.glColor4f(0.1F, 0.1F, 0.1F, 1.0F);
+                itemRender.renderWithColor = false;
+            }
+            GL11.glDisable(GL11.GL_LIGHTING); // Forge: fixes MC-33065
+            GL11.glEnable(GL11.GL_CULL_FACE);
+            itemRender.renderItemAndEffectIntoGUI(
+                    this.mc.fontRenderer,
+                    this.mc.getTextureManager(),
+                    entry.theItemStack,
+                    x + 3,
+                    y + 3);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            itemRender.renderWithColor = true;
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+
+            if (mouseX >= x && mouseX <= x + 22 && mouseY >= y && mouseY <= y + 22) {
+                hovered = entry;
+            }
+        }
+        return hovered;
+    }
+
+    /**
+     * The name of the entry under the mouse with its description and whether it is known or can be bought; for one not
+     * yet in reach, what it needs first, and past that the name is hidden.
+     */
+    private void drawTooltip(InformationBase entry, int x, int y) {
+        String title = entry.getDisplayName();
+        boolean available = ResearchLogic.canUnlockInfo(player, entry);
+
+        if (!available) {
+            int depth = ResearchLogic.func_150874_c(player, entry);
+            if (depth > HIDDEN_DEPTH) {
+                return;
+            }
+            if (depth == HIDDEN_DEPTH) {
+                title = I18n.format("achievement.unknown");
+            }
+            int width = Math.max(this.fontRendererObj.getStringWidth(title), 120);
+            String requires = new ChatComponentTranslation("achievement.requires", entry.parentInfo.getDisplayName())
+                    .getUnformattedText();
+            int height = this.fontRendererObj.splitStringWidth(requires, width);
+            this.drawGradientRect(
+                    x - 3,
+                    y - 3,
+                    x + width + 3,
+                    y + height + 12 + 3,
+                    TOOLTIP_BACKGROUND,
+                    TOOLTIP_BACKGROUND);
+            this.fontRendererObj.drawSplitString(requires, x, y + 12, width, TOOLTIP_REQUIRES);
+        } else {
+            String description = entry.getDescription();
+            int width = Math.max(this.fontRendererObj.getStringWidth(title), 120);
+            // Available entries always carry a status line below the description
+            int height = this.fontRendererObj.splitStringWidth(description, width) + 12;
+            this.drawGradientRect(
+                    x - 3,
+                    y - 3,
+                    x + width + 3,
+                    y + height + 3 + 12,
+                    TOOLTIP_BACKGROUND,
+                    TOOLTIP_BACKGROUND);
+            this.fontRendererObj.drawSplitString(description, x, y + 12, width, TOOLTIP_DESCRIPTION);
+
+            if (ResearchLogic.hasInfoUnlocked(player, entry)) {
+                this.fontRendererObj
+                        .drawStringWithShadow(I18n.format("information.discovered"), x, y + height + 4, TOOLTIP_STATUS);
+            } else if (InformationBase.easyResearch) {
+                this.fontRendererObj.drawStringWithShadow(
+                        StatCollector.translateToLocal("information.buy"),
+                        x,
+                        y + height + 4,
+                        TOOLTIP_STATUS);
+            }
+        }
+
+        int titleColour = available ? (entry.getSpecial() ? TITLE_AVAILABLE_SPECIAL : TITLE_AVAILABLE)
+                : (entry.getSpecial() ? TITLE_LOCKED_SPECIAL : TITLE_LOCKED);
+        this.fontRendererObj.drawStringWithShadow(title, x, y, titleColour);
+    }
+
     @Override
     public boolean doesGuiPauseGame() {
         return false;
     }
 
-    private int[] getVisibleRange() {
-        return new int[] { 1, 2, 3 };
-    }
+    /** The window asking whether to buy the selected entry, listing the skills it needs, red where short. */
+    private void renderPurchaseScreen(int x, int y) {
+        String[] requirements = selected.getRequiredSkills();
+        int size = requirements != null ? requirements.length : 0;
+        this.mc.getTextureManager().bindTexture(buyTex);
+        this.drawTexturedModalRect(x, y, 0, 0, buyWidth, 27);
+        for (int a = 0; a < size; a++) {
+            this.drawTexturedModalRect(x, y + 27 + (a * 19), 0, 27, buyWidth, 19);
+        }
+        this.drawTexturedModalRect(x, y + 27 + (size * 19), 0, 46, buyWidth, 26);
 
-    private void renderPurchaseScreen(int x, int y, int mx, int my) {
-        if (selected != null) {
-            String[] requirements = selected.getRequiredSkills();
-            int size = 0;
-            if (requirements != null) {
-                size = requirements.length;
-            }
-            this.mc.getTextureManager().bindTexture(buyTex);
-            this.drawTexturedModalRect(x, y, 0, 0, buyWidth, 27);// Top
-            for (int a = 0; a < size; a++) {
-                this.drawTexturedModalRect(x, y + 27 + (a * 19), 0, 27, buyWidth, 19);// Middle
-            }
-            this.drawTexturedModalRect(x, y + 27 + (size * 19), 0, 46, buyWidth, 26);// Bottom
+        // The buttons sit under the last requirement
+        int buttonY = purchaseTop() + 47 - 19 + 19 * size;
+        ((GuiButton) buttonList.get(2)).yPosition = buttonY;
+        ((GuiButton) buttonList.get(3)).yPosition = buttonY;
 
-            if (buttonList.get(2) != null && buttonList.get(3) != null) {
-                int j1 = (this.height - GuiKnowledge.field_146557_g) / 2;
-                int purchasey = j1 + (field_146557_g - buyHeight) / 2;
-
-                int offset = -19;
-                if (requirements != null) {
-                    offset += (19 * requirements.length);
-                }
-                ((GuiButton) buttonList.get(2)).yPosition = purchasey + 47 + offset;
-                ((GuiButton) buttonList.get(3)).yPosition = purchasey + 47 + offset;
-            }
-            int red = GuiHelper.getColourForRGB(220, 0, 0);
-            int white = 16777215;
-            mc.fontRenderer.drawString(selected.getDisplayName(), x + 22, y + 12, white, false);
-
-            if (requirements != null) {
-                for (int a = 0; a < requirements.length; a++) {
-                    boolean isUnlocked = selected.isUnlocked(a, mc.thePlayer);
-                    String text = requirements[a];
-                    mc.fontRenderer.drawStringWithShadow(text, x + 20, y + 32 + (a * 19), isUnlocked ? white : red);
-                }
-            }
+        int red = GuiHelper.getColourForRGB(220, 0, 0);
+        mc.fontRenderer.drawString(selected.getDisplayName(), x + 22, y + 12, WHITE, false);
+        for (int a = 0; a < size; a++) {
+            boolean isUnlocked = selected.isUnlocked(a, mc.thePlayer);
+            mc.fontRenderer.drawStringWithShadow(requirements[a], x + 20, y + 32 + (a * 19), isUnlocked ? WHITE : red);
         }
         GL11.glColor3f(255, 255, 255);
     }
 
     private void setPurchaseAvailable(EntityPlayer user) {
-        if (selected != null) {
-            canPurchase = selected.hasSkillsUnlocked(user);
-        } else {
-            canPurchase = false;
-        }
+        canPurchase = selected != null && selected.hasSkillsUnlocked(user);
     }
 
+    /** The panel left of the book with each skill's level and progress to the next. */
     protected void drawSkillList() {
         GL11.glPushMatrix();
 
         int skillWidth = 143;
         int skillHeight = 156;
-        int x = (this.width - GuiKnowledge.field_146555_f) / 2 - skillWidth + offsetByX;
-        int y = (this.height - GuiKnowledge.field_146557_g) / 2 + offsetByY;
+        int x = frameLeft() - skillWidth;
+        int y = frameTop();
         this.mc.getTextureManager().bindTexture(skillTex);
-
         this.drawTexturedModalRect(x, y, 0, 0, skillWidth, skillHeight);
 
-        drawSkill(x + 20, y + 20, SkillList.artisanry);
-        drawSkill(x + 20, y + 44, SkillList.construction);
-        drawSkill(x + 20, y + 68, SkillList.provisioning);
-        drawSkill(x + 20, y + 92, SkillList.engineering);
-        drawSkill(x + 20, y + 116, SkillList.combat);
-
-        drawSkillName(x + 20, y + 20, SkillList.artisanry);
-        drawSkillName(x + 20, y + 44, SkillList.construction);
-        drawSkillName(x + 20, y + 68, SkillList.provisioning);
-        drawSkillName(x + 20, y + 92, SkillList.engineering);
-        drawSkillName(x + 20, y + 116, SkillList.combat);
+        Skill[] skills = { SkillList.artisanry, SkillList.construction, SkillList.provisioning, SkillList.engineering,
+                SkillList.combat };
+        for (int a = 0; a < skills.length; a++) {
+            drawSkill(x + 20, y + 20 + a * 24, skills[a]);
+        }
+        for (int a = 0; a < skills.length; a++) {
+            drawSkillName(x + 20, y + 20 + a * 24, skills[a]);
+        }
 
         GL11.glPopMatrix();
     }
 
     protected void drawSkill(int x, int y, Skill skill) {
         if (skill != null) {
-            int level = RPGElements.getLevel(mc.thePlayer, skill);
-            int xp = skill.getXP(player)[0];
-            int max = skill.getXP(player)[1];
-            if (xp > max) xp = max;
-
-            float scale = (float) xp / (float) max;
-            this.drawTexturedModalRect(x + 22, y + 13, 0, 156, (int) (78F * scale), 5);
-
+            int[] xp = skill.getXP(player);
+            float progress = (float) Math.min(xp[0], xp[1]) / (float) xp[1];
+            this.drawTexturedModalRect(x + 22, y + 13, 0, 156, (int) (78F * progress), 5);
         }
     }
 
