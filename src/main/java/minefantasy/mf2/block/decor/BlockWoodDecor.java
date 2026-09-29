@@ -6,13 +6,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
 
 public abstract class BlockWoodDecor extends BlockContainer {
@@ -47,19 +47,7 @@ public abstract class BlockWoodDecor extends BlockContainer {
         itemstack = modifyDrop(tile, itemstack);
 
         if (tile != null) {
-            if (itemstack != null) {
-                float f = world.rand.nextFloat() * 0.8F + 0.1F;
-                float f1 = world.rand.nextFloat() * 0.8F + 0.1F;
-                float f2 = world.rand.nextFloat() * 0.8F + 0.1F;
-
-                EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2, itemstack);
-
-                float f3 = 0.05F;
-                entityitem.motionX = (float) world.rand.nextGaussian() * f3;
-                entityitem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
-                entityitem.motionZ = (float) world.rand.nextGaussian() * f3;
-                world.spawnEntityInWorld(entityitem);
-            }
+            InventorySlots.drop(world, x, y, z, itemstack);
 
             world.func_147453_f(x, y, z, block);
         }

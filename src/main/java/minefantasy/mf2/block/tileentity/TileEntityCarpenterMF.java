@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -36,7 +35,7 @@ import minefantasy.mf2.network.packet.StationStatePacket;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class TileEntityCarpenterMF extends TileEntity
-        implements StationStatePacket.Shown, IInventory, Diagnosis.Source {
+        implements GridProject.Bench, StationStatePacket.Shown, IInventory, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -250,11 +249,7 @@ public class TileEntityCarpenterMF extends TileEntity
     }
 
     private void craftItem(EntityPlayer user) {
-        // Re-read the grid before paying out: inventory changes after the first one do not refresh the recipe, so the
-        // project may no longer match what is actually on the bench
-        CraftPlan crafting = project;
-        updateCraftingData();
-        if (crafting == null || !crafting.sameAs(project)) {
+        if (!GridProject.stillMakes(this)) {
             progress = 0;
             return;
         }
@@ -288,10 +283,10 @@ public class TileEntityCarpenterMF extends TileEntity
                         if (result.stackSize > toAdd) {
                             ItemStack overflow = result.copy();
                             overflow.stackSize = result.stackSize - toAdd;
-                            this.dropItem(overflow);
+                            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, overflow);
                         }
                     } else {
-                        this.dropItem(result);
+                        InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, result);
                     }
         }
         onInventoryChanged();
@@ -338,40 +333,6 @@ public class TileEntityCarpenterMF extends TileEntity
             item.setTagCompound(new NBTTagCompound());
         }
         return item.getTagCompound();
-    }
-
-    private void dropItem(ItemStack itemstack) {
-        if (itemstack != null) {
-            float f = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f1 = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f2 = this.rand.nextFloat() * 0.8F + 0.1F;
-
-            while (itemstack.stackSize > 0) {
-                int j1 = this.rand.nextInt(21) + 10;
-
-                if (j1 > itemstack.stackSize) {
-                    j1 = itemstack.stackSize;
-                }
-
-                itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(
-                        worldObj,
-                        xCoord + f,
-                        yCoord + f1,
-                        zCoord + f2,
-                        new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
-
-                if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
-                }
-
-                float f3 = 0.05F;
-                entityitem.motionX = (float) this.rand.nextGaussian() * f3;
-                entityitem.motionY = (float) this.rand.nextGaussian() * f3 + 0.2F;
-                entityitem.motionZ = (float) this.rand.nextGaussian() * f3;
-                worldObj.spawnEntityInWorld(entityitem);
-            }
-        }
     }
 
     /** Sends the state to the watchers, if it changed since they got it last. */
@@ -439,7 +400,7 @@ public class TileEntityCarpenterMF extends TileEntity
         boolean paid = GridProject.pay(project, this, spill);
         resetRecipe = false;
         for (ItemStack stack : spill) {
-            dropItem(stack);
+            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
         }
         onInventoryChanged();
         return paid;
@@ -666,4 +627,9 @@ public class TileEntityCarpenterMF extends TileEntity
     }
 
     // endregion
+
+    @Override
+    public CraftPlan currentProject() {
+        return project;
+    }
 }

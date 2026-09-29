@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
@@ -147,7 +146,7 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
                                     "mob.zombie.woodbreak",
                                     1.0F,
                                     1.5F);
-                            dropItem(plank);
+                            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, plank);
                         }
                         worldObj.setBlockToAir(xCoord, yCoord, zCoord);
                         return true;
@@ -439,39 +438,5 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
 
     private boolean isShabbyRack() {
         return worldObj.getBlock(xCoord, yCoord, zCoord) == BlockListMF.tanner;
-    }
-
-    private void dropItem(ItemStack itemstack) {
-        if (itemstack != null) {
-            float f = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f1 = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f2 = this.rand.nextFloat() * 0.8F + 0.1F;
-
-            while (itemstack.stackSize > 0) {
-                int j1 = this.rand.nextInt(21) + 10;
-
-                if (j1 > itemstack.stackSize) {
-                    j1 = itemstack.stackSize;
-                }
-
-                itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(
-                        worldObj,
-                        xCoord + f,
-                        yCoord + f1,
-                        zCoord + f2,
-                        new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
-
-                if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
-                }
-
-                float f3 = 0.05F;
-                entityitem.motionX = (float) this.rand.nextGaussian() * f3;
-                entityitem.motionY = (float) this.rand.nextGaussian() * f3 + 0.2F;
-                entityitem.motionZ = (float) this.rand.nextGaussian() * f3;
-                worldObj.spawnEntityInWorld(entityitem);
-            }
-        }
     }
 }

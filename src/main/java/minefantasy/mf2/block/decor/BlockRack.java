@@ -7,11 +7,9 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
@@ -22,6 +20,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.network.packet.RackCommand;
@@ -292,41 +291,7 @@ public class BlockRack extends BlockWoodDecor {
         TileEntityRack tile = (TileEntityRack) world.getTileEntity(x, y, z);
 
         if (tile != null) {
-            for (int var6 = 0; var6 < tile.getSizeInventory(); ++var6) {
-                ItemStack var7 = tile.getStackInSlot(var6);
-
-                if (var7 != null) {
-                    float var8 = world.rand.nextFloat() * 0.8F + 0.1F;
-                    float var9 = world.rand.nextFloat() * 0.8F + 0.1F;
-                    float var10 = world.rand.nextFloat() * 0.8F + 0.1F;
-
-                    while (var7.stackSize > 0) {
-                        int var11 = world.rand.nextInt(21) + 10;
-
-                        if (var11 > var7.stackSize) {
-                            var11 = var7.stackSize;
-                        }
-
-                        var7.stackSize -= var11;
-                        EntityItem var12 = new EntityItem(
-                                world,
-                                x + var8,
-                                y + var9,
-                                z + var10,
-                                new ItemStack(var7.getItem(), var11, var7.getItemDamage()));
-
-                        if (var7.hasTagCompound()) {
-                            var12.getEntityItem().setTagCompound((NBTTagCompound) var7.getTagCompound().copy());
-                        }
-
-                        float var13 = 0.05F;
-                        var12.motionX = (float) world.rand.nextGaussian() * var13;
-                        var12.motionY = (float) world.rand.nextGaussian() * var13 + 0.2F;
-                        var12.motionZ = (float) world.rand.nextGaussian() * var13;
-                        world.spawnEntityInWorld(var12);
-                    }
-                }
-            }
+            InventorySlots.spill(world, x, y, z, tile);
         }
 
         super.breakBlock(world, x, y, z, block, meta);

@@ -22,6 +22,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.tool.ILighter;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityFirepit;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
@@ -204,24 +205,7 @@ public class BlockFirepit extends BlockContainer {
             int charcoal = tile.getCharcoalDrop();
 
             if (charcoal > 0) {
-                float xDrop = this.rand.nextFloat() * 0.8F + 0.1F;
-                float yDrop = this.rand.nextFloat() * 0.8F + 0.1F;
-                float zDrop = this.rand.nextFloat() * 0.8F + 0.1F;
-
-                for (int c = 0; c < charcoal; c++) {
-                    EntityItem drop = new EntityItem(
-                            world,
-                            x + xDrop,
-                            y + yDrop,
-                            z + zDrop,
-                            new ItemStack(Items.coal, 1, 1));
-
-                    float jumpFactor = 0.05F;
-                    drop.motionX = (float) this.rand.nextGaussian() * jumpFactor;
-                    drop.motionY = (float) this.rand.nextGaussian() * jumpFactor + 0.2F;
-                    drop.motionZ = (float) this.rand.nextGaussian() * jumpFactor;
-                    world.spawnEntityInWorld(drop);
-                }
+                InventorySlots.drop(world, x, y, z, new ItemStack(Items.coal, charcoal, 1));
             }
         }
         super.breakBlock(world, x, y, z, block, meta);

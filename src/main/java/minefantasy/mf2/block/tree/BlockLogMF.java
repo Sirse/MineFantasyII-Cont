@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
@@ -15,6 +14,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 
 public class BlockLogMF extends BlockLog {
 
@@ -67,17 +67,7 @@ public class BlockLogMF extends BlockLog {
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
         super.breakBlock(world, x, y, z, block, meta);
         if (meta == 15) {
-            float f = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f1 = this.rand.nextFloat() * 0.8F + 0.1F;
-            float f2 = this.rand.nextFloat() * 0.8F + 0.1F;
-
-            EntityItem entityitem = new EntityItem(world, x + f, y + f1, z + f2, new ItemStack(getSaplingDrop(), 1));
-
-            float f3 = 0.05F;
-            entityitem.motionX = (float) this.rand.nextGaussian() * f3;
-            entityitem.motionY = (float) this.rand.nextGaussian() * f3 + 0.2F;
-            entityitem.motionZ = (float) this.rand.nextGaussian() * f3;
-            world.spawnEntityInWorld(entityitem);
+            InventorySlots.drop(world, x, y, z, new ItemStack(getSaplingDrop(), 1));
         }
     }
 

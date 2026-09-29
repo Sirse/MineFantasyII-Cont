@@ -234,7 +234,7 @@ public class StationBoundaryTest {
         ((minefantasy.mf2.api.recipe.CraftPlan) plan)
                 .apply(minefantasy.mf2.api.recipe.CraftInventory.of(furnace), spill);
         for (ItemStack stack : spill) {
-            call(furnace, "dropItem", new Class<?>[] { ItemStack.class }, stack);
+            InventorySlots.drop(furnace.getWorldObj(), furnace.xCoord, furnace.yCoord, furnace.zCoord, stack);
         }
     }
 

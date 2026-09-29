@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -38,7 +37,7 @@ import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.StationStatePacket;
 
 public class TileEntityKitchenBench extends TileEntity
-        implements StationStatePacket.Shown, IInventory, Diagnosis.Source {
+        implements GridProject.Bench, StationStatePacket.Shown, IInventory, Diagnosis.Source {
 
     public final int width = 4;
     public final int height = 4;
@@ -272,11 +271,7 @@ public class TileEntityKitchenBench extends TileEntity
     }
 
     private void craftItem(EntityPlayer user) {
-        // Re-read the grid before paying out: inventory changes after the first one do not refresh the recipe, so the
-        // project may no longer match what is actually on the bench
-        CraftPlan crafting = project;
-        updateCraftingData();
-        if (crafting == null || !crafting.sameAs(project)) {
+        if (!GridProject.stillMakes(this)) {
             progress = 0;
             return;
         }
@@ -306,10 +301,10 @@ public class TileEntityKitchenBench extends TileEntity
                         if (result.stackSize > toAdd) {
                             ItemStack overflow = result.copy();
                             overflow.stackSize = result.stackSize - toAdd;
-                            dropItem(overflow);
+                            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, overflow);
                         }
                     } else {
-                        dropItem(result);
+                        InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, result);
                     }
         }
         onInventoryChanged();
@@ -353,26 +348,6 @@ public class TileEntityKitchenBench extends TileEntity
             item.setTagCompound(new NBTTagCompound());
         }
         return item.getTagCompound();
-    }
-
-    private void dropItem(ItemStack itemstack) {
-        while (itemstack.stackSize > 0) {
-            int j1 = Math.min(itemstack.stackSize, itemstack.getMaxStackSize());
-            itemstack.stackSize -= j1;
-            EntityItem entityitem = new EntityItem(
-                    worldObj,
-                    xCoord + 0.5D,
-                    yCoord + 0.75D,
-                    zCoord + 0.5D,
-                    new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
-            if (itemstack.hasTagCompound()) {
-                entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
-            }
-            entityitem.motionX = (float) rand.nextGaussian() * 0.05F;
-            entityitem.motionY = 0.2F;
-            entityitem.motionZ = (float) rand.nextGaussian() * 0.05F;
-            worldObj.spawnEntityInWorld(entityitem);
-        }
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
@@ -423,7 +398,7 @@ public class TileEntityKitchenBench extends TileEntity
         boolean paid = GridProject.pay(project, this, spill);
         resetRecipe = false;
         for (ItemStack stack : spill) {
-            dropItem(stack);
+            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
         }
         onInventoryChanged();
         return paid;
@@ -673,4 +648,9 @@ public class TileEntityKitchenBench extends TileEntity
     // region client sync: the server shows the project; its packets and container fill these on the client
 
     // endregion
+
+    @Override
+    public CraftPlan currentProject() {
+        return project;
+    }
 }

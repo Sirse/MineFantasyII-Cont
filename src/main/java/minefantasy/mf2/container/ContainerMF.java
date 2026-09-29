@@ -22,6 +22,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 public abstract class ContainerMF extends Container {
 
     private final List<TrackedData<?>> trackedData = new ArrayList<>();
+    /** Station slots come first in the window; {@link #shiftClicks} sets how many and which of them take input. */
+    private int stationSlots = -1, inputsFrom, inputsTo;
 
     /**
      * Registers an integer value to be automatically synchronized with the client.
@@ -236,6 +238,60 @@ public abstract class ContainerMF extends Container {
 
     private static int limit(Slot slot, ItemStack stack) {
         return Math.min(stack.getMaxStackSize(), slot.getSlotStackLimit());
+    }
+
+    /**
+     * Sets up shift-clicking for a window whose first {@code stationSlots} slots are the station's and the rest the
+     * player's: the station's slots empty into the player's inventory, and the player's items go into the station's
+     * slots from {@code inputsFrom} up to {@code inputsTo}, as far as those slots accept them, or else between the main
+     * inventory and the hotbar.
+     */
+    protected void shiftClicks(int stationSlots, int inputsFrom, int inputsTo) {
+        this.stationSlots = stationSlots;
+        this.inputsFrom = inputsFrom;
+        this.inputsTo = inputsTo;
+    }
+
+    /** Moves a stack the player shift-clicked into the station; a station whose inputs change overrides this. */
+    protected boolean moveIntoStation(ItemStack stack) {
+        return mergeItemStack(stack, inputsFrom, inputsTo, false);
+    }
+
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+        if (stationSlots < 0 || index < 0 || index >= inventorySlots.size()) {
+            return null;
+        }
+        Slot slot = (Slot) inventorySlots.get(index);
+        if (slot == null || !slot.getHasStack()) {
+            return null;
+        }
+        ItemStack stack = slot.getStack();
+        ItemStack original = stack.copy();
+        boolean moved;
+        if (index < stationSlots) {
+            moved = moveToPlayer(stack, stationSlots);
+            // mergeItemStack bypasses decrStackSize, where a furnace output counts what it gives for experience
+            if (moved) {
+                slot.onSlotChange(stack, original);
+            }
+        } else {
+            moved = moveIntoStation(stack) || bounceBetweenMainAndHotbar(stack, stationSlots, index);
+        }
+        if (!moved) {
+            return null;
+        }
+        if (stack.stackSize == 0) {
+            slot.putStack(null);
+        } else {
+            slot.onSlotChanged();
+        }
+        if (stack.stackSize == original.stackSize) {
+            return null;
+        }
+        slot.onPickupFromSlot(player, original);
+        onPostTransfer(player, slot, original);
+        return original;
     }
 
     /**

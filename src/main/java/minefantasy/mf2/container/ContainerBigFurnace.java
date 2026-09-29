@@ -1,7 +1,6 @@
 package minefantasy.mf2.container;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnace;
 import net.minecraft.item.ItemStack;
 
@@ -19,7 +18,6 @@ public class ContainerBigFurnace extends ContainerMF {
     private final TileEntityBigFurnace smelter;
 
     private final int furnaceSlotCount;
-    private final int playerInventoryStartIndex;
 
     public ContainerBigFurnace(EntityPlayer player, TileEntityBigFurnace tile) {
         this.smelter = tile;
@@ -41,7 +39,7 @@ public class ContainerBigFurnace extends ContainerMF {
             furnaceSlotCount = SMELTER_TOTAL_SLOTS;
         }
 
-        this.playerInventoryStartIndex = furnaceSlotCount;
+        shiftClicks(furnaceSlotCount, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX);
         this.addPlayerInventory(player.inventory, 0, 84);
 
         trackInt(() -> smelter.fuel, value -> smelter.fuel = value);
@@ -65,59 +63,8 @@ public class ContainerBigFurnace extends ContainerMF {
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-        boolean merged = false;
-
-        if (slotIndex < furnaceSlotCount) {
-            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
-                merged = true;
-                // SlotFurnace counts smelted items in decrStackSize, which mergeItemStack bypasses. Without this the
-                // experience counter stays at zero and onPickupFromSlot awards nothing.
-                if (slot instanceof SlotFurnace) {
-                    slot.onSlotChange(stackInSlot, originalStack);
-                }
-            }
-        } else {
-            merged = smelter.isHeater() ? this.mergeItemStack(stackInSlot, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)
-                    : this.mergeItemStack(stackInSlot, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false);
-            if (!merged) {
-                int mainStart = playerInventoryStartIndex;
-                int mainEnd = mainStart + 27;
-                int hotbarEnd = this.inventorySlots.size();
-
-                if (slotIndex >= mainStart && slotIndex < mainEnd) {
-                    merged = this.mergeItemStack(stackInSlot, mainEnd, hotbarEnd, false);
-                } else if (slotIndex >= mainEnd && slotIndex < hotbarEnd) {
-                    merged = this.mergeItemStack(stackInSlot, mainStart, mainEnd, false);
-                }
-            }
-        }
-
-        if (!merged) {
-            return null;
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-
-        if (stackInSlot.stackSize == originalStack.stackSize) {
-            return null;
-        }
-
-        slot.onPickupFromSlot(player, originalStack);
-        return originalStack;
+    protected boolean moveIntoStation(ItemStack stack) {
+        return smelter.isHeater() ? mergeItemStack(stack, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)
+                : mergeItemStack(stack, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false);
     }
 }

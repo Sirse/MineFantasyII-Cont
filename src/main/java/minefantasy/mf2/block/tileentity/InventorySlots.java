@@ -1,12 +1,17 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.Random;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.World;
 
 /**
- * The slot handling every station inventory repeats: taking from a slot, emptying it, and saving the slots. Each
- * station still calls its own change hooks around these.
+ * The slot handling every station inventory repeats: taking from a slot, emptying it, saving the slots, and throwing
+ * items out into the world. Each station still calls its own change hooks around these.
  */
 public final class InventorySlots {
 
@@ -64,5 +69,43 @@ public final class InventorySlots {
             }
         }
         return slots;
+    }
+
+    /** Throws out everything in the inventory, as a broken block does, and empties its slots. */
+    public static void spill(World world, int x, int y, int z, IInventory inventory) {
+        spill(world, x, y, z, inventory, 0, inventory.getSizeInventory());
+    }
+
+    /** Throws out the slots from {@code from} up to {@code to}, and empties them. */
+    public static void spill(World world, int x, int y, int z, IInventory inventory, int from, int to) {
+        for (int slot = from; slot < to; slot++) {
+            ItemStack stack = inventory.getStackInSlot(slot);
+            if (stack != null) {
+                inventory.setInventorySlotContents(slot, null);
+                drop(world, x, y, z, stack);
+            }
+        }
+    }
+
+    /**
+     * Throws a stack out of the block at a random point inside it, tossed a little upward as vanilla does, in pieces no
+     * larger than a stack. The stack given is used up.
+     */
+    public static void drop(World world, int x, int y, int z, ItemStack stack) {
+        if (world == null || world.isRemote || stack == null || stack.getItem() == null) {
+            return;
+        }
+        Random rand = world.rand;
+        float dx = rand.nextFloat() * 0.8F + 0.1F;
+        float dy = rand.nextFloat() * 0.8F + 0.1F;
+        float dz = rand.nextFloat() * 0.8F + 0.1F;
+        while (stack.stackSize > 0) {
+            ItemStack piece = stack.splitStack(Math.min(stack.stackSize, stack.getMaxStackSize()));
+            EntityItem entity = new EntityItem(world, x + dx, y + dy, z + dz, piece);
+            entity.motionX = rand.nextGaussian() * 0.05F;
+            entity.motionY = rand.nextGaussian() * 0.05F + 0.2F;
+            entity.motionZ = rand.nextGaussian() * 0.05F;
+            world.spawnEntityInWorld(entity);
+        }
     }
 }

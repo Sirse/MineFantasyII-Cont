@@ -299,6 +299,8 @@ public final class CraftPlan {
         private final List<Give> gives = new ArrayList<>();
         private final RecipeMetadata.Builder requirements = RecipeMetadata.builder();
         private RecipeMetadata effects = RecipeMetadata.EMPTY;
+        /** Where returned items go instead of their own slot and the outputs; null for the default. */
+        private int[] returnSlots;
 
         private Builder(RecipeId recipeId, long generation, int[] outputSlots) {
             this.recipeId = recipeId;
@@ -392,6 +394,15 @@ public final class CraftPlan {
             return this;
         }
 
+        /**
+         * Sends returned items (containers) to these slots only, for a station that keeps them apart from its inputs
+         * and outputs. Call it before the inputs that return something.
+         */
+        public Builder returns(int... slots) {
+            this.returnSlots = slots.clone();
+            return this;
+        }
+
         /** Records a requirement; null values and empty strings mean "none" and are left out. */
         public <T> Builder require(RecipeMetadataKey<T> key, T value) {
             if (value != null && !"".equals(value)) {
@@ -415,11 +426,16 @@ public final class CraftPlan {
                     effects);
         }
 
-        /** Returned items go back to their own slot first, then to the outputs. */
+        /** Returned items go back to their own slot first, then to the outputs, unless {@link #returns} says where. */
         private void giveBack(int slot, ItemStack stack) {
-            int[] targets = new int[outputSlots.length + 1];
-            targets[0] = slot;
-            System.arraycopy(outputSlots, 0, targets, 1, outputSlots.length);
+            int[] targets;
+            if (returnSlots != null) {
+                targets = returnSlots.clone();
+            } else {
+                targets = new int[outputSlots.length + 1];
+                targets[0] = slot;
+                System.arraycopy(outputSlots, 0, targets, 1, outputSlots.length);
+            }
             gives.add(new Give(stack.copy(), targets, false, true));
         }
     }

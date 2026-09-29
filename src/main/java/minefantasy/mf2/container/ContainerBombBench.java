@@ -19,8 +19,6 @@ public class ContainerBombBench extends ContainerMF {
 
     private final TileEntityBombBench tile;
 
-    private final int playerInventoryStart;
-
     public ContainerBombBench(InventoryPlayer playerInv, TileEntityBombBench tile) {
         this.tile = tile;
 
@@ -32,7 +30,7 @@ public class ContainerBombBench extends ContainerMF {
         addSlotToContainer(new SlotOutput(tile, OUTPUT_SLOT, 147, 48));
         addSlotToContainer(new SlotOutput(tile, MISC_SLOT, 147, 75));
 
-        playerInventoryStart = BENCH_SLOT_COUNT;
+        shiftClicks(BENCH_SLOT_COUNT, CASE_SLOT, OUTPUT_SLOT);
         addPlayerInventory(playerInv, 0, 126);
 
         trackFloat(() -> tile.progress, v -> tile.progress = v);
@@ -43,40 +41,6 @@ public class ContainerBombBench extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-        if (index < 0 || index >= inventorySlots.size()) return null;
-
-        Slot slot = (Slot) inventorySlots.get(index);
-        if (slot == null || !slot.getHasStack()) return null;
-
-        ItemStack stack = slot.getStack();
-        ItemStack copy = stack.copy();
-
-        boolean moved;
-
-        if (index < BENCH_SLOT_COUNT) {
-            moved = moveToPlayer(stack, playerInventoryStart);
-        } else {
-            moved = mergeItemStack(stack, CASE_SLOT, OUTPUT_SLOT, false);
-            if (!moved) {
-                moved = bounceBetweenMainAndHotbar(stack, playerInventoryStart, index);
-            }
-        }
-
-        if (!moved) return null;
-
-        if (stack.stackSize == 0) slot.putStack(null);
-        else slot.onSlotChanged();
-
-        if (stack.stackSize == copy.stackSize) return null;
-
-        slot.onPickupFromSlot(player, stack);
-        onPostTransfer(player, slot, copy);
-
-        return copy;
     }
 
     @Override

@@ -19,6 +19,27 @@ final class GridProject {
 
     private GridProject() {}
 
+    /** A station working a project read from its grid. */
+    interface Bench {
+
+        /** The project the work is being done on; null without one. */
+        CraftPlan currentProject();
+
+        /** Reads the grid again and takes up the project it makes now. */
+        void updateCraftingData();
+    }
+
+    /**
+     * Before the last hit pays out: reads the grid again and tells whether it still makes the project the work was done
+     * on. Changes to the grid between hits do not always refresh the project at once, so it may no longer match what
+     * lies on the bench.
+     */
+    static boolean stillMakes(Bench bench) {
+        CraftPlan worked = bench.currentProject();
+        bench.updateCraftingData();
+        return worked != null && worked.sameAs(bench.currentProject());
+    }
+
     /**
      * Adds every filled grid slot, taking the amount the matched recipe owes there and giving back one container per
      * item. On the anvil a hot stack is described by the item it carries, so cooling does not change the project.

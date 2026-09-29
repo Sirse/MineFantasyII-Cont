@@ -18,8 +18,6 @@ public class ContainerCrossbowBench extends ContainerMF {
 
     private final TileEntityCrossbowBench tile;
 
-    private final int playerInventoryStartIndex;
-
     public ContainerCrossbowBench(InventoryPlayer user, TileEntityCrossbowBench tile) {
         this.tile = tile;
 
@@ -30,7 +28,7 @@ public class ContainerCrossbowBench extends ContainerMF {
 
         this.addSlotToContainer(new SlotOutput(tile, OUTPUT_SLOT, 147, 48));
 
-        this.playerInventoryStartIndex = BENCH_SLOT_COUNT;
+        shiftClicks(BENCH_SLOT_COUNT, STOCK_SLOT, OUTPUT_SLOT);
         this.addPlayerInventory(user, 0, 126);
 
         trackFloat(() -> tile.progress, value -> tile.progress = value);
@@ -39,51 +37,6 @@ public class ContainerCrossbowBench extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-        boolean merged = false;
-
-        if (slotIndex < BENCH_SLOT_COUNT) {
-            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
-                merged = true;
-            }
-        } else {
-            merged = this.mergeItemStack(stackInSlot, STOCK_SLOT, OUTPUT_SLOT, false);
-
-            if (!merged) {
-                merged = this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex);
-            }
-        }
-
-        if (!merged) {
-            return null;
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-
-        if (stackInSlot.stackSize == originalStack.stackSize) {
-            return null;
-        }
-
-        slot.onPickupFromSlot(player, stackInSlot);
-        onPostTransfer(player, slot, originalStack);
-        return originalStack;
     }
 
     @Override

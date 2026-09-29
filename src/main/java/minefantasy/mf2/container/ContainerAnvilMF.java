@@ -17,13 +17,12 @@ public class ContainerAnvilMF extends ContainerMF {
 
     private final int anvilSlotCount;
     private final int anvilOutputSlotIndex;
-    private final int playerInventoryStartIndex;
 
     public ContainerAnvilMF(InventoryPlayer user, TileEntityAnvilMF tile) {
         this.tile = tile;
         this.anvilSlotCount = tile.getSizeInventory();
         this.anvilOutputSlotIndex = this.anvilSlotCount - 1;
-        this.playerInventoryStartIndex = this.anvilSlotCount;
+        shiftClicks(anvilSlotCount, 0, anvilOutputSlotIndex);
 
         init(user, true);
     }
@@ -32,7 +31,7 @@ public class ContainerAnvilMF extends ContainerMF {
         this.tile = tile;
         this.anvilSlotCount = tile.getSizeInventory();
         this.anvilOutputSlotIndex = this.anvilSlotCount - 1;
-        this.playerInventoryStartIndex = this.anvilSlotCount;
+        shiftClicks(anvilSlotCount, 0, anvilOutputSlotIndex);
         init(null, false);
     }
 
@@ -70,53 +69,6 @@ public class ContainerAnvilMF extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-        boolean merged = false;
-
-        if (slotIndex < anvilSlotCount) {
-            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
-                merged = true;
-            }
-        } else {
-            if (this.mergeItemStack(stackInSlot, 0, anvilOutputSlotIndex, false)) {
-                merged = true;
-            }
-
-            if (!merged) {
-                merged = this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex);
-            }
-        }
-
-        if (!merged) {
-            return null;
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-
-        if (stackInSlot.stackSize == originalStack.stackSize) {
-            return null;
-        }
-
-        slot.onPickupFromSlot(player, originalStack);
-        onPostTransfer(player, slot, originalStack);
-        return originalStack;
     }
 
     @Override

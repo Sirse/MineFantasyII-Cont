@@ -2,8 +2,6 @@ package minefantasy.mf2.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.block.tileentity.TileEntityBloomery;
 
@@ -15,15 +13,13 @@ public class ContainerBloomery extends ContainerMF {
 
     private final TileEntityBloomery tile;
 
-    private final int playerInventoryStartIndex;
-
     public ContainerBloomery(InventoryPlayer user, TileEntityBloomery tile) {
         this.tile = tile;
 
         this.addSlotToContainer(new SlotFiltered(tile, INPUT_SLOT, 80, 30)); // Input/Ore
         this.addSlotToContainer(new SlotFiltered(tile, FUEL_SLOT, 80, 68)); // Fuel
 
-        this.playerInventoryStartIndex = BLOOMERY_SLOT_COUNT;
+        shiftClicks(BLOOMERY_SLOT_COUNT, 0, BLOOMERY_SLOT_COUNT);
         this.addPlayerInventory(user, 0, 126);
 
         trackFloat(() -> tile.progress, value -> tile.progress = value);
@@ -33,58 +29,5 @@ public class ContainerBloomery extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-
-        boolean merged = false;
-
-        if (slotIndex < BLOOMERY_SLOT_COUNT) {
-            if (this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
-                merged = true;
-            }
-        } else {
-            merged = this.mergeItemStack(stackInSlot, 0, BLOOMERY_SLOT_COUNT, false);
-            if (!merged) {
-                int mainStart = playerInventoryStartIndex;
-                int mainEnd = mainStart + 27;
-                int hotbarEnd = this.inventorySlots.size();
-
-                if (slotIndex >= mainStart && slotIndex < mainEnd) {
-                    merged = this.mergeItemStack(stackInSlot, mainEnd, hotbarEnd, false);
-                } else if (slotIndex >= mainEnd && slotIndex < hotbarEnd) {
-                    merged = this.mergeItemStack(stackInSlot, mainStart, mainEnd, false);
-                }
-            }
-        }
-
-        if (!merged) {
-            return null;
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-
-        if (stackInSlot.stackSize == originalStack.stackSize) {
-            return null;
-        }
-
-        slot.onPickupFromSlot(player, stackInSlot);
-        return originalStack;
     }
 }

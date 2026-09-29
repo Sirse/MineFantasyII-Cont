@@ -6,7 +6,6 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -224,7 +223,7 @@ public class TileEntityBigFurnace extends TileEntity
                     List<ItemStack> spill = new ArrayList<>();
                     plan.apply(CraftInventory.of(this), spill);
                     for (ItemStack stack : spill) {
-                        dropItem(stack);
+                        InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
                     }
                     smelted = true;
                 }
@@ -414,7 +413,7 @@ public class TileEntityBigFurnace extends TileEntity
                     if (inv[0] == null) {
                         inv[0] = cont;
                     } else {
-                        dropItem(cont);
+                        InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, cont);
                     }
                 }
             }
@@ -465,17 +464,6 @@ public class TileEntityBigFurnace extends TileEntity
          * SpecialFurnaceRecipes.getResult(input); if(alloy != null) { if(alloy.getLevel() <= getSmeltLevel()) { return
          * SpecialFurnaceRecipes.getResult(input).getRecipeOutput(); } } return null;
          */
-    }
-
-    private void dropItem(ItemStack itemstack) {
-        if (itemstack == null || worldObj == null || worldObj.isRemote) {
-            return;
-        }
-        EntityItem drop = new EntityItem(worldObj, xCoord + 0.5D, yCoord + 1.0D, zCoord + 0.5D, itemstack);
-        drop.motionX = (rand.nextDouble() - 0.5D) * 0.1D;
-        drop.motionY = 0.2D;
-        drop.motionZ = (rand.nextDouble() - 0.5D) * 0.1D;
-        worldObj.spawnEntityInWorld(drop);
     }
 
     @Override

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -46,7 +45,7 @@ import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.StationStatePacket;
 
 public class TileEntityAnvilMF extends TileEntity
-        implements StationStatePacket.Shown, IInventory, IQualityBalance, Diagnosis.Source {
+        implements GridProject.Bench, StationStatePacket.Shown, IInventory, IQualityBalance, Diagnosis.Source {
 
     private final Random rand = new Random();
     public int tier;
@@ -321,11 +320,7 @@ public class TileEntityAnvilMF extends TileEntity
     }
 
     private void craftItem(EntityPlayer lastHit) {
-        // Re-read the grid before paying out: inventory changes after the first one only refresh the recipe on a
-        // timer, so the project may no longer match what is actually on the anvil
-        CraftPlan crafting = project;
-        updateCraftingData();
-        if (crafting == null || !crafting.sameAs(project)) {
+        if (!GridProject.stillMakes(this)) {
             progress = 0;
             return;
         }
@@ -371,10 +366,10 @@ public class TileEntityAnvilMF extends TileEntity
                 if (inventory[outputSlot].stackSize + result.stackSize <= getStackSize(inventory[outputSlot])) {
                     inventory[outputSlot].stackSize += result.stackSize;
                 } else {
-                    dropItem(result);
+                    InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, result);
                 }
             } else {
-                dropItem(result);
+                InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, result);
             }
         }
     }
@@ -520,48 +515,6 @@ public class TileEntityAnvilMF extends TileEntity
         return item.getTagCompound();
     }
 
-    private void dropItem(ItemStack itemstack) {
-        if (itemstack != null) {
-            float f = this.rand.nextFloat() * 0.4F + 0.3F;
-            float f1 = this.rand.nextFloat() * 0.4F + 0.3F;
-            float f2 = this.rand.nextFloat() * 0.4F + 0.3F;
-
-            while (itemstack.stackSize > 0) {
-                int j1 = this.rand.nextInt(21) + 10;
-
-                if (j1 > itemstack.stackSize) {
-                    j1 = itemstack.stackSize;
-                }
-
-                boolean delay = true;
-                double[] positions = new double[] { xCoord + f, yCoord + f1 + 1, zCoord + f2 };
-                if (worldObj.getBlock(xCoord, yCoord + 1, zCoord).getMaterial().isSolid() && lastPlayerHit != null) {
-                    EntityPlayer smith = worldObj.getPlayerEntityByName(lastPlayerHit);
-                    if (smith != null) {
-                        delay = false;
-                        positions = new double[] { smith.posX, smith.posY, smith.posZ };
-                    }
-                }
-
-                itemstack.stackSize -= j1;
-                EntityItem entityitem = new EntityItem(
-                        worldObj,
-                        positions[0],
-                        positions[1],
-                        positions[2],
-                        new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
-                if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound((NBTTagCompound) itemstack.getTagCompound().copy());
-                }
-
-                entityitem.delayBeforeCanPickup = delay ? 20 : 0;
-                entityitem.motionX = entityitem.motionY = entityitem.motionZ = 0;
-
-                worldObj.spawnEntityInWorld(entityitem);
-            }
-        }
-    }
-
     public boolean hasItems(EntityPlayer user, ItemStack[] items) {
         for (ItemStack check : items) {
             if (!hasItems(user, check)) {
@@ -647,7 +600,7 @@ public class TileEntityAnvilMF extends TileEntity
         boolean paid = GridProject.pay(project, this, spill);
         resetRecipe = false;
         for (ItemStack stack : spill) {
-            dropItem(stack);
+            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
         }
         this.onInventoryChanged();
         return paid;
@@ -1017,4 +970,9 @@ public class TileEntityAnvilMF extends TileEntity
     }
 
     // endregion
+
+    @Override
+    public CraftPlan currentProject() {
+        return project;
+    }
 }

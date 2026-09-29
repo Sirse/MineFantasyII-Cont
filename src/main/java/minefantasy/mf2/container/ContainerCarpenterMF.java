@@ -2,15 +2,12 @@ package minefantasy.mf2.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.block.tileentity.TileEntityCarpenterMF;
 
 public class ContainerCarpenterMF extends ContainerMF {
 
     private final TileEntityCarpenterMF tile;
-    private int playerInventoryStartIndex;
 
     public ContainerCarpenterMF(InventoryPlayer user, TileEntityCarpenterMF tile) {
         this.tile = tile;
@@ -42,7 +39,7 @@ public class ContainerCarpenterMF extends ContainerMF {
         }
 
         if (user != null) {
-            this.playerInventoryStartIndex = tile.getSizeInventory();
+            shiftClicks(tile.getSizeInventory(), 0, tile.getSizeInventory() - 5);
             this.addPlayerInventory(user, 0, 158);
 
             trackFloat(() -> tile.progress, value -> tile.progress = value);
@@ -55,46 +52,5 @@ public class ContainerCarpenterMF extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-
-        int tileSlotCount = tile.getSizeInventory();
-        int gridEndExclusive = tileSlotCount - 5;
-
-        if (slotIndex < tileSlotCount) {
-            if (!this.moveToPlayer(stackInSlot, playerInventoryStartIndex)) {
-                return null;
-            }
-        } else {
-            boolean moved = this.mergeItemStack(stackInSlot, 0, gridEndExclusive, false);
-
-            if (!moved && !this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex))
-                return null;
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-
-        if (stackInSlot.stackSize == originalStack.stackSize) {
-            return null;
-        }
-
-        slot.onPickupFromSlot(player, stackInSlot);
-        return originalStack;
     }
 }

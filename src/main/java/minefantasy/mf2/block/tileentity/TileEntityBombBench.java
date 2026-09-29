@@ -1,8 +1,9 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -15,9 +16,11 @@ import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.engineer.IBombComponent;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.recipe.CraftInventory;
+import minefantasy.mf2.api.recipe.CraftPlan;
+import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.item.gadget.ItemBomb;
 import minefantasy.mf2.item.gadget.ItemExplodingArrow;
@@ -117,41 +120,6 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
                 if (user != null) {
                     SkillList.engineering.addXP(user, 2);
                 }
-                boolean isArrow = isMatch(0, "arrow") || isMatch(0, "bolt");
-                for (int a = 0; a < 4; a++) {
-                    if (!(isArrow && a == 3)) {
-                        ItemStack item = getStackInSlot(a);
-                        ItemStack cont = SafeStacks.containerOf(item);
-                        if (cont != null) {
-                            // START CONTAINER CODE
-                            ItemStack spare = getStackInSlot(5);
-                            if (spare == null) {
-                                setInventorySlotContents(5, cont);
-                                cont = null;
-                            } else if (spare.isItemEqual(cont) && ItemStack.areItemStackTagsEqual(spare, cont)) {
-                                if (spare.stackSize + cont.stackSize <= spare.getMaxStackSize()) {
-                                    spare.stackSize += cont.stackSize;
-                                    cont = null;
-                                } else {
-                                    int room_left = spare.getMaxStackSize() - spare.stackSize;
-                                    spare.stackSize += room_left;
-                                    cont.stackSize -= room_left;
-                                }
-                            }
-                            if (cont != null && !worldObj.isRemote) {
-                                EntityItem ei = new EntityItem(
-                                        worldObj,
-                                        xCoord + 0.5,
-                                        yCoord + 0.5,
-                                        zCoord + 0.5,
-                                        cont);
-                                worldObj.spawnEntityInWorld(ei);
-                            }
-                        }
-                        // END CONTAINER CODE
-                        decrStackSize(a, 1);
-                    }
-                }
             }
             return true;
         }
@@ -170,18 +138,30 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
         return false;
     }
 
+    private static final RecipeId ASSEMBLY = RecipeId.of("minefantasy2", "bomb_bench/assembly");
+    private static final int OUTPUT_SLOT = 4, SPARE_SLOT = 5;
+
+    /**
+     * Takes one of each component and puts the result into the output, the components' containers into the spare slot;
+     * all of it or nothing, if the output is taken by something else or a component is no longer there.
+     */
     private boolean craftItem(ItemStack result) {
-        if (inv[4] == null) {
-            this.setInventorySlotContents(4, result);
-            return true;
-        } else {
-            if (areItemsEqual(result, inv[4]) && (inv[4].stackSize + result.stackSize) <= inv[4].getMaxStackSize()) {
-                inv[4].stackSize += result.stackSize;
-                return true;
-            } else {
-                return false;
+        boolean isArrow = isMatch(0, "arrow") || isMatch(0, "bolt");
+        CraftPlan.Builder plan = CraftPlan.builder(ASSEMBLY, 0, OUTPUT_SLOT).returns(SPARE_SLOT);
+        for (int slot = 0; slot < 4; slot++) {
+            ItemStack part = inv[slot];
+            if (part != null && !(isArrow && slot == 3)) {
+                plan.consume(slot, part, 1, part, null);
             }
         }
+        List<ItemStack> spill = new ArrayList<>();
+        if (!plan.output(result).build().apply(CraftInventory.of(this), spill)) {
+            return false;
+        }
+        for (ItemStack stack : spill) {
+            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
+        }
+        return true;
     }
 
     public void syncData() {
@@ -194,23 +174,6 @@ public class TileEntityBombBench extends TileEntity implements IInventory, ISide
          * i++) { EntityPlayer player = players.get(i); ((WorldServer)
          * worldObj).getEntityTracker().func_151248_b(player, new BombBenchPacket(this).generatePacket()); }
          */
-    }
-
-    private boolean areItemsEqual(ItemStack bomb1, ItemStack bomb2) {
-        if (ItemBomb.getCasing(bomb1) != ItemBomb.getCasing(bomb2)) {
-            return false;
-        }
-        if (ItemBomb.getPowder(bomb1) != ItemBomb.getPowder(bomb2)) {
-            return false;
-        }
-        if (ItemBomb.getFilling(bomb1) != ItemBomb.getFilling(bomb2)) {
-            return false;
-        }
-        if (ItemBomb.getFuse(bomb1) != ItemBomb.getFuse(bomb2)) {
-            return false;
-        }
-        // isItemEqual ignores NBT, so a plain bomb would merge into a slimed stack and inherit stickiness for free
-        return bomb1.isItemEqual(bomb2) && ItemStack.areItemStackTagsEqual(bomb1, bomb2);
     }
 
     public void onInventoryChanged() {}
