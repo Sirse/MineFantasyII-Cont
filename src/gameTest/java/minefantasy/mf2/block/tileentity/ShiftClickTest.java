@@ -36,6 +36,7 @@ import minefantasy.mf2.container.ContainerCarpenterMF;
 import minefantasy.mf2.container.ContainerCrucible;
 import minefantasy.mf2.container.ContainerForge;
 import minefantasy.mf2.container.ContainerKitchenBench;
+import minefantasy.mf2.container.ContainerMF;
 import minefantasy.mf2.container.ContainerQuern;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.TestItems;
@@ -101,7 +102,9 @@ public class ShiftClickTest {
                 Slot slot = (Slot) o;
                 ItemStack stack = slot.getStack();
                 if (slot.inventory != station || stack == null) continue;
-                int limit = Math.min(stack.getMaxStackSize(), station.getInventoryStackLimit());
+                int limit = Math.min(
+                        stack.getMaxStackSize(),
+                        Math.min(slot.getSlotStackLimit(), station.getInventoryStackLimit()));
                 assertTrue(
                         "station slot " + slot.getSlotIndex() + " holds " + stack.stackSize + " over " + limit,
                         stack.stackSize <= limit);
@@ -158,6 +161,64 @@ public class ShiftClickTest {
 
     /** The first main inventory slot and the first hotbar slot. */
     private static final int MAIN = 9, HOTBAR = 0;
+
+    // endregion
+
+    // region merging
+
+    /** Three station slots: one holding a single item, one taking nothing, one plain; then the player's. */
+    private static final class Narrow extends ContainerMF {
+
+        Narrow(IInventory station, EntityPlayer player) {
+            addSlotToContainer(new Slot(station, 0, 0, 0) {
+
+                @Override
+                public int getSlotStackLimit() {
+                    return 1;
+                }
+            });
+            addSlotToContainer(new SlotOutput(station, 1, 0, 0));
+            addSlotToContainer(new Slot(station, 2, 0, 0));
+            addPlayerInventory(player.inventory, 0, 0);
+        }
+
+        @Override
+        public boolean canInteractWith(EntityPlayer player) {
+            return true;
+        }
+
+        @Override
+        public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+            Slot slot = (Slot) inventorySlots.get(index);
+            ItemStack stack = slot.getStack();
+            if (stack == null || index < 3 || !mergeItemStack(stack, 0, 3, false)) return null;
+            if (stack.stackSize == 0) slot.putStack(null);
+            else slot.onSlotChanged();
+            return null;
+        }
+    }
+
+    @GameTest
+    public static void mergingKeepsToWhatASlotAcceptsAndHolds(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.carpenter);
+        TileEntityCarpenterMF carpenter = helper.assertTileEntityPresent(TileEntityCarpenterMF.class, 1, 1, 1);
+        FakePlayer maker = player(helper);
+        Bench bench = new Bench(carpenter, new Narrow(carpenter, maker), maker);
+
+        bench.give(MAIN, new ItemStack(seed, 10));
+        bench.shiftFromPlayer(MAIN);
+        assertEquals("the one-item slot took more", 1, size(carpenter.getStackInSlot(0)));
+        assertNull("a slot that takes nothing was filled", carpenter.getStackInSlot(1));
+        assertEquals("the rest did not go on", 9, size(carpenter.getStackInSlot(2)));
+
+        // Topping up respects the limit as well
+        bench.give(MAIN, new ItemStack(seed, 60));
+        bench.shiftFromPlayer(MAIN);
+        assertEquals(1, size(carpenter.getStackInSlot(0)));
+        assertEquals(64, size(carpenter.getStackInSlot(2)));
+        assertEquals("the leftover left the inventory", 5, size(bench.held(MAIN)));
+        helper.succeed();
+    }
 
     // endregion
 

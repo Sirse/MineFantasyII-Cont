@@ -30,14 +30,12 @@ import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.block.crafting.BlockEngineerTanner;
 import minefantasy.mf2.block.list.BlockListMF;
-import minefantasy.mf2.container.ContainerTanner;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.NetworkUtils;
 import minefantasy.mf2.network.packet.TannerPacket;
 
 public class TileEntityTanningRack extends TileEntity implements IInventory, Diagnosis.Source {
 
-    public final ContainerTanner container;
     public ItemStack[] items = new ItemStack[2];
     public float progress;
     public float maxProgress;
@@ -59,7 +57,6 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
     }
 
     public TileEntityTanningRack(int tier, String tex) {
-        container = new ContainerTanner(this);
         this.tier = tier;
         this.tex = tex;
     }
@@ -93,7 +90,6 @@ public class TileEntityTanningRack extends TileEntity implements IInventory, Dia
         if (leverPull && acTime > 0) {
             return true;
         }
-        container.detectAndSendChanges();
 
         ItemStack held = player.getHeldItem();
 

@@ -33,7 +33,7 @@ public class ContainerQuern extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -55,15 +55,7 @@ public class ContainerQuern extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (TileEntityQuern.isInput(stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, INPUT_SLOT, INPUT_SLOT + 1, false)) {
-                    merged = true;
-                }
-            } else if (TileEntityQuern.isPot(stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, POT_SLOT, POT_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, INPUT_SLOT, OUTPUT_SLOT, false);
             if (!merged) {
                 merged = this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex);
             }

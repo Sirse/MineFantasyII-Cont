@@ -20,6 +20,8 @@ public class ContainerReload extends ContainerMF {
      * inventory directly, so it has to be rejected explicitly.
      */
     private final int weaponHotbarIndex;
+    /** Inside a click, including the retries a shift-click makes of itself. */
+    private boolean clicking;
 
     public ContainerReload(InventoryPlayer playerInventory, ItemStack weapon) {
         this.weapon = weapon;
@@ -43,21 +45,47 @@ public class ContainerReload extends ContainerMF {
 
     @Override
     public ItemStack slotClick(int slotId, int mouseButton, int modifier, EntityPlayer player) {
-        if (!canInteractWith(player)) {
-            return null;
-        }
         // Mode 2 swaps with a hotbar slot through InventoryPlayer directly, bypassing the slot list. Letting it hit
         // the open weapon moves a copy of it into the inventory while this container keeps editing the original,
         // which duplicates the loaded ammo.
         if (modifier == 2 && mouseButton == weaponHotbarIndex) {
             return null;
         }
-        ItemStack result = super.slotClick(slotId, mouseButton, modifier, player);
+        // A shift-click repeats itself through retrySlotClick; only the outer click reads the weapon, or the inner one
+        // would overwrite what the outer one has moved but not yet written back
+        boolean outer = !clicking;
+        if (outer) {
+            showLoaded();
+        }
+        clicking = true;
+        ItemStack result;
+        try {
+            result = super.slotClick(slotId, mouseButton, modifier, player);
+        } finally {
+            clicking = !outer;
+        }
         if (weapon != null) {
             ItemStack ammo = weaponInv.getStackInSlot(0);
             AmmoMechanicsMF.setAmmo(weapon, ammo);
         }
         return result;
+    }
+
+    /**
+     * The window keeps its own copy of the loaded ammunition, but the weapon can change while it is open: the server
+     * still takes shots and loading from an ammunition box. Writing a stale copy back would return shot arrows or drop
+     * loaded ones, so the copy is read from the weapon again before every click and every sync.
+     */
+    private void showLoaded() {
+        if (weapon != null) {
+            weaponInv.setInventorySlotContents(0, AmmoMechanicsMF.getAmmo(weapon));
+        }
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        showLoaded();
+        super.detectAndSendChanges();
     }
 
     @Override

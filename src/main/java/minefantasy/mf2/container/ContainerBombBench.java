@@ -42,7 +42,7 @@ public class ContainerBombBench extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return tile != null && !tile.isInvalid() && tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -60,29 +60,7 @@ public class ContainerBombBench extends ContainerMF {
         if (index < BENCH_SLOT_COUNT) {
             moved = moveToPlayer(stack, playerInventoryStart);
         } else {
-            String type = TileEntityBombBench.getComponentType(stack);
-            if (type != null) {
-                type = type.toLowerCase();
-                switch (type) {
-                    case "bombcase":
-                    case "minecase":
-                    case "arrow":
-                    case "bolt":
-                        moved = mergeItemStack(stack, CASE_SLOT, CASE_SLOT + 1, false);
-                        break;
-                    case "powder":
-                        moved = mergeItemStack(stack, POWDER_SLOT, POWDER_SLOT + 1, false);
-                        break;
-                    case "filling":
-                        moved = mergeItemStack(stack, FILLING_SLOT, FILLING_SLOT + 1, false);
-                        break;
-                    case "fuse":
-                        moved = mergeItemStack(stack, FUSE_SLOT, FUSE_SLOT + 1, false);
-                        break;
-                    default:
-                        moved = false;
-                }
-            } else moved = false;
+            moved = mergeItemStack(stack, CASE_SLOT, OUTPUT_SLOT, false);
             if (!moved) {
                 moved = bounceBetweenMainAndHotbar(stack, playerInventoryStart, index);
             }

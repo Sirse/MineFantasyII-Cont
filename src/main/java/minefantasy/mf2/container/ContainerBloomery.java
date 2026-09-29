@@ -32,7 +32,7 @@ public class ContainerBloomery extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -56,16 +56,7 @@ public class ContainerBloomery extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (tile.isItemValidForSlot(INPUT_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, INPUT_SLOT, INPUT_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
-            if (!merged && tile.isItemValidForSlot(FUEL_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, FUEL_SLOT, FUEL_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, 0, BLOOMERY_SLOT_COUNT, false);
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;

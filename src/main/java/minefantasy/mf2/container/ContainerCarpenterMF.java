@@ -54,7 +54,7 @@ public class ContainerCarpenterMF extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override

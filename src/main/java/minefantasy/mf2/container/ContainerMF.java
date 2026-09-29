@@ -14,6 +14,7 @@ import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -160,6 +161,81 @@ public abstract class ContainerMF extends Container {
         // If origin unknown/not in player inventory, try main then hotbar
         if (this.mergeItemStack(stack, mainStart, mainEnd, false)) return true;
         return this.mergeItemStack(stack, mainEnd, hotbarEnd, false);
+    }
+
+    /**
+     * The station still stands and the player can use it from the world they are in. Coordinates alone are not enough:
+     * the same position in another dimension is just as near.
+     */
+    protected static <T extends TileEntity & IInventory> boolean stillUsable(T station, EntityPlayer player) {
+        return station != null && !station.isInvalid()
+                && station.getWorldObj() == player.worldObj
+                && station.isUseableByPlayer(player);
+    }
+
+    /**
+     * The window closes on the player's next tick once {@link #canInteractWith} fails, but a click can arrive in the
+     * same tick, after a broken station has already dropped its contents. That click would take them a second time.
+     */
+    @Override
+    public ItemStack slotClick(int slotId, int mouseButton, int modifier, EntityPlayer player) {
+        if (!canInteractWith(player)) {
+            return null;
+        }
+        return super.slotClick(slotId, mouseButton, modifier, player);
+    }
+
+    /**
+     * A double-click gathers matching items from every slot of the window. An output slot gives its contents out only
+     * through its own pickup (a furnace pays its experience there), so it is left out, like the result of a vanilla
+     * crafting table: only slots that would take the item back are swept.
+     */
+    @Override
+    public boolean func_94530_a(ItemStack stack, Slot slot) {
+        return slot.inventory instanceof InventoryPlayer || slot.isItemValid(stack);
+    }
+
+    /**
+     * Vanilla merging ignores what a slot accepts and how much it holds, so every container had to check both before
+     * calling it. Here a slot that refuses the stack is skipped and each slot takes at most its own limit.
+     */
+    @Override
+    protected boolean mergeItemStack(ItemStack stack, int start, int end, boolean reverse) {
+        boolean merged = false;
+        if (stack.isStackable()) {
+            for (int i = reverse ? end - 1 : start; stack.stackSize > 0 && i >= start
+                    && i < end; i += reverse ? -1 : 1) {
+                Slot slot = (Slot) inventorySlots.get(i);
+                ItemStack held = slot.getStack();
+                if (held == null || !slot.isItemValid(stack)
+                        || held.getItem() != stack.getItem()
+                        || stack.getHasSubtypes() && stack.getItemDamage() != held.getItemDamage()
+                        || !ItemStack.areItemStackTagsEqual(stack, held)) {
+                    continue;
+                }
+                int moved = Math.min(stack.stackSize, limit(slot, stack) - held.stackSize);
+                if (moved > 0) {
+                    held.stackSize += moved;
+                    stack.stackSize -= moved;
+                    slot.onSlotChanged();
+                    merged = true;
+                }
+            }
+        }
+        for (int i = reverse ? end - 1 : start; stack.stackSize > 0 && i >= start && i < end; i += reverse ? -1 : 1) {
+            Slot slot = (Slot) inventorySlots.get(i);
+            if (slot.getStack() != null || !slot.isItemValid(stack)) {
+                continue;
+            }
+            ItemStack placed = stack.splitStack(Math.min(stack.stackSize, limit(slot, stack)));
+            slot.putStack(placed);
+            merged = true;
+        }
+        return merged;
+    }
+
+    private static int limit(Slot slot, ItemStack stack) {
+        return Math.min(stack.getMaxStackSize(), slot.getSlotStackLimit());
     }
 
     /**

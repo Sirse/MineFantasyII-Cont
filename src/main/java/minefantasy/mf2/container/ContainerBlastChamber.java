@@ -32,7 +32,7 @@ public class ContainerBlastChamber extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -54,17 +54,7 @@ public class ContainerBlastChamber extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (tile.isItemValidForSlot(CARBON_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, CARBON_SLOT, CARBON_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
-
-            if (!merged && tile.isItemValidForSlot(INPUT_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, INPUT_SLOT, INPUT_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, 0, CHAMBER_SLOT_COUNT, false);
 
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;

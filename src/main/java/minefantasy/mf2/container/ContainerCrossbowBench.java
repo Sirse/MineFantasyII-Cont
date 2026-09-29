@@ -38,7 +38,7 @@ public class ContainerCrossbowBench extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -60,23 +60,7 @@ public class ContainerCrossbowBench extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (TileEntityCrossbowBench.isMatch(stackInSlot, "stock")) {
-                if (this.mergeItemStack(stackInSlot, STOCK_SLOT, STOCK_SLOT + 1, false)) {
-                    merged = true;
-                }
-            } else if (TileEntityCrossbowBench.isMatch(stackInSlot, "mechanism")) {
-                if (this.mergeItemStack(stackInSlot, MECHANISM_SLOT, MECHANISM_SLOT + 1, false)) {
-                    merged = true;
-                }
-            } else if (TileEntityCrossbowBench.isMatch(stackInSlot, "mod")) {
-                if (this.mergeItemStack(stackInSlot, MOD_SLOT, MOD_SLOT + 1, false)) {
-                    merged = true;
-                }
-            } else if (TileEntityCrossbowBench.isMatch(stackInSlot, "muzzle")) {
-                if (this.mergeItemStack(stackInSlot, MUZZLE_SLOT, MUZZLE_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, STOCK_SLOT, OUTPUT_SLOT, false);
 
             if (!merged) {
                 merged = this.bounceBetweenMainAndHotbar(stackInSlot, playerInventoryStartIndex, slotIndex);

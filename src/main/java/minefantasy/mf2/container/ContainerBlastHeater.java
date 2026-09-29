@@ -29,7 +29,7 @@ public class ContainerBlastHeater extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -51,11 +51,7 @@ public class ContainerBlastHeater extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (tile.isItemValidForSlot(FUEL_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, FUEL_SLOT, HEATER_SLOT_COUNT, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, FUEL_SLOT, HEATER_SLOT_COUNT, false);
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;

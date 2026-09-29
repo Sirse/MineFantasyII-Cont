@@ -61,7 +61,7 @@ public class ContainerBigFurnace extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.smelter != null && !this.smelter.isInvalid() && this.smelter.isUseableByPlayer(player);
+        return stillUsable(smelter, player);
     }
 
     @Override
@@ -88,23 +88,8 @@ public class ContainerBigFurnace extends ContainerMF {
                 }
             }
         } else {
-            if (smelter.isHeater()) {
-                if (smelter.isItemValidForSlot(HEATER_FUEL_SLOT, stackInSlot)) {
-                    if (this.mergeItemStack(stackInSlot, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)) {
-                        merged = true;
-                    }
-                }
-            } else {
-                if (smelter.isItemValidForSlot(SMELTER_INPUT_START_INDEX, stackInSlot)) {
-                    if (this.mergeItemStack(
-                            stackInSlot,
-                            SMELTER_INPUT_START_INDEX,
-                            SMELTER_OUTPUT_START_INDEX,
-                            false)) {
-                        merged = true;
-                    }
-                }
-            }
+            merged = smelter.isHeater() ? this.mergeItemStack(stackInSlot, HEATER_FUEL_SLOT, HEATER_SLOT_COUNT, false)
+                    : this.mergeItemStack(stackInSlot, SMELTER_INPUT_START_INDEX, SMELTER_OUTPUT_START_INDEX, false);
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;

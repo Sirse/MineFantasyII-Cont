@@ -28,7 +28,7 @@ public class ContainerForge extends ContainerMF {
 
     @Override
     public boolean canInteractWith(EntityPlayer player) {
-        return this.tile != null && !this.tile.isInvalid() && this.tile.isUseableByPlayer(player);
+        return stillUsable(tile, player);
     }
 
     @Override
@@ -50,11 +50,7 @@ public class ContainerForge extends ContainerMF {
                 merged = true;
             }
         } else {
-            if (tile.isItemValidForSlot(FORGE_SLOT, stackInSlot)) {
-                if (this.mergeItemStack(stackInSlot, FORGE_SLOT, FORGE_SLOT + 1, false)) {
-                    merged = true;
-                }
-            }
+            merged = this.mergeItemStack(stackInSlot, FORGE_SLOT, FORGE_SLOT_COUNT, false);
             if (!merged) {
                 int mainStart = playerInventoryStartIndex;
                 int mainEnd = mainStart + 27;
