@@ -150,6 +150,17 @@ public final class Stations {
         return count;
     }
 
+    /** The stacks of the given kind the blocks of this test dropped. */
+    static List<ItemStack> droppedStacks(Item item) {
+        List<ItemStack> stacks = new java.util.ArrayList<>();
+        for (EntityItem entity : drops(helper)) {
+            if (!entity.isDead && entity.getEntityItem().getItem() == item) {
+                stacks.add(entity.getEntityItem());
+            }
+        }
+        return stacks;
+    }
+
     /** A hot piece carrying the given stack, as the forge makes it: workable from 100, unstable above 500. */
     static ItemStack heated(ItemStack cold, int temperature) {
         ItemStack piece = new ItemStack(TestItems.hot, cold.stackSize);

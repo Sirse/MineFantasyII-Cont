@@ -21,6 +21,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.hunger.HungerSystemMF;
@@ -75,24 +76,15 @@ public class ItemFoodMF extends ItemFood {
     }
 
     public static void onTick(EntityPlayer player) {
-        int time = getEatDelay(player);
-        if (time > 0) {
-            // Written, not added: setEatDelay adds to what is left, which would double the pause every tick
-            player.getEntityData().setInteger(eatDelayNBT, time - 1);
-        }
+        Cooldowns.tick(player, eatDelayNBT);
     }
 
     private static void setEatDelay(EntityPlayer player, int time) {
-        time += getEatDelay(player);// add to existing
-
-        player.getEntityData().setInteger(eatDelayNBT, time);
+        Cooldowns.set(player, eatDelayNBT, time + getEatDelay(player));
     }
 
     private static int getEatDelay(EntityPlayer player) {
-        if (player.getEntityData().hasKey(eatDelayNBT)) {
-            return player.getEntityData().getInteger(eatDelayNBT);
-        }
-        return 0;
+        return Cooldowns.left(player, eatDelayNBT);
     }
 
     protected void onMFFoodEaten(ItemStack food, World world, EntityPlayer consumer) {

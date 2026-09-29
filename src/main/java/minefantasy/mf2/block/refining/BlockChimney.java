@@ -3,7 +3,6 @@ package minefantasy.mf2.block.refining;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,17 +10,17 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.TileEntityChimney;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockChimney extends BlockContainer {
+public class BlockChimney extends BlockTiled<TileEntityChimney> {
 
     public static int pipe_RI = 117;
     public IIcon bottomTex;
@@ -37,7 +36,7 @@ public class BlockChimney extends BlockContainer {
     private boolean isPipe;
 
     public BlockChimney(String type, boolean wide, boolean indirect, int size) {
-        super(Material.rock);
+        super(Material.rock, TileEntityChimney.class);
         this.isIndirect = indirect;
         isWide = wide;
         this.chimneyType = type;
@@ -62,9 +61,9 @@ public class BlockChimney extends BlockContainer {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
         super.onBlockPlacedBy(world, x, y, z, placer, item);
         if (!world.isRemote && placer instanceof EntityPlayer) {
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if (tile instanceof TileEntityChimney) {
-                ((TileEntityChimney) tile).setOwner((EntityPlayer) placer);
+            TileEntityChimney tile = getTile(world, x, y, z);
+            if (tile != null) {
+                tile.setOwner((EntityPlayer) placer);
             }
         }
     }
@@ -72,10 +71,6 @@ public class BlockChimney extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityChimney();
-    }
-
-    private TileEntityChimney getTile(IBlockAccess world, int x, int y, int z) {
-        return (TileEntityChimney) world.getTileEntity(x, y, z);
     }
 
     public boolean isWideChimney() {

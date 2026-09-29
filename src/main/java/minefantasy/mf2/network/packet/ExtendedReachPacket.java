@@ -9,6 +9,7 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.weapon.IExtendedReach;
 import minefantasy.mf2.network.NetworkUtils;
 
@@ -49,12 +50,9 @@ public class ExtendedReachPacket extends PacketMF {
         int id = in.readInt();
 
         // Rate limit first: canReach runs a block ray trace, so an unthrottled client could force one per packet
-        long now = user.worldObj.getTotalWorldTime();
-        long last = user.getEntityData().getLong(LAST_ATTACK_TICK_NBT);
-        if (now - last < ATTACK_COOLDOWN_TICKS) {
+        if (!Cooldowns.pass(user, LAST_ATTACK_TICK_NBT, ATTACK_COOLDOWN_TICKS)) {
             return;
         }
-        user.getEntityData().setLong(LAST_ATTACK_TICK_NBT, now);
 
         Entity target = user.worldObj.getEntityByID(id);
         if (!(target instanceof EntityLivingBase) || !canReach((EntityPlayerMP) user, target)) {

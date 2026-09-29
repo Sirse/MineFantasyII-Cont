@@ -7,23 +7,21 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockTrough extends BlockWoodDecor {
+public class BlockTrough extends BlockWoodDecor<TileEntityTrough> {
 
     public static final String NBT_fill = "Fill_Level";
     public static int trough_RI = 107;
 
     public BlockTrough(String name) {
-        super(name);
+        super(name, TileEntityTrough.class);
         this.setBlockBounds(0F, 0F, 0F, 1.0F, (7F / 16F), 1.0F);
         GameRegistry.registerBlock(this, ItemBlockTrough.class, name);
         setBlockName(name);
@@ -65,10 +63,14 @@ public class BlockTrough extends BlockWoodDecor {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-        world.setBlockMetadataWithNotify(x, y, z, direction, 2);
+    protected boolean facesPlacer() {
+        return true;
+    }
 
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
+        // The material first: the level is kept within the capacity, which depends on it
+        super.onBlockPlacedBy(world, x, y, z, user, item);
         TileEntityTrough tile = getTile(world, x, y, z);
         if (tile != null) {
             if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_fill)) {
@@ -76,7 +78,6 @@ public class BlockTrough extends BlockWoodDecor {
                 tile.fill = Math.max(0, Math.min(tile.getCapacity(), item.getTagCompound().getInteger(NBT_fill)));
             }
         }
-        super.onBlockPlacedBy(world, x, y, z, user, item);
     }
 
     @Override
@@ -88,9 +89,9 @@ public class BlockTrough extends BlockWoodDecor {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
             float yOffset, float zOffset) {
         ItemStack held = user.getHeldItem();
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityTrough) {
-            if (((TileEntityTrough) tile).interact(user, held)) {
+        TileEntityTrough tile = getTile(world, x, y, z);
+        if (tile != null) {
+            if (tile.interact(user, held)) {
                 world.playSoundEffect(
                         x + 0.5D,
                         y + 0.5D,
@@ -98,24 +99,16 @@ public class BlockTrough extends BlockWoodDecor {
                         "random.splash",
                         0.125F + user.getRNG().nextFloat() / 4F,
                         0.5F + user.getRNG().nextFloat());
-                ((TileEntityTrough) tile).syncData();
+                tile.syncData();
                 return true;
             }
         }
         return false;
     }
 
-    private TileEntityTrough getTile(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityTrough) {
-            return (TileEntityTrough) tile;
-        }
-        return null;
-    }
-
     @Override
-    protected ItemStack modifyDrop(TileEntityWoodDecor tile, ItemStack item) {
-        return modifyFill((TileEntityTrough) tile, super.modifyDrop(tile, item));
+    protected ItemStack modifyDrop(TileEntityTrough tile, ItemStack item) {
+        return modifyFill(tile, super.modifyDrop(tile, item));
     }
 
     private ItemStack modifyFill(TileEntityTrough tile, ItemStack item) {

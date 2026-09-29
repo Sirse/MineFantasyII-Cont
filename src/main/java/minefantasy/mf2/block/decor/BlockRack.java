@@ -31,12 +31,12 @@ import minefantasy.mf2.network.packet.RackCommand;
  *         Sources are provided for educational reasons. though small bits of code, or methods can be used in your own
  *         creations.
  */
-public class BlockRack extends BlockWoodDecor {
+public class BlockRack extends BlockWoodDecor<TileEntityRack> {
 
     public static int rack_RI = 115;
 
     public BlockRack(String name) {
-        super(name);
+        super(name, TileEntityRack.class);
 
         setHardness(1.0F);
         setResistance(1.0F);
@@ -234,9 +234,9 @@ public class BlockRack extends BlockWoodDecor {
      */
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityRack) {
-            ((TileEntityRack) tile).updateInventory();
+        TileEntityRack tile = getTile(world, x, y, z);
+        if (tile != null) {
+            tile.updateInventory();
         }
         int l = world.getBlockMetadata(x, y, z);
         boolean flag = false;
@@ -288,7 +288,7 @@ public class BlockRack extends BlockWoodDecor {
      */
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntityRack tile = (TileEntityRack) world.getTileEntity(x, y, z);
+        TileEntityRack tile = getTile(world, x, y, z);
 
         if (tile != null) {
             InventorySlots.spill(world, x, y, z, tile);
@@ -300,8 +300,8 @@ public class BlockRack extends BlockWoodDecor {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int i, float f, float f1,
             float f2) {
-        TileEntityRack tile = (TileEntityRack) world.getTileEntity(x, y, z);
-        if (world.isRemote) {
+        TileEntityRack tile = getTile(world, x, y, z);
+        if (world.isRemote && tile != null) {
             int slot = tile.getSlotFor(f, f2);
             if (slot >= 0 && slot < 4) {
                 ((EntityClientPlayerMP) user).sendQueue

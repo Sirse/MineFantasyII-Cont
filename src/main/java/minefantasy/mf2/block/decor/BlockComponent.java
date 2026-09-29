@@ -3,10 +3,8 @@ package minefantasy.mf2.block.decor;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -22,17 +20,18 @@ import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityComponent;
 
-public class BlockComponent extends BlockContainer {
+public class BlockComponent extends BlockTiled<TileEntityComponent> {
 
     public static int component_RI = 118;
     private final Random rand = new Random();
 
     public BlockComponent() {
-        super(Material.circuits);
+        super(Material.circuits, TileEntityComponent.class);
         GameRegistry.registerBlock(this, ItemBlockAmmoBox.class, "MF_ComponentStorage");
         setBlockName("");
         this.setHardness(1F);
@@ -145,9 +144,8 @@ public class BlockComponent extends BlockContainer {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-        world.setBlockMetadataWithNotify(x, y, z, direction, 2);
+    protected boolean facesPlacer() {
+        return true;
     }
 
     @Override
@@ -169,27 +167,27 @@ public class BlockComponent extends BlockContainer {
 
     private void useBlock(World world, int x, int y, int z, EntityPlayer user, boolean leftClick) {
         ItemStack held = user.getHeldItem();
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            ((TileEntityComponent) tile).interact(user, held, leftClick);
+        TileEntityComponent tile = getTile(world, x, y, z);
+        if (tile != null) {
+            tile.interact(user, held, leftClick);
         }
     }
 
     @Override
     public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            ((TileEntityComponent) tile).checkStack();
+        TileEntityComponent tile = getTile(world, x, y, z);
+        if (tile != null) {
+            tile.checkStack();
         }
     }
 
     @Override
     @SuppressWarnings("deprecation")
     public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            if (((TileEntityComponent) tile).item != null) {
-                ItemStack item = ((TileEntityComponent) tile).item.copy();
+        TileEntityComponent tile = getTile(world, x, y, z);
+        if (tile != null) {
+            if (tile.item != null) {
+                ItemStack item = tile.item.copy();
                 item.stackSize = 1;
                 return item;
             }
@@ -204,24 +202,21 @@ public class BlockComponent extends BlockContainer {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            TileEntityComponent component = (TileEntityComponent) tile;
-
-            if (component.item != null) {
-                ItemStack drop = component.item.copy();
-                drop.stackSize = component.stackSize;
-                component.stackSize = 0;
-                InventorySlots.drop(world, x, y, z, drop);
-            }
+        TileEntityComponent tile = getTile(world, x, y, z);
+        if (tile != null && tile.item != null) {
+            ItemStack drop = tile.item.copy();
+            drop.stackSize = tile.stackSize;
+            tile.stackSize = 0;
+            InventorySlots.drop(world, x, y, z, drop);
         }
+        super.breakBlock(world, x, y, z, block, meta);
     }
 
     private AxisAlignedBB getBoundingBox(World world, int x, int y, int z) {
         float height = 1.0F;
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            height = ((TileEntityComponent) tile).getBlockHeight();
+        TileEntityComponent tile = getTile(world, x, y, z);
+        if (tile != null) {
+            height = tile.getBlockHeight();
         }
         return AxisAlignedBB.getBoundingBox(x + 0.0625D, y + 0D, z + 0.0625D, x + 0.9375D, y + height, z + 0.9375D);
     }

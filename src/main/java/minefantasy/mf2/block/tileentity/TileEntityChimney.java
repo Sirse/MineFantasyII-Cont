@@ -4,9 +4,7 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
@@ -16,10 +14,6 @@ import minefantasy.mf2.block.refining.BlockChimney;
 
 public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
-    public Block maskBlock = Blocks.air;
-    public int maskMeta = 0;
-    public int ticksExisted;
-    public int ticksExistedTemp;
     public int lastSharedInt = 0;
     protected int smokeStorage;
     private int isIndirect = -1;
@@ -32,14 +26,8 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     @Override
     public void updateEntity() {
         super.updateEntity();
-        ++ticksExisted;
-        ++ticksExistedTemp;
         if (lastSharedInt > 0) --lastSharedInt;
 
-        /*
-         * TODO Custom Tex if(ticksExistedTemp == 20) { MineFantasyII.debugMsg("Chimney Loaded R = " +
-         * worldObj.isRemote); sync(); }
-         */
         if (smokeStorage > 0) {
             if (!isPipeChimney()) {
                 SmokeMechanics.emitSmokeFromCarrier(worldObj, xCoord, yCoord, zCoord, this, 5);
@@ -127,11 +115,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
         super.writeToNBT(nbt);
 
         nbt.setString("Owner", ownerName == null ? "" : ownerName);
-        nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setInteger("StoredSmoke", smokeStorage);
-        NBTTagList savedItems = new NBTTagList();
-
-        nbt.setInteger("BlockID", Block.getIdFromBlock(maskBlock));
     }
 
     @Override
@@ -139,21 +123,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
         super.readFromNBT(nbt);
 
         ownerName = nbt.getString("Owner");
-        ticksExisted = nbt.getInteger("ticksExisted");
         smokeStorage = nbt.getInteger("StoredSmoke");
-        setBlock(nbt.getInteger("BlockID"));
-    }
-
-    public void setBlock(int id) {
-        setBlock(id, 0);
-    }
-
-    public void setBlock(int id, int subId) {
-        /*
-         * TODO Custom Tex maskMeta = subId; Block newblock = Block.getBlockById(id); if(newblock != null) { maskBlock =
-         * newblock; } if(worldObj != null && worldObj.isRemote) { worldObj.markBlockRangeForRenderUpdate(xCoord,
-         * yCoord, zCoord, xCoord, yCoord, zCoord); }
-         */
     }
 
     @Override

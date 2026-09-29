@@ -11,18 +11,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
-import minefantasy.mf2.block.tileentity.decor.TileEntityWoodDecor;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.util.MFLogUtil;
 
-public class BlockAmmoBox extends BlockWoodDecor {
+public class BlockAmmoBox extends BlockWoodDecor<TileEntityAmmoBox> {
 
     public static final String NBT_Ammo = "Ammo", NBT_Stock = "Stock";
     public static int ammo_RI = 116;
@@ -41,7 +39,7 @@ public class BlockAmmoBox extends BlockWoodDecor {
      * @param storageType (Food, Ammo, All)
      */
     public BlockAmmoBox(String name, String texName, byte storageType) {
-        super(texName);
+        super(texName, TileEntityAmmoBox.class);
         this.storageType = storageType;
         float width = (storageType == 0 ? 8F : storageType == 1 ? 14F : 16F) / 16F;
         float height = (storageType == 0 ? 4F : storageType == 1 ? 8F : 9F) / 16F;
@@ -106,9 +104,12 @@ public class BlockAmmoBox extends BlockWoodDecor {
     }
 
     @Override
+    protected boolean facesPlacer() {
+        return true;
+    }
+
+    @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-        world.setBlockMetadataWithNotify(x, y, z, direction, 2);
         // Restore the material first: applyItemNbtToTile clamps the stock to the tile's capacity, which depends on
         // it. Running it against the default material truncated the contents of higher-tier boxes.
         super.onBlockPlacedBy(world, x, y, z, user, item);
@@ -127,9 +128,9 @@ public class BlockAmmoBox extends BlockWoodDecor {
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer user, int side, float xOffset,
             float yOffset, float zOffset) {
         if (!world.isRemote) {
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if (tile instanceof TileEntityAmmoBox) {
-                return ((TileEntityAmmoBox) tile).interact(user);
+            TileEntityAmmoBox tile = getTile(world, x, y, z);
+            if (tile != null) {
+                return tile.interact(user);
             }
         }
         return false;
@@ -141,12 +142,8 @@ public class BlockAmmoBox extends BlockWoodDecor {
     }
 
     @Override
-    protected ItemStack modifyDrop(TileEntityWoodDecor tile, ItemStack item) {
-        ItemStack base = super.modifyDrop(tile, item);
-        if (tile instanceof TileEntityAmmoBox) {
-            return writeAmmoToItem((TileEntityAmmoBox) tile, base);
-        }
-        return base;
+    protected ItemStack modifyDrop(TileEntityAmmoBox tile, ItemStack item) {
+        return writeAmmoToItem(tile, super.modifyDrop(tile, item));
     }
 
     private ItemStack writeAmmoToItem(TileEntityAmmoBox tile, ItemStack item) {
@@ -162,11 +159,6 @@ public class BlockAmmoBox extends BlockWoodDecor {
             item.getTagCompound().setInteger(NBT_Stock, tile.stock);
         }
         return item;
-    }
-
-    private TileEntityAmmoBox getTile(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        return (tile instanceof TileEntityAmmoBox) ? (TileEntityAmmoBox) tile : null;
     }
 
     private void applyItemNbtToTile(ItemStack item, TileEntityAmmoBox tile) {

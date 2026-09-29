@@ -3,6 +3,7 @@ package minefantasy.mf2.network.packet;
 import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.mechanics.CombatMechanics;
 import minefantasy.mf2.network.NetworkUtils;
 
@@ -33,12 +34,9 @@ public class DodgeCommand extends PacketMF {
         if (dodgeId != -1 && dodgeId != 0 && dodgeId != 1) {
             return;
         }
-        long now = player.worldObj.getTotalWorldTime();
-        long last = player.getEntityData().getLong(LAST_DODGE_CMD_TICK_NBT);
-        if (now - last < DODGE_COOLDOWN_TICKS) {
+        if (!Cooldowns.pass(player, LAST_DODGE_CMD_TICK_NBT, DODGE_COOLDOWN_TICKS)) {
             return;
         }
-        player.getEntityData().setLong(LAST_DODGE_CMD_TICK_NBT, now);
         CombatMechanics.requestDodge(player, dodgeId);
     }
 

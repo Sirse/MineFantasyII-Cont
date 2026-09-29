@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.mechanics.ProtectionHelper;
@@ -45,12 +46,9 @@ public class RackCommand extends PacketMF {
         }
 
         // Rate limit before doing any work, so rejected requests cannot be spammed either
-        long now = player.worldObj.getTotalWorldTime();
-        long last = player.getEntityData().getLong(LAST_RACK_CMD_TICK_NBT);
-        if (now - last < RACK_COOLDOWN_TICKS) {
+        if (!Cooldowns.pass(player, LAST_RACK_CMD_TICK_NBT, RACK_COOLDOWN_TICKS)) {
             return;
         }
-        player.getEntityData().setLong(LAST_RACK_CMD_TICK_NBT, now);
 
         // Distance first, then a loaded-chunk test: World.getTileEntity would otherwise load or even generate the
         // chunk for arbitrary coordinates sent by a modified client

@@ -3,7 +3,6 @@ package minefantasy.mf2.block.crafting;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -22,17 +21,18 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.tool.ILighter;
+import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityFirepit;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class BlockFirepit extends BlockContainer {
+public class BlockFirepit extends BlockTiled<TileEntityFirepit> {
 
     public static int firepit_RI = 112;
     private Random rand = new Random();
 
     public BlockFirepit() {
-        super(Material.wood);
+        super(Material.wood, TileEntityFirepit.class);
         setBlockBounds(0.2F, 0F, 0.2F, 0.8F, 0.5F, 0.8F);
         String name = "firepit";
         this.setBlockName(name);
@@ -50,7 +50,7 @@ public class BlockFirepit extends BlockContainer {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
             float f2) {
-        TileEntityFirepit firepit = (TileEntityFirepit) world.getTileEntity(x, y, z);
+        TileEntityFirepit firepit = getTile(world, x, y, z);
 
         if (firepit != null) {
             ItemStack held = player.getHeldItem();
@@ -160,7 +160,7 @@ public class BlockFirepit extends BlockContainer {
 
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(World world, int x, int y, int z, Random random) {
-        TileEntityFirepit firepit = (TileEntityFirepit) world.getTileEntity(x, y, z);
+        TileEntityFirepit firepit = getTile(world, x, y, z);
         if (firepit != null && firepit.isBurning()) {
             world.spawnParticle("smoke", x + 0.5D, y + 0.5D, z + 0.5D, 0.0D, 0.0D, 0.0D);
             world.spawnParticle("flame", x + 0.5D, y + 0.5D, z + 0.5D, 0.0D, 0.0D, 0.0D);
@@ -181,7 +181,7 @@ public class BlockFirepit extends BlockContainer {
         if (world.isRemote) {
             return;
         }
-        TileEntityFirepit tile = (TileEntityFirepit) world.getTileEntity(x, y, z);
+        TileEntityFirepit tile = getTile(world, x, y, z);
         if (entity == null || tile == null || tile.hasBlockAbove()) {
             return;
         }
@@ -200,7 +200,7 @@ public class BlockFirepit extends BlockContainer {
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        TileEntityFirepit tile = (TileEntityFirepit) world.getTileEntity(x, y, z);
+        TileEntityFirepit tile = getTile(world, x, y, z);
         if (tile != null) {
             int charcoal = tile.getCharcoalDrop();
 

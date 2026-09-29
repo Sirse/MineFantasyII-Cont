@@ -3,7 +3,6 @@ package minefantasy.mf2.container;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.block.tileentity.TileEntityKitchenBench;
 
@@ -39,6 +38,8 @@ public class ContainerKitchenBench extends ContainerMF {
 
         if (user != null) {
             addPlayerInventory(user, 0, 158);
+            // The player's items go to the grid and the surplus slots; the output slot turns them away
+            shiftClicks(tile.getSizeInventory(), 0, tile.getSizeInventory());
 
             trackFloat(() -> tile.progress, value -> tile.progress = value);
             trackFloat(() -> tile.progressMax, value -> tile.progressMax = value);
@@ -50,42 +51,5 @@ public class ContainerKitchenBench extends ContainerMF {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         return stillUsable(tile, player);
-    }
-
-    @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (slotIndex < 0 || slotIndex >= this.inventorySlots.size()) {
-            return null;
-        }
-        Slot slot = (Slot) this.inventorySlots.get(slotIndex);
-        if (slot == null || !slot.getHasStack()) {
-            return null;
-        }
-
-        ItemStack stackInSlot = slot.getStack();
-        ItemStack originalStack = stackInSlot.copy();
-
-        int tileSlotCount = tile.getSizeInventory();
-        int gridEnd = tileSlotCount - 5;
-
-        if (slotIndex < tileSlotCount) {
-            // bench slots (grid, output, surplus) go to the player inventory
-            if (!this.mergeItemStack(stackInSlot, tileSlotCount, this.inventorySlots.size(), true)) {
-                return null;
-            }
-        } else {
-            // player inventory goes to the crafting grid, then the surplus slots (never the output)
-            if (!this.mergeItemStack(stackInSlot, 0, gridEnd, false)
-                    && !this.mergeItemStack(stackInSlot, gridEnd + 1, tileSlotCount, false)) {
-                return null;
-            }
-        }
-
-        if (stackInSlot.stackSize == 0) {
-            slot.putStack(null);
-        } else {
-            slot.onSlotChanged();
-        }
-        return originalStack;
     }
 }

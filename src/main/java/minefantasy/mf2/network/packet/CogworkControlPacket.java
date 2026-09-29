@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.network.NetworkUtils;
 
@@ -47,12 +48,9 @@ public class CogworkControlPacket extends PacketMF {
         }
         moveForward = Math.max(-1.0F, Math.min(1.0F, moveForward));
         moveStrafe = Math.max(-1.0F, Math.min(1.0F, moveStrafe));
-        long now = player.worldObj.getTotalWorldTime();
-        long last = player.getEntityData().getLong(LAST_COGWORK_CTRL_TICK_NBT);
-        if (now - last < CONTROL_COOLDOWN_TICKS) {
+        if (!Cooldowns.pass(player, LAST_COGWORK_CTRL_TICK_NBT, CONTROL_COOLDOWN_TICKS)) {
             return;
         }
-        player.getEntityData().setLong(LAST_COGWORK_CTRL_TICK_NBT, now);
 
         Entity entity = player.worldObj.getEntityByID(id);
 

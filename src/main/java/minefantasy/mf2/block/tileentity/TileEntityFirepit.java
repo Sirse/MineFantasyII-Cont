@@ -13,9 +13,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 
@@ -31,7 +28,7 @@ import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 
-public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatSource {
+public class TileEntityFirepit extends TileEntityShown implements IBasicMetre, IHeatSource {
 
     private final int maxFuel = 12000; // 10 minutes
     public int fuel = 0;
@@ -114,7 +111,7 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     public void setLit(boolean lit) {
         if (worldObj != null) {
             worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, lit ? 1 : 0, 2);
-            worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+            sendState(true);
         }
         ticksExisted = 0;
     }
@@ -144,6 +141,7 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
             if (fuel > maxFuel) {
                 fuel = maxFuel;
             }
+            sendState(true);
             return true;
         }
         return false;
@@ -160,22 +158,22 @@ public class TileEntityFirepit extends TileEntity implements IBasicMetre, IHeatS
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        setLit(nbt.getBoolean("isLit"));
         fuel = nbt.getInteger("fuel");
         ticksExisted = nbt.getInteger("ticksExisted");
         charcoal = nbt.getFloat("charcoal");
     }
 
+    /** The fuel left; the client counts it down itself while the pit burns. */
     @Override
-    public Packet getDescriptionPacket() {
+    protected NBTTagCompound describe() {
         NBTTagCompound tag = new NBTTagCompound();
         tag.setInteger("fuel", fuel);
-        return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+        return tag;
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        fuel = packet.func_148857_g().getInteger("fuel");
+    public void show(NBTTagCompound state) {
+        fuel = state.getInteger("fuel");
     }
 
     @Override

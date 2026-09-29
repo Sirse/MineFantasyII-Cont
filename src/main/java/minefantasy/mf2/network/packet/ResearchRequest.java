@@ -3,6 +3,7 @@ package minefantasy.mf2.network.packet;
 import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -36,12 +37,9 @@ public class ResearchRequest extends PacketMF {
         if (requestedId < 0 || requestedId >= InformationList.knowledgeList.size()) {
             return;
         }
-        long now = player.worldObj.getTotalWorldTime();
-        long last = player.getEntityData().getLong(LAST_REQUEST_TICK_NBT);
-        if (now - last < REQUEST_COOLDOWN_TICKS) {
+        if (!Cooldowns.pass(player, LAST_REQUEST_TICK_NBT, REQUEST_COOLDOWN_TICKS)) {
             return;
         }
-        player.getEntityData().setLong(LAST_REQUEST_TICK_NBT, now);
 
         InformationBase research = InformationList.knowledgeList.get(requestedId);
         if (research != null && research.isEasy()) {

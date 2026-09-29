@@ -3,17 +3,13 @@ package minefantasy.mf2.block.crafting;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -21,17 +17,18 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.tileentity.TileEntityBombPress;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
-public class BlockBombPress extends BlockContainer {
+public class BlockBombPress extends BlockTiled<TileEntityBombPress> {
 
     public static int bpress_RI = 108;
     private Random rand = new Random();
 
     public BlockBombPress() {
-        super(Material.iron);
+        super(Material.iron, TileEntityBombPress.class);
         GameRegistry.registerBlock(this, "MF_BombPress");
         setBlockName("bombPress");
         this.setStepSound(Block.soundTypeMetal);
@@ -55,10 +52,8 @@ public class BlockBombPress extends BlockContainer {
      * Called when the block is placed in the world.
      */
     @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack item) {
-        int direction = MathHelper.floor_double(user.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-
-        world.setBlockMetadataWithNotify(x, y, z, direction, 2);
+    protected boolean facesPlacer() {
+        return true;
     }
 
     /**
@@ -82,10 +77,6 @@ public class BlockBombPress extends BlockContainer {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityBombPress();
-    }
-
-    private TileEntityBombPress getTile(World world, int x, int y, int z) {
-        return (TileEntityBombPress) world.getTileEntity(x, y, z);
     }
 
     @Override

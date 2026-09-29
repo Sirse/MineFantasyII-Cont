@@ -32,6 +32,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.armour.IElementalResistance;
 import minefantasy.mf2.api.helpers.*;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -138,7 +139,7 @@ public class CombatMechanics {
     }
 
     public static void setParryCooldown(EntityLivingBase user, int ticks) {
-        user.getEntityData().setInteger(parryCooldownNBT, ticks);
+        Cooldowns.set(user, parryCooldownNBT, ticks);
 
         if (!user.worldObj.isRemote && user instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) user;
@@ -147,17 +148,11 @@ public class CombatMechanics {
     }
 
     public static int getParryCooldown(EntityLivingBase user) {
-        if (user.getEntityData().hasKey(parryCooldownNBT)) {
-            return user.getEntityData().getInteger(parryCooldownNBT);
-        }
-        return 0;
+        return Cooldowns.left(user, parryCooldownNBT);
     }
 
     public static void tickParryCooldown(EntityLivingBase user) {
-        int ticks = getParryCooldown(user);
-        if (ticks > 0) {
-            user.getEntityData().setInteger(parryCooldownNBT, ticks - 1);
-        }
+        Cooldowns.tick(user, parryCooldownNBT);
     }
 
     public static boolean isParryAvailable(EntityLivingBase user) {
@@ -165,21 +160,15 @@ public class CombatMechanics {
     }
 
     public static void setPostHitCooldown(EntityLivingBase user, int ticks) {
-        user.getEntityData().setInteger(posthitCooldownNBT, ticks);
+        Cooldowns.set(user, posthitCooldownNBT, ticks);
     }
 
     public static int getPostHitCooldown(EntityLivingBase user) {
-        if (user.getEntityData().hasKey(posthitCooldownNBT)) {
-            return user.getEntityData().getInteger(posthitCooldownNBT);
-        }
-        return 0;
+        return Cooldowns.left(user, posthitCooldownNBT);
     }
 
     public static void tickPostHitCooldown(EntityLivingBase user) {
-        int ticks = getPostHitCooldown(user);
-        if (ticks > 0) {
-            setPostHitCooldown(user, ticks - 1);
-        }
+        Cooldowns.tick(user, posthitCooldownNBT);
     }
 
     /**

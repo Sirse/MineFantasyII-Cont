@@ -1,40 +1,19 @@
 package minefantasy.mf2.block.basic;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityStation;
 
 /**
- * The block of a station: finds its station, throws the station's contents out when it is broken, and may turn to face
- * whoever placed it.
+ * The block of a station: throws the station's contents out when it is broken.
  */
-public abstract class BlockStation<T extends TileEntityStation> extends BlockContainer {
-
-    private final Class<T> type;
+public abstract class BlockStation<T extends TileEntityStation> extends BlockTiled<T> {
 
     protected BlockStation(Material material, Class<T> type) {
-        super(material);
-        this.type = type;
-    }
-
-    /** The station at the position, or null when there is none or another block's. */
-    protected T getTile(IBlockAccess world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        return type.isInstance(tile) ? type.cast(tile) : null;
-    }
-
-    /** Whether the block turns to face the player who places it. */
-    protected boolean facesPlacer() {
-        return false;
+        super(material, type);
     }
 
     /**
@@ -48,15 +27,6 @@ public abstract class BlockStation<T extends TileEntityStation> extends BlockCon
     /** How many of the station's slots, from the first, are thrown out when it is broken; all by default. */
     protected int spilledSlots(T station) {
         return station.getSizeInventory();
-    }
-
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
-        if (facesPlacer()) {
-            int direction = MathHelper.floor_double(placer.rotationYaw * 4.0F / 360.0F + 0.5D) & 3;
-            world.setBlockMetadataWithNotify(x, y, z, direction, 2);
-        }
-        super.onBlockPlacedBy(world, x, y, z, placer, item);
     }
 
     @Override

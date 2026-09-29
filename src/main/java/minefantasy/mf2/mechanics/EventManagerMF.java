@@ -52,6 +52,7 @@ import minefantasy.mf2.api.armour.ItemArmourMFBase;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.*;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
@@ -203,29 +204,19 @@ public class EventManagerMF {
     }
 
     public static void tickHitSpeeds(EntityLivingBase user) {
-        int time = getHitspeedTime(user);
-        if (time > 0) {
-            time--;
-            user.getEntityData().setInteger(hitspeedNBT, time);
-        }
+        Cooldowns.tick(user, hitspeedNBT);
     }
 
     public static void setHitTime(EntityLivingBase user, int time) {
-        user.getEntityData().setInteger(hitspeedNBT, time);
+        Cooldowns.set(user, hitspeedNBT, time);
     }
 
     public static int getHitspeedTime(Entity entity) {
-        if (entity != null && entity.getEntityData().hasKey(hitspeedNBT)) {
-            return entity.getEntityData().getInteger(hitspeedNBT);
-        }
-        return 0;
+        return Cooldowns.left(entity, hitspeedNBT);
     }
 
     public static int getInjuredTime(Entity entity) {
-        if (entity.getEntityData().hasKey(injuredNBT)) {
-            return entity.getEntityData().getInteger(injuredNBT);
-        }
-        return 0;
+        return Cooldowns.left(entity, injuredNBT);
     }
 
     @SubscribeEvent
@@ -802,9 +793,8 @@ public class EventManagerMF {
                 entity.addPotionEffect(new PotionEffect(Potion.confusion.id, 100, 50));
             }
         }
-        if (injury > 0 && !entity.worldObj.isRemote) {
-            injury--;
-            entity.getEntityData().setInteger(injuredNBT, injury);
+        if (!entity.worldObj.isRemote) {
+            Cooldowns.tick(entity, injuredNBT);
         }
         if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(entity)) {
             StaminaMechanics.tickEntity(event.entityLiving);
