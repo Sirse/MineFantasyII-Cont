@@ -7,6 +7,7 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.entity.*;
+import minefantasy.mf2.util.MFLogUtil;
 
 public class EntityListMF {
 
@@ -29,7 +30,7 @@ public class EntityListMF {
     public static int autoAssign() {
         for (int a = 0; a <= 255; a++) {
             if (!EntityList.IDtoClassMapping.containsKey(Integer.valueOf(a))) {
-                System.out.println("MineFantasy: Autoassigned EntityID " + a);
+                MFLogUtil.logDebug("Autoassigned EntityID " + a);
                 return a;
             }
         }

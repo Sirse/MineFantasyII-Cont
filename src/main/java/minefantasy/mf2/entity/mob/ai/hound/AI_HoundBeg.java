@@ -73,8 +73,8 @@ public class AI_HoundBeg extends EntityAIBase {
     /**
      * Gets if the Player has the Bone in the hand.
      */
-    private boolean hasPlayerGotBoneInHand(EntityPlayer p_75382_1_) {
-        ItemStack itemstack = p_75382_1_.inventory.getCurrentItem();
+    private boolean hasPlayerGotBoneInHand(EntityPlayer player) {
+        ItemStack itemstack = player.inventory.getCurrentItem();
         return itemstack == null ? false
                 : (!this.theWolf.isTamed() && itemstack.getItem() == Items.bone ? true
                         : this.theWolf.isBreedingItem(itemstack));

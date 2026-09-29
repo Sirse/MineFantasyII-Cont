@@ -261,8 +261,6 @@ public class ItemComponentMF extends Item implements ITieredComponent {
     /// the color will always be only one layer from only one material
 
     public int getColorFromItemStack(ItemStack item, int layer) {
-        // return CustomToolHelper.getColourFromItemStack(item, layer,
-        // super.getColorFromItemStack(item, layer));
         if (isCustom) {
             CustomMaterial mat = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
             if (mat != null) return mat.getColourInt();

@@ -117,9 +117,9 @@ public class BlockCogwork extends BlockDirectional {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void registerBlockIcons(IIconRegister p_149651_1_) {
-        this.facetex = p_149651_1_.registerIcon(this.getTextureName() + "_face");
-        this.toptex = p_149651_1_.registerIcon(this.getTextureName() + "_top");
-        this.blockIcon = p_149651_1_.registerIcon(this.getTextureName() + "_side");
+    public void registerBlockIcons(IIconRegister reg) {
+        this.facetex = reg.registerIcon(this.getTextureName() + "_face");
+        this.toptex = reg.registerIcon(this.getTextureName() + "_top");
+        this.blockIcon = reg.registerIcon(this.getTextureName() + "_side");
     }
 }

@@ -184,7 +184,7 @@ public class EntityBomb extends Entity {
             this.worldObj.spawnParticle("flame", this.posX, this.posY + 0.125D, this.posZ, 0.0D, 0.0D, 0.0D);
         }
 
-        if (!worldObj.isRemote && this.ridingEntity != null && ridingEntity instanceof EntityLivingBase) {
+        if (!worldObj.isRemote && this.ridingEntity instanceof EntityLivingBase) {
             if (!(ridingEntity instanceof EntityChicken)) {
                 CombatMechanics.panic((EntityLivingBase) ridingEntity, 1.0F, 30);
             }

@@ -55,7 +55,7 @@ public class RenderDragonBreath extends Render {
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
+    protected ResourceLocation getEntityTexture(Entity hound) {
         return TextureMap.locationItemsTexture;
     }
 

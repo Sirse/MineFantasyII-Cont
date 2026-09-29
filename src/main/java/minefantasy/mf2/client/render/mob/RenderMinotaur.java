@@ -50,10 +50,10 @@ public class RenderMinotaur extends RenderBiped {
     }
 
     @Override
-    protected void renderEquippedItems(EntityLiving p_77029_1_, float p_77029_2_) {
+    protected void renderEquippedItems(EntityLiving entity, float partialTicks) {
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
-        ItemStack itemstack = p_77029_1_.getHeldItem();
-        ItemStack itemstack1 = p_77029_1_.func_130225_q(3);
+        ItemStack itemstack = entity.getHeldItem();
+        ItemStack itemstack1 = entity.func_130225_q(3);
         Item item;
         float f1;
 
@@ -77,7 +77,7 @@ public class RenderMinotaur extends RenderBiped {
                     GL11.glScalef(f1, -f1, -f1);
                 }
 
-                this.renderManager.itemRenderer.renderItem(p_77029_1_, itemstack1, 0);
+                this.renderManager.itemRenderer.renderItem(entity, itemstack1, 0);
             } else if (item == Items.skull) {
                 f1 = 1.0625F;
                 GL11.glScalef(f1, -f1, -f1);
@@ -170,7 +170,7 @@ public class RenderMinotaur extends RenderBiped {
                     f2 = (j >> 8 & 255) / 255.0F;
                     float f3 = (j & 255) / 255.0F;
                     GL11.glColor4f(f5, f2, f3, 1.0F);
-                    this.renderManager.itemRenderer.renderItem(p_77029_1_, itemstack, i);
+                    this.renderManager.itemRenderer.renderItem(entity, itemstack, i);
                 }
             } else {
                 i = itemstack.getItem().getColorFromItemStack(itemstack, 0);
@@ -178,7 +178,7 @@ public class RenderMinotaur extends RenderBiped {
                 f5 = (i >> 8 & 255) / 255.0F;
                 f2 = (i & 255) / 255.0F;
                 GL11.glColor4f(f4, f5, f2, 1.0F);
-                this.renderManager.itemRenderer.renderItem(p_77029_1_, itemstack, 0);
+                this.renderManager.itemRenderer.renderItem(entity, itemstack, 0);
             }
 
             GL11.glPopMatrix();

@@ -214,7 +214,6 @@ public class BasicRecipesMF {
     }
 
     private static void assembleWoodVariations(CustomMaterial material) {
-        // TODO
         if (!"RefinedWood".equals(material.name)) {
             ArrayList<ItemStack> list = OreDictionary.getOres("planks" + material.name);
             if (list.isEmpty()) {

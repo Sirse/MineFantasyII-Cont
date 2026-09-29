@@ -67,7 +67,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
+    protected ResourceLocation getEntityTexture(Entity hound) {
         return this.getEntityTexture(0);
     }
 
@@ -88,7 +88,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
         }
         EntityLivingBase user = (EntityLivingBase) entity;
 
-        if (entity.riddenByEntity != null && entity.riddenByEntity instanceof EntityLivingBase) {
+        if (entity.riddenByEntity instanceof EntityLivingBase) {
             user = (EntityLivingBase) entity.riddenByEntity;
         }
         this.doRender(user, x, y, z, f, f1);
@@ -333,7 +333,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
         if (base instanceof EntityCogwork) {
             return (EntityCogwork) base;
         }
-        if (base.ridingEntity != null && base.ridingEntity instanceof EntityCogwork) {
+        if (base.ridingEntity instanceof EntityCogwork) {
             return (EntityCogwork) base.ridingEntity;
         }
         return null;
@@ -344,45 +344,38 @@ public class RenderPowerArmour extends RendererLivingEntity {
     }
 
     @Override
-    protected void renderModel(EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_, float p_77036_4_,
-            float p_77036_5_, float p_77036_6_, float p_77036_7_) {
-        this.renderModel(0, p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+    protected void renderModel(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float ageInTicks,
+            float headYaw, float headPitch, float scale) {
+        this.renderModel(0, entity, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch, scale);
     }
 
-    protected void renderModel(int layer, EntityLivingBase p_77036_1_, float p_77036_2_, float p_77036_3_,
-            float p_77036_4_, float p_77036_5_, float p_77036_6_, float p_77036_7_) {
+    protected void renderModel(int layer, EntityLivingBase entity, float limbSwing, float limbSwingAmount,
+            float ageInTicks, float headYaw, float headPitch, float scale) {
         this.bindEntityTexture(layer);
 
-        if (!p_77036_1_.isInvisible()) {
-            this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
-        } else if (!p_77036_1_.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) {
+        if (!entity.isInvisible()) {
+            this.mainModel.render(entity, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch, scale);
+        } else if (!entity.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer)) {
             GL11.glPushMatrix();
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.15F);
             GL11.glDepthMask(false);
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.003921569F);
-            this.mainModel.render(p_77036_1_, p_77036_2_, p_77036_3_, p_77036_4_, p_77036_5_, p_77036_6_, p_77036_7_);
+            this.mainModel.render(entity, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch, scale);
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
             GL11.glPopMatrix();
             GL11.glDepthMask(true);
         } else {
-            this.mainModel.setRotationAngles(
-                    p_77036_2_,
-                    p_77036_3_,
-                    p_77036_4_,
-                    p_77036_5_,
-                    p_77036_6_,
-                    p_77036_7_,
-                    p_77036_1_);
+            this.mainModel.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch, scale, entity);
         }
     }
 
-    private float interpolateRotation(float p_77034_1_, float p_77034_2_, float p_77034_3_) {
+    private float interpolateRotation(float prevAngle, float angle, float partialTicks) {
         float f3;
 
-        for (f3 = p_77034_2_ - p_77034_1_; f3 < -180.0F; f3 += 360.0F) {
+        for (f3 = angle - prevAngle; f3 < -180.0F; f3 += 360.0F) {
             ;
         }
 
@@ -390,7 +383,7 @@ public class RenderPowerArmour extends RendererLivingEntity {
             f3 -= 360.0F;
         }
 
-        return p_77034_1_ + p_77034_3_ * f3;
+        return prevAngle + partialTicks * f3;
     }
 
     @Override

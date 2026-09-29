@@ -53,26 +53,26 @@ public class RenderBombIcon extends Render {
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
     @Override
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
+    protected ResourceLocation getEntityTexture(Entity hound) {
         return TextureMap.locationItemsTexture;
     }
 
-    private void func_77026_a(Tessellator p_77026_1_, IIcon p_77026_2_) {
-        float f = p_77026_2_.getMinU();
-        float f1 = p_77026_2_.getMaxU();
-        float f2 = p_77026_2_.getMinV();
-        float f3 = p_77026_2_.getMaxV();
+    private void func_77026_a(Tessellator tessellator, IIcon icon) {
+        float f = icon.getMinU();
+        float f1 = icon.getMaxU();
+        float f2 = icon.getMinV();
+        float f3 = icon.getMaxV();
         float f4 = 1.0F;
         float f5 = 0.5F;
         float f6 = 0.25F;
         GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-        p_77026_1_.startDrawingQuads();
-        p_77026_1_.setNormal(0.0F, 1.0F, 0.0F);
-        p_77026_1_.addVertexWithUV(0.0F - f5, 0.0F - f6, 0.0D, f, f3);
-        p_77026_1_.addVertexWithUV(f4 - f5, 0.0F - f6, 0.0D, f1, f3);
-        p_77026_1_.addVertexWithUV(f4 - f5, f4 - f6, 0.0D, f1, f2);
-        p_77026_1_.addVertexWithUV(0.0F - f5, f4 - f6, 0.0D, f, f2);
-        p_77026_1_.draw();
+        tessellator.startDrawingQuads();
+        tessellator.setNormal(0.0F, 1.0F, 0.0F);
+        tessellator.addVertexWithUV(0.0F - f5, 0.0F - f6, 0.0D, f, f3);
+        tessellator.addVertexWithUV(f4 - f5, 0.0F - f6, 0.0D, f1, f3);
+        tessellator.addVertexWithUV(f4 - f5, f4 - f6, 0.0D, f1, f2);
+        tessellator.addVertexWithUV(0.0F - f5, f4 - f6, 0.0D, f, f2);
+        tessellator.draw();
     }
 }

@@ -116,19 +116,17 @@ public class BlockRack extends BlockWoodDecor<TileEntityRack> {
      * cleared to be reused)
      */
     @Override
-    public AxisAlignedBB getCollisionBoundingBoxFromPool(World p_149668_1_, int p_149668_2_, int p_149668_3_,
-            int p_149668_4_) {
-        this.setBlockBoundsBasedOnState(p_149668_1_, p_149668_2_, p_149668_3_, p_149668_4_);
-        return super.getCollisionBoundingBoxFromPool(p_149668_1_, p_149668_2_, p_149668_3_, p_149668_4_);
+    public AxisAlignedBB getCollisionBoundingBoxFromPool(World worldIn, int x, int y, int z) {
+        this.setBlockBoundsBasedOnState(worldIn, x, y, z);
+        return super.getCollisionBoundingBoxFromPool(worldIn, x, y, z);
     }
 
     /**
      * Updates the blocks bounds based on its current state. Args: world, x, y, z
      */
     @Override
-    public void setBlockBoundsBasedOnState(IBlockAccess p_149719_1_, int p_149719_2_, int p_149719_3_,
-            int p_149719_4_) {
-        this.modifyBoundingbox(p_149719_1_.getBlockMetadata(p_149719_2_, p_149719_3_, p_149719_4_));
+    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, int x, int y, int z) {
+        this.modifyBoundingbox(worldIn.getBlockMetadata(x, y, z));
     }
 
     /**
@@ -136,10 +134,9 @@ public class BlockRack extends BlockWoodDecor<TileEntityRack> {
      */
     @SideOnly(Side.CLIENT)
     @Override
-    public AxisAlignedBB getSelectedBoundingBoxFromPool(World p_149633_1_, int p_149633_2_, int p_149633_3_,
-            int p_149633_4_) {
-        this.setBlockBoundsBasedOnState(p_149633_1_, p_149633_2_, p_149633_3_, p_149633_4_);
-        return super.getSelectedBoundingBoxFromPool(p_149633_1_, p_149633_2_, p_149633_3_, p_149633_4_);
+    public AxisAlignedBB getSelectedBoundingBoxFromPool(World worldIn, int x, int y, int z) {
+        this.setBlockBoundsBasedOnState(worldIn, x, y, z);
+        return super.getSelectedBoundingBoxFromPool(worldIn, x, y, z);
     }
 
     public void modifyBoundingbox(int meta) {
@@ -195,33 +192,30 @@ public class BlockRack extends BlockWoodDecor<TileEntityRack> {
      * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
      */
     @Override
-    public boolean canPlaceBlockAt(World p_149742_1_, int p_149742_2_, int p_149742_3_, int p_149742_4_) {
-        return p_149742_1_.isSideSolid(p_149742_2_ - 1, p_149742_3_, p_149742_4_, EAST)
-                || p_149742_1_.isSideSolid(p_149742_2_ + 1, p_149742_3_, p_149742_4_, WEST)
-                || p_149742_1_.isSideSolid(p_149742_2_, p_149742_3_, p_149742_4_ - 1, SOUTH)
-                || p_149742_1_.isSideSolid(p_149742_2_, p_149742_3_, p_149742_4_ + 1, NORTH);
+    public boolean canPlaceBlockAt(World worldIn, int x, int y, int z) {
+        return worldIn.isSideSolid(x - 1, y, z, EAST) || worldIn.isSideSolid(x + 1, y, z, WEST)
+                || worldIn.isSideSolid(x, y, z - 1, SOUTH)
+                || worldIn.isSideSolid(x, y, z + 1, NORTH);
     }
 
     @Override
-    public int onBlockPlaced(World p_149660_1_, int p_149660_2_, int p_149660_3_, int p_149660_4_, int p_149660_5_,
-            float p_149660_6_, float p_149660_7_, float p_149660_8_, int p_149660_9_) {
-        int j1 = p_149660_9_;
+    public int onBlockPlaced(World worldIn, int x, int y, int z, int side, float subX, float subY, float subZ,
+            int meta) {
+        int j1 = meta;
 
-        if ((p_149660_9_ == 0 || p_149660_5_ == 2)
-                && p_149660_1_.isSideSolid(p_149660_2_, p_149660_3_, p_149660_4_ + 1, NORTH)) {
+        if ((meta == 0 || side == 2) && worldIn.isSideSolid(x, y, z + 1, NORTH)) {
             j1 = 2;
         }
 
-        if ((j1 == 0 || p_149660_5_ == 3)
-                && p_149660_1_.isSideSolid(p_149660_2_, p_149660_3_, p_149660_4_ - 1, SOUTH)) {
+        if ((j1 == 0 || side == 3) && worldIn.isSideSolid(x, y, z - 1, SOUTH)) {
             j1 = 3;
         }
 
-        if ((j1 == 0 || p_149660_5_ == 4) && p_149660_1_.isSideSolid(p_149660_2_ + 1, p_149660_3_, p_149660_4_, WEST)) {
+        if ((j1 == 0 || side == 4) && worldIn.isSideSolid(x + 1, y, z, WEST)) {
             j1 = 4;
         }
 
-        if ((j1 == 0 || p_149660_5_ == 5) && p_149660_1_.isSideSolid(p_149660_2_ - 1, p_149660_3_, p_149660_4_, EAST)) {
+        if ((j1 == 0 || side == 5) && worldIn.isSideSolid(x - 1, y, z, EAST)) {
             j1 = 5;
         }
 

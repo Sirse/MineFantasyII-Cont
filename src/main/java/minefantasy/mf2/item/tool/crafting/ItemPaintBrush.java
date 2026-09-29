@@ -26,10 +26,6 @@ public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
         super(name, "brush", 0, uses);
         setCreativeTab(CreativeTabMF.tabCraftTool);
 
-        // setTextureName("minefantasy2:Tool/Crafting/"+name);
-        // this.setUnlocalizedName(name);
-        // this.setMaxDamage(uses);
-        // setMaxStackSize(1);
         this.setFull3D();
     }
 

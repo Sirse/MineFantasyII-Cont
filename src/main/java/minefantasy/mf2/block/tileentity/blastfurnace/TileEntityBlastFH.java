@@ -86,8 +86,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
     private void smeltItem() {
         for (int y = 0; y < maxFurnaceHeight; y++) {
             TileEntity tileEntity = worldObj.getTileEntity(xCoord, yCoord + y + 1, zCoord);
-            if (tileEntity != null && tileEntity instanceof TileEntityBlastFC
-                    && !(tileEntity instanceof TileEntityBlastFH)) {
+            if (tileEntity instanceof TileEntityBlastFC && !(tileEntity instanceof TileEntityBlastFH)) {
                 ItemStack result = getSmeltedResult((TileEntityBlastFC) tileEntity, y + 1);
                 if (result != null) {
                     dropItem(result);

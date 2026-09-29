@@ -232,7 +232,6 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
         list.add(createBomb((byte) 3, (byte) 2, (byte) 0, (byte) 0, 1));
     }
 
-    // TODO Icons
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(byte type) {
         if (type < 0) {

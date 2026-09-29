@@ -277,16 +277,17 @@ public class EntityHound extends EntityTameable {
      * Used when calculating the amount of shading to apply while the wolf is shaking.
      */
     @SideOnly(Side.CLIENT)
-    public float getShadingWhileShaking(float p_70915_1_) {
-        return 0.75F + (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * p_70915_1_)
-                / 2.0F
-                * 0.25F;
+    public float getShadingWhileShaking(float partialTicks) {
+        return 0.75F
+                + (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * partialTicks)
+                        / 2.0F
+                        * 0.25F;
     }
 
     @SideOnly(Side.CLIENT)
-    public float getShakeAngle(float p_70923_1_, float p_70923_2_) {
-        float f2 = (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * p_70923_1_
-                + p_70923_2_) / 1.8F;
+    public float getShakeAngle(float partialTicks, float offset) {
+        float f2 = (this.prevTimeWolfIsShaking + (this.timeWolfIsShaking - this.prevTimeWolfIsShaking) * partialTicks
+                + offset) / 1.8F;
 
         if (f2 < 0.0F) {
             f2 = 0.0F;
@@ -305,8 +306,9 @@ public class EntityHound extends EntityTameable {
     }
 
     @SideOnly(Side.CLIENT)
-    public float getInterestedAngle(float p_70917_1_) {
-        return (this.field_70924_f + (this.field_70926_e - this.field_70924_f) * p_70917_1_) * 0.15F * (float) Math.PI;
+    public float getInterestedAngle(float partialTicks) {
+        return (this.field_70924_f + (this.field_70926_e - this.field_70924_f) * partialTicks) * 0.15F
+                * (float) Math.PI;
     }
 
     /**

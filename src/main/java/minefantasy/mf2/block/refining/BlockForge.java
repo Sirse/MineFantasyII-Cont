@@ -49,7 +49,6 @@ public class BlockForge extends BlockStation<TileEntityForge> {
         this.tier = tier;
         this.type = tex;
         this.isActive = isActive;
-        // setBlockBounds(0F, 0F, 0F, 1F, 12F/16F, 1F);
         GameRegistry.registerBlock(this, "MF_Forge" + tex + (isActive ? "Active" : ""));
         setBlockName("forge." + tex);
         this.setStepSound(Block.soundTypeStone);
@@ -70,7 +69,7 @@ public class BlockForge extends BlockStation<TileEntityForge> {
         keepInventory = true;
         Block block = world.getBlock(x, y, z);
 
-        if (block != null && block instanceof BlockForge) {
+        if (block instanceof BlockForge) {
             int blocktier = ((BlockForge) block).tier;
             if (state) {
                 world.setBlock(x, y, z, getActiveBlock(blocktier));

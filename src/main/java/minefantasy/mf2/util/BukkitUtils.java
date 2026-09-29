@@ -49,7 +49,7 @@ public final class BukkitUtils {
                             x,
                             y,
                             z));
-            if (MineFantasyII.isDebug()) throwable.printStackTrace();
+            if (MineFantasyII.isDebug()) MFLogUtil.MF_LOGGER.warn(MFLogUtil.PREFIX + "Bukkit event failed", throwable);
         }
         return true;
     }
@@ -70,7 +70,7 @@ public final class BukkitUtils {
                             "Failed call EntityDamageByEntityEvent: [Damager: %s, Damagee: %s]",
                             String.valueOf(damager),
                             String.valueOf(damagee)));
-            if (MineFantasyII.isDebug()) throwable.printStackTrace();
+            if (MineFantasyII.isDebug()) MFLogUtil.MF_LOGGER.warn(MFLogUtil.PREFIX + "Bukkit event failed", throwable);
         }
         return true;
     }
@@ -93,7 +93,7 @@ public final class BukkitUtils {
         for (RegisteredListener listener : listeners) try {
             listener.callEvent(event);
         } catch (Throwable throwable) {
-            if (MineFantasyII.isDebug()) throwable.printStackTrace();
+            if (MineFantasyII.isDebug()) MFLogUtil.MF_LOGGER.warn(MFLogUtil.PREFIX + "Bukkit event failed", throwable);
         }
     }
 }

@@ -3,9 +3,6 @@ package minefantasy.mf2.api.helpers;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class BlockPositionHelper {
-    // private static ForgeDirection[] FD = new
-    // ForgeDirection[]{ForgeDirection.SOUTH, ForgeDirection.WEST,
-    // ForgeDirection.NORTH, ForgeDirection.EAST};
 
     /**
      * Gets the Grid slot in relation to mouse click

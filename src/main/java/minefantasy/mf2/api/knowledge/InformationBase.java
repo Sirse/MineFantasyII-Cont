@@ -96,8 +96,8 @@ public class InformationBase {
     /*
      * public IChatComponent func_150951_e() { IChatComponent ichatcomponent = super.func_150951_e();
      * ichatcomponent.getChatStyle().setColor(this.getSpecial() ? EnumChatFormatting.DARK_PURPLE :
-     * EnumChatFormatting.GREEN); return ichatcomponent; } public InformationBase func_150953_b(Class p_150953_1_) {
-     * return (InformationBase)super.func_150953_b(p_150953_1_); }
+     * EnumChatFormatting.GREEN); return ichatcomponent; } public InformationBase func_150953_b(Class statClass) {
+     * return (InformationBase)super.func_150953_b(statClass); }
      */
 
     /**

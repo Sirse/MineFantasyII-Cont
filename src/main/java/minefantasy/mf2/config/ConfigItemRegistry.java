@@ -284,7 +284,7 @@ public class ConfigItemRegistry extends ConfigurationBaseMF {
 
     private static Item getItemFromString(String id) {
         Object object = Item.itemRegistry.getObject(id);
-        return object != null && object instanceof Item ? (Item) object : null;
+        return object instanceof Item ? (Item) object : null;
     }
 
     @Override

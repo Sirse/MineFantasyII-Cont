@@ -290,8 +290,8 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     /**
      * Indicates whether or not a leaf node requires additional wood to be added to preserve integrity.
      */
-    boolean leafNodeNeedsBase(int p_76493_1_) {
-        return p_76493_1_ >= this.heightLimit * 0.2D;
+    boolean leafNodeNeedsBase(int height) {
+        return height >= this.heightLimit * 0.2D;
     }
 
     /**
@@ -343,13 +343,13 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
      * Checks a line of blocks in the world from the first coordinate to triplet to the second, returning the distance
      * (in blocks) before a non-air, non-leaf block is encountered and/or the end is encountered.
      */
-    int checkBlockLine(int[] p_76496_1_, int[] p_76496_2_) {
+    int checkBlockLine(int[] from, int[] to) {
         int[] aint2 = new int[] { 0, 0, 0 };
         byte b0 = 0;
         byte b1;
 
         for (b1 = 0; b0 < 3; ++b0) {
-            aint2[b0] = p_76496_2_[b0] - p_76496_1_[b0];
+            aint2[b0] = to[b0] - from[b0];
 
             if (Math.abs(aint2[b0]) > Math.abs(aint2[b1])) {
                 b1 = b0;
@@ -376,9 +376,9 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
             int j;
 
             for (j = aint2[b1] + b4; i != j; i += b4) {
-                aint3[b1] = p_76496_1_[b1] + i;
-                aint3[b2] = MathHelper.floor_double(p_76496_1_[b2] + i * d0);
-                aint3[b3] = MathHelper.floor_double(p_76496_1_[b3] + i * d1);
+                aint3[b1] = from[b1] + i;
+                aint3[b2] = MathHelper.floor_double(from[b2] + i * d0);
+                aint3[b3] = MathHelper.floor_double(from[b3] + i * d1);
                 Block block = this.worldObj.getBlock(aint3[0], aint3[1], aint3[2]);
 
                 if (!this.isReplaceable(worldObj, aint3[0], aint3[1], aint3[2])) {
@@ -425,15 +425,15 @@ public class WorldGenMFTree extends WorldGenAbstractTree {
     /**
      * Rescales the generator settings, only used in WorldGenBigTree
      */
-    public void setScale(double p_76487_1_, double p_76487_3_, double p_76487_5_) {
-        this.heightLimitLimit = (int) (p_76487_1_ * 12.0D);
+    public void setScale(double heightScale, double widthScale, double density) {
+        this.heightLimitLimit = (int) (heightScale * 12.0D);
 
-        if (p_76487_1_ > 0.5D) {
+        if (heightScale > 0.5D) {
             this.leafDistanceLimit = 5;
         }
 
-        this.scaleWidth = p_76487_3_;
-        this.leafDensity = p_76487_5_;
+        this.scaleWidth = widthScale;
+        this.leafDensity = density;
     }
 
     public boolean generate(World world, Random rand, int x, int y, int z) {

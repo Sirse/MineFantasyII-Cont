@@ -25,16 +25,16 @@ public class ItemBedMF extends Item {
      * Callback for item usage. If the item does something special on right clicking, he will have one of those. Return
      * True if something happen and false if it don't. This is for ITEMS, not BLOCKS
      */
-    public boolean onItemUse(ItemStack p_77648_1_, EntityPlayer p_77648_2_, World p_77648_3_, int p_77648_4_,
-            int p_77648_5_, int p_77648_6_, int p_77648_7_, float p_77648_8_, float p_77648_9_, float p_77648_10_) {
-        if (p_77648_3_.isRemote) {
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side,
+            float hitX, float hitY, float hitZ) {
+        if (world.isRemote) {
             return true;
-        } else if (p_77648_7_ != 1) {
+        } else if (side != 1) {
             return false;
         } else {
-            ++p_77648_5_;
+            ++y;
             BlockBedMF blockbed = (BlockBedMF) BlockListMF.bedroll;
-            int i1 = Heading.of(p_77648_2_);
+            int i1 = Heading.of(player);
             byte b0 = 0;
             byte b1 = 0;
 
@@ -54,23 +54,17 @@ public class ItemBedMF extends Item {
                 b0 = 1;
             }
 
-            if (p_77648_2_.canPlayerEdit(p_77648_4_, p_77648_5_, p_77648_6_, p_77648_7_, p_77648_1_)
-                    && p_77648_2_.canPlayerEdit(p_77648_4_ + b0, p_77648_5_, p_77648_6_ + b1, p_77648_7_, p_77648_1_)) {
-                if (p_77648_3_.isAirBlock(p_77648_4_, p_77648_5_, p_77648_6_)
-                        && p_77648_3_.isAirBlock(p_77648_4_ + b0, p_77648_5_, p_77648_6_ + b1)
-                        && World.doesBlockHaveSolidTopSurface(p_77648_3_, p_77648_4_, p_77648_5_ - 1, p_77648_6_)
-                        && World.doesBlockHaveSolidTopSurface(
-                                p_77648_3_,
-                                p_77648_4_ + b0,
-                                p_77648_5_ - 1,
-                                p_77648_6_ + b1)) {
-                    p_77648_3_.setBlock(p_77648_4_, p_77648_5_, p_77648_6_, blockbed, i1, 3);
+            if (player.canPlayerEdit(x, y, z, side, stack) && player.canPlayerEdit(x + b0, y, z + b1, side, stack)) {
+                if (world.isAirBlock(x, y, z) && world.isAirBlock(x + b0, y, z + b1)
+                        && World.doesBlockHaveSolidTopSurface(world, x, y - 1, z)
+                        && World.doesBlockHaveSolidTopSurface(world, x + b0, y - 1, z + b1)) {
+                    world.setBlock(x, y, z, blockbed, i1, 3);
 
-                    if (p_77648_3_.getBlock(p_77648_4_, p_77648_5_, p_77648_6_) == blockbed) {
-                        p_77648_3_.setBlock(p_77648_4_ + b0, p_77648_5_, p_77648_6_ + b1, blockbed, i1 + 8, 3);
+                    if (world.getBlock(x, y, z) == blockbed) {
+                        world.setBlock(x + b0, y, z + b1, blockbed, i1 + 8, 3);
                     }
 
-                    --p_77648_1_.stackSize;
+                    --stack.stackSize;
                     return true;
                 } else {
                     return false;

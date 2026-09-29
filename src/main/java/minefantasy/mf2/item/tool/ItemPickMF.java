@@ -101,7 +101,6 @@ public class ItemPickMF extends ItemPickaxe implements IToolMaterial {
     }
 
     private boolean canMineBlock(World world, int i, int j, int k) {
-        // TODO Auto-generated method stub
         return false;
     }
 

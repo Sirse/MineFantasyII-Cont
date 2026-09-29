@@ -289,7 +289,6 @@ public class StructureGenDSRoom extends StructureModuleMF {
         tryPlaceMinorRoom(-width_span, 0, zOffset, rotateRight(), false);
         tryPlaceMinorRoom(offset2, 0, depth - zOffset, rotateRight(), hall2);
         tryPlaceMinorRoom(0, 0, offset3, direction, hall3);
-        // this.placeSpawner(0, 1, depth-5);
 
         EntityMinotaur mob = new EntityMinotaur(worldObj);
         this.placeEntity(mob, 0, 1, depth - 5);
@@ -325,7 +324,6 @@ public class StructureGenDSRoom extends StructureModuleMF {
         }
         placeBlock(BlockListMF.schematic_general, 0, 0, 2, (int) Math.floor((float) depth / 2) - 1);
         placeBlock(BlockListMF.schematic_general, 1, 0, 2, (int) Math.ceil((float) depth / 2) + 1);
-        // this.placeSpawner(0, 1, depth/2, "Silverfish");
         EntityMinotaur mob = new EntityMinotaur(worldObj);
         this.placeEntity(mob, 0, 1, depth / 2);
         mob.setSpecies(MinotaurBreed.getEnvironment(subtype));
@@ -408,7 +406,7 @@ public class StructureGenDSRoom extends StructureModuleMF {
     private void placeRack(int x, int y, int z, int newDirection) {
         placeBlock(BlockListMF.rack_wood, BlockRack.getDirection(newDirection), x, y, z);
         TileEntity tile = this.getTileEntity(x, y, z, direction);
-        if (tile != null && tile instanceof TileEntityRack) {
+        if (tile instanceof TileEntityRack) {
             setupRack((TileEntityRack) tile);
         }
     }
@@ -470,7 +468,6 @@ public class StructureGenDSRoom extends StructureModuleMF {
 
         placeMiscMachine1(-(width - 2) * position, 0, depth - 3);
         placeMiscMachine1(-(width - 2) * position, 0, 3);
-        // this.placeSpawner(0, 1, depth/2);
 
         EntityMinotaur mob = new EntityMinotaur(worldObj);
         this.placeEntity(mob, 0, 1, depth / 2);

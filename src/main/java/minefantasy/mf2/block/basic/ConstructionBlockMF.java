@@ -69,8 +69,6 @@ public class ConstructionBlockMF extends Block {
         return super.setResistance(level);
     }
 
-    // public Item getItemDropped(int meta, Random rand, int i) { return null; };
-
     public void addConstructRecipes() {
         GameRegistry.addSmelting(new ItemStack(this, 1, 1), new ItemStack(this, 1, 0), 0);
 

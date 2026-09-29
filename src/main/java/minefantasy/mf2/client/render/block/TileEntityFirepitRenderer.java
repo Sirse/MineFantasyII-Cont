@@ -58,11 +58,11 @@ public class TileEntityFirepitRenderer extends TileEntitySpecialRenderer {
     }
 
     @Override
-    protected void bindTexture(ResourceLocation p_147499_1_) {
+    protected void bindTexture(ResourceLocation texture) {
         TextureManager texturemanager = TileEntityRendererDispatcher.instance.field_147553_e;
 
         if (texturemanager != null) {
-            texturemanager.bindTexture(p_147499_1_);
+            texturemanager.bindTexture(texture);
         }
     }
 

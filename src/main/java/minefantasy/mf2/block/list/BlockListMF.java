@@ -82,12 +82,6 @@ public class BlockListMF {
     public static Block thatch_stair = new ConstructionBlockMF.StairsConstBlock("thatch_stair", thatch)
             .register("thatch_stair");
 
-    // public static Block limestone_cobblestone = new
-    // BasicBlockMF("limestone_cobblestone",
-    // Material.rock).setHardness(0.8F).setResistance(4.0F).setStepSound(Block.soundTypePiston);
-    // public static Block limestone = new BasicBlockMF("limestone", Material.rock,
-    // limestone_cobblestone).setHardness(1.0F).setResistance(5.0F).setStepSound(Block.soundTypeStone);
-
     public static Block limestone = new ConstructionBlockMF("limestone").setHardness(1.2F).setResistance(8F);
 
     public static Block firebricks = new BasicBlockMF("firebricks", Material.rock).setHardness(5.0F)

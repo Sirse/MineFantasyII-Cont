@@ -315,7 +315,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
 
     public void initBeserk() {
         TacticalManager.tryDisarm(this);
-        // this.playSound("minefantasy2:mob.minotaur.beserk", 1.0F, 1.0F);
         setSprinting(true);
         setAttack((byte) 2);
     }
@@ -364,7 +363,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         return 0.5F;
     }
 
-    protected void func_145780_a(int p_145780_1_, int p_145780_2_, int p_145780_3_, Block p_145780_4_) {
+    protected void func_145780_a(int x, int y, int z, Block blockIn) {
         this.playSound("mob.cow.step", 0.75F, 0.9F);
     }
 
@@ -505,7 +504,6 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         if (worldObj.difficultySetting == EnumDifficulty.PEACEFUL && target instanceof EntityPlayer) {
             return false;
         }
-        // if(hitCooldownTime > 0)return false;
 
         if (!canEntityBeSeen(target)) {
             return false;

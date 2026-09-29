@@ -34,7 +34,7 @@ public class MFPositionedStack extends PositionedStack {
                 List<ItemStack> permutations = ItemList.itemMap.get(item.getItem());
                 if (permutations != null && !permutations.isEmpty()) {
                     for (ItemStack stack : permutations) {
-                        if (CustomToolHelper.doesMatchForRecipe(item, stack)) { // TODO:
+                        if (CustomToolHelper.doesMatchForRecipe(item, stack)) {
                             // Rework
                             stacks.add(stack.copy());
                         }

@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.GridRepair;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.util.MFLogUtil;
 
 /**
  * @author AnonymousProductions
@@ -20,7 +21,7 @@ public class CraftingManagerAnvil {
     private static final CraftingManagerAnvil instance = new CraftingManagerAnvil();
 
     private CraftingManagerAnvil() {
-        System.out.println("MineFantasy: Anvil recipes initiating");
+        MFLogUtil.logDebug("Anvil recipes initiating");
     }
 
     /**

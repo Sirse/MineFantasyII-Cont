@@ -113,12 +113,12 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    public ItemStack getEquipmentInSlot(int p_71124_1_) {
+    public ItemStack getEquipmentInSlot(int slot) {
         return null;
     }
 
     @Override
-    public void setCurrentItemOrArmor(int p_70062_1_, ItemStack p_70062_2_) {}
+    public void setCurrentItemOrArmor(int slotIn, ItemStack itemStackIn) {}
 
     @Override
     public ItemStack[] getLastActiveItems() {
@@ -288,7 +288,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     public void updateRider() {
         if (!isPowered()) return;
 
-        if (worldObj.isRemote && riddenByEntity != null && riddenByEntity instanceof EntityPlayer) {
+        if (worldObj.isRemote && riddenByEntity instanceof EntityPlayer) {
             float forward = ((EntityPlayer) riddenByEntity).moveForward;
             float strafe = ((EntityPlayer) riddenByEntity).moveStrafing;
 
@@ -551,7 +551,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
 
     @Override
     public void moveEntityWithHeading(float strafe, float forward) {
-        if (isPowered() && this.riddenByEntity != null && this.riddenByEntity instanceof EntityLivingBase) {
+        if (isPowered() && this.riddenByEntity instanceof EntityLivingBase) {
             EntityLivingBase user = (EntityLivingBase) riddenByEntity;
 
             this.prevRotationYaw = this.rotationYaw = this.riddenByEntity.rotationYaw;
@@ -585,7 +585,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         }
     }
 
-    public void moveCogwork(float p_70612_1_, float p_70612_2_) {
+    public void moveCogwork(float strafe, float forward) {
         double d0;
 
         if (this.isInWater() || this.handleLavaMovement()) {
@@ -623,7 +623,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
             f4 *= 2.0F;
         }
 
-        this.moveFlying(p_70612_1_, p_70612_2_, f4);
+        this.moveFlying(strafe, forward, f4);
         f2 = 0.91F;
 
         if (this.onGround) {
@@ -730,7 +730,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
     }
 
     @Override
-    protected void func_145780_a(int p_145780_1_, int p_145780_2_, int p_145780_3_, Block p_145780_4_) {
+    protected void func_145780_a(int x, int y, int z, Block blockIn) {
         String s = alternateStep ? "in" : "out";
         alternateStep = !alternateStep;
         this.playSound("tile.piston." + s, 0.25F, 1.0F);
@@ -835,7 +835,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         boolean canDestroy = false;// Only spanner or fire can destroy frames
         boolean isFrame = plating == null;
 
-        if (source.getSourceOfDamage() != null && source.getSourceOfDamage() instanceof EntityLivingBase) {
+        if (source.getSourceOfDamage() instanceof EntityLivingBase) {
             canDestroy = ToolHelper.getCrafterTool(((EntityLivingBase) source.getSourceOfDamage()).getHeldItem())
                     .equalsIgnoreCase("spanner");
         }
@@ -913,9 +913,7 @@ public class EntityCogwork extends EntityLivingBase implements IPowerArmour {
         TacticalManager.knockbackEntity(hit, this, force, force / 4F);
         boolean damaged = hit.attackEntityFrom(
                 DamageSource.causeMobDamage(
-                        (riddenByEntity != null && riddenByEntity instanceof EntityLivingBase)
-                                ? (EntityLivingBase) riddenByEntity
-                                : this),
+                        (riddenByEntity instanceof EntityLivingBase) ? (EntityLivingBase) riddenByEntity : this),
                 force);
         if (damaged) {
             this.playSound(this.getHurtSound(), this.getSoundVolume(), this.getSoundPitch());

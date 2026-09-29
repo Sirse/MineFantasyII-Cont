@@ -127,7 +127,6 @@ public class RenderCrossbow implements IItemRenderer {
         ItemCrossbow crossbow = (ItemCrossbow) item.getItem();
 
         if (type.equals(ItemRenderType.EQUIPPED)) {
-            // GL11.glRotatef(45, 0F, 1F, -1F);
             renderPart(item, player, "stock");
             renderPart(item, player, "mechanism");
             renderPart(item, player, "string");

@@ -127,7 +127,7 @@ public class EntityFireBlast extends EntityFireball {
 
     private float getPyro() {
 
-        if (!ConfigMobs.dragonGriefFire && shootingEntity != null && shootingEntity instanceof EntityDragon) {
+        if (!ConfigMobs.dragonGriefFire && shootingEntity instanceof EntityDragon) {
             return 0F;
         }
 

@@ -221,12 +221,11 @@ public class ItemLootSack extends Item {
 
         @Override
         public void markDirty() {
-            // TODO Auto-generated method stub
 
         }
 
         @Override
-        public boolean isUseableByPlayer(EntityPlayer p_70300_1_) {
+        public boolean isUseableByPlayer(EntityPlayer player) {
             return false;
         }
 
@@ -237,7 +236,7 @@ public class ItemLootSack extends Item {
         public void closeInventory() {}
 
         @Override
-        public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
+        public boolean isItemValidForSlot(int index, ItemStack stack) {
             return false;
         }
 

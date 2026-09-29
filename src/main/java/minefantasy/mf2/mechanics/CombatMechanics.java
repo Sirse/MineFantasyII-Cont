@@ -319,7 +319,7 @@ public class CombatMechanics {
         if (damage <= 0) {
             event.setCanceled(true);
         }
-        if (hitter != null && hitter instanceof EntityLivingBase) {
+        if (hitter instanceof EntityLivingBase) {
             int hitTime = 5;
             if (hitter.getHeldItem() != null) {
                 ItemStack weapon = hitter.getHeldItem();
@@ -367,7 +367,7 @@ public class CombatMechanics {
         if (damage > 0 && hit.isSprinting()) {
             hit.setSprinting(false);
         }
-        // TODO: Zombie armour
+        // Zombie armour
         if (event.entityLiving.getEntityData().hasKey(MonsterUpgrader.zombieArmourNBT)
                 && event.entityLiving instanceof EntityZombie) {
             ItemStack[] armours = new ItemStack[4];
@@ -376,7 +376,7 @@ public class CombatMechanics {
             }
             damage = ISpecialArmor.ArmorProperties.ApplyArmor(event.entityLiving, armours, event.source, damage);
         }
-        // TODO: Stick arrows (EXPERIMENTAL)
+        // Stuck arrows (experimental)
         if (ConfigExperiment.stickArrows && event.source.getSourceOfDamage() != null
                 && event.source.getSourceOfDamage() instanceof EntityArrow) {
             if (!event.entity.worldObj.isRemote) {
@@ -437,14 +437,14 @@ public class CombatMechanics {
             dam = modifyPlayerDamage((EntityPlayer) hit, dam);
         }
 
-        if (source != null && hitter != null && hitter instanceof EntityLivingBase) {
+        if (source != null && hitter instanceof EntityLivingBase) {
             dam = modifyUserHitDamage(dam, (EntityLivingBase) hitter, source, hitter == source, hit, properHit);
         }
         if (src.isExplosion() && isSkeleton(hit)) {
             dam *= 5F;
         }
 
-        // TODO: Elemental resistance
+        // Elemental resistance
         dam *= TacticalManager.getResistance(hit, src);
         if (src.isFireDamage()) {
             if (dam <= 0.0F) {
@@ -459,7 +459,6 @@ public class CombatMechanics {
         return target instanceof EntitySkeleton;
     }
 
-    // TODO: damage modifier
     private float modifyUserHitDamage(float dam, EntityLivingBase user, Entity source, boolean melee, Entity target,
             boolean properHit) {
         dam = modifyMobDamage(user, dam);
@@ -492,7 +491,7 @@ public class CombatMechanics {
         if (user instanceof EntityLivingBase) {
             EntityLivingBase player = user;
 
-            // TODO: Stamina Traits
+            // Stamina
             if (StaminaBar.isSystemActive) {
                 if (StaminaBar.getStaminaValue(player) <= 0) {
                     dam *= ConfigStamina.weaponDrain;
@@ -506,7 +505,7 @@ public class CombatMechanics {
         ItemStack weapon = user.getHeldItem();
         if (weapon != null) {
             if (weapon.getItem() instanceof IDamageModifier) {
-                // TODO: IDamageModifier, this mods the damage for weapons
+                // Weapons that modify their own damage
                 dam = ((IDamageModifier) weapon.getItem()).modifyDamage(weapon, user, target, dam, properHit);
             }
             CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(weapon);
@@ -551,7 +550,7 @@ public class CombatMechanics {
         Entity source = src.getSourceOfDamage();
         Entity hitter = src.getEntity();
 
-        if (source != null && hitter != null && hitter instanceof EntityLivingBase) {
+        if (source != null && hitter instanceof EntityLivingBase) {
             if (source == hitter) {
                 EntityLivingBase user = (EntityLivingBase) hitter;
                 ItemStack weapon = user.getHeldItem();
@@ -661,7 +660,7 @@ public class CombatMechanics {
                         ItemWeaponMF.setParry(weapon, 20);
                     }
 
-                    if (entityHitting != null && entityHitting instanceof EntityLivingBase) {
+                    if (entityHitting instanceof EntityLivingBase) {
                         EntityLivingBase hitter = (EntityLivingBase) entityHitting;
                         int hitTime = 5;
                         if (hitter.getHeldItem() != null) {
@@ -714,8 +713,7 @@ public class CombatMechanics {
             }
         }
 
-        if ((dam > 0 && user instanceof EntityPlayer)
-                || (entityHitting != null && entityHitting instanceof EntityPlayer)) {
+        if ((dam > 0 && user instanceof EntityPlayer) || (entityHitting instanceof EntityPlayer)) {
             if (!user.worldObj.isRemote) {
                 String type = "Mixed";
                 float[] f = ArmourCalculator.getRatioForSource(source);
@@ -848,7 +846,7 @@ public class CombatMechanics {
             {
                 EntityLivingBase tar = mob.getAttackTarget();
 
-                if (tar != null && tar instanceof EntityPlayer && ((EntityPlayer) tar).isBlocking()) {
+                if (tar instanceof EntityPlayer && ((EntityPlayer) tar).isBlocking()) {
                     double dist = mob.getDistanceSqToEntity(tar);
 
                     if (mob instanceof EntityZombie && mob.onGround

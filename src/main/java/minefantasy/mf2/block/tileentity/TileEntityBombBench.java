@@ -39,14 +39,14 @@ public class TileEntityBombBench extends TileEntityStation implements IBasicMetr
     }
 
     public static String getComponentType(ItemStack item) {
-        if (item != null && item.getItem() != null && item.getItem() instanceof IBombComponent) {
+        if (item != null && item.getItem() instanceof IBombComponent) {
             return ((IBombComponent) item.getItem()).getComponentType();
         }
         return null;
     }
 
     public static byte getComponentTier(ItemStack item) {
-        if (item != null && item.getItem() != null && item.getItem() instanceof IBombComponent) {
+        if (item != null && item.getItem() instanceof IBombComponent) {
             return ((IBombComponent) item.getItem()).getTier();
         }
         return (byte) 0;

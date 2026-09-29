@@ -369,8 +369,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                     explode();
                 }
                 if (movingobjectposition.entityHit != null) {
-                    float dam = Math.max(0.1F, this.getHitDamage() * firepower);// (getDamageModifier()*power) / 10F *
-                                                                                // (float)k;
+                    float dam = Math.max(0.1F, this.getHitDamage() * firepower);
 
                     dam *= getDamageModifier(movingobjectposition.entityHit);
 
@@ -419,7 +418,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                                 }
                             }
 
-                            if (this.shootingEntity != null && this.shootingEntity instanceof EntityLivingBase) {
+                            if (this.shootingEntity instanceof EntityLivingBase) {
                                 EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
                                 EnchantmentHelper
                                         .func_151385_b((EntityLivingBase) this.shootingEntity, entitylivingbase);

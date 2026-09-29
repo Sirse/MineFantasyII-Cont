@@ -72,7 +72,6 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
                 && ItemLumberAxe.canAcceptCost(user)) {
             int range = 2;
             for (int x1 = -range; x1 <= range; x1++) {
-                // for(int y1 = -1; y1 <= 1; y1 ++)
                 {
                     for (int z1 = -range; z1 <= range; z1++) {
                         if (getDistance(x + x1, y, z + z1, x, y, z) <= range * 1 + 0.5D) {

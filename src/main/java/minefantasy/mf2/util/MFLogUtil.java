@@ -19,18 +19,15 @@ public class MFLogUtil {
     // a progress figure) otherwise throws from String.format
     public static void log(String mes) {
         FMLLog.info("%s", PREFIX + mes);
-        // MF_LOGGER.log(Level.INFO, PREFIX + mes);
     }
 
     public static void logWarn(String mes) {
         FMLLog.warning("%s", PREFIX + "(warning) " + mes);
-        // MF_LOGGER.log(Level.WARN, PREFIX + mes);
     }
 
     public static void logDebug(String mes) {
         if (MineFantasyII.isDebug()) {
             FMLLog.info("%s", PREFIX + "(debug) " + mes);
-            // MF_LOGGER.debug(PREFIX + mes);
         }
     }
 

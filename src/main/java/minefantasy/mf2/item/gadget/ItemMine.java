@@ -199,7 +199,6 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
         list.add(createMine((byte) 3, (byte) 2, (byte) 0, (byte) 0, 1));
     }
 
-    // TODO Icons
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(byte type) {
         return mines[type];

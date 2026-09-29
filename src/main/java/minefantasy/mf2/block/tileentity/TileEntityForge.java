@@ -180,9 +180,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
                     temp += increase;
                 }
             }
-            if (temp <= 0) {
-                // this.setInventorySlotContents(slot, ItemHeated.getItem(item));
-            } else {
+            if (temp <= 0) {} else {
                 int maxTemp = ItemHeated.getMaxTemp(item);
                 if (maxTemp > 0 && temp >= maxTemp) {
                     Sounds.at(this, "random.fizz", 0.7F, 0.5F);
@@ -204,7 +202,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     public int getTier() {
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
-        if (block != null && block instanceof BlockForge) {
+        if (block instanceof BlockForge) {
             return ((BlockForge) block).tier;
         }
         return 0;
@@ -259,7 +257,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 
-        if (block != null && block instanceof BlockForge) {
+        if (block instanceof BlockForge) {
             return (BlockForge) block;
         }
         return null;
@@ -429,7 +427,6 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     private void pumpBellows(int x, int z, float pump) {
         if (fuel <= 0) return;
 
-        // int share = 2;
         TileEntityForge forge = Tiles.get(worldObj, xCoord + x, yCoord, zCoord + z, TileEntityForge.class);
         if (forge != null) {
             forge.onUsedWithBellows(pump);
@@ -454,11 +451,11 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (worldObj == null) return false;
 
         TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        if (tile != null && tile instanceof IHeatUser) {
+        if (tile instanceof IHeatUser) {
             return ((IHeatUser) tile).canAccept(this);
         }
 
-        return tile != null && tile instanceof TileEntityFurnace;
+        return tile instanceof TileEntityFurnace;
     }
 
     public boolean tryAddHeatable(ItemStack held) {

@@ -155,7 +155,6 @@ public class ClientProxyMF extends CommonProxyMF {
         Minecraft mc = Minecraft.getMinecraft();
         if (ID == 0) {
             TileEntity tile = world.getTileEntity(x, y, z);
-            // int meta = world.getBlockMetadata(x, y, z);
 
             if (tile == null) {
                 return null;

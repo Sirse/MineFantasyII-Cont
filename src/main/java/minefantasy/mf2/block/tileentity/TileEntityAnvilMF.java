@@ -715,7 +715,7 @@ public class TileEntityAnvilMF extends TileEntityStation
             return false;
         }
 
-        if (progressMax > 0 && recipe != null && recipe instanceof ItemStack) {
+        if (progressMax > 0 && recipe instanceof ItemStack) {
             return this.canFitResult(recipe);
         }
         return false;

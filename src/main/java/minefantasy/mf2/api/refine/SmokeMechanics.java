@@ -49,7 +49,6 @@ public class SmokeMechanics {
             {
                 return -1;
             }
-            // if(world.canBlockSeeTheSky(x, y+1, z))
             {
                 spawnSmoke(world, x, y + 1, z, value);
                 return 1;

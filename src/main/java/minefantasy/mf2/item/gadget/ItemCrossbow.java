@@ -441,7 +441,6 @@ public class ItemCrossbow extends Item
         if (!(ammo.getAmmoType(arrow).equalsIgnoreCase("bolt"))) {
             return false;
         }
-        // TODO Arrow entity instance
         EntityArrowMF entArrow = ammo
                 .getFiredArrow(new EntityArrowMF(world, user, getFullValue(bow, "spread"), charge * 2.0F), arrow);
 
@@ -462,7 +461,7 @@ public class ItemCrossbow extends Item
             entArrow.canBePickedUp = 2;
         }
 
-        if (bow != null && bow.getItem() != null && bow.getItem() instanceof ISpecialBow) {
+        if (bow != null && bow.getItem() instanceof ISpecialBow) {
             entArrow = (EntityArrowMF) ((ISpecialBow) bow.getItem()).modifyArrow(bow, entArrow);
         }
         if (!world.isRemote) {

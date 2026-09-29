@@ -962,12 +962,6 @@ public class ModelFrostDragon extends ModelBase {
         this.Headback.rotateAngleY = neckY / (180F / (float) Math.PI);
 
         this.Mouthback_MOVE_THIS_TO_OPEN_MOUTH.rotateAngleX = jawAngle - (3.141F / 9F);
-        // this.Tail1.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
-        // this.Tail3.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
-        // this.Tail4.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
 
         if (!dragon.isTerrestrial()) // Fly
         {
@@ -997,8 +991,6 @@ public class ModelFrostDragon extends ModelBase {
             this.Body.rotateAngleX = 0.5462880558742251F;
             this.Wingshoulderright.rotateAngleZ = (float) -Math.toRadians(40);
             this.Wingshoulderleft.rotateAngleZ = (float) Math.toRadians(40);
-            // this.Winglowerarmright.rotateAngleZ = (float) Math.toRadians(180);
-            // this.Winglowerarmleft.rotateAngleZ = (float) -Math.toRadians(180);
 
             this.Righthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
             this.Lefthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;

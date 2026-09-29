@@ -551,7 +551,7 @@ public class TileEntityBigFurnace extends TileEntityStation
     public boolean isHeater() {
         Block block = worldObj != null ? getBlockType() : blockType;
 
-        if (block != null && block instanceof BlockBigFurnace) {
+        if (block instanceof BlockBigFurnace) {
             return ((BlockBigFurnace) block).isHeater;
         }
         return false;
@@ -560,7 +560,7 @@ public class TileEntityBigFurnace extends TileEntityStation
     public int getTier() {
         Block block = worldObj != null ? getBlockType() : blockType;
 
-        if (block != null && block instanceof BlockBigFurnace) {
+        if (block instanceof BlockBigFurnace) {
             return ((BlockBigFurnace) block).tier;
         }
         return 0;
@@ -860,7 +860,6 @@ public class TileEntityBigFurnace extends TileEntityStation
 
     @Override
     public String getInventoryName() {
-        // TODO Auto-generated method stub
         return null;
     }
 

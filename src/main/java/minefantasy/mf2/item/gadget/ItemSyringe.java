@@ -133,14 +133,14 @@ public class ItemSyringe extends ItemPotion {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int p_77617_1_) {
+    public IIcon getIconFromDamage(int damage) {
         return icon;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamageForRenderPass(int p_77618_1_, int p_77618_2_) {
-        return p_77618_2_ == 0 ? fill : super.getIconFromDamageForRenderPass(p_77618_1_, p_77618_2_);
+    public IIcon getIconFromDamageForRenderPass(int damage, int pass) {
+        return pass == 0 ? fill : super.getIconFromDamageForRenderPass(damage, pass);
     }
 
     @Override

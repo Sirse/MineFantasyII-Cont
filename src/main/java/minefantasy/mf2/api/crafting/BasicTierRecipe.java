@@ -65,12 +65,8 @@ public class BasicTierRecipe extends ShapedRecipes {
                 ItemStack itemstack1 = matrix.getStackInRowAndColumn(k, l);
 
                 if (itemstack1 != null || itemstack != null) {
-                    // String recipe_wood = CustomToolHelper.getComponentMaterial(itemstack,
-                    // "wood");
                     String recipe_metal = CustomToolHelper.getComponentMaterial(itemstack, "metal");
 
-                    // String component_wood = CustomToolHelper.getComponentMaterial(itemstack1,
-                    // "wood");
                     String component_metal = CustomToolHelper.getComponentMaterial(itemstack1, "metal");
 
                     if (recipe_metal != null) {

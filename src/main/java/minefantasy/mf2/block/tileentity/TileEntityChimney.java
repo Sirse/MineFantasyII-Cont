@@ -138,7 +138,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
     @Override
     public int getMaxSmokeStorage() {
-        if (this.blockType != null && blockType instanceof BlockChimney) {
+        if (this.blockType instanceof BlockChimney) {
             return ((BlockChimney) blockType).size;
         }
         return 5;
@@ -149,7 +149,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
 
-        if (block != null && block instanceof BlockChimney) {
+        if (block instanceof BlockChimney) {
             return (BlockChimney) block;
         }
         return null;

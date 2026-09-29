@@ -11,6 +11,7 @@ import net.minecraftforge.common.DungeonHooks;
 
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.TileEntityWorldGenMarker;
+import minefantasy.mf2.util.MFLogUtil;
 import minefantasy.mf2.util.XSTRandom;
 
 public abstract class StructureModuleMF {
@@ -71,7 +72,7 @@ public abstract class StructureModuleMF {
                 }
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
+            MFLogUtil.MF_LOGGER.error(MFLogUtil.PREFIX + "Structure generation failed", exception);
         }
     }
 
@@ -307,7 +308,7 @@ public abstract class StructureModuleMF {
 
         worldObj.setBlock(offset[0], offset[1], offset[2], BlockListMF.WG_Mark, dir, 2);
         TileEntity tile = worldObj.getTileEntity(offset[0], offset[1], offset[2]);
-        if (tile != null && tile instanceof TileEntityWorldGenMarker) {
+        if (tile instanceof TileEntityWorldGenMarker) {
             ((TileEntityWorldGenMarker) tile).className = piece.getName();
             ((TileEntityWorldGenMarker) tile).length = lengthId - 1;
             ((TileEntityWorldGenMarker) tile).deviation = deviationCount;

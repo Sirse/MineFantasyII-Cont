@@ -129,8 +129,6 @@ public class BaseMaterialMF {
         pigiron = addMaterial("PigIron", 0, 250, 0, 1.5F, 3, 1.00F, 0).setForgeStats(2, 2, 2.0F, 100, 400);
         silver = addMaterial("Silver", -1, 150, 0, 0.0F, 10, 0.70F, 0).setForgeStats(1, 1, 3F, 90, 120);
         gold = addMaterial("Gold", -1, 150, 0, 0.0F, 25, 1.50F, 0).setForgeStats(1, 1, 3F, 90, 120);
-        // goldPure = addMaterial("PureGold", -1, 50 , 0, 0.0F, 50, 2.00F,
-        // 0).setRarity(1);
         ornate = addMaterial("Ornate", -1, 300, 0, 0.0F, 30, 1.00F, 30).setRarity(1).setForgeStats(1, 1, 4F, 120, 150);
         tungsten = addMaterial("Tungsten", 2, 600, 3, 4F, 5, 1.50F, 0).setRarity(1).setForgeStats(3, 3, 5.0F, 150, 300);
 

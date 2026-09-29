@@ -200,7 +200,7 @@ public class EntityDragon extends EntityFlyingMF
                         Iterator players = list.iterator();
                         while (players.hasNext()) {
                             Object instance = players.next();
-                            if (instance != null && instance instanceof EntityPlayer) {
+                            if (instance instanceof EntityPlayer) {
                                 if (((EntityPlayer) instance).getDistanceToEntity(this) < 128D) {
                                     ((EntityPlayer) instance).addChatMessage(
                                             new ChatComponentText(
@@ -526,7 +526,7 @@ public class EntityDragon extends EntityFlyingMF
 
         if (source == DamageSource.inWall) return false;
 
-        if (source.getEntity() != null && source.getEntity() instanceof EntityPlayer) {
+        if (source.getEntity() instanceof EntityPlayer) {
             if ((getDisengageTime() <= 0 && getAttackTarget() == null) || damage > 16
                     || (targetedEntity != null && !(targetedEntity instanceof EntityPlayer))) {
                 setTarget(source.getEntity());
@@ -756,7 +756,7 @@ public class EntityDragon extends EntityFlyingMF
     }
 
     public void disengage(int time) {
-        if (targetedEntity != null && targetedEntity instanceof EntityPlayer) {
+        if (targetedEntity instanceof EntityPlayer) {
             lastEnemy = targetedEntity;
         }
         setDisengageTime(time);

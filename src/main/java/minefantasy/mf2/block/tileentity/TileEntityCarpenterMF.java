@@ -495,7 +495,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
     }
 
     public boolean canCraft() {
-        if (progressMax > 0 && recipe != null && recipe instanceof ItemStack) {
+        if (progressMax > 0 && recipe instanceof ItemStack) {
             return this.canFitResult(recipe);
         }
         return false;

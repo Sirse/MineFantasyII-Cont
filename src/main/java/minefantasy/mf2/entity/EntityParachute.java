@@ -206,7 +206,6 @@ public class EntityParachute extends Entity {
     public void onUpdate() {
         if (this.riddenByEntity != null) {
             riddenByEntity.fallDistance = 0;
-            // this.rotationYaw = riddenByEntity.rotationYaw;
         }
         super.onUpdate();
 
@@ -286,7 +285,7 @@ public class EntityParachute extends Entity {
                 this.motionY += 0.007000000216066837D;
             }
 
-            if (this.riddenByEntity != null && this.riddenByEntity instanceof EntityLivingBase) {
+            if (this.riddenByEntity instanceof EntityLivingBase) {
                 EntityLivingBase entitylivingbase = (EntityLivingBase) this.riddenByEntity;
                 float f = this.riddenByEntity.rotationYaw + -entitylivingbase.moveStrafing * 90.0F;
                 this.motionX += -Math.sin(f * (float) Math.PI / 180.0F) * this.speedMultiplier
@@ -394,7 +393,7 @@ public class EntityParachute extends Entity {
     }
 
     private boolean isTooHeavy() {
-        if (riddenByEntity != null && riddenByEntity instanceof EntityLivingBase) {
+        if (riddenByEntity instanceof EntityLivingBase) {
             return ArmourCalculator.getTotalWeightOfWorn((EntityLivingBase) riddenByEntity, false) > 100F;
         }
         return false;

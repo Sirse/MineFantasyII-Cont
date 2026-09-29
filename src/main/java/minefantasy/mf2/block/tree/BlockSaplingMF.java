@@ -84,31 +84,26 @@ public class BlockSaplingMF extends BlockBush implements IGrowable {
         }
     }
 
-    public boolean func_149880_a(World p_149880_1_, int p_149880_2_, int p_149880_3_, int p_149880_4_,
-            int p_149880_5_) {
-        return p_149880_1_.getBlock(p_149880_2_, p_149880_3_, p_149880_4_) == this
-                && (p_149880_1_.getBlockMetadata(p_149880_2_, p_149880_3_, p_149880_4_) & 7) == p_149880_5_;
+    public boolean func_149880_a(World world, int x, int y, int z, int meta) {
+        return world.getBlock(x, y, z) == this && (world.getBlockMetadata(x, y, z) & 7) == meta;
     }
 
     /**
      * Determines the damage on the item the block drops. Used in cloth and wood.
      */
-    public int damageDropped(int p_149692_1_) {
-        return MathHelper.clamp_int(p_149692_1_ & 7, 0, 5);
+    public int damageDropped(int meta) {
+        return MathHelper.clamp_int(meta & 7, 0, 5);
     }
 
-    public boolean func_149851_a(World p_149851_1_, int p_149851_2_, int p_149851_3_, int p_149851_4_,
-            boolean p_149851_5_) {
+    public boolean func_149851_a(World worldIn, int x, int y, int z, boolean isClient) {
         return true;
     }
 
-    public boolean func_149852_a(World p_149852_1_, Random p_149852_2_, int p_149852_3_, int p_149852_4_,
-            int p_149852_5_) {
-        return p_149852_1_.rand.nextFloat() < (0.45D) / growthModifier;
+    public boolean func_149852_a(World worldIn, Random random, int x, int y, int z) {
+        return worldIn.rand.nextFloat() < (0.45D) / growthModifier;
     }
 
-    public void func_149853_b(World p_149853_1_, Random p_149853_2_, int p_149853_3_, int p_149853_4_,
-            int p_149853_5_) {
-        this.initGrow(p_149853_1_, p_149853_3_, p_149853_4_, p_149853_5_, p_149853_2_);
+    public void func_149853_b(World worldIn, Random random, int x, int y, int z) {
+        this.initGrow(worldIn, x, y, z, random);
     }
 }

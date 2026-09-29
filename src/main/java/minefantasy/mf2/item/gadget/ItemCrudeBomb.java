@@ -39,7 +39,6 @@ public class ItemCrudeBomb extends ItemBomb implements ISpecialSalvage {
         list.add(new ItemStack(this));
     }
 
-    // TODO Icons
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(byte type) {
         return basicIcon;

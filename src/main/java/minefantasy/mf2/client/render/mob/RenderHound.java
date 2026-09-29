@@ -58,28 +58,28 @@ public class RenderHound extends RenderLiving {
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(EntityHound p_110775_1_) {
+    protected ResourceLocation getEntityTexture(EntityHound entity) {
         return TextureHelperMF.getResource("textures/models/animal/hound/hound.png");
     }
 
     /**
      * Queries whether should render the specified pass or not.
      */
-    protected int shouldRenderPass(EntityLivingBase p_77032_1_, int p_77032_2_, float p_77032_3_) {
-        return this.shouldRenderPass((EntityHound) p_77032_1_, p_77032_2_, p_77032_3_);
+    protected int shouldRenderPass(EntityLivingBase entity, int pass, float partialTicks) {
+        return this.shouldRenderPass((EntityHound) entity, pass, partialTicks);
     }
 
     /**
      * Defines what float the third param in setRotationAngles of ModelBase is
      */
-    protected float handleRotationFloat(EntityLivingBase p_77044_1_, float p_77044_2_) {
-        return this.handleRotationFloat((EntityHound) p_77044_1_, p_77044_2_);
+    protected float handleRotationFloat(EntityLivingBase entity, float partialTicks) {
+        return this.handleRotationFloat((EntityHound) entity, partialTicks);
     }
 
     /**
      * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
      */
-    protected ResourceLocation getEntityTexture(Entity p_110775_1_) {
-        return this.getEntityTexture((EntityHound) p_110775_1_);
+    protected ResourceLocation getEntityTexture(Entity entity) {
+        return this.getEntityTexture((EntityHound) entity);
     }
 }

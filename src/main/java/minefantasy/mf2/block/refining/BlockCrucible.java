@@ -63,7 +63,7 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
         keepInventory = true;
         Block block = world.getBlock(x, y, z);
 
-        if (block != null && block instanceof BlockCrucible) {
+        if (block instanceof BlockCrucible) {
             int blocktier = ((BlockCrucible) block).tier;
             boolean auto = ((BlockCrucible) block).isAuto;
             if (state) {

@@ -856,12 +856,6 @@ public class ModelAshDragon extends ModelBase {
         this.Head1.rotateAngleY = neckY / (180F / (float) Math.PI);
 
         this.Mouthback_MOVE_TO_OPEN.rotateAngleX = jawAngle - (3.141F / 9F);
-        // this.Tail1.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
-        // this.Tail3.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
-        // this.Tail4.rotateAngleY = (float)
-        // Math.toRadians(dragon.prevRotationYaw-dragon.rotationYaw)*1.5F;
 
         if (!dragon.isTerrestrial()) // Fly
         {
@@ -888,8 +882,6 @@ public class ModelAshDragon extends ModelBase {
         } else // Walk
         {
             this.Bodyfront.rotateAngleX = 0.5462880558742251F;
-            // this.Winglowerarmright.rotateAngleZ = (float) Math.toRadians(180);
-            // this.Winglowerarmleft.rotateAngleZ = (float) -Math.toRadians(180);
 
             this.ThighR.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
             this.ThighL.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;

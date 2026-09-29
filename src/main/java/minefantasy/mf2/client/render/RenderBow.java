@@ -101,14 +101,13 @@ public class RenderBow implements IItemRenderer {
 
         int drawAmount = -2;
 
-        if (entityLivingBase != null && entityLivingBase instanceof EntityPlayer) {
+        if (entityLivingBase instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) entityLivingBase;
 
             int timer = player.getItemInUseDuration();
 
             if (bow != null) {
                 drawAmount = bow.getDrawAmount(timer);
-                // arrowStack = bow.getArrow(item);
             } else {
                 if (timer >= 18) drawAmount = 2;
                 else if (timer > 13) drawAmount = 1;

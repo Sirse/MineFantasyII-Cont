@@ -27,9 +27,7 @@ public class WorldGenStructures {
             if (confineToGrid(chunkX, chunkZ, ConfigWorldGen.DSGrid)) {
                 if (seed.nextFloat() < ConfigWorldGen.DSChance) {
                     generateDwarvenStronghold(seed, chunkX, chunkZ, world);
-                } else {
-                    // placeGridBeacon(world, chunkX, chunkZ);
-                }
+                } else {}
             }
         }
     }
@@ -120,7 +118,6 @@ public class WorldGenStructures {
 
             WorldGenAncientAlter ruin = new WorldGenAncientAlter();
             for (int x1 = 0; x1 < 16; x1++) {
-                // for(int z1 = 0; z1 < 16; z1++)
                 {
                     if (ruin.generate(world, seed, x + x1, 0, spawnZ)) {
                         MFLogUtil.logDebug("Placed Ancient Alter at " + x + x1 + " " + spawnZ);

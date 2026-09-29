@@ -116,9 +116,6 @@ public class ItemBandage extends Item {
 
                     if (!player.capabilities.isCreativeMode) {
                         item.stackSize--;
-                        if (item.stackSize <= 0) {
-
-                        }
                     }
                 }
                 Cooldowns.set(toHeal, EventManagerMF.injuredNBT, 0);

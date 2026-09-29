@@ -219,7 +219,6 @@ public class StaminaMechanics {
             StaminaBar.modifyStaminaValue(user, -getWeaponModifier(user) * modifier);
         }
         StaminaBar.setIdleTime(user, 50F * getIdleRate(user));
-        // syncStamina(user, new float[]{stam, StaminaBar.getMaxStamina(user)});
     }
 
     public static float getWeaponModifier(EntityLivingBase user) {

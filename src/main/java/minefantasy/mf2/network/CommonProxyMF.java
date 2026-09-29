@@ -47,7 +47,6 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
             return new ContainerReload(player.inventory, player.getHeldItem());
         } else if (ID == 0) {
             TileEntity tile = world.getTileEntity(x, y, z);
-            // int meta = world.getBlockMetadata(x, y, z);
             if (tile == null) {
                 return null;
             }

@@ -158,8 +158,6 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
             return ((IRackItem) item.getItem()).canHang(this, item, slot);
         }
         if (item.getItem() instanceof ItemArmor) return false;
-        // if(item.getItem() instanceof ItemCrossbow || item.getItem() instanceof
-        // ItemBomb || item.getItem() instanceof ItemMine)return false;
         return item.getItem().isItemTool(item);
     }
 
@@ -182,15 +180,11 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     public void closeInventory() {}
 
     public boolean hasRackAbove(int slot) {
-        return Tiles.is(worldObj, xCoord, yCoord + 1, zCoord, TileEntityRack.class);// &&
-                                                                                    // ((TileEntityRack)side).getStackInSlot(slot)
-                                                                                    // == null;
+        return Tiles.is(worldObj, xCoord, yCoord + 1, zCoord, TileEntityRack.class);
     }
 
     public boolean hasRackBelow(int slot) {
-        return Tiles.is(worldObj, xCoord, yCoord - 1, zCoord, TileEntityRack.class);// &&
-                                                                                    // ((TileEntityRack)side).getStackInSlot(slot)
-                                                                                    // == null;
+        return Tiles.is(worldObj, xCoord, yCoord - 1, zCoord, TileEntityRack.class);
     }
 
     public void updateInventory() {

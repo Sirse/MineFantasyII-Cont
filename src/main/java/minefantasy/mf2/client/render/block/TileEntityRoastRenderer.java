@@ -73,11 +73,11 @@ public class TileEntityRoastRenderer extends TileEntitySpecialRenderer {
     }
 
     @Override
-    protected void bindTexture(ResourceLocation p_147499_1_) {
+    protected void bindTexture(ResourceLocation texture) {
         TextureManager texturemanager = TileEntityRendererDispatcher.instance.field_147553_e;
 
         if (texturemanager != null) {
-            texturemanager.bindTexture(p_147499_1_);
+            texturemanager.bindTexture(texture);
         }
     }
 
@@ -97,9 +97,7 @@ public class TileEntityRoastRenderer extends TileEntitySpecialRenderer {
         if (itemstack.getItemSpriteNumber() == 0 && itemstack.getItem() instanceof ItemBlock
                 && RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemstack.getItem()).getRenderType())) {
             Block block = Block.getBlockFromItem(itemstack.getItem());
-            if (block != null) {
-                // this.blockrender.renderBlockAsItem(block, itemstack.getItemDamage(), 1.0F);
-            }
+            if (block != null) {}
         }
         // Item
         else if (itemstack.getItem().getIconFromDamage(itemstack.getItemDamage()) != null) {

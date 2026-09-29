@@ -14,8 +14,6 @@ public class CustomArmourListMF {
             standard_splint_boots;
     public static ItemArmourMF standard_plate_helmet, standard_plate_chest, standard_plate_legs, standard_plate_boots;
 
-    // public static ItemHorseArmorMF standart_plate_horse_armor;
-
     public static void load() {
         String design = "standard";
         CreativeTabs tab = CreativeTabMF.tabArmour;
@@ -135,7 +133,5 @@ public class CustomArmourListMF {
                 "plate_layer_1",
                 0).setCreativeTab(tab);
 
-        // standart_plate_horse_armor = new ItemHorseArmorMF("horse_armor", BaseMaterialMF.getMaterial("steel"),
-        // ArmourDesign.FIELDPLATE, "plate_layer_1", 0);
     }
 }

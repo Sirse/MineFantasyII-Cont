@@ -28,8 +28,6 @@ public final class Heatable implements RecipeChecks.Validated {
 
     public static final int forgeMaximumMetalHeat = 5000;
     public static final String NBT_Item = "MFHeatable_ItemSave";
-    // public static final String NBT_ItemID = "MFHeatable_ItemID";
-    // public static final String NBT_SubID = "MFHeatable_SubID";
     public static final String NBT_ShouldDisplay = "MFHeatable_DisplayTemperature";
     public static final String NBT_CurrentTemp = "MFHeatable_Temperature";
     public static final String NBT_WorkableTemp = "MFHeatable_WorkTemp";

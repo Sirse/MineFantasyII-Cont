@@ -158,12 +158,12 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     @Override
-    protected void actionPerformed(GuiButton p_146284_1_) {
-        if (p_146284_1_.id == 1) {
+    protected void actionPerformed(GuiButton pressed) {
+        if (pressed.id == 1) {
             this.mc.displayGuiScreen((GuiScreen) null);
         }
 
-        if (selected == null && p_146284_1_.id == 2) {
+        if (selected == null && pressed.id == 2) {
             currentPage++;
 
             if (currentPage >= InformationPage.getInfoPages().size()) {
@@ -172,12 +172,12 @@ public class GuiKnowledge extends GuiScreen {
             button.displayString = InformationPage.getTitle(currentPage);
         }
 
-        if (p_146284_1_.id == 3 && selected != null) {
+        if (pressed.id == 3 && selected != null) {
             ((EntityClientPlayerMP) player).sendQueue
                     .addToSendQueue(new ResearchRequest(player, selected.ID).generatePacket());
             selected = null;
         }
-        if (p_146284_1_.id == 4 && selected != null) {
+        if (pressed.id == 4 && selected != null) {
             selected = null;
         }
     }
@@ -186,12 +186,12 @@ public class GuiKnowledge extends GuiScreen {
      * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
      */
     @Override
-    protected void keyTyped(char p_73869_1_, int p_73869_2_) {
-        if (p_73869_2_ == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
+    protected void keyTyped(char typedChar, int keyCode) {
+        if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
             this.mc.displayGuiScreen((GuiScreen) null);
             this.mc.setIngameFocus();
         } else {
-            super.keyTyped(p_73869_1_, p_73869_2_);
+            super.keyTyped(typedChar, keyCode);
         }
     }
 
@@ -702,8 +702,6 @@ public class GuiKnowledge extends GuiScreen {
             float scale = (float) xp / (float) max;
             this.drawTexturedModalRect(x + 22, y + 13, 0, 156, (int) (78F * scale), 5);
 
-            // mc.fontRenderer.drawString(skill.getDisplayName(), x+2, y+1, 0);
-            // mc.fontRenderer.drawString(""+level, x+1, y+10, 0);
         }
     }
 

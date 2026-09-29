@@ -63,7 +63,7 @@ public class EntryPageRecipeAnvil extends EntryPage {
 
         if (tooltipStack != null) {
             List<String> tooltipData = tooltipStack.getTooltip(Minecraft.getMinecraft().thePlayer, false);
-            List<String> parsedTooltip = new ArrayList();
+            List<String> parsedTooltip = new ArrayList<>();
             boolean first = true;
 
             for (String s : tooltipData) {

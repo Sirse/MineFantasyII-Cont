@@ -43,8 +43,8 @@ public class MFArrowDispenser extends BehaviorDefaultDispenseItem {
     /**
      * Play the dispense sound from the specified block.
      */
-    protected void playDispenseSound(IBlockSource p_82485_1_) {
-        p_82485_1_.getWorld().playAuxSFX(1002, p_82485_1_.getXInt(), p_82485_1_.getYInt(), p_82485_1_.getZInt(), 0);
+    protected void playDispenseSound(IBlockSource source) {
+        source.getWorld().playAuxSFX(1002, source.getXInt(), source.getYInt(), source.getZInt(), 0);
     }
 
     protected float func_82498_a() {

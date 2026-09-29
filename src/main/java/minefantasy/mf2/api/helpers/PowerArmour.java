@@ -14,18 +14,18 @@ import minefantasy.mf2.block.crafting.BlockFrame;
 public class PowerArmour {
 
     public static boolean isWearingCogwork(EntityLivingBase user) {
-        return user.ridingEntity != null && user.ridingEntity instanceof IPowerArmour;
+        return user.ridingEntity instanceof IPowerArmour;
     }
 
     public static boolean isPowered(EntityLivingBase user) {
-        if (user.ridingEntity != null && user.ridingEntity instanceof IPowerArmour) {
+        if (user.ridingEntity instanceof IPowerArmour) {
             return ((IPowerArmour) user.ridingEntity).isPowered();
         }
         return false;
     }
 
     public static boolean isFullyArmoured(EntityLivingBase user) {
-        if (user.ridingEntity != null && user.ridingEntity instanceof IPowerArmour) {
+        if (user.ridingEntity instanceof IPowerArmour) {
             return ((IPowerArmour) user.ridingEntity).isFullyArmoured();
         }
         return false;

@@ -682,8 +682,6 @@ public class KnowledgePageRegistry {
         KnowledgeListMF.compPlate.addPages(
                 new EntryPageText("knowledge.compPlate.1"),
                 new EntryPageRecipeAnvil(KnowledgeListMF.compPlateR));
-        // KnowledgeListMF.craftOrnateWeapons.addPages(new
-        // EntryPageText("knowledge.craftOrnateWeapons.1"));
 
         KnowledgeListMF.repair_basic.addPages(
                 new EntryPageText("knowledge.repair_basic.1"),

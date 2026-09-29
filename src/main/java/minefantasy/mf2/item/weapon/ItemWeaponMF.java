@@ -641,7 +641,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
      * 0 = Cannot Counter 1 = Can Counter -1 = Not Possible
      */
     private int canCounter(EntityLivingBase user, ItemStack item) {
-        if (user != null && user instanceof EntityPlayer) {
+        if (user instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) user;
             if (getParry(item) > 0) {
                 if (ResearchLogic.hasInfoUnlocked(player, "counteratt")) {

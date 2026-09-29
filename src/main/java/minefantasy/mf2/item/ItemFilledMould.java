@@ -21,7 +21,6 @@ public class ItemFilledMould extends ItemComponentMF {
 
     public ItemFilledMould() {
         super("ingot_mould_filled");
-        // setMaxStackSize(1);
         this.setUnlocalizedName("ingot_mould");
     }
 

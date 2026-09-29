@@ -60,8 +60,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
 
         if (!worldObj.isRemote && ticksExisted % dropFrequency == 0) {
             TileEntity neighbour = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-            if (neighbour != null && neighbour instanceof TileEntityBlastFC
-                    && !(neighbour instanceof TileEntityBlastFH)) {
+            if (neighbour instanceof TileEntityBlastFC && !(neighbour instanceof TileEntityBlastFH)) {
                 interact((TileEntityBlastFC) neighbour);
             }
         }
