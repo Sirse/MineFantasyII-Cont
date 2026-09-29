@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.TileEntityRoad;
 import minefantasy.mf2.item.tool.advanced.ItemMattock;
@@ -57,11 +58,11 @@ public class BlockRoad extends BlockContainer {
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(IBlockAccess world, int x, int y, int z, int side) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityRoad) {
-            if (((TileEntityRoad) tile).surface[0] > 0) {
-                Block surface = ((TileEntityRoad) tile).getBaseBlock();
-                int surface_m = ((TileEntityRoad) tile).surface[1];
+        TileEntityRoad tile = Tiles.get(world, x, y, z, TileEntityRoad.class);
+        if (tile != null) {
+            if (tile.surface[0] > 0) {
+                Block surface = tile.getBaseBlock();
+                int surface_m = tile.surface[1];
                 return surface.getIcon(side, surface_m);
             }
         }
@@ -156,11 +157,7 @@ public class BlockRoad extends BlockContainer {
     }
 
     private TileEntityRoad getTile(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityRoad) {
-            return (TileEntityRoad) tile;
-        }
-        return null;
+        return Tiles.get(world, x, y, z, TileEntityRoad.class);
     }
 
     @Override
@@ -192,11 +189,10 @@ public class BlockRoad extends BlockContainer {
                     if ((id == BlockListMF.road || id == BlockListMF.lowroad)) {
                         if (getDistance(x + x2, y + y2, z + z2, x, y, z) < r) {
                             {
-                                TileEntity tile = world.getTileEntity(x + x2, y + y2, z + z2);
-                                if (tile != null && tile instanceof TileEntityRoad
-                                        && !((TileEntityRoad) tile).isLocked) {
+                                TileEntityRoad tile = Tiles.get(world, x + x2, y + y2, z + z2, TileEntityRoad.class);
+                                if (tile != null && !tile.isLocked) {
                                     flag = true;
-                                    ((TileEntityRoad) tile).setSurface(block, held.getItemDamage());
+                                    tile.setSurface(block, held.getItemDamage());
                                 }
                             }
                         }

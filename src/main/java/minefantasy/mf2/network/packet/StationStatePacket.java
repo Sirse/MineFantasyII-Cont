@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.network.NetworkUtils;
 
 /**
@@ -41,9 +42,9 @@ public class StationStatePacket extends PacketMF {
         // Locals, not fields: this handler instance is shared by every player through packetList
         int[] at = NetworkUtils.readCoords(packet);
         NBTTagCompound read = ByteBufUtils.readTag(packet);
-        TileEntity entity = player.worldObj.getTileEntity(at[0], at[1], at[2]);
-        if (entity instanceof Shown && read != null) {
-            ((Shown) entity).show(read);
+        Shown shown = Tiles.get(player.worldObj, at[0], at[1], at[2], Shown.class);
+        if (shown != null && read != null) {
+            shown.show(read);
         }
     }
 

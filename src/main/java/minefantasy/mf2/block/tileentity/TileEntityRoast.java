@@ -18,6 +18,7 @@ import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.block.crafting.BlockRoast;
@@ -71,11 +72,8 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
     }
 
     private int getTemp() {
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (tile != null && tile instanceof IHeatSource) {
-            return ((IHeatSource) tile).getHeat();
-        }
-        return 0;
+        IHeatSource source = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, IHeatSource.class);
+        return source != null ? source.getHeat() : 0;
     }
 
     public TileEntityRoast setInventoryModel(String tex, boolean isOven) {

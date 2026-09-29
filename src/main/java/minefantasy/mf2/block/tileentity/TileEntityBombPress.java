@@ -2,7 +2,8 @@ package minefantasy.mf2.block.tileentity;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
+
+import minefantasy.mf2.api.helpers.Tiles;
 
 public class TileEntityBombPress extends TileEntityShown {
 
@@ -26,9 +27,9 @@ public class TileEntityBombPress extends TileEntityShown {
     }
 
     public void use(EntityPlayer user) {
-        TileEntity under = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (animation <= 0 && under != null && under instanceof TileEntityBombBench) {
-            ((TileEntityBombBench) under).tryCraft(user, true);
+        TileEntityBombBench under = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityBombBench.class);
+        if (animation <= 0 && under != null) {
+            under.tryCraft(user, true);
             animation = 1.0F;
             worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "tile.piston.out", 1.0F, 0.75F);
             syncAnimation();

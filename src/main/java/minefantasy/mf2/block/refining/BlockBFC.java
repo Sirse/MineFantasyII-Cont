@@ -18,6 +18,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
@@ -47,9 +48,9 @@ public class BlockBFC extends BlockStation<TileEntityBlastFC> {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
         super.onBlockPlacedBy(world, x, y, z, placer, item);
         if (!world.isRemote && placer instanceof EntityPlayer) {
-            TileEntity tile = world.getTileEntity(x, y, z);
-            if (tile instanceof TileEntityBlastFC) {
-                ((TileEntityBlastFC) tile).setOwner((EntityPlayer) placer);
+            TileEntityBlastFC tile = Tiles.get(world, x, y, z, TileEntityBlastFC.class);
+            if (tile != null) {
+                tile.setOwner((EntityPlayer) placer);
             }
         }
     }

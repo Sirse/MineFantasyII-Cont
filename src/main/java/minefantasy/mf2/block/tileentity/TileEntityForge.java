@@ -18,6 +18,7 @@ import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.Functions;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.IBellowsUseable;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.refining.BlockForge;
@@ -127,12 +128,8 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (fuel <= 0) return;
 
         int share = 2;
-        TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null) return;
-
-        if (tile instanceof TileEntityForge) {
-            TileEntityForge forge = (TileEntityForge) tile;
-
+        TileEntityForge forge = Tiles.get(worldObj, xCoord + x, yCoord, zCoord + z, TileEntityForge.class);
+        if (forge != null) {
             if (isLit && !forge.isLit && forge.fuel > 0) {
                 forge.fireUpForge();
             }
@@ -432,11 +429,8 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (fuel <= 0) return;
 
         // int share = 2;
-        TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null) return;
-
-        if (tile instanceof TileEntityForge) {
-            TileEntityForge forge = (TileEntityForge) tile;
+        TileEntityForge forge = Tiles.get(worldObj, xCoord + x, yCoord, zCoord + z, TileEntityForge.class);
+        if (forge != null) {
             forge.onUsedWithBellows(pump);
         }
     }

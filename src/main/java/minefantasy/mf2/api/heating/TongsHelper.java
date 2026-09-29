@@ -6,8 +6,9 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
+import minefantasy.mf2.api.helpers.Tiles;
 
 public class TongsHelper {
 
@@ -135,10 +136,7 @@ public class TongsHelper {
     }
 
     public static float getQuenced(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof IQuenchBlock) {
-            return ((IQuenchBlock) tile).quench();
-        }
-        return -1F;
+        IQuenchBlock tile = Tiles.get(world, x, y, z, IQuenchBlock.class);
+        return tile != null ? tile.quench() : -1F;
     }
 }

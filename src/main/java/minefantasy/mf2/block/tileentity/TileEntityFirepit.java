@@ -12,7 +12,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 
 import cpw.mods.fml.relauncher.Side;
@@ -23,6 +22,7 @@ import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.Functions;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.item.food.FoodListMF;
@@ -264,13 +264,7 @@ public class TileEntityFirepit extends TileEntityShown implements IBasicMetre, I
     }
 
     public boolean hasBlockAbove() {
-        if (worldObj == null) return false;
-
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        if (tile != null && tile instanceof IHeatUser) {
-            return ((IHeatUser) tile).canAccept(this);
-        }
-
-        return false;
+        IHeatUser user = Tiles.get(worldObj, xCoord, yCoord + 1, zCoord, IHeatUser.class);
+        return user != null && user.canAccept(this);
     }
 }

@@ -7,12 +7,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Tiles;
 
 public class ItemHide extends ItemComponentMF {
 
@@ -80,8 +80,7 @@ public class ItemHide extends ItemComponentMF {
     }
 
     public boolean isTrough(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        return tile != null && tile instanceof IQuenchBlock;
+        return Tiles.is(world, x, y, z, IQuenchBlock.class);
     }
 
     public boolean isCauldron(World world, int x, int y, int z) {

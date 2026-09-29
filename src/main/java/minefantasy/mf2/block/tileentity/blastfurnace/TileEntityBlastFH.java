@@ -13,6 +13,7 @@ import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
@@ -112,9 +113,8 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     /** Puts a smelted result into the crucible below; what does not fit goes out into the world. */
     public void dropItem(ItemStack result) {
-        TileEntity under = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (under != null && under instanceof TileEntityCrucible) {
-            TileEntityCrucible crucible = (TileEntityCrucible) under;
+        TileEntityCrucible crucible = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityCrucible.class);
+        if (crucible != null) {
             int slot = crucible.getSizeInventory() - 1;
             {
                 if (crucible.getStackInSlot(slot) == null) {

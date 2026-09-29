@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.ISmokeCarrier;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.refining.BlockChimney;
@@ -81,9 +82,8 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     }
 
     private boolean tryPassTo(int x, int y, int z, boolean priority, boolean sideways) {
-        TileEntity tile = worldObj.getTileEntity(x + xCoord, y + yCoord, z + zCoord);
-        if (tile != null && tile instanceof TileEntityChimney) {
-            TileEntityChimney carrier = (TileEntityChimney) tile;
+        TileEntityChimney carrier = Tiles.get(worldObj, x + xCoord, y + yCoord, z + zCoord, TileEntityChimney.class);
+        if (carrier != null) {
             boolean canPass = !sideways || carrier.canAcceptSideways();
 
             int smoke = carrier.getSmokeValue();

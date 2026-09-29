@@ -3,9 +3,9 @@ package minefantasy.mf2.block.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockComponent;
 
@@ -69,9 +69,9 @@ public class TileEntityComponent extends TileEntityShown {
         if (!BlockComponent.canBuildOn(worldObj, xCoord, yCoord - 1, zCoord)) {
             worldObj.setBlockToAir(xCoord, yCoord, zCoord);
         }
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        if (tile != null && tile instanceof TileEntityComponent) {
-            ((TileEntityComponent) tile).checkStack();
+        TileEntityComponent tile = Tiles.get(worldObj, xCoord, yCoord + 1, zCoord, TileEntityComponent.class);
+        if (tile != null) {
+            tile.checkStack();
         }
     }
 

@@ -20,6 +20,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.Heading;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
@@ -58,9 +59,9 @@ public class BlockComponent extends BlockTiled<TileEntityComponent> {
     }
 
     public static boolean canBuildOn(World world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile instanceof TileEntityComponent) {
-            return ((TileEntityComponent) tile).isFull();
+        TileEntityComponent tile = Tiles.get(world, x, y, z, TileEntityComponent.class);
+        if (tile != null) {
+            return tile.isFull();
         }
         return world.isSideSolid(x, y, z, ForgeDirection.UP);
     }

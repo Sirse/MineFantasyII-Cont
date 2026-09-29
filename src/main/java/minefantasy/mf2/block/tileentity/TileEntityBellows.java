@@ -3,9 +3,9 @@ package minefantasy.mf2.block.tileentity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.IBellowsUseable;
 
 public class TileEntityBellows extends TileEntityShown {
@@ -97,9 +97,8 @@ public class TileEntityBellows extends TileEntityShown {
         int y2 = yCoord + dir.offsetY;
         int z2 = zCoord + dir.offsetZ;
 
-        TileEntity tile = worldObj.getTileEntity(x2, y2, z2);
-
-        if (tile != null && tile instanceof IBellowsUseable) return (IBellowsUseable) tile;
+        IBellowsUseable tile = Tiles.get(worldObj, x2, y2, z2, IBellowsUseable.class);
+        if (tile != null) return tile;
 
         if (worldObj.getBlock(x2, y2, z2).getMaterial() != null
                 && worldObj.getBlock(x2, y2, z2).getMaterial().isSolid()) {
@@ -114,12 +113,7 @@ public class TileEntityBellows extends TileEntityShown {
         int y2 = yCoord + (dir.offsetY * 2);
         int z2 = zCoord + (dir.offsetZ * 2);
 
-        TileEntity tile = worldObj.getTileEntity(x2, y2, z2);
-        if (tile == null) return null;
-        if (tile instanceof IBellowsUseable) {
-            return (IBellowsUseable) tile;
-        }
-        return null;
+        return Tiles.get(worldObj, x2, y2, z2, IBellowsUseable.class);
     }
 
     @Override

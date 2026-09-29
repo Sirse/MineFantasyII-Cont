@@ -5,12 +5,12 @@ import java.lang.reflect.Method;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.Packet;
 import net.minecraft.server.management.PlayerManager;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.api.helpers.Tiles;
 
 /**
  * Here I used code in Railcraft.
@@ -85,13 +85,10 @@ public class NetworkUtils {
         return buf != null && buf.readableBytes() >= bytes;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T getTile(World world, int[] coords, Class<T> clazz) {
         if (world == null || coords == null || coords.length < 3) return null;
         if (!world.blockExists(coords[0], coords[1], coords[2])) return null;
-        TileEntity te = world.getTileEntity(coords[0], coords[1], coords[2]);
-        if (clazz.isInstance(te)) return (T) te;
-        return null;
+        return Tiles.get(world, coords[0], coords[1], coords[2], clazz);
     }
 
     public static boolean isWithinDistanceSq(EntityPlayer player, int[] coords, double maxDistanceSq) {

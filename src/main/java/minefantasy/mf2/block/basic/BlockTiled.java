@@ -9,6 +9,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.api.helpers.Heading;
+import minefantasy.mf2.api.helpers.Tiles;
 
 /** A block with a tile of its own: finds that tile, and may turn to face whoever placed it. */
 public abstract class BlockTiled<T extends TileEntity> extends BlockContainer {
@@ -22,8 +23,7 @@ public abstract class BlockTiled<T extends TileEntity> extends BlockContainer {
 
     /** The block's tile at the position, or null when there is none or another block's. */
     protected T getTile(IBlockAccess world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        return type.isInstance(tile) ? type.cast(tile) : null;
+        return Tiles.get(world, x, y, z, type);
     }
 
     /** Whether the block turns to face the player who places it. */

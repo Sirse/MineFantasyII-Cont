@@ -12,7 +12,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
@@ -26,6 +25,7 @@ import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.SafeStacks;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -121,13 +121,8 @@ public class TileEntityBigFurnace extends TileEntityStation
 
     private void pumpBellows(int x, int z, float pump) {
         int share = 2;
-        TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord, zCoord + z);
-        if (tile == null) return;
-
-        if (tile instanceof TileEntityBigFurnace) {
-            TileEntityBigFurnace furn = (TileEntityBigFurnace) tile;
-            if (furn.isHeater()) furn.onUsedWithBellows(pump);
-        }
+        TileEntityBigFurnace furn = Tiles.get(worldObj, xCoord + x, yCoord, zCoord + z, TileEntityBigFurnace.class);
+        if (furn != null && furn.isHeater()) furn.onUsedWithBellows(pump);
     }
 
     @Override
@@ -361,19 +356,13 @@ public class TileEntityBigFurnace extends TileEntityStation
     }
 
     private TileEntityBigFurnace getHeater() {
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (tile != null && tile instanceof TileEntityBigFurnace) {
-            if (((TileEntityBigFurnace) tile).isHeater()) return (TileEntityBigFurnace) tile;
-        }
-        return null;
+        TileEntityBigFurnace tile = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityBigFurnace.class);
+        return tile != null && tile.isHeater() ? tile : null;
     }
 
     private TileEntityBigFurnace getFurnace() {
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        if (tile != null && tile instanceof TileEntityBigFurnace) {
-            if (!((TileEntityBigFurnace) tile).isHeater()) return (TileEntityBigFurnace) tile;
-        }
-        return null;
+        TileEntityBigFurnace tile = Tiles.get(worldObj, xCoord, yCoord + 1, zCoord, TileEntityBigFurnace.class);
+        return tile != null && !tile.isHeater() ? tile : null;
     }
 
     private void updateHeater() {

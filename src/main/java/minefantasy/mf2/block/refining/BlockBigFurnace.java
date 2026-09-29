@@ -16,6 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.TileEntityBigFurnace;
@@ -58,11 +59,9 @@ public class BlockBigFurnace extends BlockStation<TileEntityBigFurnace> {
 
     @Override
     public int getLightValue(IBlockAccess world, int x, int y, int z) {
-        TileEntity tile = world.getTileEntity(x, y, z);
-        if (tile != null && tile instanceof TileEntityBigFurnace) {
-            if (((TileEntityBigFurnace) tile).isBurning()) {
-                return 10;
-            }
+        TileEntityBigFurnace tile = Tiles.get(world, x, y, z, TileEntityBigFurnace.class);
+        if (tile != null && tile.isBurning()) {
+            return 10;
         }
         return super.getLightValue(world, x, y, z);
     }

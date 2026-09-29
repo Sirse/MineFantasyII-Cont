@@ -6,11 +6,11 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.helpers.BlockPositionHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.weapon.IRackItem;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 
@@ -182,13 +182,15 @@ public class TileEntityRack extends TileEntityWoodDecor implements IInventory {
     public void closeInventory() {}
 
     public boolean hasRackAbove(int slot) {
-        TileEntity side = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        return side != null && side instanceof TileEntityRack;// && ((TileEntityRack)side).getStackInSlot(slot) == null;
+        return Tiles.is(worldObj, xCoord, yCoord + 1, zCoord, TileEntityRack.class);// &&
+                                                                                    // ((TileEntityRack)side).getStackInSlot(slot)
+                                                                                    // == null;
     }
 
     public boolean hasRackBelow(int slot) {
-        TileEntity side = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        return side != null && side instanceof TileEntityRack;// && ((TileEntityRack)side).getStackInSlot(slot) == null;
+        return Tiles.is(worldObj, xCoord, yCoord - 1, zCoord, TileEntityRack.class);// &&
+                                                                                    // ((TileEntityRack)side).getStackInSlot(slot)
+                                                                                    // == null;
     }
 
     public void updateInventory() {

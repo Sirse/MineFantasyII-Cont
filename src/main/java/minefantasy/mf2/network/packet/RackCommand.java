@@ -1,10 +1,10 @@
 package minefantasy.mf2.network.packet;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.helpers.Cooldowns;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.mechanics.ProtectionHelper;
@@ -59,12 +59,8 @@ public class RackCommand extends PacketMF {
             return;
         }
 
-        TileEntity tile = player.worldObj.getTileEntity(x, y, z);
-        if (!(tile instanceof TileEntityRack)) {
-            return;
-        }
-        TileEntityRack target = (TileEntityRack) tile;
-        if (!target.isUseableByPlayer(player)) {
+        TileEntityRack target = Tiles.get(player.worldObj, x, y, z, TileEntityRack.class);
+        if (target == null || !target.isUseableByPlayer(player)) {
             return;
         }
         // This path replaces a right-click that never reached the vanilla handler, so raise the same interaction

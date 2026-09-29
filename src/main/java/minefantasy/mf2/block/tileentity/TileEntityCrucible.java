@@ -17,6 +17,7 @@ import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.RecipeEntry;
@@ -273,11 +274,8 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             return 750F;
         }
 
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord - 1, zCoord);
-        if (tile instanceof TileEntityForge) {
-            return Math.min(((TileEntityForge) tile).getBlockTemperature(), 2500F);
-        }
-        return 0F;
+        TileEntityForge forge = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityForge.class);
+        return forge != null ? Math.min(forge.getBlockTemperature(), 2500F) : 0F;
     }
 
     public boolean isCoated() {
@@ -357,8 +355,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (worldObj == null) {
             return false;
         }
-        TileEntity tile = worldObj.getTileEntity(xCoord, yCoord + 1, zCoord);
-        return tile instanceof TileEntityBlastFH;
+        return Tiles.is(worldObj, xCoord, yCoord + 1, zCoord, TileEntityBlastFH.class);
     }
 
     @Override
