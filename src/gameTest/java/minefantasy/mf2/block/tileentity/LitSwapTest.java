@@ -42,7 +42,13 @@ public class LitSwapTest {
         TestPos at = helper.absolute(1, 1, 1);
 
         swap.to(true, at);
+        Block lit = helper.getWorld().getBlock(at.x(), at.y(), at.z());
+        assertTrue(type.getSimpleName() + ": lighting did not swap the block", lit != unlit);
         swap.to(false, at);
+        assertSame(
+                type.getSimpleName() + ": putting out did not swap back",
+                unlit,
+                helper.getWorld().getBlock(at.x(), at.y(), at.z()));
 
         TileEntityStation after = helper.assertTileEntityPresent(type, 1, 1, 1);
         assertSame(type.getSimpleName() + ": the swap replaced the station", station, after);

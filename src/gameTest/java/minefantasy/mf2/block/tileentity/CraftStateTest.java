@@ -5,6 +5,8 @@ import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -49,16 +51,22 @@ public class CraftStateTest {
         helper.succeed();
     }
 
-    /** A block whose state is one number. */
+    /** A block whose state is one number; it keeps what it sends instead of sending it. */
     private static final class Counter extends TileEntityShown {
 
         float value;
+        final List<NBTTagCompound> sends = new ArrayList<>();
 
         @Override
         protected NBTTagCompound describe() {
             NBTTagCompound state = new NBTTagCompound();
             state.setFloat("Value", value);
             return state;
+        }
+
+        @Override
+        protected void send(NBTTagCompound tag) {
+            sends.add((NBTTagCompound) tag.copy());
         }
     }
 
@@ -68,13 +76,23 @@ public class CraftStateTest {
         try {
             Counter counter = place(new Counter());
             counter.value = 1F;
-            assertTrue("a new state was not due", unsent(counter));
             counter.sendState(false);
-            assertFalse("the sent state was not kept", unsent(counter));
             counter.sendState(false);
-            assertFalse(unsent(counter));
+            assertEquals("an unchanged state was sent again", 1, counter.sends.size());
+            assertEquals(1F, counter.sends.get(0).getFloat("Value"), 0F);
             counter.value = 2F;
-            assertTrue("the kept copy followed the block's state", unsent(counter));
+            counter.sendState(false);
+            assertEquals("a changed state was not sent", 2, counter.sends.size());
+            assertEquals(2F, counter.sends.get(1).getFloat("Value"), 0F);
+            counter.sendState(true);
+            assertEquals("a forced send was skipped", 3, counter.sends.size());
+            NBTTagCompound moment = new NBTTagCompound();
+            moment.setBoolean("Moment", true);
+            counter.sendMoment(moment);
+            assertEquals("the moment was not sent", 4, counter.sends.size());
+            assertTrue(counter.sends.get(3).getBoolean("Moment"));
+            counter.sendState(false);
+            assertEquals("a moment made the state due again", 4, counter.sends.size());
         } finally {
             Stations.end();
         }

@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.api.helpers.TextureHelperMF;
 import minefantasy.mf2.block.tileentity.TileEntityKitchenBench;
 import minefantasy.mf2.container.ContainerKitchenBench;
 
@@ -42,6 +43,8 @@ public class GuiKitchenBench extends GuiCraftBench {
         if (max <= 0 || tile.dirtyProgress <= 0) {
             return;
         }
+        // The icons above leave another texture bound
+        mc.getTextureManager().bindTexture(TextureHelperMF.getResource(texture()));
         GL11.glColor4f(1.0F, 0.4F, 0.4F, 1.0F);
         drawTexturedModalRect(left + 8, top + 26, 0, 240, (int) (160F / max * Math.min(max, tile.dirtyProgress)), 2);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

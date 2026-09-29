@@ -38,7 +38,7 @@ public abstract class TileEntityShown extends TileEntity implements StationState
             return;
         }
         sent = (NBTTagCompound) state.copy();
-        NetworkUtils.sendToWatchers(new StationStatePacket(this, state).generatePacket(), worldObj, xCoord, zCoord);
+        send(state);
     }
 
     /**
@@ -50,7 +50,12 @@ public abstract class TileEntityShown extends TileEntity implements StationState
         if (worldObj == null || worldObj.isRemote) {
             return;
         }
-        NetworkUtils.sendToWatchers(new StationStatePacket(this, moment).generatePacket(), worldObj, xCoord, zCoord);
+        send(moment);
+    }
+
+    /** Sends a tag to the players watching the block, for {@link #show} on their side. */
+    protected void send(NBTTagCompound tag) {
+        NetworkUtils.sendToWatchers(new StationStatePacket(this, tag).generatePacket(), worldObj, xCoord, zCoord);
     }
 
     @Override
