@@ -67,11 +67,11 @@ public class GuiKnowledge extends GuiScreen {
     private static final int DIM_DEPTH = 2;
     private static final int HIDDEN_DEPTH = 3;
 
-    private static final int LINK_LOCKED = 0xFF000000;
+    private static final int LINK_LOCKED = 0x90000000;
     private static final int LINK_DISCOVERED = 0xFFA0A0A0;
     private static final int LINK_AVAILABLE = 0xFF00FF00;
     /** Links among entries still out of reach: faint, so the tree reads whole without giving it away. */
-    private static final int LINK_DISTANT = 0x50000000;
+    private static final int LINK_DISTANT = 0x38000000;
     private static final int TOOLTIP_BACKGROUND = 0xC0000000;
     private static final int TOOLTIP_REQUIRES = 0xFF705050;
     private static final int TOOLTIP_DESCRIPTION = 0xFFA0A0A0;
@@ -441,6 +441,13 @@ public class GuiKnowledge extends GuiScreen {
             if (distant) {
                 continue;
             }
+            // The arrow takes the line's colour, and its transparency too: drawRect leaves blending off
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glColor4f(
+                    (colour >> 16 & 255) / 255F,
+                    (colour >> 8 & 255) / 255F,
+                    (colour & 255) / 255F,
+                    (colour >>> 24) / 255F);
 
             if (childX > parentX) {
                 this.drawTexturedModalRect(childX - 11 - 7, childY - 5, 114, 234, 7, 11);
@@ -451,6 +458,7 @@ public class GuiKnowledge extends GuiScreen {
             } else if (childY < parentY) {
                 this.drawTexturedModalRect(childX - 5, childY + 11, 96, 241, 11, 7);
             }
+            GL11.glDisable(GL11.GL_BLEND);
         }
     }
 
