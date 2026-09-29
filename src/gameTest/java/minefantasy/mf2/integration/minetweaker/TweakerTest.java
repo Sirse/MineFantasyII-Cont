@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.function.Function;
 
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import com.gtnewhorizons.horizonqa.api.GameTestArguments;
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
@@ -27,12 +29,15 @@ import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.refine.Alloy;
+import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 
 /**
@@ -284,6 +289,60 @@ public class TweakerTest {
         assertEquals(2, shapeless.getRecipeSize());
         absent(registry, ScriptRecipes.scriptId(registry.getStation(), "t_gone"));
         absent(registry, native0);
+    }
+
+    /**
+     * A material condition in a script anvil recipe applies to the piece inside a hot stack: with onlyWithTag hot iron
+     * matches an iron recipe, hot copper and iron that has cooled below working heat do not. withTag on an input is no
+     * condition in CraftTweaker, so a recipe written that way takes any material.
+     */
+    @GameTest
+    public static void anvilScriptTellsHotPiecesApartByMaterial(GameTestHelper helper) throws Exception {
+        around(helper, () -> {
+            String iron = "({MF_CustomMaterials: {main_metal: \"iron\"}})";
+            String add = "mods.minefantasy.Anvil.addShapeless(\"%s\", " + item(
+                    "junk") + ", \"\", \"\", false, \"hammer\", 0, 0, 10, [" + item("bar") + ".%s" + iron + "]);";
+            noErrors(run(String.format(add, "t_hot_iron", "onlyWithTag"), String.format(add, "t_any", "withTag")));
+            GridRecipe recipe = added(MFRecipes.ANVIL, "t_hot_iron");
+            assertTrue("hot iron is refused", recipe.matches(anvil(hot(bar, "iron", 500))));
+            assertFalse("hot copper passes for iron", recipe.matches(anvil(hot(bar, "copper", 500))));
+            assertFalse("iron below working heat passes", recipe.matches(anvil(hot(bar, "iron", 50))));
+            assertTrue(
+                    "withTag became a condition: the guidance to use onlyWithTag is out of date",
+                    added(MFRecipes.ANVIL, "t_any").matches(anvil(hot(bar, "copper", 500))));
+        });
+    }
+
+    /** A hot stack carrying one piece of the material, at the temperature; workable from 100. */
+    private static ItemStack hot(Item item, String material, int temperature) {
+        ItemStack piece = new ItemStack(item);
+        CustomMaterial.addMaterial(piece, CustomToolHelper.slot_main, material);
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag(Heatable.NBT_Item, piece.writeToNBT(new NBTTagCompound()));
+        tag.setInteger(Heatable.NBT_CurrentTemp, temperature);
+        tag.setInteger(Heatable.NBT_WorkableTemp, 100);
+        tag.setInteger(Heatable.NBT_UnstableTemp, 1000);
+        ItemStack stack = new ItemStack(TestItems.hot);
+        stack.setTagCompound(tag);
+        return stack;
+    }
+
+    /** An anvil grid holding the stack in its first cell. */
+    private static InventoryCrafting anvil(ItemStack stack) {
+        int w = GridRecipe.Grid.ANVIL.width;
+        int h = GridRecipe.Grid.ANVIL.height;
+        return new InventoryCrafting(null, w, h) {
+
+            @Override
+            public ItemStack getStackInSlot(int slot) {
+                return slot == 0 ? stack : null;
+            }
+
+            @Override
+            public ItemStack getStackInRowAndColumn(int col, int row) {
+                return col == 0 && row == 0 ? stack : null;
+            }
+        };
     }
 
     @GameTest
