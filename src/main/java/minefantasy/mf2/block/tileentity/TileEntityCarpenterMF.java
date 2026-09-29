@@ -16,6 +16,7 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.carpenter.CraftingManagerCarpenter;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -153,7 +154,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
 
             Requirements.Verdict verdict = verdict(user);
             if (verdict != null && verdict.allows() && canCraft()) {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getUseSound(), 1.0F, 1.0F);
+                Sounds.at(this, getUseSound(), 1.0F, 1.0F);
                 float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem());
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
@@ -165,7 +166,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
                     craftItem(user);
                 }
             } else {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
+                Sounds.at(this, "step.stone", 1.25F, 1.5F);
             }
             lastPlayerHit = user.getCommandSenderName();
             updateCraftingData();

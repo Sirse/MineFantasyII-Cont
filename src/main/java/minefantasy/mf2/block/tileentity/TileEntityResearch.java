@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.knowledge.IArtefact;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchArtefacts;
@@ -80,13 +81,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
                     && ResearchLogic.canPurchase(user, base)
                     && base.hasSkillsUnlocked(user)) {
                 int artefacts = ResearchArtefacts.useArtefact(items[0], base, user);
-                worldObj.playSoundEffect(
-                        xCoord + 0.5,
-                        yCoord + 0.5,
-                        zCoord + 0.5,
-                        "minefantasy2:updateResearch",
-                        1.0F,
-                        1.0F);
+                Sounds.at(this, "minefantasy2:updateResearch", 1.0F, 1.0F);
                 if (!user.worldObj.isRemote) {
                     Object name = new ChatComponentTranslation("knowledge." + base.getUnlocalisedName());
                     if (artefacts == -1) {
@@ -151,13 +146,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         if (user.swingProgress > 0) {
             efficiency *= Math.max(0F, 1.0F - user.swingProgress);
         }
-        worldObj.playSoundEffect(
-                xCoord + 0.5,
-                yCoord + 0.5,
-                zCoord + 0.5,
-                "minefantasy2:block.flipPage",
-                1.0F,
-                rand.nextFloat() * 0.4F + 0.8F);
+        Sounds.at(this, "minefantasy2:block.flipPage", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
         efficiency *= getEnvironmentBoost();
         progress += efficiency;
     }

@@ -12,6 +12,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -176,7 +177,7 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
             progress = 0;
             progressMax = inv[SLOT_INPUT].stackSize * BloomRecipe.TICKS_PER_ITEM;
             project.start(result.getPlan());
-            worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "fire.ignite", 1.0F, 1.0F);
+            Sounds.at(this, "fire.ignite", 1.0F, 1.0F);
         }
         return true;
     }
@@ -246,13 +247,7 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
                 Drops.still(worldObj, xCoord + 0.5D, yCoord + 1.25D, zCoord + 0.5D, drop, 10);
                 syncData();
             }
-            worldObj.playSoundEffect(
-                    xCoord + 0.5D,
-                    yCoord + 0.5D,
-                    zCoord + 0.5D,
-                    "minefantasy2:block.anvilsucceed",
-                    0.25F,
-                    1.0F);
+            Sounds.at(this, "minefantasy2:block.anvilsucceed", 0.25F, 1.0F);
 
             return true;
         }

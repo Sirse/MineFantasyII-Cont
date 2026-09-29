@@ -18,6 +18,7 @@ import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -105,7 +106,7 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
                 tryDecrMainItem(player, amount);
                 updateRecipe();
                 if (!isOven() && this.getTemp() > 0) {
-                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.fizz", 1.0F, 1.0F);
+                    Sounds.at(this, "random.fizz", 1.0F, 1.0F);
                 }
                 return true;
             }

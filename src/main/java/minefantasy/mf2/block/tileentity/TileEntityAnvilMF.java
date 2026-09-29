@@ -24,6 +24,7 @@ import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.ItemQuality;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -209,13 +210,7 @@ public class TileEntityAnvilMF extends TileEntityStation
                     ruinCraft();
                 }
 
-                worldObj.playSoundEffect(
-                        xCoord + 0.5D,
-                        yCoord + 0.5D,
-                        zCoord + 0.5D,
-                        "minefantasy2:block.anvilsucceed",
-                        0.25F,
-                        rightClick ? 1.2F : 1.0F);
+                Sounds.at(this, "minefantasy2:block.anvilsucceed", 0.25F, rightClick ? 1.2F : 1.0F);
                 float efficiency = ToolHelper.getCrafterEfficiency(user.getHeldItem()) * (rightClick ? 0.75F : 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
@@ -227,13 +222,7 @@ public class TileEntityAnvilMF extends TileEntityStation
                     craftItem(user);
                 }
             } else {
-                worldObj.playSoundEffect(
-                        xCoord + 0.5D,
-                        yCoord + 0.5D,
-                        zCoord + 0.5D,
-                        "minefantasy2:block.anvilfail",
-                        0.25F,
-                        1.0F);
+                Sounds.at(this, "minefantasy2:block.anvilfail", 0.25F, 1.0F);
             }
             lastPlayerHit = user.getCommandSenderName();
             updateCraftingData();
@@ -847,13 +836,7 @@ public class TileEntityAnvilMF extends TileEntityStation
 
     public void upset(EntityPlayer user) {
         if (this.progress > 0 && this.progressMax > 0) {
-            worldObj.playSoundEffect(
-                    xCoord + 0.5D,
-                    yCoord + 0.5D,
-                    zCoord + 0.5D,
-                    "minefantasy2:block.anvilsucceed",
-                    0.25F,
-                    0.75F);
+            Sounds.at(this, "minefantasy2:block.anvilsucceed", 0.25F, 0.75F);
             if (!worldObj.isRemote) {
                 progress -= (progressMax / 10F);
                 if (progress < 0) {

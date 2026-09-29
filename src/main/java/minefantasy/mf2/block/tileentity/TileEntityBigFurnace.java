@@ -25,6 +25,7 @@ import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.SafeStacks;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
@@ -574,13 +575,7 @@ public class TileEntityBigFurnace extends TileEntityStation
 
     public void openChest() {
         if (numUsers == 0) {
-            this.worldObj.playSoundEffect(
-                    xCoord + 0.5D,
-                    this.yCoord + 0.5D,
-                    zCoord + 0.5D,
-                    "minefantasy2:block.furnace_open",
-                    0.5F,
-                    this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            Sounds.at(this, "minefantasy2:block.furnace_open", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
         ++numUsers;
     }
@@ -588,13 +583,7 @@ public class TileEntityBigFurnace extends TileEntityStation
     public void closeChest() {
         --numUsers;
         if (numUsers == 0 && doorAngle >= 15) {
-            this.worldObj.playSoundEffect(
-                    xCoord + 0.5D,
-                    this.yCoord + 0.5D,
-                    zCoord + 0.5D,
-                    "minefantasy2:block.furnace_close",
-                    0.5F,
-                    this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
+            Sounds.at(this, "minefantasy2:block.furnace_close", 0.5F, this.worldObj.rand.nextFloat() * 0.1F + 0.9F);
         }
     }
 

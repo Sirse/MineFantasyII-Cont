@@ -18,6 +18,7 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -131,7 +132,7 @@ public class TileEntityKitchenBench extends TileEntityStation
         if (!worldObj.isRemote && isWaterContainer(held)) {
             if (dirtyProgress > 0 || user.capabilities.isCreativeMode) {
                 washBench(user);
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.splash", 0.75F, 1.0F);
+                Sounds.at(this, "random.splash", 0.75F, 1.0F);
             }
             return true;
         }
@@ -151,9 +152,9 @@ public class TileEntityKitchenBench extends TileEntityStation
             }
 
             if (dirty) {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
+                Sounds.at(this, "step.stone", 1.25F, 1.5F);
             } else if (isAllowed(verdict(user)) && canCraft()) {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, getCraftingSound(), 1.0F, 1.0F);
+                Sounds.at(this, getCraftingSound(), 1.0F, 1.0F);
 
                 if (user.swingProgress > 0 && user.swingProgress <= 1.0) {
                     efficiency *= (0.5F - user.swingProgress);
@@ -163,7 +164,7 @@ public class TileEntityKitchenBench extends TileEntityStation
                     craftItem(user);
                 }
             } else {
-                worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "step.stone", 1.25F, 1.5F);
+                Sounds.at(this, "step.stone", 1.25F, 1.5F);
             }
             lastPlayerHit = user.getCommandSenderName();
             updateCraftingData();

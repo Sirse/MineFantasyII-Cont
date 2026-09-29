@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.IBellowsUseable;
 
@@ -31,13 +32,7 @@ public class TileEntityBellows extends TileEntityShown {
             if (entity instanceof EntityPlayer) {
                 ((EntityPlayer) entity).playSound("minefantasy2:block.bellows", 1, 1);
             } else if (!worldObj.isRemote) {
-                worldObj.playSoundEffect(
-                        xCoord + 0.5D,
-                        yCoord + 0.5D,
-                        zCoord + 0.5D,
-                        "minefantasy2:block.bellows",
-                        1.0F,
-                        1.0F);
+                Sounds.at(this, "minefantasy2:block.bellows", 1.0F, 1.0F);
             }
             press = 50;
             if (forge != null) {

@@ -13,6 +13,7 @@ import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -96,7 +97,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             }
         }
         fireTime = 20;
-        worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "random.fizz", 2.0F, 0.5F);
+        Sounds.at(this, "random.fizz", 2.0F, 0.5F);
         worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.25, zCoord + 0.5, "fire.fire", 1.0F, 0.75F);
         startFire(1, 0, 0);
         startFire(-1, 0, 0);

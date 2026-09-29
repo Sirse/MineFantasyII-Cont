@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 
 import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 
 public class ItemHide extends ItemComponentMF {
@@ -58,7 +59,7 @@ public class ItemHide extends ItemComponentMF {
     private void tryClean(ItemStack item, World world, EntityPlayer player) {
         player.swingItem();
         if (!world.isRemote) {
-            world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
+            Sounds.scoop(world, player);
             if (rand.nextFloat() * 2 * hardness < 1.0F) {
                 item.stackSize--;
                 Drops.spawn(world, player.posX, player.posY, player.posZ, new ItemStack(result), 0);

@@ -32,6 +32,7 @@ import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.ISmithTongs;
@@ -106,8 +107,7 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
                         cooled = Heatable.getQuenchedItem(drop, water);
                         cooled.stackSize = drop.stackSize;
 
-                        player.playSound("random.splash", 1F, 1F);
-                        player.playSound("random.fizz", 2F, 0.5F);
+                        Sounds.quench(player);
 
                         for (int a = 0; a < 5; a++) {
                             world.spawnParticle("largesmoke", i + 0.5F, j + 1, k + 0.5F, 0, 0.065F, 0);

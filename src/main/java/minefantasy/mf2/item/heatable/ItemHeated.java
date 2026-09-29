@@ -24,6 +24,7 @@ import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.GuiHelper;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.util.MFLogUtil;
 
@@ -228,8 +229,7 @@ public class ItemHeated extends Item implements IHotItem {
                 float water = TongsHelper.getWaterSource(world, i, j, k);
 
                 if (water >= 0) {
-                    player.playSound("random.splash", 1F, 1F);
-                    player.playSound("random.fizz", 2F, 0.5F);
+                    Sounds.quench(player);
                     for (int a = 0; a < 5; a++) {
                         world.spawnParticle("largesmoke", i + 0.5F, j + 1, k + 0.5F, 0, 0.065F, 0);
                     }

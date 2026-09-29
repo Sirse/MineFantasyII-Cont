@@ -18,6 +18,7 @@ import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.Functions;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.IBellowsUseable;
 import minefantasy.mf2.api.refine.SmokeMechanics;
@@ -184,7 +185,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
             } else {
                 int maxTemp = ItemHeated.getMaxTemp(item);
                 if (maxTemp > 0 && temp >= maxTemp) {
-                    worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "random.fizz", 0.7F, 0.5F);
+                    Sounds.at(this, "random.fizz", 0.7F, 0.5F);
                     this.setInventorySlotContents(slot, null);
                 } else {
                     ItemHeated.setTemp(item, Math.max(0, temp));

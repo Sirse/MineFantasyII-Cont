@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.block.decor.BlockComponent;
 import minefantasy.mf2.item.ItemComponentMF;
@@ -113,7 +114,7 @@ public class ItemJug extends ItemComponentMF {
     private void gather(ItemStack item, World world, EntityPlayer player) {
         player.swingItem();
         if (!world.isRemote) {
-            world.playSoundAtEntity(player, "random.splash", 0.125F + rand.nextFloat() / 4F, 0.5F + rand.nextFloat());
+            Sounds.scoop(world, player);
             item.stackSize--;
             Drops.spawn(world, player.posX, player.posY, player.posZ, new ItemStack(FoodListMF.jug_water), 0);
         }

@@ -17,6 +17,7 @@ import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
@@ -119,8 +120,8 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     }
 
     private void onAutoSmelt() {
-        worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "random.fizz", 1.0F, 1.0F);
-        worldObj.playSoundEffect(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, "random.piston.out", 1.0F, 1.0F);
+        Sounds.at(this, "random.fizz", 1.0F, 1.0F);
+        Sounds.at(this, "random.piston.out", 1.0F, 1.0F);
     }
 
     private boolean isOutside() {
