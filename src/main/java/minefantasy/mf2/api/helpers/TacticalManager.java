@@ -22,7 +22,7 @@ import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.weapon.IParryable;
 import minefantasy.mf2.api.weapon.ISpecialCombatMob;
 import minefantasy.mf2.entity.EntityArrowMF;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.Parrying;
 
 /**
  * This calculates different tactical contexts for combat like flanking and blocking
@@ -105,7 +105,7 @@ public class TacticalManager {
             }
         }
 
-        if (!CombatMechanics.isParryAvailable(user)) {
+        if (!Parrying.isParryAvailable(user)) {
             return false;
         }
         int confusion = 0;

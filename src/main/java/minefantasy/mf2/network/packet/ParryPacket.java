@@ -3,7 +3,7 @@ package minefantasy.mf2.network.packet;
 import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.Parrying;
 import minefantasy.mf2.network.NetworkUtils;
 
 public class ParryPacket extends PacketMF {
@@ -24,7 +24,7 @@ public class ParryPacket extends PacketMF {
         }
 
         value = packet.readInt();
-        CombatMechanics.setParryCooldown(player, value);
+        Parrying.setParryCooldown(player, value);
     }
 
     @Override

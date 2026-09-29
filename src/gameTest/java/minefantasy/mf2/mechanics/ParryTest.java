@@ -97,9 +97,9 @@ public class ParryTest {
     public static void aParryWaitsForItsCooldown(GameTestHelper helper) {
         withoutStamina(() -> {
             FakePlayer player = fencer(helper, true);
-            CombatMechanics.setParryCooldown(player, 20);
+            Parrying.setParryCooldown(player, 20);
             assertFalse("a parry came during the cooldown", parries(player, zombie(helper, 2)));
-            CombatMechanics.setParryCooldown(player, 0);
+            Parrying.setParryCooldown(player, 0);
             assertTrue(parries(player, zombie(helper, 2)));
         });
         helper.succeed();

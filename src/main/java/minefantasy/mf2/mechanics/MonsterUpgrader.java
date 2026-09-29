@@ -18,6 +18,8 @@ import minefantasy.mf2.util.XSTRandom;
 public class MonsterUpgrader {
 
     public static final String zombieArmourNBT = "MF_ZombieArmour";
+    /** Some skeletons carry swords. */
+    public static boolean swordSkeleton = true;
     private static final String upgradedNbt = "MF_Upgraded";
     private static final String legacyUpgradedNbt = "giveMFWeapon";
     private static final float zombieWepChance = 10F;
@@ -35,7 +37,7 @@ public class MonsterUpgrader {
             if (mob instanceof EntitySkeleton) {
                 if (((EntitySkeleton) mob).getSkeletonType() == 1) {
                     giveEntityWeapon(mob, "Obsidian", random.nextInt(8));
-                } else if (CombatMechanics.swordSkeleton && random.nextInt(3) == 0) {
+                } else if (MonsterUpgrader.swordSkeleton && random.nextInt(3) == 0) {
                     mob.setCurrentItemOrArmor(0, CustomToolListMF.standard_sword.construct("Bronze", "OakWood"));
                     ((EntitySkeleton) mob).setCombatTask();
                 }

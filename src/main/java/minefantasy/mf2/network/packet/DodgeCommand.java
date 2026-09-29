@@ -4,7 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.helpers.Cooldowns;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.Dodging;
 import minefantasy.mf2.network.NetworkUtils;
 
 public class DodgeCommand extends PacketMF {
@@ -37,7 +37,7 @@ public class DodgeCommand extends PacketMF {
         if (!Cooldowns.pass(player, LAST_DODGE_CMD_TICK_NBT, DODGE_COOLDOWN_TICKS)) {
             return;
         }
-        CombatMechanics.requestDodge(player, dodgeId);
+        Dodging.requestDodge(player, dodgeId);
     }
 
     @Override

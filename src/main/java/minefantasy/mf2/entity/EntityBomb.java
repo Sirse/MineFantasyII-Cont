@@ -25,6 +25,7 @@ import minefantasy.mf2.item.gadget.EnumExplosiveType;
 import minefantasy.mf2.item.gadget.EnumFuseType;
 import minefantasy.mf2.item.gadget.EnumPowderType;
 import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.MobTactics;
 import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityBomb extends Entity {
@@ -186,7 +187,7 @@ public class EntityBomb extends Entity {
 
         if (!worldObj.isRemote && this.ridingEntity instanceof EntityLivingBase) {
             if (!(ridingEntity instanceof EntityChicken)) {
-                CombatMechanics.panic((EntityLivingBase) ridingEntity, 1.0F, 30);
+                MobTactics.panic((EntityLivingBase) ridingEntity, 1.0F, 30);
             }
         }
         if (isStuckInBlock()) {

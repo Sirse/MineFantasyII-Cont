@@ -33,7 +33,7 @@ import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.item.archery.ArrowType;
 import minefantasy.mf2.item.gadget.EnumExplosiveType;
 import minefantasy.mf2.item.gadget.EnumPowderType;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.WeaponBanes;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageType, IArrowRetrieve {
@@ -568,7 +568,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
 
     private float getDamageModifier(Entity target) {
         CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(getArrowStack());
-        return CombatMechanics.getSpecialModifier(material, "standard", target, true);
+        return WeaponBanes.getSpecialModifier(material, "standard", target, true);
     }
 
     private boolean isExplosive() {

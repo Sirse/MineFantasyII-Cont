@@ -5,7 +5,7 @@ import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.tileentity.TileEntityRoast;
 import minefantasy.mf2.hunger.HungerSystemMF;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.MonsterUpgrader;
 
 public class ConfigHardcore extends ConfigurationBaseMF {
 
@@ -157,7 +157,7 @@ public class ConfigHardcore extends ConfigurationBaseMF {
                 "Critical Injury Limp",
                 true,
                 "This means when you're badly wounded, you slow down and limp").getBoolean();
-        CombatMechanics.swordSkeleton = config.get(CATEGORY_MOB, "Skeleton Swords", true, "Some Skeletons use swords")
+        MonsterUpgrader.swordSkeleton = config.get(CATEGORY_MOB, "Skeleton Swords", true, "Some Skeletons use swords")
                 .getBoolean();
     }
 }

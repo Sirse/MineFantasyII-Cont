@@ -28,7 +28,7 @@ import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.Dodging;
 
 /**
  * Packets as a modified client would send them: truncated, garbage, or naming things the player cannot see or reach.
@@ -233,9 +233,9 @@ public class PacketAbuseTest {
     /** Stands the player, then lifts them off the ground, as the server sees a jump through position packets. */
     private static void jump(FakePlayer player) {
         player.onGround = true;
-        CombatMechanics.trackDodgeWindow(player);
+        Dodging.trackDodgeWindow(player);
         player.onGround = false;
-        CombatMechanics.trackDodgeWindow(player);
+        Dodging.trackDodgeWindow(player);
     }
 
     private static boolean moved(FakePlayer player) {
@@ -260,12 +260,12 @@ public class PacketAbuseTest {
 
             // The request beats the position packet: it waits for the server to see the jump
             player.onGround = true;
-            CombatMechanics.trackDodgeWindow(player);
+            Dodging.trackDodgeWindow(player);
             handler.process(ints(1), player);
             later(player);
             assertFalse("a dodge came while standing", moved(player));
             player.onGround = false;
-            CombatMechanics.trackDodgeWindow(player);
+            Dodging.trackDodgeWindow(player);
             assertTrue("a request a tick before the jump was dropped", moved(player));
 
             handler.process(ints(-1), player);

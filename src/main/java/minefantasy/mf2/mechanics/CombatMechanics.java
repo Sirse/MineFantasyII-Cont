@@ -1,21 +1,15 @@
 package minefantasy.mf2.mechanics;
 
-import java.util.Map;
-
-import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityEnderPearl;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -25,14 +19,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ISpecialArmor;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.armour.IElementalResistance;
 import minefantasy.mf2.api.helpers.*;
-import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.RPGElements;
@@ -43,42 +34,16 @@ import minefantasy.mf2.config.ConfigArmour;
 import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.config.ConfigStamina;
 import minefantasy.mf2.config.ConfigWeapon;
-import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.entity.Shockwave;
-import minefantasy.mf2.entity.mob.EntityMinotaur;
 import minefantasy.mf2.item.weapon.*;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
-import minefantasy.mf2.network.packet.DodgeCommand;
-import minefantasy.mf2.network.packet.ParryPacket;
 import minefantasy.mf2.util.MFLogUtil;
 import minefantasy.mf2.util.XSTRandom;
 
 public class CombatMechanics {
 
-    public static final String parryCooldownNBT = "MF_Parry_Cooldown";
-    public static final String posthitCooldownNBT = "MF_PostHit";
-    /**
-     * Damage done by silver to undead/witches
-     */
-    public static final float specialUnholyModifier = 2.0F;
-    /**
-     * Damage done by silver to werewolves
-     */
-    public static final float specialWerewolfModifier = 8.0F;
-    /**
-     * Damage done with dragonforged design to dragons
-     */
-    public static final float specialDragonModifier = 1.5F;
-    /**
-     * Damage done with ornate design to undead/witches
-     */
-    public static final float specialOrnateModifier = 1.5F;
     private static final float power_attack_base = 25F;
-    private static final float parryFatigue = 5F;
-    public static boolean swordSkeleton = true;
     private static XSTRandom random = new XSTRandom();
-    protected float jumpEvade_cost = 30;
-    protected float evade_cost = 10;
 
     /**
      * 0 = false 1 = true -1 = failure
@@ -93,7 +58,7 @@ public class CombatMechanics {
                 if (properHit) {
                     ItemWeaponMF.applyFatigue(user, points);
                 }
-                return getPostHitCooldown(user) > 0 ? -1 : 1;
+                return Parrying.getPostHitCooldown(user) > 0 ? -1 : 1;
             } else {
                 return 0;
             }
@@ -111,122 +76,8 @@ public class CombatMechanics {
         return user.fallDistance > 0 && !user.isOnLadder();
     }
 
-    private static boolean isFightStance(EntityLivingBase user) {
+    static boolean isFightStance(EntityLivingBase user) {
         return user.isSneaking();
-    }
-
-    public static void applyUndeadBane(EntityLivingBase living) {
-        living.playSound("random.fizz", 0.5F, 0.5F);
-        living.addPotionEffect(new PotionEffect(Potion.weakness.id, 1200, 2));
-        living.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1200, 2));
-        if (random.nextInt(5) == 0) {
-            living.setFire(3);
-        }
-    }
-
-    protected static void performEffects(Map<PotionEffect, Float> map, EntityLivingBase entityHit) {
-        double roll = Math.random();
-        if (map == null || map.isEmpty()) {
-            return;
-        }
-
-        for (PotionEffect effect : map.keySet()) {
-            // add effects if they aren't already applied, with corresponding chance factor
-            if (!entityHit.isPotionActive(effect.getPotionID()) && map.get(effect) > roll) {
-                entityHit.addPotionEffect(new PotionEffect(effect));
-            }
-        }
-    }
-
-    public static void setParryCooldown(EntityLivingBase user, int ticks) {
-        Cooldowns.set(user, parryCooldownNBT, ticks);
-
-        if (!user.worldObj.isRemote && user instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) user;
-            MineFantasyII.packetHandler.sendPacketToPlayer(new ParryPacket(ticks, player).generatePacket(), player);
-        }
-    }
-
-    public static int getParryCooldown(EntityLivingBase user) {
-        return Cooldowns.left(user, parryCooldownNBT);
-    }
-
-    public static void tickParryCooldown(EntityLivingBase user) {
-        Cooldowns.tick(user, parryCooldownNBT);
-    }
-
-    public static boolean isParryAvailable(EntityLivingBase user) {
-        return getParryCooldown(user) <= 0;
-    }
-
-    public static void setPostHitCooldown(EntityLivingBase user, int ticks) {
-        Cooldowns.set(user, posthitCooldownNBT, ticks);
-    }
-
-    public static int getPostHitCooldown(EntityLivingBase user) {
-        return Cooldowns.left(user, posthitCooldownNBT);
-    }
-
-    public static void tickPostHitCooldown(EntityLivingBase user) {
-        Cooldowns.tick(user, posthitCooldownNBT);
-    }
-
-    /**
-     * Client-sided dodge
-     */
-    private static void commandDodge(EntityPlayer user, int type) {
-        initDodge(user, type);
-        ((EntityClientPlayerMP) user).sendQueue.addToSendQueue(new DodgeCommand(user, type).generatePacket());
-    }
-
-    public static void initDodge(EntityPlayer user, int type) {
-        if (!canDodge(user)) {
-            return;
-        }
-        float bulk = ArmourCalculator.getTotalBulk(user);
-        int cost = (int) ((type == 0 ? 15 : 10) * (bulk + 1));// Medium armour cost 2x more
-
-        if (bulk <= 1.0F && ItemWeaponMF.tryPerformAbility(user, cost)) {
-            float force = 1.0F - (bulk * 0.25F);// Medium armour gives 75%
-
-            float direction = user.rotationYaw;
-            if (type == 0) direction += 180;// BACK
-            if (type == 1) direction -= 90;// LEFT
-            if (type == -1) direction += 90;// RIGHT
-            TacticalManager.leap(user, direction, force, 0.0F);
-        }
-    }
-
-    /*
-     * Causes the victim to 'Spaz out' which never stops being funny (Apply every tick)
-     */
-    public static void panic(EntityLivingBase victim, float speed, int directionTimer) {
-        if (!shouldPanic(victim)) {
-            return;
-        }
-        double moveX = victim.getEntityData().getDouble("MF2_PanicX");
-        double moveZ = victim.getEntityData().getDouble("MF2_PanicZ");
-        victim.setJumping(true);
-
-        if ((moveX == 0 && moveZ == 0) || random.nextInt(directionTimer) == 0) {
-            moveX = (random.nextDouble() - 0.5D) * 0.85D * speed;
-            moveZ = (random.nextDouble() - 0.5D) * 0.85D * speed;
-
-            victim.getEntityData().setDouble("MF2_PanicX", moveX);
-            victim.getEntityData().setDouble("MF2_PanicZ", moveZ);
-            if (victim.onGround) victim.motionY = 0.25F;
-            victim.rotationYaw = (float) (Math.atan2(moveX, moveZ));
-        }
-        victim.swingItem();
-        victim.limbSwing = 1.0F;
-        victim.moveEntity(moveX, 0D, moveZ);
-    }
-
-    private static boolean shouldPanic(EntityLivingBase victim) {
-        if (victim instanceof EntityMinotaur) {
-            return ((EntityMinotaur) victim).getRageLevel() < 80;
-        }
-        return !(victim instanceof EntityPlayer || victim instanceof EntityCogwork);
     }
 
     /**
@@ -238,44 +89,6 @@ public class CombatMechanics {
             mod += 3F;
         }
         return Math.max(-0.5F, mod);
-    }
-
-    public static float getSpecialModifier(CustomMaterial material, String design, Entity target, boolean addEffect) {
-        if (target == null) return 1.0F;
-
-        float modifier = 1.0F;
-
-        if (design != null) {
-            if (design.equalsIgnoreCase("dragonforged")) {
-                if (TacticalManager.isDragon(target)) {
-                    modifier *= specialDragonModifier;
-                }
-            }
-
-            if (design.equalsIgnoreCase("ornate")) {
-                if (TacticalManager.isUnholyCreature(target)) {
-                    modifier *= specialOrnateModifier;
-                }
-            }
-        }
-
-        if (material != null) {
-            if (isSilverishMaterial(material.name) && target instanceof EntityLivingBase) {
-                if (target.getClass().getName().contains("Werewolf")) {
-                    modifier *= specialWerewolfModifier;
-                    applyUndeadBane((EntityLivingBase) target);
-                } else if (TacticalManager.isUnholyCreature(target)) {
-                    modifier *= specialUnholyModifier;
-                    applyUndeadBane((EntityLivingBase) target);
-                }
-            }
-        }
-
-        return modifier;
-    }
-
-    public static boolean isSilverishMaterial(String material) {
-        return material.equalsIgnoreCase("silver");
     }
 
     @SubscribeEvent
@@ -510,7 +323,7 @@ public class CombatMechanics {
             }
             CustomMaterial material = CustomToolHelper.getCustomPrimaryMaterial(weapon);
             String weaponType = CustomToolHelper.getCustomStyle(weapon);
-            dam *= getSpecialModifier(material, weaponType, target, true);
+            dam *= WeaponBanes.getSpecialModifier(material, weaponType, target, true);
         }
         return dam;
     }
@@ -523,8 +336,8 @@ public class CombatMechanics {
             ticks = ((IPowerAttack) weapon.getItem()).getParryModifier(weapon, user, target);
         }
         if (target instanceof EntityLivingBase) {
-            if (ticks > getParryCooldown((EntityLivingBase) target)) {
-                setParryCooldown((EntityLivingBase) target, ticks);
+            if (ticks > Parrying.getParryCooldown((EntityLivingBase) target)) {
+                Parrying.setParryCooldown((EntityLivingBase) target, ticks);
             }
         }
         if (!user.worldObj.isRemote) {
@@ -562,7 +375,7 @@ public class CombatMechanics {
                 }
             }
         }
-        CombatMechanics.setPostHitCooldown(target, 10);
+        Parrying.setPostHitCooldown(target, 10);
     }
 
     private void onWeaponHit(EntityLivingBase user, ItemStack weapon, Entity target, float dam) {
@@ -587,100 +400,7 @@ public class CombatMechanics {
 
     private float onUserHit(EntityLivingBase user, Entity entityHitting, DamageSource source, float dam,
             boolean properHit) {
-        ItemStack weapon = user.getHeldItem();
-        if ((properHit || source.isProjectile()) && weapon != null
-                && !source.isUnblockable()
-                && !source.isExplosion()) {
-            float threshold = 10;// DEFAULT PARRY THRESHOLD
-            float weaponFatigue = 2.0F;// DEFAULT FATIGUE
-            int ticks = 18;// DEFAULT TICKS
-            IParryable parry = null;
-
-            if (weapon.getItem() instanceof IParryable) {
-                parry = (IParryable) weapon.getItem();
-
-                ticks = parry.getParryCooldown(source, dam, weapon);
-                threshold = parry.getMaxDamageParry(user, weapon);
-                weaponFatigue = parry.getParryStaminaDecay(source, weapon);
-            }
-            if (StaminaBar.isSystemActive && !StaminaBar.isAnyStamina(user, false)) {
-                threshold /= 2;
-            }
-            threshold *= TacticalManager.getHighgroundModifier(user, entityHitting, 1.15F);
-
-            if (ArmourCalculator.advancedDamageTypes && !user.worldObj.isRemote) {
-                threshold = ArmourCalculator.adjustACForDamage(source, threshold, 1.0F, 0.75F, 0.5F);
-            }
-
-            if (ConfigExperiment.debugParry && !user.worldObj.isRemote) {
-                MFLogUtil.logDebug("Init Parry: Damage = " + dam + " Threshold = " + threshold);
-            }
-
-            // USED FOR PARRYING its harder to block arrows
-            if (TacticalManager.canParry(source, user, entityHitting, weapon)) {
-                float previousDam = dam;
-                dam = Math.max(0F, dam - threshold);
-
-                if (properHit || dam <= 0) {
-                    user.hurtResistantTime = user.maxHurtResistantTime;
-                    user.hurtTime = 0;
-
-                    int result = onParry(source, user, entityHitting, dam, previousDam, parry);
-
-                    if (result == 1) {
-                        dam = 0;
-                    }
-                    ticks = ArmourCalculator.modifyParryCooldown(user, ticks);
-
-                    if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(user)
-                            && !StaminaBar.isAnyStamina(user, false)) {
-                        ticks *= 3;
-                    }
-                    if (ticks > getParryCooldown(user)) {
-                        setParryCooldown(user, ticks);
-                    }
-
-                    ItemWeaponMF.applyFatigue(
-                            user,
-                            TacticalManager.getHighgroundModifier(user, entityHitting, 2.0F) * (dam + 1F)
-                                    * parryFatigue
-                                    * weaponFatigue);
-                    if (parry == null) {
-                        user.worldObj.playSoundAtEntity(
-                                user,
-                                getDefaultParrySound(weapon),
-                                1.0F,
-                                1.25F + (random.nextFloat() * 0.5F));
-                    } else if (!parry.playCustomParrySound(user, entityHitting, weapon)) {
-                        user.worldObj
-                                .playSoundAtEntity(user, "mob.zombie.metal", 1.0F, 1.25F + (random.nextFloat() * 0.5F));
-                    }
-                    if (user instanceof EntityPlayer) {
-                        ((EntityPlayer) user).stopUsingItem();
-                        ItemWeaponMF.setParry(weapon, 20);
-                    }
-
-                    if (entityHitting instanceof EntityLivingBase) {
-                        EntityLivingBase hitter = (EntityLivingBase) entityHitting;
-                        int hitTime = 5;
-                        if (hitter.getHeldItem() != null) {
-                            ItemStack attackingWep = hitter.getHeldItem();
-                            if (attackingWep.getItem() instanceof IWeaponSpeed) {
-                                hitTime += ((IWeaponSpeed) attackingWep.getItem()).modifyHitTime(hitter, attackingWep);
-                            }
-                        }
-                        if (hitTime > 0) {
-                            MFLogUtil.logDebug(
-                                    "Recoil hitter: " + hitter.getCommandSenderName()
-                                            + " for "
-                                            + hitTime * 3
-                                            + " ticks.");
-                            EventManagerMF.setHitTime(hitter, hitTime * 3);
-                        }
-                    }
-                }
-            }
-        }
+        dam = Parrying.parry(user, entityHitting, source, dam, properHit);
         if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(user) && !StaminaBar.isAnyStamina(user, false)) {
             dam *= Math.max(1.0F, ConfigStamina.exhaustDamage);
         }
@@ -745,162 +465,6 @@ public class CombatMechanics {
         return false;
     }
 
-    private String getDefaultParrySound(ItemStack weapon) {
-        if (weapon.getUnlocalizedName().contains("wood") || weapon.getUnlocalizedName().contains("Wood")
-                || weapon.getUnlocalizedName().contains("stone")
-                || weapon.getUnlocalizedName().contains("Stone")) {
-            return "minefantasy2:weapon.wood_parry";
-        }
-        return "mob.zombie.metal";
-    }
-
-    /**
-     * @return 0 for normal parry and 1 for evade
-     */
-    private int onParry(DamageSource source, EntityLivingBase user, Entity attacker, float dam, float prevDam,
-            IParryable parry) {
-        /*
-         * if(RPGElements.isSystemActive && user instanceof EntityPlayer) { SkillList.block.addXP((EntityPlayer)user, 10
-         * + (int)prevDam*2); }
-         */
-        if (RPGElements.isSystemActive && user instanceof EntityPlayer) {
-            SkillList.combat.addXP((EntityPlayer) user, (int) (prevDam / 3F));
-        }
-        if (parry != null) {
-            parry.onParry(source, user, attacker, dam);
-        }
-        if (user instanceof ISpecialCombatMob) {
-            ((ISpecialCombatMob) user).onParry(source, attacker, dam);
-        }
-
-        boolean groundBlock = user.onGround;
-        ItemStack weapon = user.getHeldItem();
-
-        // Redirect
-        if (!user.worldObj.isRemote && !TacticalManager.isRanged(source)) {
-            if (canEvade(user)) {
-                float powerMod = attacker.isSprinting() ? 4.0F : 2.5F;
-
-                attacker.setSprinting(false);
-                TacticalManager.lungeEntity(attacker, user, powerMod, 0.0F);
-                TacticalManager.lungeEntity(user, attacker, 3F, 0.0F);
-                return 1;
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Determines if an evade can be made (jump or normal)
-     */
-    private boolean canEvade(EntityLivingBase user) {
-        float stamModifier = 1.0F;
-        if (user instanceof EntityPlayer) {
-            if (!ResearchLogic.hasInfoUnlocked((EntityPlayer) user, "parrypro")) {
-                return false;
-            }
-
-            if (!isFightStance(user)) {
-                return false;
-            }
-        } else {
-            if (random.nextInt(10) != 0)// Mobs can evade
-            {
-                return false;
-            }
-        }
-
-        if (!user.onGround && !tryJumpEvade(user, stamModifier)) {
-            return false;
-        }
-        return tryGroundEvade(user, stamModifier);
-    }
-
-    /**
-     * If the player can slip past enemies Should be any armour but heavy
-     */
-    private boolean tryGroundEvade(EntityLivingBase user, float cost) {
-        return ItemWeaponMF.tryPerformAbility(user, evade_cost * cost, true, false);
-    }
-
-    /**
-     * If the player can jump over enemies in evading Only ment for unarmoured/Lightarmour
-     */
-    private boolean tryJumpEvade(EntityLivingBase user, float cost) {
-        return ItemWeaponMF.tryPerformAbility(user, jumpEvade_cost * cost, true, false);
-    }
-
-    @SubscribeEvent
-    public void updateLiving(LivingUpdateEvent event) {
-        EntityLivingBase living = event.entityLiving;
-
-        tickParryCooldown(living);
-        tickPostHitCooldown(living);
-        if (living instanceof EntityPlayer && !living.worldObj.isRemote) {
-            trackDodgeWindow((EntityPlayer) living);
-        }
-        if (living instanceof EntityLiving) {
-            EntityLiving mob = (EntityLiving) living;
-            ItemStack held = mob.getHeldItem();
-
-            {
-                EntityLivingBase tar = mob.getAttackTarget();
-
-                if (tar instanceof EntityPlayer && ((EntityPlayer) tar).isBlocking()) {
-                    double dist = mob.getDistanceSqToEntity(tar);
-
-                    if (mob instanceof EntityZombie && mob.onGround
-                            && mob.getRNG().nextInt(10) == 0
-                            && dist > 1D
-                            && dist < 4D) {
-                        mob.motionY = 0.5F;
-                    }
-                }
-            }
-            if (isAxe(held)) {
-                EntityLivingBase tar = mob.getAttackTarget();
-
-                if (tar != null) {
-                    double dist = mob.getDistanceSqToEntity(tar);
-
-                    if (mob.onGround && mob.getRNG().nextInt(5) == 0 && dist > 1D && dist < 4.0D) {
-                        mob.motionY = 0.5F;
-                    }
-                }
-                if (mob.getRNG().nextInt(100) == 0 && !mob.isSprinting() && !mob.isChild()) {
-                    mob.setSprinting(true);
-                }
-            }
-            if (isFastblade(held)) {
-                EntityLivingBase tar = mob.getAttackTarget();
-
-                if (tar != null) {
-                    double dist = mob.getDistanceSqToEntity(tar);
-
-                    if (mob.onGround && mob.getRNG().nextInt(20) == 0 && dist > 1D && dist < 4.0D) {
-                        mob.motionY = 0.5F;
-                    }
-                }
-                if (mob.getRNG().nextInt(20) == 0 && !mob.isSprinting() && !mob.isChild()) {
-                    mob.setSprinting(true);
-                }
-            }
-            if (living.isBurning() && !living.isImmuneToFire()) {
-                panic(living, 0.25F, 5);
-            }
-        }
-    }
-
-    private boolean isAxe(ItemStack held) {
-        return held != null && held.getItem() instanceof ItemWaraxeMF
-                || held != null && held.getItem() instanceof ItemBattleaxeMF;
-    }
-
-    private boolean isFastblade(ItemStack held) {
-        return held != null && held.getItem() instanceof ItemDagger
-                || held != null && held.getItem() instanceof ItemKatanaMF;
-    }
-
     private void applyBalance(EntityPlayer entityPlayer) {
         MFLogUtil.logDebug("Weapon Balance Init");
         ItemStack weapon = entityPlayer.getHeldItem();
@@ -917,117 +481,9 @@ public class CombatMechanics {
 
     @SubscribeEvent
     public void jump(LivingJumpEvent event) {
-        if (event.entityLiving instanceof EntityPlayer) {
-            if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(event.entityLiving)) {
-                StaminaMechanics.onJump(event.entityLiving);
-            }
-        }
-        if (event.entityLiving.worldObj.isRemote && event.entityLiving instanceof EntityPlayer) {
-            tryDodge((EntityPlayer) event.entityLiving);
-        }
-    }
-
-    /**
-     * Shared by the client trigger and by the serverbound DodgeCommand, so a modified client cannot skip the
-     * raised-guard requirement by sending the command on its own.
-     */
-    public static boolean canDodge(EntityPlayer user) {
-        return user != null && user.isBlocking();
-    }
-
-    private static final String DODGE_GROUND_NBT = "MF2_DodgeGround";
-    private static final String DODGE_JUMP_NBT = "MF2_DodgeJump";
-    private static final String DODGE_SPENT_NBT = "MF2_DodgeSpent";
-    private static final String DODGE_WANT_DIR_NBT = "MF2_DodgeWantDir";
-    private static final String DODGE_WANT_TICK_NBT = "MF2_DodgeWantTick";
-    /** How long a request waits for the server to see the player leave the ground. */
-    private static final long DODGE_PENDING_TICKS = 3L;
-    /** How long after leaving the ground a dodge is still part of that jump. */
-    private static final long DODGE_JUMP_TICKS = 10L;
-
-    /**
-     * Watches for the ground to air transition, which is the server's own evidence that a jump happened:
-     * NetHandlerPlayServer writes onGround from every position packet. The transition both opens the window and
-     * releases a request that arrived before the server had seen it.
-     */
-    public static void trackDodgeWindow(EntityPlayer user) {
-        if (user == null) {
-            return;
-        }
-        NBTTagCompound data = user.getEntityData();
-        long now = user.worldObj.getTotalWorldTime();
-        if (data.getBoolean(DODGE_GROUND_NBT) && !user.onGround) {
-            data.setLong(DODGE_JUMP_NBT, now);
-            long wanted = data.getLong(DODGE_WANT_TICK_NBT);
-            if (isFresh(wanted, now, DODGE_PENDING_TICKS)) {
-                data.setLong(DODGE_WANT_TICK_NBT, 0L);
-                spendJump(user, data.getInteger(DODGE_WANT_DIR_NBT), now);
-            }
-        }
-        data.setBoolean(DODGE_GROUND_NBT, user.onGround);
-
-        long wanted = data.getLong(DODGE_WANT_TICK_NBT);
-        if (wanted > 0L && !isFresh(wanted, now, DODGE_PENDING_TICKS)) {
-            data.setLong(DODGE_WANT_TICK_NBT, 0L);
-        }
-    }
-
-    /**
-     * These stamps live in the player's persistent data, so a restored save can hand back a tick from the future. Treat
-     * anything that is not inside the window, in either direction, as expired.
-     */
-    private static boolean isFresh(long stamp, long now, long window) {
-        return stamp > 0L && now >= stamp && now - stamp <= window;
-    }
-
-    /**
-     * Serverbound entry point for DodgeCommand. Dodges only on a jump the server itself observed, once per jump. A
-     * request that beats the position packet is held briefly rather than rejected, because the client fires from
-     * LivingJumpEvent at the moment of the jump and the server can still believe the player is standing.
-     */
-    public static void requestDodge(EntityPlayer user, int type) {
-        if (!canDodge(user)) {
-            return;
-        }
-        long now = user.worldObj.getTotalWorldTime();
-        if (spendJump(user, type, now)) {
-            return;
-        }
-        NBTTagCompound data = user.getEntityData();
-        data.setInteger(DODGE_WANT_DIR_NBT, type);
-        data.setLong(DODGE_WANT_TICK_NBT, now);
-    }
-
-    /** Uses up the current jump, if there is a recent one that has not paid for a dodge yet. */
-    private static boolean spendJump(EntityPlayer user, int type, long now) {
-        if (!canDodge(user)) {
-            return false;
-        }
-        NBTTagCompound data = user.getEntityData();
-        long jump = data.getLong(DODGE_JUMP_NBT);
-        if (!isFresh(jump, now, DODGE_JUMP_TICKS) || data.getLong(DODGE_SPENT_NBT) == jump) {
-            return false;
-        }
-        data.setLong(DODGE_SPENT_NBT, jump);
-        initDodge(user, type);
-        return true;
-    }
-
-    private void tryDodge(EntityPlayer user) {
-        if (canDodge(user)) {
-            float forward = user.moveForward;
-            float side = user.moveStrafing;
-
-            if (side > 0F)// LEFT
-            {
-                commandDodge(user, 1);
-            } else if (side < 0)// RIGHT
-            {
-                commandDodge(user, -1);
-            } else if (forward < 0)// BACK
-            {
-                commandDodge(user, 0);
-            }
+        if (event.entityLiving instanceof EntityPlayer && StaminaBar.isSystemActive
+                && StaminaBar.doesAffectEntity(event.entityLiving)) {
+            StaminaMechanics.onJump(event.entityLiving);
         }
     }
 

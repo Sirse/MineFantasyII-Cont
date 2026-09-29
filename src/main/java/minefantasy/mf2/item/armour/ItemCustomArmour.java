@@ -27,7 +27,7 @@ import minefantasy.mf2.integration.thaumcraft.TCCompat;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.CustomArmourListMF;
 import minefantasy.mf2.material.BaseMaterialMF;
-import minefantasy.mf2.mechanics.CombatMechanics;
+import minefantasy.mf2.mechanics.WeaponBanes;
 import minefantasy.mf2.util.MFLogUtil;
 import thaumcraft.api.IGoggles;
 import thaumcraft.api.nodes.IRevealer;
@@ -222,7 +222,7 @@ public class ItemCustomArmour extends ItemArmourMF implements IGoggles, IReveale
 
     @Override
     protected float getSpecialModifier(ItemStack armour, DamageSource source) {
-        float modifier = CombatMechanics
+        float modifier = WeaponBanes
                 .getSpecialModifier(this.getCustomMaterial(armour), this.specialDesign, source.getEntity(), false);
 
         MFLogUtil.logDebug("Modifier = " + modifier);
