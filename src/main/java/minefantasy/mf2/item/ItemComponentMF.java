@@ -286,7 +286,6 @@ public class ItemComponentMF extends Item implements ITieredComponent {
     // ==============================================================\\
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         if (isCustom) {
             return CustomToolHelper.getLocalisedName(item, "item.commodity_" + name + ".name");

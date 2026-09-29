@@ -194,6 +194,7 @@ material.purpleheartwood.name=Purple Heart
 material.silverwoodwood.name=Silverwood
 material.greatwoodwood.name=Greatwood
 material.yewwood.name=Yew
+material.magic.name=Magic
 
 
 
@@ -1056,6 +1057,7 @@ item.schem_cogwork.name=Cogwork Frame Schematics
 item.schem_bomb.name=Dwarven Bomb Schematics
 item.schem_crossbow.name=Dwarven Crossbow Schematics
 item.schem_alloy.name=Composite Alloy Schematics
+tile.schematic_general.name=Dwarven Schematics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /FOOD/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1579,7 +1581,7 @@ knowledge.smeltMithium.desc=Tier %1$s, Master material
 knowledge.smeltMithium.1=This material is a purer form of regular mithril in the ancient arts. What is known as Mithium appears to be nearly weightless, and appears hollow at the touch. It will be possible to further refine the properties of mithril to create the lightest material yet.^This can only be made in a master crucible.
 
 knowledge.smeltEnder=Enderforge Smithing
-knowledge.smeltEnderforge.desc=Tier %1$s, Master material
+knowledge.smeltEnder.desc=Tier %1$s, Master material
 
 knowledge.smeltEnderforge.1=There's always been something strange about those ender creatures... And this discovery may lead to their origins, perhaps they were the ones that created these artifacts, can't explain how though, ender creatures don't appear too civilized.^Enderforge appears to be designed as a compromise between the two materials of mithril and adamantium, taking the best from both to create a new material. It appears that ender pearls can act as a catalyst to form these two materials together.^This can only be made in a master crucible.
 

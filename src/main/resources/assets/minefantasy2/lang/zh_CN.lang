@@ -194,6 +194,7 @@ material.purpleheartwood.name=紫心木
 material.silverwoodwood.name=银木
 material.greatwoodwood.name=宏伟之木
 material.yewwood.name=紫杉木
+material.magic.name=魔法
 
 
 
@@ -1056,6 +1057,7 @@ item.schem_cogwork.name=机甲框架图纸
 item.schem_bomb.name=矮人炸弹图纸
 item.schem_crossbow.name=矮人弩图纸
 item.schem_alloy.name=复合合金图纸
+tile.schematic_general.name=矮人图纸
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /FOOD/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1579,7 +1581,7 @@ knowledge.smeltMithium.desc=等级 %1$s，大师级材料
 knowledge.smeltMithium.1=这种材料是使用古代技术锻造出的比秘银更加纯净的材料。传说锭非常之轻，摸起来恍若无物。^这一材料只能在大师级坩埚里锻造。
 
 knowledge.smeltEnder=锻造末影锭
-knowledge.smeltEnderforge.desc=等级 %1$s，大师级材料
+knowledge.smeltEnder.desc=等级 %1$s，大师级材料
 
 knowledge.smeltEnderforge.1=总有一些东西比那些末地来的生命还要奇怪……而这个发现也许会引导你到它们的起源，也许是它们造出了这种制品，尽管无从解释，因为末影生命并没有高度的文明。^末影锭被视为秘银和艾达曼两种材料的折中产物，兼具二者的优点。在将两种材料融为一体的过程中，末影珍珠起了催化作用。^这一材料只能在大师级坩埚里锻造。
 

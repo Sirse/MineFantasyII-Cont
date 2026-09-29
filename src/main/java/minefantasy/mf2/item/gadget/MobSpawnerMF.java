@@ -53,7 +53,6 @@ public class MobSpawnerMF extends ItemComponentMF {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         return StatCollector
                 .translateToLocal("item.spawn_" + types[Math.min(types.length - 1, item.getItemDamage())] + ".name");

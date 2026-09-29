@@ -214,6 +214,26 @@ public class PlayerTickHandlerMF {
     // SLOW=5: = 2:20 (5mins till starve, 3:30 till nosprint) (1h 40m in MC time for
     // 4 missing bars)
     // EXHAUSTION SCALE = 3.0F = 1hunger
+    /**
+     * Sets a player carrying a hot item on fire. Blacksmith attire protects, unless hardcore hot burns are on.
+     *
+     * @return whether the player was set on fire
+     */
+    public static boolean burnWithHotItems(EntityPlayer player) {
+        if (!ConfigHardcore.HCChotBurn && ItemApron.isUserProtected(player)) {
+            return false;
+        }
+        for (int a = 0; a < player.inventory.getSizeInventory(); a++) {
+            ItemStack item = player.inventory.getStackInSlot(a);
+            if (item != null && item.getItem() instanceof IHotItem) {
+                player.setFire(5);
+                player.attackEntityFrom(DamageSource.onFire, 1.0F);
+                return true;
+            }
+        }
+        return false;
+    }
+
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
@@ -251,17 +271,8 @@ public class PlayerTickHandlerMF {
                 applyBalance(event.player);
             }
 
-            if (!event.player.worldObj.isRemote
-                    && !(!ConfigHardcore.HCChotBurn && ItemApron.isUserProtected(event.player))
-                    && event.player.ticksExisted % 100 == 0) {
-                for (int a = 0; a < event.player.inventory.getSizeInventory(); a++) {
-                    ItemStack item = event.player.inventory.getStackInSlot(a);
-                    if (item != null && item.getItem() instanceof IHotItem) {
-                        event.player.setFire(5);
-                        event.player.attackEntityFrom(DamageSource.onFire, 1.0F);
-                        break;
-                    }
-                }
+            if (!event.player.worldObj.isRemote && event.player.ticksExisted % 100 == 0) {
+                burnWithHotItems(event.player);
             }
             if (!event.player.worldObj.isRemote) {
                 ItemStack item = event.player.getHeldItem();

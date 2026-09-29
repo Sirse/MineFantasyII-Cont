@@ -236,7 +236,6 @@ public class ItemHammer extends ItemTool implements IToolMaterial, IToolMF, IDam
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         String unlocalName = this.getUnlocalizedNameInefficiently(item) + ".name";
         return CustomToolHelper.getLocalisedName(item, unlocalName);

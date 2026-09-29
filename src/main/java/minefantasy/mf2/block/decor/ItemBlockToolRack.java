@@ -10,8 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
@@ -41,7 +39,6 @@ public class ItemBlockToolRack extends ItemBlock {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         return CustomToolHelper.getLocalisedName(item, this.getUnlocalizedNameInefficiently(item) + ".name");
     }

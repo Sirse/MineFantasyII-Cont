@@ -429,7 +429,6 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         String unlocalName = this.getUnlocalizedNameInefficiently(item) + ".name";
         return CustomToolHelper.getWoodenLocalisedName(item, unlocalName);

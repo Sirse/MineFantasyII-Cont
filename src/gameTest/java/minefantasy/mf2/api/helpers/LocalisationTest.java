@@ -15,9 +15,20 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
+
+import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.InformationBase;
+import minefantasy.mf2.api.knowledge.InformationList;
+import minefantasy.mf2.api.material.CustomMaterial;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.CustomToolListMF;
 
 /**
  * Checks the shipped lang files as data: every key of en_US is translated, en_GB only overrides, placeholders match
@@ -40,6 +51,9 @@ public class LocalisationTest {
      */
     private static final Pattern PERCENT = Pattern.compile("%(\\d+\\$)?[sdf]|%%|%\\d+\\$");
     private static final int SHOWN = 15;
+    /** Blocks a player never holds: the world generation marker and components laid on the ground. */
+    private static final List<String> UNNAMED = Arrays
+            .asList(MineFantasyII.MODID + ":WorldGenFlag", MineFantasyII.MODID + ":MF_ComponentStorage");
 
     @GameTest
     public static void everyKeyIsTranslated(GameTestHelper helper) throws Exception {
@@ -115,6 +129,69 @@ public class LocalisationTest {
         }
         report(problems);
         helper.succeed();
+    }
+
+    /** Every knowledge entry has its title and description, every material its name. */
+    @GameTest
+    public static void everyKnowledgeEntryAndMaterialHasItsKeys(GameTestHelper helper) throws Exception {
+        Map<String, String> en = load("en_US");
+        List<String> problems = new ArrayList<>();
+        for (InformationBase entry : InformationList.knowledgeList) {
+            String key = "knowledge." + entry.getUnlocalisedName();
+            for (String needed : Arrays.asList(key, key + ".desc")) {
+                if (!en.containsKey(needed)) problems.add("en_US misses " + needed);
+            }
+        }
+        for (CustomMaterial material : CustomMaterial.materialList.values()) {
+            // the test mod registers its own materials, named test...
+            if (material.getName().toLowerCase().startsWith("test")) continue;
+            String key = "material." + material.getName().toLowerCase() + ".name";
+            if (!en.containsKey(key)) problems.add("en_US misses " + key);
+        }
+        report(problems);
+        helper.succeed();
+    }
+
+    /** Every registered item and block shows a name, not a raw key. */
+    @GameTest
+    public static void everyItemShowsAName(GameTestHelper helper) {
+        List<String> problems = new ArrayList<>();
+        for (Object o : Item.itemRegistry) {
+            Item item = (Item) o;
+            String id = Item.itemRegistry.getNameForObject(item);
+            if (id == null || !id.startsWith(MineFantasyII.MODID + ":") || UNNAMED.contains(id)) continue;
+            String name = item.getItemStackDisplayName(new ItemStack(item));
+            if (name == null || name.trim().isEmpty() || name.contains(".name") || name.matches("(item|tile)\\..*")) {
+                problems.add(id + " shows " + name);
+            }
+        }
+        report(problems);
+        helper.succeed();
+    }
+
+    /** English names take the material as a noun, one space apart, whichever slot the item names it by. */
+    @GameTest
+    public static void englishNamesCarryTheMaterial(GameTestHelper helper) {
+        assertEquals(
+                "Steel Sword",
+                named(CustomToolListMF.standard_sword, CustomToolHelper.slot_main, "steel", "oakwood"));
+        assertEquals("Yew Bow", named(CustomToolListMF.standard_bow, CustomToolHelper.slot_haft, "yewwood", null));
+        assertEquals(
+                "Steel Bodkin Arrow",
+                named(CustomToolListMF.standard_arrow_bodkin, CustomToolHelper.slot_main, "steel", null));
+        assertEquals("Steel Plate", named(ComponentListMF.plate, CustomToolHelper.slot_main, "steel", null));
+        assertEquals(
+                "Oak Trough",
+                named(Item.getItemFromBlock(BlockListMF.trough_wood), CustomToolHelper.slot_main, "oakwood", null));
+        helper.succeed();
+    }
+
+    /** The name of the item made of the material in the slot, with a haft of the given wood if any. */
+    private static String named(Item item, String slot, String material, String haft) {
+        ItemStack stack = new ItemStack(item);
+        CustomMaterial.addMaterial(stack, slot, material);
+        if (haft != null) CustomMaterial.addMaterial(stack, CustomToolHelper.slot_haft, haft);
+        return item.getItemStackDisplayName(stack);
     }
 
     @GameTest

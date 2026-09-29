@@ -255,7 +255,6 @@ public class ItemHvyPick extends ItemPickaxe implements IToolMaterial {
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     public String getItemStackDisplayName(ItemStack item) {
         String unlocalName = this.getUnlocalizedNameInefficiently(item) + ".name";
         return CustomToolHelper.getLocalisedName(item, unlocalName);
