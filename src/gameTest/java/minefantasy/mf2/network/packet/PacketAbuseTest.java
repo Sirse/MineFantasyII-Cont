@@ -19,11 +19,16 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.knowledge.InformationBase;
+import minefantasy.mf2.api.knowledge.InformationList;
+import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.mechanics.CombatMechanics;
 
 /**
  * Packets as a modified client would send them: truncated, garbage, or naming things the player cannot see or reach.
@@ -218,6 +223,107 @@ public class PacketAbuseTest {
         handler.process(control(suit, 50F), player);
         later(player);
         assertEquals("the rider's input was not clamped", 1F, suit.getMoveForward(), 0F);
+        helper.succeed();
+    }
+
+    // endregion
+
+    // region dodge
+
+    /** Stands the player, then lifts them off the ground, as the server sees a jump through position packets. */
+    private static void jump(FakePlayer player) {
+        player.onGround = true;
+        CombatMechanics.trackDodgeWindow(player);
+        player.onGround = false;
+        CombatMechanics.trackDodgeWindow(player);
+    }
+
+    private static boolean moved(FakePlayer player) {
+        boolean moved = player.motionX != 0 || player.motionZ != 0;
+        player.motionX = player.motionY = player.motionZ = 0;
+        return moved;
+    }
+
+    @GameTest
+    public static void aDodgeComesOnlyWithABlockAndAJumpOncePerJump(GameTestHelper helper) {
+        boolean stamina = StaminaBar.isSystemActive;
+        StaminaBar.isSystemActive = false;
+        try {
+            // A fresh test world has not ticked yet, and a stamp of tick 0 counts as none
+            if (helper.getWorld().getTotalWorldTime() < 100) {
+                helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
+            }
+            DodgeCommand handler = new DodgeCommand();
+            FakePlayer player = player(helper, 1, 1, 1);
+            player.setItemInUse(new ItemStack(Items.iron_sword), 72000);
+            assertTrue("the fake player does not block", player.isBlocking());
+
+            // The request beats the position packet: it waits for the server to see the jump
+            player.onGround = true;
+            CombatMechanics.trackDodgeWindow(player);
+            handler.process(ints(1), player);
+            later(player);
+            assertFalse("a dodge came while standing", moved(player));
+            player.onGround = false;
+            CombatMechanics.trackDodgeWindow(player);
+            assertTrue("a request a tick before the jump was dropped", moved(player));
+
+            handler.process(ints(-1), player);
+            later(player);
+            assertFalse("one jump paid for two dodges", moved(player));
+
+            player.stopUsingItem();
+            jump(player);
+            handler.process(ints(0), player);
+            later(player);
+            assertFalse("a dodge came without blocking", moved(player));
+        } finally {
+            StaminaBar.isSystemActive = stamina;
+        }
+        helper.succeed();
+    }
+
+    // endregion
+
+    // region research
+
+    /** The first research a new player could learn once what comes before it is learned, needing artefacts. */
+    private static int researchNeedingArtefacts(FakePlayer player) {
+        for (int id = 0; id < InformationList.knowledgeList.size(); id++) {
+            InformationBase info = InformationList.knowledgeList.get(id);
+            if (info.isPreUnlocked() || info.getPerk()
+                    || info.getArtefactCount() == 0
+                    || !info.hasSkillsUnlocked(player))
+                continue;
+            for (InformationBase parent = info.parentInfo; parent != null; parent = parent.parentInfo) {
+                ResearchLogic.forceUnlock(player, parent);
+            }
+            if (ResearchLogic.canPurchase(player, info)) return id;
+        }
+        return -1;
+    }
+
+    /** Research that needs artefacts is bought by request only when the server allows research without them. */
+    @GameTest
+    public static void aResearchRequestBuysOnlyWhatTheServerAllows(GameTestHelper helper) {
+        boolean easy = InformationBase.easyResearch;
+        try {
+            ResearchRequest handler = new ResearchRequest();
+            InformationBase.easyResearch = false;
+            FakePlayer player = player(helper, 1, 1, 1);
+            int id = researchNeedingArtefacts(player);
+            assertTrue("no research needs artefacts", id >= 0);
+            InformationBase info = InformationList.knowledgeList.get(id);
+            handler.process(ints(id), player);
+            later(player);
+            assertFalse("research needing artefacts was bought outright", ResearchLogic.hasInfoUnlocked(player, info));
+
+            InformationBase.easyResearch = true;
+            handler.process(ints(id), player);
+            assertTrue("easy research was not bought", ResearchLogic.hasInfoUnlocked(player, info));
+        } finally {
+            InformationBase.easyResearch = easy;
+        }
         helper.succeed();
     }
 

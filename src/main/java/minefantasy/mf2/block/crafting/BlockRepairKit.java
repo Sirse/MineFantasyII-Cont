@@ -114,6 +114,7 @@ public class BlockRepairKit extends Block {
         {
             return held.isItemDamaged();
         }
-        return held.getItem().isRepairable();
+        // Nothing to mend on a whole item, and the kit could break for it
+        return held.getItem().isRepairable() && held.isItemDamaged();
     }
 }

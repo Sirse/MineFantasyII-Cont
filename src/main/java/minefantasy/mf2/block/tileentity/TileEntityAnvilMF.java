@@ -343,6 +343,27 @@ public class TileEntityAnvilMF extends TileEntityStation
         return result;
     }
 
+    /**
+     * A forge within four blocks holding a dragon heart, for a player who has learned dragonforging; null for none. The
+     * craft that finds it takes that one heart.
+     */
+    TileEntityForge heartedForge(EntityPlayer player) {
+        if (player == null || !ResearchLogic.hasInfoUnlocked(player, KnowledgeListMF.smeltDragonforge)) {
+            return null;
+        }
+        for (int x = -4; x <= 4; x++) {
+            for (int y = -4; y <= 4; y++) {
+                for (int z = -4; z <= 4; z++) {
+                    TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord + y, zCoord + z);
+                    if (tile instanceof TileEntityForge && ((TileEntityForge) tile).dragonHeartPower > 0) {
+                        return (TileEntityForge) tile;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private ItemStack modifySpecials(ItemStack result) {
         boolean hasHeart = false;
         boolean isTool = result.getMaxStackSize() == 1 && result.isItemStackDamageable();
@@ -350,28 +371,14 @@ public class TileEntityAnvilMF extends TileEntityStation
 
         Item DF = SpecialForging.getDragonCraft(result);
 
-        if (DF != null) {
-            // DRAGONFORGE
-            for (int x = -4; x <= 4; x++) {
-                for (int y = -4; y <= 4; y++) {
-                    for (int z = -4; z <= 4; z++) {
-                        TileEntity tile = worldObj.getTileEntity(xCoord + x, yCoord + y, zCoord + z);
-                        if (player != null && ResearchLogic.hasInfoUnlocked(player, KnowledgeListMF.smeltDragonforge)
-                                && tile != null
-                                && tile instanceof TileEntityForge) {
-                            if (((TileEntityForge) tile).dragonHeartPower > 0) {
-                                hasHeart = true;
-                                ((TileEntityForge) tile).dragonHeartPower = 0;
-                                worldObj.createExplosion(player, xCoord + x, yCoord + y, zCoord + z, 1F, false);
-                                PlayerTickHandlerMF.spawnDragon(player);
-                                PlayerTickHandlerMF.addDragonEnemyPts(player, 2);
-
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+        TileEntityForge forge = DF != null ? heartedForge(player) : null;
+        if (forge != null) {
+            // DRAGONFORGE: one heart per craft, however many forges nearby hold one
+            hasHeart = true;
+            forge.dragonHeartPower = 0;
+            worldObj.createExplosion(player, forge.xCoord, forge.yCoord, forge.zCoord, 1F, false);
+            PlayerTickHandlerMF.spawnDragon(player);
+            PlayerTickHandlerMF.addDragonEnemyPts(player, 2);
         }
         if (hasHeart) {
             NBTBase nbt = !(result.hasTagCompound()) ? null : result.getTagCompound().copy();

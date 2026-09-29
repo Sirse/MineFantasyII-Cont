@@ -100,7 +100,8 @@ public final class InventorySlots {
         float dy = rand.nextFloat() * 0.8F + 0.1F;
         float dz = rand.nextFloat() * 0.8F + 0.1F;
         while (stack.stackSize > 0) {
-            ItemStack piece = stack.splitStack(Math.min(stack.stackSize, stack.getMaxStackSize()));
+            // Another mod's item may claim a stack limit of zero or less; a piece of at least one still ends the loop
+            ItemStack piece = stack.splitStack(Math.max(1, Math.min(stack.stackSize, stack.getMaxStackSize())));
             EntityItem entity = new EntityItem(world, x + dx, y + dy, z + dz, piece);
             entity.motionX = rand.nextGaussian() * 0.05F;
             entity.motionY = rand.nextGaussian() * 0.05F + 0.2F;

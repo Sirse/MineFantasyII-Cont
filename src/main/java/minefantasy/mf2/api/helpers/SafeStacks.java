@@ -14,7 +14,7 @@ public final class SafeStacks {
         if (stack == null || stack.getItem() == null || stack.stackSize <= 0) {
             return null;
         }
-        stack.stackSize = Math.min(stack.stackSize, stack.getMaxStackSize());
+        stack.stackSize = Math.max(1, Math.min(stack.stackSize, stack.getMaxStackSize()));
         return stack;
     }
 
@@ -29,6 +29,10 @@ public final class SafeStacks {
         }
         ItemStack single = used.copy();
         single.stackSize = 1;
+        // The item may leave a container only in some states; it says so here, not by what getContainerItem returns
+        if (!single.getItem().hasContainerItem(single)) {
+            return null;
+        }
         ItemStack container = single.getItem().getContainerItem(single);
         if (container == null || container.getItem() == null) {
             return null;

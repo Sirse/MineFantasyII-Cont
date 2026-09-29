@@ -85,6 +85,10 @@ public class PacketHandlerMF {
     }
 
     public void sendPacketToPlayer(FMLProxyPacket packet, EntityPlayerMP player) {
+        // A fake player, another mod's automation, has no connection to send to
+        if (player.playerNetServerHandler == null) {
+            return;
+        }
         channels.get(packet.channel()).sendTo(packet, player);
     }
 

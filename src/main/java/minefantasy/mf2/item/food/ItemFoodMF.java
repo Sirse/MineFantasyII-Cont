@@ -77,8 +77,8 @@ public class ItemFoodMF extends ItemFood {
     public static void onTick(EntityPlayer player) {
         int time = getEatDelay(player);
         if (time > 0) {
-            time--;
-            setEatDelay(player, time);
+            // Written, not added: setEatDelay adds to what is left, which would double the pause every tick
+            player.getEntityData().setInteger(eatDelayNBT, time - 1);
         }
     }
 
