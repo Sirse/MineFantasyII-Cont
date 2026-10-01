@@ -1,14 +1,21 @@
 package minefantasy.mf2.api.knowledge.client;
 
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
 public class EntryPageText extends EntryPage {
 
-    private Minecraft mc = Minecraft.getMinecraft();
-    private String paragraph;
+    /** Where the text starts on the page and how wide it runs. */
+    public static final int TEXT_LEFT = 14;
+    public static final int TEXT_TOP = 15;
+    public static final int TEXT_WIDTH = 155;
+    /** The book's ink, which the markup's reset returns to. */
+    public static final int INK = 0x3A2A1A;
+
+    private final String paragraph;
     private Object[] additional;
 
     public EntryPageText(String paragraph, Object... additional) {
@@ -20,48 +27,24 @@ public class EntryPageText extends EntryPage {
         this.paragraph = paragraph;
     }
 
+    /** The page's text, translated and with its markup turned into formatting codes. */
+    public String getText() {
+        String local = additional != null && additional.length > 0
+                ? StatCollector.translateToLocalFormatted(paragraph, additional)
+                : StatCollector.translateToLocal(paragraph);
+        return BookMarkup.parse(local);
+    }
+
+    /** The text broken into lines of the given width, formatting carried from one line to the next. */
+    @SuppressWarnings("unchecked")
+    public List<String> getLines(int width) {
+        return Minecraft.getMinecraft().fontRenderer.listFormattedStringToWidth(getText(), width);
+    }
+
     @Override
     public void render(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-        String local = StatCollector.translateToLocal(paragraph);
-        if (additional != null && additional.length > 0) {
-            local = StatCollector.translateToLocalFormatted(paragraph, additional);
-        }
-        String text = "";
-        String temp = "";
-        boolean prefix = false;
-        for (int a = 0; a < local.length(); a++) {
-            char c = local.charAt(a);
-            if (a == local.length() - 1) {
-                text = text + temp + c;
-                temp = "";
-            } else if (prefix) {
-                if (c == "h".charAt(0)) {
-                    text = text + temp + EnumChatFormatting.DARK_BLUE + EnumChatFormatting.BOLD;
-                    temp = "";
-                } else if (c == "d".charAt(0)) {
-                    text = text + temp + EnumChatFormatting.DARK_RED;
-                    temp = "";
-                } else if (c == "y".charAt(0)) {
-                    text = text + temp + EnumChatFormatting.GOLD;
-                    temp = "";
-                } else if (c == "u".charAt(0)) {
-                    text = text + temp + EnumChatFormatting.UNDERLINE;
-                    temp = "";
-                } else if (c == "r".charAt(0)) {
-                    text = text + temp + EnumChatFormatting.RESET + EnumChatFormatting.BLACK;
-                    temp = "";
-                }
-                prefix = false;
-            } else if (c == "^".charAt(0)) {
-                text = text + temp + "\n\n";
-                temp = "";
-            } else if (c == "$".charAt(0)) {
-                prefix = true;
-            } else {
-                temp = temp + c;
-            }
-        }
-        mc.fontRenderer.drawSplitString(text, posX + 14, posY + 15, 155, 0);
+        Minecraft.getMinecraft().fontRenderer
+                .drawSplitString(getText(), posX + TEXT_LEFT, posY + TEXT_TOP, TEXT_WIDTH, INK);
     }
 
     @Override

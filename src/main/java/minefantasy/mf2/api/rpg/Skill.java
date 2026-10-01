@@ -19,6 +19,11 @@ public class Skill {
         return 100;
     }
 
+    /** Whether the player has reached this skill's cap, past which it gains no more experience. */
+    public boolean isMaxed(EntityPlayer player) {
+        return RPGElements.getLevel(player, this) >= getMaxLevel();
+    }
+
     public int getStartLevel() {
         return 1;
     }
@@ -69,9 +74,7 @@ public class Skill {
 
         int value = skill.getInteger("xp");
         int max = skill.getInteger("xpMax");
-        int curLvl = RPGElements.getLevel(player, this);
-
-        if (max <= 0 || curLvl >= getMaxLevel()) {
+        if (max <= 0 || isMaxed(player)) {
             return;
         }
         value += xp;

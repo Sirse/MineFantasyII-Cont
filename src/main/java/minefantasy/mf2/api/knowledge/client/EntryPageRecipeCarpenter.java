@@ -1,113 +1,68 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
 
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.GuiHelper;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 
-public class EntryPageRecipeCarpenter extends EntryPage {
+public class EntryPageRecipeCarpenter extends EntryPageRecipe {
 
-    public static int switchRate = 15;
-    private Minecraft mc = Minecraft.getMinecraft();
-    private GridRecipe[] recipes = new GridRecipe[] {};
-    private int recipeID;
-    private boolean shapelessRecipe = false;
-    private boolean oreDictRecipe = false;
-    private ItemStack tooltipStack;
-    /**
-     * Station label/icon key. Null means it is derived from where the recipe is registered.
-     */
-    private String station;
+    private static final int CELL = 23;
+    private final GridRecipe[] recipes;
+    /** Station label/icon key. Null means it is derived from where the recipe is registered. */
+    private final String station;
 
     public EntryPageRecipeCarpenter(List<GridRecipe> recipes) {
-        GridRecipe[] array = new GridRecipe[recipes.size()];
-        for (int a = 0; a < recipes.size(); a++) {
-            array[a] = recipes.get(a);
-        }
-        this.recipes = array;
-
+        this(recipes.toArray(new GridRecipe[0]));
     }
 
     public EntryPageRecipeCarpenter(GridRecipe... recipes) {
-        this.recipes = recipes;
+        this(null, recipes);
     }
 
     /**
      * @param station tool type key used for the station label and icon, e.g. "carpenter" or "kitchenbench"
      */
     public EntryPageRecipeCarpenter(String station, GridRecipe... recipes) {
+        super("carpenterGrid");
         this.recipes = recipes;
         this.station = station;
     }
 
     @Override
-    public void render(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-        if (onTick) {
-            tickRecipes();
-        }
-        tooltipStack = null;
+    protected int variantCount() {
+        return recipes.length;
+    }
 
-        this.mc.getTextureManager()
-                .bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/carpenterGrid.png"));
-        parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
+    @Override
+    protected int stationY() {
+        return 175;
+    }
 
-        // The page holds the recipe registered by the mod; a script may have replaced or removed it since
-        GridRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : current(recipes[recipeID]);
-        String cft = "<" + StatCollector.translateToLocal("method." + getStation(recipe)) + ">";
-        mc.fontRenderer.drawSplitString(
-                cft,
-                posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2),
-                posY + 175,
-                117,
-                0);
-        renderRecipe(parent, x, y, f, posX, posY, recipe);
+    @Override
+    protected String station() {
+        return recipes.length == 0 ? "carpenter" : stationOf(shown());
+    }
 
-        if (tooltipStack != null) {
-            List<String> tooltipData = tooltipStack.getTooltip(Minecraft.getMinecraft().thePlayer, false);
-            List<String> parsedTooltip = new ArrayList<>();
-            boolean first = true;
-
-            for (String s : tooltipData) {
-                String s_ = s;
-                if (!first) s_ = EnumChatFormatting.GRAY + s;
-                parsedTooltip.add(s_);
-                first = false;
-            }
-
-            minefantasy.mf2.api.helpers.RenderHelper.renderTooltip(x, y, parsedTooltip);
-        }
-
+    /** The page holds the recipe registered by the mod; a script may have replaced or removed it since. */
+    private GridRecipe shown() {
+        GridRecipe recipe = recipes[variant()];
+        // Recipes registered with the kitchen manager belong to the kitchen bench; everything else is a carpenter one
+        return MFRecipes.KITCHEN.idOf(recipe) != null ? MFRecipes.KITCHEN.current(recipe)
+                : MFRecipes.CARPENTER.current(recipe);
     }
 
     /**
-     * Recipes registered with the kitchen manager belong to the kitchen bench; everything else is a carpenter recipe.
-     * Deriving it keeps the page correct when the kitchen bench is disabled and its recipes fall back to the carpenter
-     * bench.
+     * Derived from where the recipe is registered, which keeps the page correct when the kitchen bench is disabled and
+     * its recipes fall back to the carpenter bench.
      */
-    private static GridRecipe current(GridRecipe recipe) {
-        if (MFRecipes.KITCHEN.idOf(recipe) != null) {
-            return MFRecipes.KITCHEN.current(recipe);
-        }
-        return MFRecipes.CARPENTER.current(recipe);
-    }
-
-    private String getStation(GridRecipe recipe) {
+    private String stationOf(GridRecipe recipe) {
         if (station != null) {
             return station;
         }
@@ -117,13 +72,16 @@ public class EntryPageRecipeCarpenter extends EntryPage {
         return "carpenter";
     }
 
-    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, GridRecipe recipe) {
-        if (parent == null) return;
-        if (recipe == null) return;
-        shapelessRecipe = false;
-        oreDictRecipe = false;
-
-        GL11.glColor3f(255, 255, 255);
+    @Override
+    protected void drawRecipe(GuiScreen parent, int posX, int posY, int mx, int my) {
+        if (recipes.length == 0) {
+            return;
+        }
+        GridRecipe recipe = shown();
+        if (recipe == null) {
+            return;
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GuiHelper.renderToolIcon(
                 parent,
                 recipe.getToolType(),
@@ -132,89 +90,10 @@ public class EntryPageRecipeCarpenter extends EntryPage {
                 posY + 51,
                 true,
                 true);
-        GuiHelper.renderToolIcon(parent, getStation(recipe), recipe.getAnvil(), posX + 124, posY + 51, true, true);
-
+        GuiHelper.renderToolIcon(parent, stationOf(recipe), recipe.getAnvil(), posX + 124, posY + 51, true, true);
         GridPages.forEachEntry(
                 recipe,
-                (x, y, stack) -> renderItemAtGridPos(parent, 1 + x, 1 + y, stack, true, posX, posY, mx, my));
-        shapelessRecipe = !recipe.isShaped();
-        renderResult(parent, recipe.getRecipeOutput(), false, posX, posY, mx, my);
+                (x, y, stack) -> drawItem(stack, posX + x * CELL + 46, posY + y * CELL + 80, mx, my));
+        drawItem(recipe.getRecipeOutput(), posX + 80, posY + 42, mx, my);
     }
-
-    private void tickRecipes() {
-        if (recipeID < recipes.length - 1) {
-            ++recipeID;
-        } else {
-            recipeID = 0;
-        }
-    }
-
-    public void renderResult(GuiScreen gui, ItemStack stack, boolean accountForContainer, int xOrigin, int yOrigin,
-            int mx, int my) {
-        if (stack == null || stack.getItem() == null) return;
-        stack = stack.copy();
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-
-        int xPos = xOrigin + 80;
-        int yPos = yOrigin + 42;
-        ItemStack stack1 = stack.copy();
-        if (stack1.getItemDamage() == -1) stack1.setItemDamage(0);
-
-        renderItem(gui, xPos, yPos, stack1, accountForContainer, mx, my);
-    }
-
-    public void renderItemAtGridPos(GuiScreen gui, int x, int y, ItemStack stack, boolean accountForContainer,
-            int xOrigin, int yOrigin, int mx, int my) {
-        if (stack == null || stack.getItem() == null) return;
-        stack = stack.copy();
-
-        int gridSize = 23;
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-
-        x -= 1;
-        y -= 1;
-        int xPos = xOrigin + (x * gridSize) + 46;
-        int yPos = yOrigin + (y * gridSize) + 80;
-        ItemStack stack1 = stack.copy();
-        if (stack1.getItemDamage() == -1) stack1.setItemDamage(0);
-
-        renderItem(gui, xPos, yPos, stack1, accountForContainer, mx, my);
-    }
-
-    public void renderItem(GuiScreen gui, int xPos, int yPos, ItemStack stack, boolean accountForContainer, int mx,
-            int my) {
-        RenderItem render = new RenderItem();
-        if (mx > xPos && mx < (xPos + 16) && my > yPos && my < (yPos + 16)) {
-            tooltipStack = stack;
-        }
-        boolean mouseDown = Mouse.isButtonDown(0);
-
-        GL11.glPushMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        render.renderItemAndEffectIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        render.renderItemOverlayIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        RenderHelper.disableStandardItemLighting();
-        GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
-    }
-
-    @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
 }

@@ -1,254 +1,86 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import minefantasy.mf2.api.helpers.TextureHelperMF;
 
-public class EntryPageRecipeBase extends EntryPage {
+/** A vanilla crafting recipe, on the workbench's three by three grid. */
+public class EntryPageRecipeBase extends EntryPageRecipe {
 
-    private Minecraft mc = Minecraft.getMinecraft();
-    private IRecipe[] recipes;
-    private int recipeID;
-    private ItemStack tooltipStack;
+    private static final int CELL = 29;
+    private final IRecipe[] recipes;
 
     public EntryPageRecipeBase(List<IRecipe> recipes) {
-        IRecipe[] array = new IRecipe[recipes.size()];
-        for (int a = 0; a < recipes.size(); a++) {
-            array[a] = recipes.get(a);
-        }
-        this.recipes = array;
-
+        this(recipes.toArray(new IRecipe[0]));
     }
 
     public EntryPageRecipeBase(IRecipe... recipes) {
+        super("craftGrid");
         this.recipes = recipes;
     }
 
     @Override
-    public void render(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-        if (onTick) {
-            tickRecipes();
-        }
-        tooltipStack = null;
-
-        this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/craftGrid.png"));
-        parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
-
-        IRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null : recipes[recipeID];
-        String cft = "<" + StatCollector.translateToLocal("method.workbench") + ">";
-        mc.fontRenderer.drawSplitString(
-                cft,
-                posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2),
-                posY + 175,
-                117,
-                0);
-        renderRecipe(parent, x, y, f, posX, posY, recipe);
-
-        if (tooltipStack != null) {
-            List<String> tooltipData = tooltipStack.getTooltip(Minecraft.getMinecraft().thePlayer, false);
-            List<String> parsedTooltip = new ArrayList<>();
-            boolean first = true;
-
-            for (String s : tooltipData) {
-                String s_ = s;
-                if (!first) s_ = EnumChatFormatting.GRAY + s;
-                parsedTooltip.add(s_);
-                first = false;
-            }
-
-            minefantasy.mf2.api.helpers.RenderHelper.renderTooltip(x, y, parsedTooltip);
-        }
-    }
-
-    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, IRecipe recipe) {
-        if (recipe == null) {
-            return;
-        }
-
-        if (recipe instanceof ShapedRecipes) {
-            ShapedRecipes shaped = (ShapedRecipes) recipe;
-
-            for (int y = 0; y < shaped.recipeHeight; y++) {
-                for (int x = 0; x < shaped.recipeWidth; x++) {
-                    renderItemAtGridPos(
-                            parent,
-                            x,
-                            y,
-                            shaped.recipeItems[y * shaped.recipeWidth + x],
-                            true,
-                            posX,
-                            posY,
-                            mx,
-                            my);
-                }
-            }
-        } else if (recipe instanceof ShapedOreRecipe) {
-            ShapedOreRecipe shaped = (ShapedOreRecipe) recipe;
-            int width = (Integer) ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, shaped, 4);
-            int height = (Integer) ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, shaped, 5);
-
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    Object input = shaped.getInput()[y * width + x];
-                    if (input != null) renderItemAtGridPos(
-                            parent,
-                            x,
-                            y,
-                            input instanceof ItemStack ? (ItemStack) input : ((ArrayList<ItemStack>) input).get(0),
-                            true,
-                            posX,
-                            posY,
-                            mx,
-                            my);
-                }
-            }
-        } else if (recipe instanceof ShapelessRecipes) {
-            ShapelessRecipes shapeless = (ShapelessRecipes) recipe;
-
-            drawGrid: {
-                for (int y = 0; y < 3; y++) {
-                    for (int x = 0; x < 3; x++) {
-                        int index = y * 3 + x;
-
-                        if (index >= shapeless.recipeItems.size()) break drawGrid;
-
-                        renderItemAtGridPos(
-                                parent,
-                                x,
-                                y,
-                                (ItemStack) shapeless.recipeItems.get(index),
-                                true,
-                                posX,
-                                posY,
-                                mx,
-                                my);
-                    }
-                }
-            }
-        } else if (recipe instanceof ShapelessOreRecipe) {
-            ShapelessOreRecipe shapeless = (ShapelessOreRecipe) recipe;
-
-            drawGrid: {
-                for (int y = 0; y < 3; y++) {
-                    for (int x = 0; x < 3; x++) {
-                        int index = y * 3 + x;
-
-                        if (index >= shapeless.getRecipeSize()) break drawGrid;
-
-                        Object input = shapeless.getInput().get(index);
-                        if (input != null) renderItemAtGridPos(
-                                parent,
-                                x,
-                                y,
-                                input instanceof ItemStack ? (ItemStack) input : ((ArrayList<ItemStack>) input).get(0),
-                                true,
-                                posX,
-                                posY,
-                                mx,
-                                my);
-                    }
-                }
-            }
-        }
-
-        renderResult(parent, recipe.getRecipeOutput(), false, posX, posY, mx, my);
-    }
-
-    private void tickRecipes() {
-        if (recipeID < recipes.length - 1) {
-            ++recipeID;
-        } else {
-            recipeID = 0;
-        }
-    }
-
-    public void renderResult(GuiScreen gui, ItemStack stack, boolean accountForContainer, int xOrigin, int yOrigin,
-            int mx, int my) {
-        if (stack == null || stack.getItem() == null) return;
-        stack = stack.copy();
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-
-        int xPos = xOrigin + 80;
-        int yPos = yOrigin + 42;
-        ItemStack stack1 = stack.copy();
-        if (stack1.getItemDamage() == -1) stack1.setItemDamage(0);
-
-        renderItem(gui, xPos, yPos, stack1, accountForContainer, mx, my);
-    }
-
-    public void renderItemAtGridPos(GuiScreen gui, int x, int y, ItemStack stack, boolean accountForContainer,
-            int xOrigin, int yOrigin, int mx, int my) {
-        if (stack == null || stack.getItem() == null) return;
-        stack = stack.copy();
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-
-        int xPos = xOrigin + (x * 29) + 51;
-        int yPos = yOrigin + (y * 29) + 86;
-        ItemStack stack1 = stack.copy();
-        if (stack1.getItemDamage() == -1) stack1.setItemDamage(0);
-
-        renderItem(gui, xPos, yPos, stack1, accountForContainer, mx, my);
-    }
-
-    public int getGridX() {
-        return 7;
-    }
-
-    public int getGridY() {
-        return 36;
-    }
-
-    public void renderItem(GuiScreen gui, int xPos, int yPos, ItemStack stack, boolean accountForContainer, int mx,
-            int my) {
-        RenderItem render = new RenderItem();
-        if (mx > xPos && mx < (xPos + 16) && my > yPos && my < (yPos + 16)) {
-            tooltipStack = stack;
-        }
-
-        GL11.glPushMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        render.renderItemAndEffectIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        render.renderItemOverlayIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        RenderHelper.disableStandardItemLighting();
-        GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
+    protected int variantCount() {
+        return recipes.length;
     }
 
     @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
+    protected String station() {
+        return "workbench";
+    }
+
+    @Override
+    protected int stationY() {
+        return 175;
+    }
+
+    @Override
+    protected void drawRecipe(GuiScreen parent, int posX, int posY, int mx, int my) {
+        IRecipe recipe = recipes.length == 0 ? null : recipes[variant()];
+        if (recipe == null) {
+            return;
+        }
+        Object[] inputs;
+        int width;
+        if (recipe instanceof ShapedRecipes) {
+            inputs = ((ShapedRecipes) recipe).recipeItems;
+            width = ((ShapedRecipes) recipe).recipeWidth;
+        } else if (recipe instanceof ShapedOreRecipe) {
+            inputs = ((ShapedOreRecipe) recipe).getInput();
+            width = (Integer) ReflectionHelper.getPrivateValue(ShapedOreRecipe.class, (ShapedOreRecipe) recipe, 4);
+        } else if (recipe instanceof ShapelessRecipes) {
+            inputs = ((ShapelessRecipes) recipe).recipeItems.toArray();
+            width = 3;
+        } else if (recipe instanceof ShapelessOreRecipe) {
+            inputs = ((ShapelessOreRecipe) recipe).getInput().toArray();
+            width = 3;
+        } else {
+            inputs = new Object[0];
+            width = 3;
+        }
+        for (int i = 0; i < Math.min(9, inputs.length); i++) {
+            drawItem(stackOf(inputs[i]), posX + i % width * CELL + 51, posY + i / width * CELL + 86, mx, my);
+        }
+        drawItem(recipe.getRecipeOutput(), posX + 80, posY + 42, mx, my);
+    }
+
+    /** An ingredient as one stack: itself, or the first of an ore dictionary name's stacks. */
+    private static ItemStack stackOf(Object input) {
+        if (input instanceof ItemStack) {
+            return (ItemStack) input;
+        }
+        if (input instanceof List && !((List<?>) input).isEmpty()) {
+            Object first = ((List<?>) input).get(0);
+            return first instanceof ItemStack ? (ItemStack) first : null;
+        }
+        return null;
+    }
 }

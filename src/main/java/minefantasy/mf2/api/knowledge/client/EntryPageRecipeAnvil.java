@@ -1,18 +1,11 @@
 package minefantasy.mf2.api.knowledge.client;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
@@ -20,68 +13,47 @@ import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.TextureHelperMF;
 
-public class EntryPageRecipeAnvil extends EntryPage {
+public class EntryPageRecipeAnvil extends EntryPageRecipe {
 
-    private Minecraft mc = Minecraft.getMinecraft();
-    private GridRecipe[] recipes;
-    private int recipeID;
-    private ItemStack tooltipStack;
+    private static final int CELL = 18;
+    private static final ResourceLocation GRID = TextureHelperMF.getResource("textures/gui/knowledge/anvilGrid.png");
+    private final GridRecipe[] recipes;
 
     public EntryPageRecipeAnvil(List<GridRecipe> recipes) {
-        GridRecipe[] array = new GridRecipe[recipes.size()];
-        for (int a = 0; a < recipes.size(); a++) {
-            array[a] = recipes.get(a);
-        }
-        this.recipes = array;
+        this(recipes.toArray(new GridRecipe[0]));
     }
 
     public EntryPageRecipeAnvil(GridRecipe... recipes) {
+        super("anvilGrid");
         this.recipes = recipes;
     }
 
     @Override
-    public void render(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {
-        tooltipStack = null;
-        if (onTick) {
-            tickRecipes();
-        }
-
-        this.mc.getTextureManager().bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/anvilGrid.png"));
-        parent.drawTexturedModalRect(posX, posY, 0, 0, this.universalBookImageWidth, this.universalBookImageHeight);
-
-        // The page holds the recipe registered by the mod; a script may have replaced or removed it since
-        GridRecipe recipe = (recipeID < 0 || recipeID >= recipes.length) ? null
-                : MFRecipes.ANVIL.current(recipes[recipeID]);
-        String cft = "<" + StatCollector.translateToLocal("method.anvil") + ">";
-        mc.fontRenderer.drawSplitString(
-                cft,
-                posX + (universalBookImageWidth / 2) - (mc.fontRenderer.getStringWidth(cft) / 2),
-                posY + 150,
-                117,
-                0);
-        renderRecipe(parent, x, y, f, posX, posY, recipe);
-
-        if (tooltipStack != null) {
-            List<String> tooltipData = tooltipStack.getTooltip(Minecraft.getMinecraft().thePlayer, false);
-            List<String> parsedTooltip = new ArrayList<>();
-            boolean first = true;
-
-            for (String s : tooltipData) {
-                String s_ = s;
-                if (!first) s_ = EnumChatFormatting.GRAY + s;
-                parsedTooltip.add(s_);
-                first = false;
-            }
-
-            minefantasy.mf2.api.helpers.RenderHelper.renderTooltip(x, y, parsedTooltip);
-        }
-
+    protected int variantCount() {
+        return recipes.length;
     }
 
-    private void renderRecipe(GuiScreen parent, int mx, int my, float f, int posX, int posY, GridRecipe recipe) {
-        if (recipe == null) return;
+    @Override
+    protected String station() {
+        return "anvil";
+    }
 
-        GL11.glColor3f(255, 255, 255);
+    @Override
+    protected int stationY() {
+        return 150;
+    }
+
+    @Override
+    protected void drawRecipe(GuiScreen parent, int posX, int posY, int mx, int my) {
+        if (recipes.length == 0) {
+            return;
+        }
+        // The page holds the recipe registered by the mod; a script may have replaced or removed it since
+        GridRecipe recipe = MFRecipes.ANVIL.current(recipes[variant()]);
+        if (recipe == null) {
+            return;
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         GuiHelper.renderToolIcon(
                 parent,
                 recipe.getToolType(),
@@ -91,96 +63,23 @@ public class EntryPageRecipeAnvil extends EntryPage {
                 true,
                 true);
         GuiHelper.renderToolIcon(parent, "anvil", recipe.getAnvil(), posX + 124, posY + 51, true, true);
-
-        GridPages.forEachEntry(
-                recipe,
-                (x, y, stack) -> renderItemAtGridPos(parent, 1 + x, 1 + y, stack, true, posX, posY, mx, my));
-        renderResult(parent, recipe.getRecipeOutput(), false, posX, posY, mx, my, recipe.outputHot());
-    }
-
-    private void tickRecipes() {
-        if (recipeID < recipes.length - 1) {
-            ++recipeID;
-        } else {
-            recipeID = 0;
+        GridPages.forEachEntry(recipe, (x, y, stack) -> {
+            int itemX = posX + x * CELL + 36, itemY = posY + y * CELL + 76;
+            if (Heatable.canHeatItem(stack)) {
+                heatMark(parent, itemX, itemY);
+            }
+            drawItem(stack, itemX, itemY, mx, my);
+        });
+        if (recipe.outputHot()) {
+            heatMark(parent, posX + 80, posY + 42);
         }
+        drawItem(recipe.getRecipeOutput(), posX + 80, posY + 42, mx, my);
     }
 
-    public void renderResult(GuiScreen gui, ItemStack stack, boolean accountForContainer, int xOrigin, int yOrigin,
-            int mx, int my, boolean hot) {
-        if (stack == null || stack.getItem() == null) return;
-        stack = stack.copy();
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-        if (stack.getItemDamage() == -1) stack.setItemDamage(0);
-
-        int xPos = xOrigin + 80;
-        int yPos = yOrigin + 42;
-
-        renderItem(gui, xPos, yPos, stack, accountForContainer, mx, my, hot);
+    /** The small mark in a cell's corner: this goes in, or comes out, hot. */
+    private void heatMark(GuiScreen parent, int x, int y) {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        mc.getTextureManager().bindTexture(GRID);
+        parent.drawTexturedModalRect(x, y, 248, 0, 8, 8);
     }
-
-    public void renderItemAtGridPos(GuiScreen gui, int x, int y, ItemStack stack, boolean accountForContainer,
-            int xOrigin, int yOrigin, int mx, int my) {
-        if (stack == null || stack.getItem() == null) return;
-
-        boolean heatable = Heatable.canHeatItem(stack);
-
-        stack = stack.copy();
-
-        int gridSize = 18;
-
-        if (stack.getItemDamage() == Short.MAX_VALUE) stack.setItemDamage(0);
-        if (stack.getItemDamage() == -1) stack.setItemDamage(0);
-
-        x -= 1;
-        y -= 1;
-        int xPos = xOrigin + (x * gridSize) + 36;
-        int yPos = yOrigin + (y * gridSize) + 76;
-
-        renderItem(gui, xPos, yPos, stack, accountForContainer, mx, my, heatable);
-    }
-
-    public void renderItem(GuiScreen gui, int xPos, int yPos, ItemStack stack, boolean accountForContainer, int mx,
-            int my, boolean heatable) {
-        if (heatable) {
-            GL11.glPushMatrix();
-            GL11.glColor3f(255, 255, 255);
-            this.mc.getTextureManager()
-                    .bindTexture(TextureHelperMF.getResource("textures/gui/knowledge/anvilGrid.png"));
-            gui.drawTexturedModalRect(xPos, yPos, 248, 0, 8, 8);
-            GL11.glPopMatrix();
-        }
-
-        RenderItem render = new RenderItem();
-        if (mx > xPos && mx < (xPos + 16) && my > yPos && my < (yPos + 16)) {
-            tooltipStack = stack;
-        }
-
-        GL11.glPushMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        RenderHelper.enableGUIStandardItemLighting();
-        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        render.renderItemAndEffectIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        render.renderItemOverlayIntoGUI(
-                Minecraft.getMinecraft().fontRenderer,
-                Minecraft.getMinecraft().getTextureManager(),
-                stack,
-                xPos,
-                yPos);
-        RenderHelper.disableStandardItemLighting();
-        GL11.glPopMatrix();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
-    }
-
-    @Override
-    public void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick) {}
 }
