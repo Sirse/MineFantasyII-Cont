@@ -130,13 +130,20 @@ public class InformationBase {
         return this;
     }
 
+    /** What the entry is about, without the skills it needs. */
     @SideOnly(Side.CLIENT)
-    public String getDescription() {
+    public String getSummary() {
         String localised = StatCollector.translateToLocal(this.description);
         if (descriptValues != null && descriptValues.length > 0) {
             localised = StatCollector.translateToLocalFormatted(description, descriptValues);
         }
-        String text = this.statStringFormatter != null ? this.statStringFormatter.formatString(localised) : localised;
+        return this.statStringFormatter != null ? this.statStringFormatter.formatString(localised) : localised;
+    }
+
+    /** What the entry is about, followed by the skills it needs. */
+    @SideOnly(Side.CLIENT)
+    public String getDescription() {
+        String text = getSummary();
 
         if (RPGElements.isSystemActive) {
             String[] requirements = getRequiredSkills();

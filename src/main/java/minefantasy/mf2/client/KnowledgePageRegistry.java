@@ -20,6 +20,7 @@ import minefantasy.mf2.recipe.ForgingRecipes;
 public class KnowledgePageRegistry {
 
     public static void registerPages() {
+        registerStations();
         ItemStack pigiron = ComponentListMF.bar("PigIron");
         ItemStack black = ComponentListMF.bar("BlackSteel");
         ItemStack red = ComponentListMF.bar("RedSteel");
@@ -1182,5 +1183,21 @@ public class KnowledgePageRegistry {
 
     private static EntryPage assembleSimpleImgPage(String name, String text) {
         return new EntryPageImage("textures/gui/knowledge/image/" + name + ".png", 96, 96, text);
+    }
+
+    /** The blocks the book shows beside a recipe's station. */
+    private static void registerStations() {
+        EntryPageRecipe.registerStation("workbench", new ItemStack(Blocks.crafting_table));
+        EntryPageRecipe.registerStation("furnace", new ItemStack(Blocks.furnace));
+        EntryPageRecipe.registerStation("anvil", new ItemStack(BlockListMF.anvilStone), 1.4F);
+        EntryPageRecipe.registerStation("carpenter", new ItemStack(BlockListMF.carpenter));
+        EntryPageRecipe.registerStation("kitchenbench", new ItemStack(BlockListMF.kitchenBench));
+        EntryPageRecipe.registerStation("quern", new ItemStack(BlockListMF.quern));
+        EntryPageRecipe.registerStation("bloomery", new ItemStack(BlockListMF.bloomery));
+        EntryPageRecipe.registerStation("blastfurnace", new ItemStack(BlockListMF.blast_chamber));
+        EntryPageRecipe.registerStation("crucible", new ItemStack(BlockListMF.crucible));
+        EntryPageRecipe.registerStation("crucibleT2", new ItemStack(BlockListMF.crucibleadv));
+        EntryPageRecipe.registerStation("crucibleT3", new ItemStack(BlockListMF.cruciblemythic));
+        EntryPageRecipe.registerStation("crucibleT4", new ItemStack(BlockListMF.cruciblemaster));
     }
 }
