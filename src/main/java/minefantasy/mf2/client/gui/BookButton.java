@@ -26,6 +26,9 @@ public class BookButton extends GuiButton {
     /** A magnifying glass, for the search. */
     public static final String[] MAGNIFIER = { ".####.....", "#....#....", "#....#....", "#....#....", "#....#....",
             ".####.....", ".....##...", "......##..", ".......##.", "........##" };
+    /** A question mark, for how to get about the map. */
+    public static final String[] QUESTION = { ".#####.", "##...##", ".....##", "....##.", "...##..", "...##..",
+            ".......", "...##..", "...##.." };
     /** A ring with a dot in its middle, for centring the map. */
     public static final String[] TARGET = { ".....#.....", "...##.##...", "..#.....#..", ".#.......#.", ".#.......#.",
             "#....#....#", ".#.......#.", ".#.......#.", "..#.....#..", "...##.##...", ".....#....." };

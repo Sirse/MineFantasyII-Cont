@@ -9,14 +9,27 @@ import minefantasy.mf2.api.rpg.Skill;
 public class InformationPage {
 
     private static LinkedList<InformationPage> infoPages = new LinkedList<InformationPage>();
-    public final Skill baseSkill;
+    /** The skills the category trains, shown with their progress in the research book; none for some. */
+    private final List<Skill> skills = new ArrayList<Skill>();
     private String name;
     private LinkedList<InformationBase> entries;
 
     public InformationPage(String name, Skill skill, InformationBase... achievements) {
         this.name = name;
-        this.baseSkill = skill;
+        if (skill != null) {
+            skills.add(skill);
+        }
         this.entries = new LinkedList<InformationBase>(Arrays.asList(achievements));
+    }
+
+    /** One more skill the category trains. */
+    public InformationPage addSkill(Skill skill) {
+        skills.add(skill);
+        return this;
+    }
+
+    public List<Skill> getSkills() {
+        return Collections.unmodifiableList(skills);
     }
 
     /**
@@ -81,10 +94,6 @@ public class InformationPage {
 
     public static String getTitle(int index) {
         return StatCollector.translateToLocal(index == -1 ? "infoPage.basic" : getInfoPage(index).getName());
-    }
-
-    public static Skill getSkill(int index) {
-        return index == -1 ? null : getInfoPage(index).baseSkill;
     }
 
     public String getName() {

@@ -41,11 +41,17 @@ knowledge.unknownUse=Вы не знаете, как использовать э�
 knowledge.known=Вы уже знаете это.
 
 infoPage.basic=Основы
+infoPage.basic.desc=С чего начинается путь ремесленника: первые инструменты, огонь и камень. Отсюда ведут дороги во все остальные разделы.
 infoPage.artisanry=Кузнечное дело
+infoPage.artisanry.desc=Металл и горн: плавка руды, ковка на наковальне, сплавы и закалка. Чем выше мастерство, тем крепче сталь.
 infoPage.construction=Строительное дело
+infoPage.construction.desc=Камень, дерево и раствор: прочные стены, крыши и мебель. Всё, из чего строится дом и мастерская.
 infoPage.provisioning=Ремесло снабжения
+infoPage.provisioning.desc=Еда и припасы: от мельницы и кухни до долгих запасов. Сытый мастер работает дольше.
 infoPage.engineering=Инженерное дело
+infoPage.engineering.desc=Механизмы и порох: бомбы, арбалеты, кузнечные меха и хитрые устройства. Точность важнее силы.
 infoPage.mastery=Мастерство
+infoPage.mastery.desc=Искусство боя: приёмы, стойки и выучка воина. Здесь оттачивается то, что не выковать молотом.
 infoPage.dwarvern=Знания гномов
 infoPage.gnomish=Гномские секреты
 
@@ -59,7 +65,6 @@ research.null=Больше нечего изучать
 
 research.addArtefact=Добавлено знание: %1$s (%2$s/%3$s)
 research.finishResearch=Исследовано: "%1$s"
-research.cluecount= (%1$s/%2$s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MOBS/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2522,10 +2527,13 @@ knowledge.read=Читать
 knowledge.status.known=Изучено
 knowledge.status.available=Можно изучить сейчас
 knowledge.status.clues=Изучается за столом исследований
+knowledge.clues=Clues found: %1$s of %2$s
 knowledge.status.locked=Пока недоступно
-knowledge.requires=После: %1$s
-knowledge.opens=Откроет: %1$s
+knowledge.requires=После:
+knowledge.opens=Откроет:
 knowledge.learnableNow=Можно изучить сейчас:
 knowledge.andMore=...и ещё %1$s
-knowledge.controls=Тяните карту, колесо — масштаб. H — к началу, F — весь раздел, / — поиск
+knowledge.controls=Тяните карту мышью, колесо — масштаб. H — к началу, F — весь раздел, / — поиск. Двойной клик по карте снимает выбор.
+knowledge.help.search=Найти исследование по названию (/ или Ctrl+F)
+knowledge.help.home=Вернуть карту к началу (H)
 knowledge.status.needsSkill=Не хватает навыка

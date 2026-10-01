@@ -1,5 +1,6 @@
 package minefantasy.mf2.client.gui;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,9 +33,9 @@ import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.InformationPage;
 import minefantasy.mf2.api.knowledge.ResearchAvailability;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.api.knowledge.client.BookSearch;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
-import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 import minefantasy.mf2.network.packet.ResearchRequest;
 
@@ -57,16 +58,14 @@ public class GuiKnowledge extends GuiScreen {
     /** The written area of the left page, inside its binding. */
     private static final int TEXT_LEFT = 18;
     private static final int TEXT_WIDTH = 146;
-    /** The map fills the right page below the line of the category's count and the close cross. */
+    /** The map fills the right page inside its margins. */
     private static final int MAP_LEFT = PAGE_WIDTH;
-    private static final int MAP_TOP = 26;
+    private static final int MAP_TOP = 10;
     private static final int MAP_WIDTH = 164;
-    private static final int MAP_HEIGHT = 189;
+    private static final int MAP_HEIGHT = 205;
     /** The foot line of the spread: the search on the left page, the centring button on the map beside it. */
     private static final int FOOT_Y = 206;
     /** How far the close cross sits in from the top and right edges of the page, the same both ways. */
-    /** The line of the open category's count over the map. */
-    private static final int COUNT_Y = 12;
     /** "< 2/5 >" at the right of the foot line, stepping through the search's matches; shown past this many. */
     private static final int SWITCH_WIDTH = 44;
     private static final int SWITCH_ARROW = 16;
@@ -79,9 +78,14 @@ public class GuiKnowledge extends GuiScreen {
     private static final int SPINE_FADE = 14;
     /** Faint dots where the cells meet, a hint of the grid without its lines. */
     private static final int GRID = 0x24503020;
-    /** Compact skill rows on the left page: name and level over a thin bar. */
-    private static final int SKILLS_TOP = 12;
-    private static final int SKILL_ROW = 16;
+    /** The head of the left page: the category's name over a rule. */
+    private static final int TITLE_Y = 11;
+    private static final int HEAD_RULE = 24;
+    /** The category's progress bars stack at the foot of the left page, over the search: each a label over a bar. */
+    private static final int BAR_ROW = 16;
+    private static final int BAR_HEIGHT = 13;
+    /** How long between two clicks on the map makes them a double click, which lets the chosen entry go. */
+    private static final long DOUBLE_CLICK_MS = 350;
     /** Ribbon colours: basics first, then each registered category in order; later ones reuse the last. */
     static final int[] RIBBON_COLOURS = { 0x7A8AA0, 0xA83A2A, 0xA87430, 0x4E8040, 0x3A5A98, 0xC8A040 };
     /** How far the view can scroll, in map pixels. */
@@ -134,19 +138,26 @@ public class GuiKnowledge extends GuiScreen {
     private static final int INK_MET = 0x3A6A2A;
     private static final int INK_SHORT = 0xA03020;
     private static final int INK_LINK = 0x2A4A8A;
-    /** The card on the left page: where it starts, and the most lines of description it gives room to. */
-    private static final int CARD_TOP = 33;
     /** The entry's item on its card, drawn this many times its usual size. */
-    private static final float CARD_ICON_SCALE = 2.0F;
+    private static final float CARD_ICON_SCALE = 3.0F;
     private static final float TITLE_SCALE = 1.3F;
-    /** The "learnable now" list on the overview page: where it starts and how many it names. */
-    private static final int LEARNABLE_TOP = 124;
+    /** How many entries the "learnable now" list on the overview page names. */
     private static final int LEARNABLE_SHOWN = 5;
+    /** The card's "leads to" list names at most this many. */
+    private static final int OPENS_SHOWN = 3;
+    /** Lists of links: the heading's line, each entry's line, and how far entries sit in from the heading. */
+    private static final int LIST_HEADING = 11;
+    private static final int LIST_ROW = 10;
+    private static final int LIST_INDENT = 6;
     /** Room left around a category when F fits it to the map. */
     private static final int FIT_MARGIN = 16;
     /** How long to wait for the server to confirm a purchase before letting the learn button be pressed again. */
     private static final int PURCHASE_WAIT_TICKS = 40;
     private static final int RULE = 0x40503020;
+    /** The search field: an ink frame, paper lighter than the page, and a shade along its top. */
+    private static final int FIELD_FRAME = 0xFF6A5236;
+    private static final int FIELD_PAPER = 0xFFF6EFDC;
+    private static final int FIELD_SHADE = 0x40503020;
     /** A skill's bar, after the vanilla experience bar: a dark frame, a sunken track, and a fill lit along its top. */
     private static final int BAR_FRAME = 0xC0301E10;
     private static final int BAR_TRACK = 0x40301E10;
@@ -166,6 +177,7 @@ public class GuiKnowledge extends GuiScreen {
     private static final int BUTTON_READ = 4;
     private static final int BUTTON_SEARCH = 5;
     private static final int BUTTON_HOME = 6;
+    private static final int BUTTON_HELP = 7;
 
     private static final ResourceLocation sealTex = new ResourceLocation(
             "minefantasy2:textures/gui/knowledge/book/seal.png");
@@ -212,17 +224,17 @@ public class GuiKnowledge extends GuiScreen {
     private final List<Spark> sparks = new LinkedList<Spark>();
     private GuiButton learnButton;
     private GuiButton searchButton;
+    private GuiButton homeButton;
+    private GuiButton helpButton;
     private GuiButton readButton;
-    /** Where the card's link to the parent entry was drawn this frame, to be clicked: x, y, width, height. */
-    private int[] parentLink;
     /** Lines of the "learnable now" list drawn this frame, to be clicked. */
-    private final List<LearnableLine> learnableLines = new LinkedList<LearnableLine>();
-    /** Search: whether the player is typing a query, the query, and which match Enter goes to next. */
-    private boolean searching;
-    private String query = "";
-    private int shownMatch = -1;
-    /** Whether the pinned entry was reached from the search, so its button shares the foot with the match switch. */
-    private boolean fromSearch;
+    private final List<LinkLine> linkLines = new LinkedList<LinkLine>();
+    /** The search, kept apart from the buttons at the foot, which only follow it. */
+    private long lastMapClick;
+    private InformationBase lastClicked;
+    private final BookSearch<InformationBase> search = new BookSearch<InformationBase>(this::find);
+    /** What the search's finds depend on besides the query, worked out once a frame: language and what is known. */
+    private Object searchStamp = "";
     private LinkedList<InformationBase> informationList = new LinkedList<InformationBase>();
     private EntityPlayer player;
 
@@ -332,13 +344,14 @@ public class GuiKnowledge extends GuiScreen {
                         BookRibbon.OUT_OPEN,
                         BookRibbon.HEIGHT));
         this.buttonList.add(
-                searchButton = BookButton.icon(
-                        BUTTON_SEARCH,
-                        folioLeft() + TEXT_LEFT - 1,
-                        folioTop() + FOOT_Y - 2,
-                        BookButton.MAGNIFIER));
-        this.buttonList.add(BookButton.icon(BUTTON_HOME, mapLeft() + 10, folioTop() + FOOT_Y - 3, BookButton.TARGET));
-        int y = folioTop() + FOOT_Y - 3;
+                searchButton = BookButton
+                        .icon(BUTTON_SEARCH, footLeft() + 15, folioTop() + FOOT_Y - 2, BookButton.MAGNIFIER));
+        this.buttonList
+                .add(homeButton = BookButton.icon(BUTTON_HOME, footLeft(), folioTop() + FOOT_Y - 3, BookButton.TARGET));
+        // Only explains how to get about the map, under the mouse; pressing it does nothing
+        this.buttonList.add(
+                helpButton = BookButton.icon(BUTTON_HELP, helpLeft(), folioTop() + FOOT_Y - 2, BookButton.QUESTION));
+        int y = readTop();
         this.buttonList.add(
                 learnButton = new BookButton(
                         BUTTON_LEARN,
@@ -357,6 +370,34 @@ public class GuiKnowledge extends GuiScreen {
                         I18n.format("knowledge.read")));
     }
 
+    /** The foot row of the right page, over the map's lower edge: the centring first, then the search. */
+    private int footLeft() {
+        return mapLeft() + 10;
+    }
+
+    /** The question mark keeps the right end of the foot row. */
+    private int helpLeft() {
+        return mapLeft() + MAP_WIDTH - 12;
+    }
+
+    /** The search's line runs from after the glass to before the question mark, the switch at its right end. */
+    private int searchLeft() {
+        return footLeft() + 30;
+    }
+
+    private int searchRight() {
+        return helpLeft() - 5;
+    }
+
+    private int switchCentre() {
+        return searchRight() - SWITCH_WIDTH / 2;
+    }
+
+    /** The chosen entry's button sits over the rule that sets the bars apart. */
+    private int readTop() {
+        return barsTop(bars().size()) - 9 - 13;
+    }
+
     protected void mouseClicked(int screenX, int screenY, int button) {
         int x = toBook(screenX), y = toBook(screenY);
         int ribbon = button == 0 ? ribbonAt(x, y) : -2;
@@ -369,20 +410,49 @@ public class GuiKnowledge extends GuiScreen {
         } else if (ribbon != -2 && ribbon != currentPage) {
             currentPage = ribbon;
             pinned = null;
+            search.choseElsewhere();
             this.mc.getSoundHandler().playSound(
                     PositionedSoundRecord.func_147674_a(new ResourceLocation("minefantasy2:block.flipPage"), 1.0F));
-        } else if (button == 0 && learnableAt(x, y) != null) {
-            goTo(learnableAt(x, y));
-        } else if (button == 0 && overParentLink(x, y)) {
-            goTo(cardEntry().parentInfo);
+        } else if (button == 0 && linkAt(x, y) != null) {
+            goTo(linkAt(x, y));
+            search.choseElsewhere();
+        } else if (button == 0 && highlighted == null && overMap(x, y)) {
+            long now = Minecraft.getSystemTime();
+            if (now - lastMapClick < DOUBLE_CLICK_MS) {
+                pinned = null;
+                search.choseElsewhere();
+                now = 0;
+            }
+            lastMapClick = now;
+            lastClicked = null;
         } else if (button == 0 && highlighted != null) {
+            long now = Minecraft.getSystemTime();
+            if (highlighted == lastClicked && now - lastMapClick < DOUBLE_CLICK_MS && canRead(highlighted)) {
+                // A double click opens the entry to read
+                pinned = highlighted;
+                lastClicked = null;
+                player.openGui(MineFantasyII.instance, 1, player.worldObj, 0, pinned.ID, 0);
+                super.mouseClicked(x, y, button);
+                return;
+            }
+            lastClicked = highlighted;
+            lastMapClick = now;
             // A click pins the entry's card, and a second click lets it go
             pinned = pinned == highlighted ? null : highlighted;
-            fromSearch = false;
+            search.choseElsewhere();
             this.mc.getSoundHandler()
                     .playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
         }
         super.mouseClicked(x, y, button);
+    }
+
+    /** Whether the entry is learned and has pages to read. */
+    private boolean canRead(InformationBase entry) {
+        return ResearchAvailability.of(player, entry) == ResearchAvailability.KNOWN && !entry.getPages().isEmpty();
+    }
+
+    private boolean overMap(int x, int y) {
+        return x >= mapLeft() && x < mapLeft() + MAP_WIDTH && y >= mapTop() && y < mapTop() + MAP_HEIGHT;
     }
 
     private boolean overButton(int x, int y) {
@@ -394,20 +464,14 @@ public class GuiKnowledge extends GuiScreen {
         return false;
     }
 
-    /** Goes to the next or the previous of the search's matches, round from the last to the first. */
+    /** Goes to the next or the previous of the search's finds, round from the last to the first. */
     private void stepMatch(int direction) {
-        List<InformationBase> matches = matches();
-        if (matches.isEmpty()) {
-            return;
-        }
-        shownMatch = ((shownMatch < 0 && direction < 0 ? 0 : shownMatch) + direction + matches.size()) % matches.size();
-        goTo(matches.get(shownMatch));
-        fromSearch = true;
+        goTo(search.step(direction, searchStamp));
     }
 
-    /** Whether the foot line shows the match switch: while searching, or on an entry the search went to. */
+    /** Whether the foot line shows the switch between finds: with the search open on enough of them. */
     private boolean showsSwitch() {
-        return (searching || fromSearch && pinned != null) && matches().size() > SWITCH_FROM;
+        return search.isOpen() && search.results(searchStamp).size() > SWITCH_FROM;
     }
 
     /** The switch's arrow under the point: -1 back, 1 on, 0 neither. */
@@ -415,7 +479,7 @@ public class GuiKnowledge extends GuiScreen {
         if (!showsSwitch()) {
             return 0;
         }
-        int centre = folioLeft() + TEXT_LEFT + TEXT_WIDTH - SWITCH_WIDTH / 2, top = folioTop() + FOOT_Y - 3;
+        int centre = switchCentre(), top = folioTop() + FOOT_Y - 3;
         if (y < top || y >= top + 13) {
             return 0;
         }
@@ -427,12 +491,6 @@ public class GuiKnowledge extends GuiScreen {
         return 0;
     }
 
-    private void startSearch() {
-        searching = true;
-        query = "";
-        shownMatch = -1;
-    }
-
     /** Back to where the map opens, at its usual size. */
     private void goHome() {
         zoom = ZOOM_MIN;
@@ -440,21 +498,14 @@ public class GuiKnowledge extends GuiScreen {
         targetViewY = homeViewY();
     }
 
-    private InformationBase learnableAt(int x, int y) {
+    private InformationBase linkAt(int x, int y) {
         int left = folioLeft() + TEXT_LEFT;
-        for (LearnableLine line : learnableLines) {
+        for (LinkLine line : linkLines) {
             if (x >= left && x < left + TEXT_WIDTH && y >= line.top && y < line.top + 10) {
                 return line.entry;
             }
         }
         return null;
-    }
-
-    private boolean overParentLink(int x, int y) {
-        return parentLink != null && x >= parentLink[0]
-                && x < parentLink[0] + parentLink[2]
-                && y >= parentLink[1]
-                && y < parentLink[1] + parentLink[3];
     }
 
     /** Pins an entry and glides the map to it, turning to its category first when it is in another. */
@@ -492,12 +543,7 @@ public class GuiKnowledge extends GuiScreen {
             purchasedAt = ticks;
         }
         if (pressed.id == BUTTON_SEARCH) {
-            if (searching) {
-                searching = false;
-                query = "";
-            } else {
-                startSearch();
-            }
+            search.toggle();
         }
         if (pressed.id == BUTTON_HOME) {
             goHome();
@@ -508,15 +554,23 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     protected void keyTyped(char typedChar, int keyCode) {
-        if (searching) {
+        if (search.isTyping()) {
             typeSearch(typedChar, keyCode);
+            return;
+        }
+        if (search.isBrowsing() && keyCode == Keyboard.KEY_ESCAPE) {
+            search.close();
+            return;
+        }
+        if (search.isBrowsing() && (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER)) {
+            stepMatch(1);
             return;
         }
         if (keyCode == this.mc.gameSettings.keyBindInventory.getKeyCode()) {
             this.mc.displayGuiScreen((GuiScreen) null);
             this.mc.setIngameFocus();
         } else if (typedChar == '/' || keyCode == Keyboard.KEY_F && isCtrlKeyDown()) {
-            startSearch();
+            search.open();
         } else if (keyCode == Keyboard.KEY_F) {
             fitCategory();
         } else if (keyCode == Keyboard.KEY_HOME || keyCode == Keyboard.KEY_H) {
@@ -526,37 +580,26 @@ public class GuiKnowledge extends GuiScreen {
         }
     }
 
-    /** While searching, keys edit the query: Enter goes to the next match, Escape ends the search. */
+    /** While typing, keys edit the query: Enter goes to the next find, Escape ends the search. */
     private void typeSearch(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_ESCAPE) {
-            searching = false;
-            query = "";
+            search.close();
         } else if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_NUMPADENTER) {
-            List<InformationBase> matches = matches();
-            if (!matches.isEmpty()) {
-                stepMatch(1);
-            }
+            stepMatch(1);
         } else if (keyCode == Keyboard.KEY_BACK) {
-            if (!query.isEmpty()) {
-                query = query.substring(0, query.length() - 1);
-                shownMatch = -1;
-            }
-        } else if (ChatAllowedCharacters.isAllowedCharacter(typedChar) && query.length() < 24) {
-            query += typedChar;
-            shownMatch = -1;
+            search.erase();
+        } else if (ChatAllowedCharacters.isAllowedCharacter(typedChar)) {
+            search.type(typedChar);
         }
     }
 
     /**
-     * Entries whose name the book shows and that contain the query, from every category; none for an empty query. An
-     * entry too far out of reach to be named cannot be found by its name either.
+     * Entries whose name the book shows and that contain the query, from every category. An entry too far out of reach
+     * to be named cannot be found by its name either.
      */
-    private List<InformationBase> matches() {
+    private List<InformationBase> find(String query) {
         List<InformationBase> found = new LinkedList<InformationBase>();
-        if (query.trim().isEmpty()) {
-            return found;
-        }
-        String wanted = query.trim().toLowerCase();
+        String wanted = query.toLowerCase();
         for (InformationBase entry : InformationList.knowledgeList) {
             boolean named = ResearchLogic.hasInfoUnlocked(player, entry)
                     || ResearchLogic.func_150874_c(player, entry) < HIDDEN_DEPTH;
@@ -626,6 +669,7 @@ public class GuiKnowledge extends GuiScreen {
         handleZoom(mx, my);
         targetViewX = MathHelper.clamp_double(targetViewX, VIEW_MIN_X, VIEW_MAX_X - 1);
         targetViewY = MathHelper.clamp_double(targetViewY, VIEW_MIN_Y, VIEW_MAX_Y - 1);
+        searchStamp = this.mc.gameSettings.language + ":" + known(InformationList.knowledgeList);
         updateButtons();
 
         this.drawDefaultBackground();
@@ -642,14 +686,8 @@ public class GuiKnowledge extends GuiScreen {
         // One short of a skill still shows the button, greyed, so the card says what is missing beside it
         learnButton.visible = state == ResearchAvailability.BUYABLE || state == ResearchAvailability.NEEDS_SKILL;
         learnButton.enabled = state == ResearchAvailability.BUYABLE && purchased != pinned;
-        // A chosen entry's button takes the foot of the page, and the search gives way to it
-        searchButton.visible = !readButton.visible && !learnButton.visible;
-        if (!searchButton.visible && !fromSearch) {
-            searching = false;
-        }
-        int width = TEXT_WIDTH - (showsSwitch() ? SWITCH_WIDTH + 4 : 0);
-        ((BookButton) readButton).setWidth(width);
-        ((BookButton) learnButton).setWidth(width);
+        // The bars can change with the category, and the button rides over them
+        readButton.yPosition = learnButton.yPosition = readTop();
     }
 
     /** Dragging inside the map moves the view with the mouse, scaled by the zoom. */
@@ -760,7 +798,8 @@ public class GuiKnowledge extends GuiScreen {
         GL11.glDepthFunc(GL11.GL_LEQUAL);
         GL11.glPushMatrix();
         GL11.glTranslatef(mapX, mapY, -200.0F);
-        GL11.glScalef(1.0F / zoom, 1.0F / zoom, 0.0F);
+        // Scaled alike in depth, not flattened to nothing: a block's model keeps its shape and its light
+        GL11.glScalef(1.0F / zoom, 1.0F / zoom, 1.0F / zoom);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -781,6 +820,7 @@ public class GuiKnowledge extends GuiScreen {
         // The map runs to the fold: the page's own shadow there goes back on top, so the map sinks into the spine
         drawSpineShadow(folioLeft() + PAGE_WIDTH, mapY);
         frame.drawDust();
+        drawFoot();
 
         this.zLevel = 0.0F;
         GL11.glDepthFunc(GL11.GL_LEQUAL);
@@ -793,10 +833,9 @@ public class GuiKnowledge extends GuiScreen {
         boolean overMap = mx >= mapX && mx < mapX + MAP_WIDTH && my >= mapY && my < mapY + MAP_HEIGHT;
         highlighted = overMap ? hovered : null;
         hovered = highlighted;
-        if (cardEntry() == null) {
-            drawSkillTooltip(mx, my);
-        }
+        drawSkillTooltip(mx, my);
         drawRibbonTooltip(mx, my);
+        drawFootTooltip(mx, my);
 
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_LIGHTING);
@@ -876,7 +915,8 @@ public class GuiKnowledge extends GuiScreen {
     private InformationBase drawEntries(List<InformationBase> entries, int scrollX, int scrollY, float mouseX,
             float mouseY) {
         InformationBase hovered = null;
-        List<InformationBase> matches = searching ? matches() : new LinkedList<InformationBase>();
+        List<InformationBase> matches = search.isOpen() ? search.results(searchStamp)
+                : new LinkedList<InformationBase>();
         long now = Minecraft.getSystemTime();
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glDisable(GL11.GL_LIGHTING);
@@ -942,7 +982,7 @@ public class GuiKnowledge extends GuiScreen {
                 tint(RING_PINNED, 0.95F);
                 drawImage(outline, x - 6, y - 6, 34, 34);
             }
-            if (searching && matches.contains(entry)) {
+            if (matches.contains(entry)) {
                 tint(RING_FOUND, 0.6F + 0.3F * MathHelper.sin(now / 350F));
                 drawImage(outline, x - 6, y - 6, 34, 34);
             }
@@ -962,7 +1002,12 @@ public class GuiKnowledge extends GuiScreen {
                 GL11.glColor4f(0.30F, 0.20F, 0.14F, 0.85F);
                 itemRender.renderWithColor = false;
             }
-            GL11.glDisable(GL11.GL_LIGHTING); // Forge: fixes MC-33065
+            // Lit as in the inventory, so a block shows its faces; a locked silhouette stays flat ink
+            if (available || known) {
+                RenderHelper.enableGUIStandardItemLighting();
+            } else {
+                GL11.glDisable(GL11.GL_LIGHTING);
+            }
             GL11.glEnable(GL11.GL_CULL_FACE);
             itemRender.renderItemAndEffectIntoGUI(
                     this.mc.fontRenderer,
@@ -970,6 +1015,7 @@ public class GuiKnowledge extends GuiScreen {
                     entry.theItemStack,
                     x + 3,
                     y + 3);
+            RenderHelper.disableStandardItemLighting();
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glDisable(GL11.GL_LIGHTING);
             itemRender.renderWithColor = true;
@@ -1093,74 +1139,192 @@ public class GuiKnowledge extends GuiScreen {
         int x = folioLeft() + TEXT_LEFT;
         int top = folioTop();
         List<InformationBase> entries = entriesOf(currentPage, informationList);
-        if (searching && searchButton.visible) {
-            drawSearch(x + 14, top + FOOT_Y);
-        }
-        if (showsSwitch()) {
-            drawSwitch(x + TEXT_WIDTH - SWITCH_WIDTH / 2, top + FOOT_Y);
-        }
-        // The count of the open category heads the map, level with the close cross
-        drawCentred(learnedCount(entries), mapLeft() + MAP_WIDTH / 2, top + COUNT_Y, INK_FAINT);
 
-        parentLink = null;
-        learnableLines.clear();
+        linkLines.clear();
+        // The same head and foot over the overview and over a card, so only what is between them changes
+        int below = drawHead(x, top);
+        drawBars(x, bars());
         InformationBase card = cardEntry();
         if (card != null) {
-            drawTitle(x, top + 11);
-            drawCard(card, x, top + CARD_TOP);
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-            return;
+            drawCard(card, x, below);
+        } else {
+            drawLearnable(x, drawDescription(x, below + 1) + 4);
         }
-
-        Skill[] skills = skills();
-        for (int a = 0; a < skills.length; a++) {
-            drawSkill(x, top + SKILLS_TOP + a * SKILL_ROW, skills[a], ribbonColour(a + 1));
-        }
-        int below = top + SKILLS_TOP + skills.length * SKILL_ROW;
-        drawRect(x, below, x + TEXT_WIDTH, below + 1, RULE);
-        // The skills are the same on every ribbon; the category's own part of the page starts under its name
-        drawTitle(x, below + 7);
-
-        drawLearnable(x, top + LEARNABLE_TOP);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     /** The open category's name, larger than the rest of the page, over a rule. */
-    private void drawTitle(int x, int y) {
+    /** The head of the left page: the open category's name, larger than the rest, over a rule. Gives the line below. */
+    private int drawHead(int x, int top) {
         GL11.glPushMatrix();
-        GL11.glTranslatef(x + TEXT_WIDTH / 2, y, 0);
+        GL11.glTranslatef(x + TEXT_WIDTH / 2, top + TITLE_Y, 0);
         GL11.glScalef(TITLE_SCALE, TITLE_SCALE, 1.0F);
         drawCentred(InformationPage.getTitle(currentPage), 0, 0, INK);
         GL11.glPopMatrix();
-        drawRect(x, y + 16, x + TEXT_WIDTH, y + 17, RULE);
+        drawRect(x, top + HEAD_RULE, x + TEXT_WIDTH, top + HEAD_RULE + 1, RULE);
+        return top + HEAD_RULE + 6;
+    }
+
+    /** What the open category is about, in a few faint lines under its name. Gives the line below. */
+    private int drawDescription(int x, int y) {
+        String key = (currentPage < 0 ? "infoPage.basic" : InformationPage.getInfoPage(currentPage).getName())
+                + ".desc";
+        if (!StatCollector.canTranslate(key)) {
+            return y;
+        }
+        for (Object line : this.fontRendererObj.listFormattedStringToWidth(I18n.format(key), TEXT_WIDTH)) {
+            this.fontRendererObj.drawString((String) line, x, y, INK_FAINT);
+            y += 9;
+        }
+        return y;
+    }
+
+    /** One progress bar at the foot of the page: a skill the category trains, or how much of the book is learned. */
+    private static final class Bar {
+
+        final String label, value;
+        final float progress;
+        final boolean maxed;
+        final int colour;
+        /** The skill it shows, for its tooltip; none for the book's own progress. */
+        final Skill skill;
+
+        Bar(String label, String value, float progress, boolean maxed, int colour, Skill skill) {
+            this.label = label;
+            this.value = value;
+            this.progress = progress;
+            this.maxed = maxed;
+            this.colour = colour;
+            this.skill = skill;
+        }
+    }
+
+    /**
+     * The open category's bars: a bar for each skill it trains, in the category's colour; the basics, which train none,
+     * show how much of the whole book is learned instead.
+     */
+    private List<Bar> bars() {
+        List<Bar> bars = new ArrayList<Bar>();
+        int colour = ribbonColour(currentPage + 1);
+        if (currentPage < 0) {
+            List<InformationBase> all = InformationList.knowledgeList;
+            int known = known(all);
+            bars.add(
+                    new Bar(
+                            learnedCount(all),
+                            "",
+                            all.isEmpty() ? 0F : known / (float) all.size(),
+                            known == all.size(),
+                            colour,
+                            null));
+        } else if (currentPage < InformationPage.getInfoPages().size()) {
+            for (Skill skill : InformationPage.getInfoPage(currentPage).getSkills()) {
+                boolean maxed = skill.isMaxed(player);
+                int[] xp = skill.getXP(player);
+                // At the cap there is no next level to fill towards: the bar stands full, and its gold gleam says so
+                float progress = maxed ? 1F : xp[1] > 0 ? (float) Math.min(xp[0], xp[1]) / (float) xp[1] : 0F;
+                bars.add(
+                        new Bar(
+                                skill.getDisplayName(),
+                                String.valueOf(RPGElements.getLevel(player, skill)),
+                                progress,
+                                maxed,
+                                colour,
+                                skill));
+            }
+        }
+        return bars;
+    }
+
+    /** Where the bars start, stacked up from the foot of the left page; the foot itself with none. */
+    private int barsTop(int count) {
+        return folioTop() + PAGE_HEIGHT - 14 - count * BAR_ROW;
+    }
+
+    /** The bars over the search, a rule above them. */
+    private void drawBars(int x, List<Bar> bars) {
+        if (bars.isEmpty()) {
+            return;
+        }
+        int y = barsTop(bars.size());
+        drawRect(x, y - 5, x + TEXT_WIDTH, y - 4, RULE);
+        for (Bar bar : bars) {
+            drawProgress(x, y, bar.label, bar.value, bar.progress, bar.maxed, bar.colour);
+            y += BAR_ROW;
+        }
     }
 
     /**
      * An entry's card: its icon and name, where it stands, what it is about, which skills it needs, which entry comes
      * before it and what it leads to. An entry too far out of reach keeps its name and what it is about to itself.
      */
-    /** Where the card must end, clear of the learn and read buttons at the foot of the page. */
+    /** Where the card must end, clear of the bars and the buttons at the foot of the page. */
     private int cardBottom() {
-        return folioTop() + PAGE_HEIGHT - 29;
+        boolean button = readButton.visible || learnButton.visible;
+        return button ? readTop() - 3 : barsTop(bars().size()) - 8;
     }
 
     /**
      * The names of what the entry leads to; entries still too far to name stay unnamed, and those beyond are not
      * mentioned at all.
      */
-    private List<String> opensOf(InformationBase entry) {
-        List<String> opens = new LinkedList<String>();
+    private List<InformationBase> opensOf(InformationBase entry) {
+        List<InformationBase> opens = new LinkedList<InformationBase>();
         for (InformationBase child : InformationList.knowledgeList) {
-            if (child.parentInfo == entry) {
-                int depth = ResearchLogic.func_150874_c(player, child);
-                if (depth < HIDDEN_DEPTH || ResearchLogic.hasInfoUnlocked(player, child)) {
-                    opens.add(child.getDisplayName());
-                } else if (depth == HIDDEN_DEPTH) {
-                    opens.add(I18n.format("achievement.unknown"));
-                }
+            if (child.parentInfo == entry && ResearchLogic.func_150874_c(player, child) <= HIDDEN_DEPTH) {
+                opens.add(child);
             }
         }
         return opens;
+    }
+
+    /** An entry's name as the book may show it: unnamed while too far out of reach. */
+    private String nameOf(InformationBase entry) {
+        return ResearchLogic.hasInfoUnlocked(player, entry) || ResearchLogic.func_150874_c(player, entry) < HIDDEN_DEPTH
+                ? entry.getDisplayName()
+                : I18n.format("achievement.unknown");
+    }
+
+    /** How tall a list of links is with this many entries, at most so many named. */
+    private static int listHeight(int count, int shown) {
+        return count == 0 ? 0 : LIST_HEADING + (Math.min(count, shown) + (count > shown ? 1 : 0)) * LIST_ROW;
+    }
+
+    /**
+     * A heading over entries, one to a line and set in a little, each a link that takes the map there; past the most
+     * shown, or past what fits above the bars, how many more. Gives the line below the list.
+     */
+    private int drawLinks(String heading, List<InformationBase> entries, int x, int y, int shown) {
+        // Only as many as fit above the bars; the last line that fits says how many more there are
+        int room = (cardBottom() - y - LIST_HEADING) / LIST_ROW;
+        if (entries.isEmpty() || room < 1) {
+            return y;
+        }
+        if (Math.min(shown, entries.size()) > room || entries.size() > shown && shown >= room) {
+            shown = room - 1;
+        }
+        if (shown < 1 && entries.size() > 1) {
+            return y;
+        }
+        shown = Math.max(shown, 1);
+        this.fontRendererObj.drawString(heading, x, y, INK);
+        int line = y + LIST_HEADING;
+        for (int i = 0; i < entries.size() && i < shown; i++) {
+            InformationBase entry = entries.get(i);
+            String name = this.fontRendererObj.trimStringToWidth(nameOf(entry), TEXT_WIDTH - LIST_INDENT);
+            this.fontRendererObj.drawString(name, x + LIST_INDENT, line, INK_LINK);
+            linkLines.add(new LinkLine(entry, line));
+            line += LIST_ROW;
+        }
+        if (entries.size() > shown) {
+            this.fontRendererObj.drawString(
+                    I18n.format("knowledge.andMore", entries.size() - shown),
+                    x + LIST_INDENT,
+                    line,
+                    INK_FAINT);
+            line += LIST_ROW;
+        }
+        return line;
     }
 
     private void drawCard(InformationBase entry, int x, int y) {
@@ -1172,7 +1336,11 @@ public class GuiKnowledge extends GuiScreen {
         int centre = x + TEXT_WIDTH / 2;
         GL11.glPushMatrix();
         GL11.glTranslatef(centre - 8 * CARD_ICON_SCALE, y, 0);
-        GL11.glScalef(CARD_ICON_SCALE, CARD_ICON_SCALE, 1.0F);
+        // Scaled in depth too, or a block's model is flattened; its faces sorted by depth, or the far ones show through
+        GL11.glScalef(CARD_ICON_SCALE, CARD_ICON_SCALE, CARD_ICON_SCALE);
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glDepthMask(true);
         RenderHelper.enableGUIStandardItemLighting();
         GL11.glEnable(GL12.GL_RESCALE_NORMAL);
         itemRender.renderItemAndEffectIntoGUI(
@@ -1219,19 +1387,32 @@ public class GuiKnowledge extends GuiScreen {
         }
         drawCentred(status, centre, line, statusInk);
         line += 11;
+        if (!known && !hidden && !entry.isEasy()) {
+            // How far the clues gathered at a research table have got towards it
+            String clues = I18n.format(
+                    "knowledge.clues",
+                    ResearchLogic.getArtefactCount(entry.getUnlocalisedName(), player),
+                    entry.getArtefactCount());
+            drawCentred(clues, centre, line - 2, INK_FAINT);
+            line += 9;
+        }
         drawRect(x, line, x + TEXT_WIDTH, line + 1, RULE);
         line += 4;
 
         // What comes after the description, worked out first so the description takes only the room that is left
         String[] requirements = entry.getRequiredSkills();
-        boolean parentShown = entry.parentInfo != null && !ResearchLogic.hasInfoUnlocked(player, entry.parentInfo);
-        List<String> opens = hidden ? new LinkedList<String>() : opensOf(entry);
-        int below = (requirements == null ? 0 : requirements.length * 9) + (parentShown ? 11 : 0)
-                + (opens.isEmpty() ? 0 : 9);
+        List<InformationBase> before = new LinkedList<InformationBase>();
+        if (entry.parentInfo != null && !ResearchLogic.hasInfoUnlocked(player, entry.parentInfo)) {
+            before.add(entry.parentInfo);
+        }
+        List<InformationBase> opens = hidden ? new LinkedList<InformationBase>() : opensOf(entry);
+        int below = (requirements == null ? 0 : requirements.length * 9) + listHeight(before.size(), 1)
+                + listHeight(opens.size(), OPENS_SHOWN);
 
         if (!hidden) {
             List<String> description = this.fontRendererObj.listFormattedStringToWidth(entry.getSummary(), TEXT_WIDTH);
-            int shown = Math.max(1, (cardBottom() - line - 3 - below) / 9);
+            // What follows the description keeps its room; the description gives way, to nothing if it must
+            int shown = Math.max(0, (cardBottom() - line - 3 - below) / 9);
             for (int i = 0; i < description.size() && i < shown; i++) {
                 String text = description.get(i);
                 if (i == shown - 1 && description.size() > shown) {
@@ -1244,40 +1425,15 @@ public class GuiKnowledge extends GuiScreen {
         }
 
         // Skills the entry needs, green where met and red where still short
-        for (int i = 0; requirements != null && i < requirements.length; i++) {
+        for (int i = 0; requirements != null && i < requirements.length && line + 9 <= cardBottom(); i++) {
             boolean met = entry.isUnlocked(i, player);
             this.fontRendererObj.drawString((met ? "+ " : "- ") + requirements[i], x, line, met ? INK_MET : INK_SHORT);
             line += 9;
         }
 
-        // The entry before this one, as a link that takes the map to it
-        if (parentShown) {
-            String before = I18n.format("knowledge.requires", "");
-            String parent = entry.parentInfo.getDisplayName();
-            int width = this.fontRendererObj.getStringWidth(before);
-            parent = this.fontRendererObj.trimStringToWidth(parent, TEXT_WIDTH - width);
-            this.fontRendererObj.drawString(before, x, line, INK_FAINT);
-            this.fontRendererObj.drawString(parent, x + width, line, INK_LINK);
-            drawRect(
-                    x + width,
-                    line + 9,
-                    x + width + this.fontRendererObj.getStringWidth(parent),
-                    line + 10,
-                    0x802A4A8A);
-            parentLink = new int[] { x + width, line, this.fontRendererObj.getStringWidth(parent), 10 };
-            line += 11;
-        }
-
-        if (!opens.isEmpty()) {
-            String text = I18n.format("knowledge.opens", joined(opens));
-            for (Object part : this.fontRendererObj.listFormattedStringToWidth(text, TEXT_WIDTH)) {
-                if (line + 9 > cardBottom()) {
-                    break;
-                }
-                this.fontRendererObj.drawString((String) part, x, line, INK_FAINT);
-                line += 9;
-            }
-        }
+        // The entry before this one and those it leads to, as links that take the map there
+        line = drawLinks(I18n.format("knowledge.requires"), before, x, line, 1);
+        drawLinks(I18n.format("knowledge.opens"), opens, x, line, OPENS_SHOWN);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
@@ -1301,84 +1457,63 @@ public class GuiKnowledge extends GuiScreen {
             this.fontRendererObj.drawSplitString(I18n.format("knowledge.controls"), x, y + 36, TEXT_WIDTH, INK_FAINT);
             return;
         }
-        this.fontRendererObj.drawString(I18n.format("knowledge.learnableNow"), x, y, INK);
-        int line = y + 12;
-        for (int i = 0; i < learnable.size() && i < LEARNABLE_SHOWN; i++) {
-            InformationBase entry = learnable.get(i);
-            String name = this.fontRendererObj.trimStringToWidth(entry.getDisplayName(), TEXT_WIDTH - 8);
-            this.fontRendererObj.drawString("- " + name, x, line, here.contains(entry) ? INK_LINK : INK_FAINT);
-            learnableLines.add(new LearnableLine(entry, line));
-            line += 10;
-        }
-        if (learnable.size() > LEARNABLE_SHOWN) {
-            this.fontRendererObj.drawString(
-                    I18n.format("knowledge.andMore", learnable.size() - LEARNABLE_SHOWN),
-                    x,
-                    line,
-                    INK_FAINT);
-        }
+        drawLinks(I18n.format("knowledge.learnableNow"), learnable, x, y, LEARNABLE_SHOWN);
     }
 
-    /** The search line, open once the glass is clicked: the query being typed and how many entries it finds. */
+    /** The search on the foot row of the map, over its lower edge: the query while typing, and the switch. */
+    private void drawFoot() {
+        int y = folioTop() + FOOT_Y;
+        if (search.isTyping()) {
+            drawSearch(searchLeft(), y);
+        }
+        if (showsSwitch()) {
+            drawSwitch(switchCentre(), y);
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    /**
+     * The search line, open once the glass is clicked: the query being typed; the switch beside it counts the finds.
+     */
     private void drawSearch(int x, int y) {
-        int width = TEXT_WIDTH - 14 - (showsSwitch() ? SWITCH_WIDTH + 4 : 0);
-        drawRect(x - 2, y - 3, x + width + 2, y + 10, 0x20503020);
-        int found = matches().size();
+        int width = searchRight() - x - (showsSwitch() ? SWITCH_WIDTH + 4 : 0);
+        // A field set into the page: solid, so nothing of the map shows through, framed in ink and sunk along its top
+        int x0 = x - 3, y0 = y - 3, x1 = x + width + 2, y1 = y + 10;
+        drawRect(x0, y0, x1, y1, FIELD_FRAME);
+        drawRect(x0 + 1, y0 + 1, x1 - 1, y1 - 1, FIELD_PAPER);
+        drawRect(x0 + 1, y0 + 1, x1 - 1, y0 + 2, FIELD_SHADE);
         String caret = Minecraft.getSystemTime() / 500 % 2 == 0 ? "_" : " ";
-        String line = query + caret;
-        String count = query.trim().isEmpty() ? "" : " (" + found + ")";
+        boolean none = !search.query().trim().isEmpty() && search.results(searchStamp).isEmpty();
         this.fontRendererObj.drawString(
-                this.fontRendererObj.trimStringToWidth(line, width - this.fontRendererObj.getStringWidth(count)),
+                this.fontRendererObj.trimStringToWidth(search.query() + caret, width),
                 x,
                 y,
-                INK);
-        this.fontRendererObj.drawString(
-                count,
-                x + width - this.fontRendererObj.getStringWidth(count),
-                y,
-                found == 0 ? INK_SHORT : INK_FAINT);
+                none ? INK_SHORT : INK);
     }
 
-    /** "< 2/5 >": which match is shown of how many, the arrows gold under the mouse. */
+    /** "< 2/5 >", or "< 36 >" before going to any: which find is shown of how many, the arrows gold under the mouse. */
     private void drawSwitch(int centre, int y) {
-        int count = matches().size();
-        String counter = (shownMatch < 0 ? "-" : String.valueOf(shownMatch % count + 1)) + "/" + count;
-        drawCentred(counter, centre, y, INK_FAINT);
+        drawCentred(search.counter(searchStamp), centre, y, INK_FAINT);
         int mx = toBook(Mouse.getX() * this.width / this.mc.displayWidth);
         int my = toBook(this.height - Mouse.getY() * this.height / this.mc.displayHeight - 1);
         drawCentred("<", centre - SWITCH_ARROW, y, switchArrowAt(mx, my) < 0 ? 0xB08A2A : INK);
         drawCentred(">", centre + SWITCH_ARROW, y, switchArrowAt(mx, my) > 0 ? 0xB08A2A : INK);
     }
 
-    private static String joined(List<String> parts) {
-        StringBuilder text = new StringBuilder();
-        for (String part : parts) {
-            if (text.length() > 0) {
-                text.append(", ");
-            }
-            text.append(part);
-        }
-        return text.toString();
-    }
-
-    private static Skill[] skills() {
-        return new Skill[] { SkillList.artisanry, SkillList.construction, SkillList.provisioning, SkillList.engineering,
-                SkillList.combat };
-    }
-
-    /** Over a skill in the panel: its level and experience towards the next. */
+    /** Over one of the category's skill bars: its level and experience towards the next. */
     private void drawSkillTooltip(int mx, int my) {
         int x = folioLeft() + TEXT_LEFT;
-        int y = folioTop() + SKILLS_TOP;
-        if (mx < x || mx >= x + TEXT_WIDTH || my < y) {
+        List<Bar> bars = bars();
+        int y = barsTop(bars.size());
+        int row = my - y < 0 ? -1 : (my - y) / BAR_ROW;
+        if (mx < x || mx >= x + TEXT_WIDTH
+                || row < 0
+                || row >= bars.size()
+                || (my - y) % BAR_ROW >= BAR_HEIGHT
+                || bars.get(row).skill == null) {
             return;
         }
-        int row = (my - y) / SKILL_ROW;
-        Skill[] skills = skills();
-        if (row >= skills.length || skills[row] == null) {
-            return;
-        }
-        Skill skill = skills[row];
+        Skill skill = bars.get(row).skill;
         int[] xp = skill.getXP(player);
         List<String> lines = new LinkedList<String>();
         lines.add(skill.getDisplayName());
@@ -1390,23 +1525,11 @@ public class GuiKnowledge extends GuiScreen {
         GL11.glDisable(GL11.GL_LIGHTING);
     }
 
-    /**
-     * A skill's name and level in ink, and its progress to the next level as a thin bar under them in the colour of the
-     * skill's own ribbon, a silver gleam running along it, gold at the cap.
-     */
-    protected void drawSkill(int x, int y, Skill skill, int colour) {
-        if (skill == null) {
-            return;
-        }
-        boolean maxed = skill.isMaxed(player);
-        // At the cap the gold gleam says so; the number stays plain
-        String level = String.valueOf(RPGElements.getLevel(player, skill));
-        this.fontRendererObj.drawString(skill.getDisplayName(), x, y, INK);
+    /** A label on the left and a value on the right, over a bar filled so far. */
+    private void drawProgress(int x, int y, String label, String value, float progress, boolean maxed, int colour) {
+        this.fontRendererObj.drawString(label, x, y, INK);
         this.fontRendererObj
-                .drawString(level, x + TEXT_WIDTH - this.fontRendererObj.getStringWidth(level), y, INK_FAINT);
-        int[] xp = skill.getXP(player);
-        // At the cap there is no next level to fill towards: the bar stands full
-        float progress = maxed ? 1F : xp[1] > 0 ? (float) Math.min(xp[0], xp[1]) / (float) xp[1] : 0F;
+                .drawString(value, x + TEXT_WIDTH - this.fontRendererObj.getStringWidth(value), y, INK_FAINT);
         drawBar(x, y + 9, TEXT_WIDTH, progress, maxed, colour);
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
@@ -1564,6 +1687,22 @@ public class GuiKnowledge extends GuiScreen {
         this.height = screenHeight;
     }
 
+    /** Over the icons at the foot: what the glass and the centring do, and how to get about the map. */
+    private void drawFootTooltip(int mx, int my) {
+        String key = searchButton.mousePressed(this.mc, mx, my) ? "knowledge.help.search"
+                : homeButton.mousePressed(this.mc, mx, my) ? "knowledge.help.home"
+                        : helpButton.mousePressed(this.mc, mx, my) ? "knowledge.controls" : null;
+        if (key == null) {
+            return;
+        }
+        List<String> lines = new ArrayList<String>();
+        for (Object line : this.fontRendererObj.listFormattedStringToWidth(I18n.format(key), 150)) {
+            lines.add((String) line);
+        }
+        drawTooltip(lines, mx, my);
+        GL11.glDisable(GL11.GL_LIGHTING);
+    }
+
     /** Over a ribbon: the category's name and how much of it is known. */
     private void drawRibbonTooltip(int mx, int my) {
         int page = ribbonAt(mx, my);
@@ -1645,12 +1784,12 @@ public class GuiKnowledge extends GuiScreen {
     }
 
     /** A line of the "learnable now" list: the entry it names and where it was drawn. */
-    private static final class LearnableLine {
+    private static final class LinkLine {
 
         final InformationBase entry;
         final int top;
 
-        LearnableLine(InformationBase entry, int top) {
+        LinkLine(InformationBase entry, int top) {
             this.entry = entry;
             this.top = top;
         }

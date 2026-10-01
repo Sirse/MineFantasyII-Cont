@@ -36,11 +36,17 @@ knowledge.unknownUse=你不知道如何使用它！
 knowledge.known=你已经知道这个了
 
 infoPage.basic=基本信息
+infoPage.basic.desc=工匠之路的起点：最初的工具、火与石头。其他各篇都由此展开。
 infoPage.artisanry=手艺
+infoPage.artisanry.desc=金属与熔炉：冶炼矿石、在铁砧上锻造、合金与淬火。技艺越高，钢材越精。
 infoPage.construction=建造
+infoPage.construction.desc=石材、木料与灰浆：坚固的墙壁、屋顶与家具。房屋与工坊的一切根基。
 infoPage.provisioning=食物
+infoPage.provisioning.desc=食物与储备：从磨坊、厨房到耐存的口粮。吃饱的工匠干得更久。
 infoPage.engineering=工程
+infoPage.engineering.desc=机关与火药：炸弹、弩、风箱与精巧装置。精准胜于蛮力。
 infoPage.mastery=精通
+infoPage.mastery.desc=战斗的艺术：招式、架势与战士的训练。铁锤锻不出的，在这里磨砺。
 infoPage.dwarvern=矮人
 infoPage.gnomish=侏儒
 
@@ -54,7 +60,6 @@ research.null=这里面已经没有可学的了。
 
 research.addArtefact=习得 %1$s 的知识 (%2$s/%3$s)
 research.finishResearch=完成 %1$s 研究
-research.cluecount=(%1$s/%2$s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MOBS/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2405,10 +2410,13 @@ knowledge.read=阅读
 knowledge.status.known=已学习
 knowledge.status.available=现在可以学习
 knowledge.status.clues=需在研究台上研究
+knowledge.clues=Clues found: %1$s of %2$s
 knowledge.status.locked=尚不可及
-knowledge.requires=前置：%1$s
-knowledge.opens=解锁：%1$s
+knowledge.requires=前置：
+knowledge.opens=解锁：
 knowledge.learnableNow=现在可以学习：
 knowledge.andMore=……还有 %1$s 项
-knowledge.controls=拖动移动，滚轮缩放。H 起点，F 整个分类，/ 查找
+knowledge.controls=拖动地图，滚轮缩放。 H：回到起点，F：显示整个分类，/：搜索。 双击地图取消选择。
+knowledge.help.search=按名称查找研究（/ 或 Ctrl+F）
+knowledge.help.home=地图回到起点（H）
 knowledge.status.needsSkill=技能不足
