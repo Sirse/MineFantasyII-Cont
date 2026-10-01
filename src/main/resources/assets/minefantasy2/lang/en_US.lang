@@ -36,11 +36,17 @@ knowledge.unknownUse=You don't know how to use this!
 knowledge.known=You already know this.
 
 infoPage.basic=Basic Information
+infoPage.basic.desc=Where a craftsman begins: first tools, fire and stone. Every other section starts from here.
 infoPage.artisanry=Artisanry
+infoPage.artisanry.desc=Metal and the forge: smelting ore, smithing at the anvil, alloys and tempering. The higher the skill, the finer the steel.
 infoPage.construction=Construction
+infoPage.construction.desc=Stone, timber and mortar: sturdy walls, roofs and furniture. All a house and a workshop are built from.
 infoPage.provisioning=Provisioning
+infoPage.provisioning.desc=Food and stores: from the mill and the kitchen to provisions that keep. A fed craftsman works longer.
 infoPage.engineering=Engineering
+infoPage.engineering.desc=Mechanisms and black powder: bombs, crossbows, bellows and clever devices. Precision over strength.
 infoPage.mastery=Mastery
+infoPage.mastery.desc=The art of combat: techniques, stances and a fighter's training. What no hammer can forge is honed here.
 infoPage.dwarvern=Dwarven
 infoPage.gnomish=Gnomish
 
@@ -54,7 +60,6 @@ research.null=There is nothing to learn from this.
 
 research.addArtefact=Added Knowledge to %1$s (%2$s/%3$s)
 research.finishResearch=Finished Research for %1$s
-research.cluecount= (%1$s/%2$s)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /MOBS/
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2407,10 +2412,13 @@ knowledge.read=Read
 knowledge.status.known=Learned
 knowledge.status.available=Can be learned now
 knowledge.status.clues=Studied at a research table
+knowledge.clues=Clues found: %1$s of %2$s
 knowledge.status.locked=Not yet in reach
-knowledge.requires=After: %1$s
-knowledge.opens=Leads to: %1$s
+knowledge.requires=After:
+knowledge.opens=Leads to:
 knowledge.learnableNow=Can be learned now:
 knowledge.andMore=...and %1$s more
-knowledge.controls=Drag to move, wheel to zoom. H: start, F: whole category, /: find
+knowledge.controls=Drag the map, scroll to zoom. H: back to the start, F: the whole category, /: search. Double-click the map to let the chosen entry go.
+knowledge.help.search=Find an entry by name (/ or Ctrl+F)
+knowledge.help.home=Back to the start of the map (H)
 knowledge.status.needsSkill=Needs more skill

@@ -3,7 +3,6 @@ package minefantasy.mf2.api.knowledge;
 import java.util.ArrayList;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -162,15 +161,6 @@ public class InformationBase {
         String name = this.statStringFormatter != null
                 ? this.statStringFormatter.formatString(StatCollector.translateToLocal("knowledge." + this.idName))
                 : StatCollector.translateToLocal("knowledge." + this.idName);
-
-        if (!easyResearch) {
-            EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-            if (player != null && !ResearchLogic.hasInfoUnlocked(player, this)) {
-                int artefacts = ResearchLogic.getArtefactCount(this.idName, player);
-                int max = this.getArtefactCount();
-                name += StatCollector.translateToLocalFormatted("research.cluecount", artefacts, max);
-            }
-        }
 
         return name;
     }
