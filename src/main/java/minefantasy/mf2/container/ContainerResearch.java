@@ -21,7 +21,7 @@ public class ContainerResearch extends ContainerMF {
         addPlayerMainInventory(playerInventory, 2, 76);
         addPlayerHotbar(playerInventory, 2, 134);
 
-        trackInt(() -> (int) tile.progress, v -> tile.progress = v);
+        trackInt(() -> (int) tile.study.progress, v -> tile.study.progress = v);
         trackInt(() -> (int) tile.maxProgress, v -> tile.maxProgress = v);
     }
 

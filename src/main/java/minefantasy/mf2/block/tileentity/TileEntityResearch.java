@@ -19,7 +19,15 @@ import minefantasy.mf2.item.list.ComponentListMF;
 
 public class TileEntityResearch extends TileEntityStation implements IBasicMetre {
 
-    public float progress;
+    /** Bookshelves count within this far of the table: across, and up and down. */
+    public static final int SHELF_REACH = 5;
+    public static final int SHELF_HEIGHT = 3;
+    /** The most bookshelves can speed study up by, and how many shelves bring two thirds of it. */
+    public static final float SHELF_MOST = 1.5F;
+    public static final float SHELF_SCALE = 10F;
+
+    /** How far study has got, on which item and by whom, and its pace; saved with the table. */
+    public final ResearchStudy study = new ResearchStudy();
     public float maxProgress;
     public int researchID = -1;
     private ItemStack[] items = new ItemStack[1];
@@ -43,6 +51,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         if (worldObj.isRemote) {
             return true;
         }
+        study.startOverIfChanged(items[0], user.getUniqueID().toString());
         ArrayList<String> research = this.getInfo(items[0]);
         int result = canResearch(user, research);
 
@@ -56,9 +65,9 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
             if (maxProgress > 0) {
                 addProgress(user);
 
-                if (progress >= maxProgress) {
+                if (study.progress >= maxProgress) {
                     addResearch(research, user);
-                    progress = 0;
+                    study.progress = 0;
                 }
 
                 return true;
@@ -68,7 +77,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
                 if (!user.worldObj.isRemote)
                     user.addChatComponentMessage(new ChatComponentTranslation("research.null", new Object[0]));
             }
-            progress = 0;
+            study.progress = 0;
         }
 
         return items[0] != null;
@@ -129,11 +138,19 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         return this.getInfo(items[0]) != null ? t : 0;
     }
 
+    /**
+     * How much the shelves around speed study up: each helps less than the one before, and all of them together never
+     * more than {@link #SHELF_MOST} again.
+     */
+    public static float shelfBoost(int shelves) {
+        return 1.0F + SHELF_MOST * (1.0F - (float) Math.exp(-Math.max(0, shelves) / SHELF_SCALE));
+    }
+
     private void addProgress(EntityPlayer user) {
         ItemStack held = user.getHeldItem();
         if (held != null && (held.getItem() == ComponentListMF.talisman_lesser
                 || held.getItem() == ComponentListMF.talisman_greater)) {
-            progress = maxProgress;
+            study.progress = maxProgress;
             if (!user.capabilities.isCreativeMode && held.getItem() == ComponentListMF.talisman_lesser) {
                 --held.stackSize;
                 if (held.stackSize <= 0) {
@@ -142,27 +159,25 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
             }
             return;
         }
-        float efficiency = 1.0F;
-        if (user.swingProgress > 0) {
-            efficiency *= Math.max(0F, 1.0F - user.swingProgress);
-        }
+        // Paced by the world's clock, not by how fast the player can click
+        long now = worldObj.getTotalWorldTime();
         Sounds.at(this, "minefantasy2:block.flipPage", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
-        efficiency *= getEnvironmentBoost();
-        progress += efficiency;
+        study.strike(now, shelfBoost(study.shelves(now, this::countShelves)));
     }
 
-    private float getEnvironmentBoost() {
-        int books = 0;
-        for (int x = -8; x <= 8; x++) {
-            for (int y = -8; y <= 8; y++) {
-                for (int z = -8; z <= 8; z++) {
+    /** The bookshelves around the table. */
+    private int countShelves() {
+        int found = 0;
+        for (int x = -SHELF_REACH; x <= SHELF_REACH; x++) {
+            for (int y = -SHELF_HEIGHT; y <= SHELF_HEIGHT; y++) {
+                for (int z = -SHELF_REACH; z <= SHELF_REACH; z++) {
                     if (worldObj.getBlock(xCoord + x, yCoord + y, zCoord + z) == Blocks.bookshelf) {
-                        ++books;
+                        ++found;
                     }
                 }
             }
         }
-        return 1.0F + (0.1F * books);
+        return found;
     }
 
     @Override
@@ -183,7 +198,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
 
         nbt.setInteger("researchID", researchID);
         nbt.setInteger("ticksExisted", ticksExisted);
-        nbt.setFloat("progress", progress);
+        study.write(nbt);
         nbt.setFloat("maxProgress", maxProgress);
         InventorySlots.write(nbt, "Items", items);
     }
@@ -194,7 +209,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
 
         ticksExisted = nbt.getInteger("ticksExisted");
         researchID = nbt.getInteger("researchID");
-        progress = nbt.getFloat("progress");
+        study.read(nbt);
         maxProgress = nbt.getFloat("maxProgress");
         items = InventorySlots.read(nbt, "Items", items.length);
     }
@@ -214,7 +229,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         if (maxProgress <= 0) {
             return 0;
         }
-        return (int) Math.min(size, Math.ceil(size / maxProgress * progress));
+        return (int) Math.min(size, Math.ceil(size / maxProgress * study.progress));
     }
 
     @Override
@@ -236,7 +251,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
     protected NBTTagCompound describe() {
         NBTTagCompound state = new NBTTagCompound();
         state.setInteger("ResearchID", researchID);
-        state.setFloat("Progress", progress);
+        state.setFloat("Progress", study.progress);
         state.setFloat("MaxProgress", Math.max(0, maxProgress));
         InventorySlots.write(state, "Items", items);
         return state;
@@ -245,7 +260,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
     @Override
     public void show(NBTTagCompound state) {
         researchID = state.getInteger("ResearchID");
-        progress = state.getFloat("Progress");
+        study.progress = state.getFloat("Progress");
         maxProgress = state.getFloat("MaxProgress");
         items = InventorySlots.read(state, "Items", items.length);
     }
