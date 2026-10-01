@@ -24,14 +24,16 @@ import minefantasy.mf2.api.helpers.TextureHelperMF;
 
 /**
  * A page showing a recipe on its station's grid. Where a page holds several variants they take turns, but stand still
- * while the mouse is on the page; under the station's name the arrows step through them, beside which one is shown.
+ * while the mouse is on the page; under the station's name the arrows step through them, beside which one is shown. A
+ * variant picked by hand stays. Variants a script has removed since are left out, and a page with none left says so.
  */
 @SideOnly(Side.CLIENT)
 public abstract class EntryPageRecipe extends EntryPage {
 
-    /** How long each variant stays, and how much longer after one was picked by hand. */
+    /** How long each variant stays. */
     private static final long SWITCH_MS = 1500;
-    private static final long PICKED_MS = 6000;
+    /** A page not drawn for this long has been out of view, and is taken as coming into it afresh. */
+    private static final long UNSEEN_MS = 500;
     private static final int INK = 0x3A2A1A;
     private static final int INK_FAINT = 0x7A6446;
     private static final int INK_HOVER = 0xB08A2A;
@@ -49,8 +51,12 @@ public abstract class EntryPageRecipe extends EntryPage {
 
     protected final Minecraft mc = Minecraft.getMinecraft();
     private final ResourceLocation background;
+    /** The variant shown, as the subclass numbers them, and those of them still registered, in order. */
     private int variant;
-    private long nextSwitch;
+    private int[] present = new int[0];
+    /** Whether the reader picked the variant, which then stays rather than taking turns. */
+    private boolean picked;
+    private long nextSwitch, lastDrawn = Long.MIN_VALUE / 2;
     private ItemStack hovered;
     /** Where the counter was drawn this frame, for its arrows to be clicked: its middle and top; none when unset. */
     private int switchX = Integer.MIN_VALUE, switchY;
@@ -75,6 +81,11 @@ public abstract class EntryPageRecipe extends EntryPage {
         return 1;
     }
 
+    /** Whether a variant is still registered; a script may have removed it since the page was made. */
+    protected boolean isPresent(int variant) {
+        return true;
+    }
+
     /** The variant shown now. */
     protected final int variant() {
         return variant;
@@ -91,19 +102,22 @@ public abstract class EntryPageRecipe extends EntryPage {
 
     @Override
     public void render(GuiScreen parent, int mx, int my, float f, int posX, int posY, boolean onTick) {
-        int count = Math.max(1, variantCount());
         long now = Minecraft.getSystemTime();
+        if (now - lastDrawn > UNSEEN_MS) {
+            comeIntoView(now);
+        }
+        lastDrawn = now;
+        int count = present.length;
         boolean overPage = mx >= posX && mx < posX + universalBookImageWidth
                 && my >= posY
                 && my < posY + universalBookImageHeight;
         if (overPage) {
             // Held while the mouse is on the page, so an ingredient can be looked at
             nextSwitch = Math.max(nextSwitch, now + SWITCH_MS);
-        } else if (now >= nextSwitch) {
-            variant = (variant + 1) % count;
+        } else if (!picked && count > 1 && now >= nextSwitch) {
+            step(1);
             nextSwitch = now + SWITCH_MS;
         }
-        variant %= count;
         hovered = null;
 
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -112,16 +126,82 @@ public abstract class EntryPageRecipe extends EntryPage {
         mc.getTextureManager().bindTexture(background);
         parent.drawTexturedModalRect(posX, posY, 0, 0, universalBookImageWidth, universalBookImageHeight);
 
-        drawRecipe(parent, posX, posY, mx, my);
+        if (count > 0) {
+            drawRecipe(parent, posX, posY, mx, my);
+        } else {
+            drawDisabled(posX + universalBookImageWidth / 2, posY + 80);
+        }
         drawStation(posX + universalBookImageWidth / 2, posY + stationY() + STATION_DROP);
         drawSwitch(posX + universalBookImageWidth / 2, posY + stationY() + STATION_DROP + 13, count, mx, my);
     }
 
-    @Override
-    public void drawOverlay(int mx, int my) {
-        if (hovered != null) {
-            drawTooltip(hovered, mx, my);
+    /**
+     * Works out which variants are still registered and starts the turns afresh, the first after a full while rather
+     * than at once; a variant picked by hand is kept while it is still there.
+     */
+    private void comeIntoView(long now) {
+        List<Integer> found = new ArrayList<Integer>();
+        for (int i = 0; i < variantCount(); i++) {
+            if (isPresent(i)) {
+                found.add(i);
+            }
         }
+        present = new int[found.size()];
+        for (int i = 0; i < present.length; i++) {
+            present[i] = found.get(i);
+        }
+        if (indexOf(variant) < 0) {
+            variant = present.length == 0 ? 0 : present[0];
+            picked = false;
+        }
+        nextSwitch = now + SWITCH_MS;
+    }
+
+    private int indexOf(int wanted) {
+        for (int i = 0; i < present.length; i++) {
+            if (present[i] == wanted) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /** Moves to the next or the previous of the variants still registered, round from the last to the first. */
+    private void step(int direction) {
+        if (present.length == 0) {
+            return;
+        }
+        int at = Math.max(0, indexOf(variant));
+        variant = present[(at + direction + present.length) % present.length];
+    }
+
+    /** In place of the grid when a script has removed every variant the page held. */
+    @SuppressWarnings("unchecked")
+    private void drawDisabled(int centre, int y) {
+        FontRenderer font = mc.fontRenderer;
+        List<String> lines = font.listFormattedStringToWidth(
+                StatCollector.translateToLocal("knowledge.recipeDisabled"),
+                universalBookImageWidth - 50);
+        for (String line : lines) {
+            font.drawString(line, centre - font.getStringWidth(line) / 2, y, INK_FAINT);
+            y += 9;
+        }
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<String> getTooltip() {
+        if (hovered == null) {
+            return null;
+        }
+        List<String> lines = new ArrayList<String>();
+        boolean first = true;
+        for (String line : (List<String>) hovered.getTooltip(mc.thePlayer, false)) {
+            lines.add(first ? line : EnumChatFormatting.GRAY + line);
+            first = false;
+        }
+        return lines;
     }
 
     /** The station's icon and name, centred on the line. */
@@ -155,7 +235,7 @@ public abstract class EntryPageRecipe extends EntryPage {
         switchX = centre;
         switchY = y;
         FontRenderer font = mc.fontRenderer;
-        String counter = (variant + 1) + "/" + count;
+        String counter = (indexOf(variant) + 1) + "/" + count;
         font.drawString(counter, centre - font.getStringWidth(counter) / 2, y, INK_FAINT);
         for (int direction = -1; direction <= 1; direction += 2) {
             String arrow = direction < 0 ? "<" : ">";
@@ -188,9 +268,8 @@ public abstract class EntryPageRecipe extends EntryPage {
         if (direction == 0) {
             return false;
         }
-        int count = Math.max(1, variantCount());
-        variant = (variant + direction + count) % count;
-        nextSwitch = Minecraft.getSystemTime() + PICKED_MS;
+        step(direction);
+        picked = true;
         return true;
     }
 
@@ -223,17 +302,6 @@ public abstract class EntryPageRecipe extends EntryPage {
         GL11.glPopMatrix();
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void drawTooltip(ItemStack stack, int mx, int my) {
-        List<String> lines = new ArrayList<String>();
-        boolean first = true;
-        for (String line : (List<String>) stack.getTooltip(mc.thePlayer, false)) {
-            lines.add(first ? line : EnumChatFormatting.GRAY + line);
-            first = false;
-        }
-        minefantasy.mf2.api.helpers.RenderHelper.renderTooltip(mx, my, lines);
     }
 
     @Override

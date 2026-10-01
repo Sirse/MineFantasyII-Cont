@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.item.crafting.ShapelessRecipes;
@@ -30,6 +31,12 @@ public class EntryPageRecipeBase extends EntryPageRecipe {
     @Override
     protected int variantCount() {
         return recipes.length;
+    }
+
+    /** Still in the crafting manager's list: a script that removes a recipe takes it out of there. */
+    @Override
+    protected boolean isPresent(int variant) {
+        return CraftingManager.getInstance().getRecipeList().contains(recipes[variant]);
     }
 
     @Override

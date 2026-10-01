@@ -34,6 +34,11 @@ public class EntryPageRecipeAnvil extends EntryPageRecipe {
     }
 
     @Override
+    protected boolean isPresent(int variant) {
+        return MFRecipes.ANVIL.current(recipes[variant]) != null;
+    }
+
+    @Override
     protected String station() {
         return "anvil";
     }

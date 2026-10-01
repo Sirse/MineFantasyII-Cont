@@ -151,14 +151,30 @@ public class GuiKnowledgeEntry extends GuiScreen {
         drawPage(mx, my, f, currentPage, left, top, onTick);
         drawPage(mx, my, f, currentPage + 1, left + PAGE_WIDTH, top, onTick);
         drawPageNumber(left, top);
-        for (int side = 0; side < 2 && currentPage + side < pages; side++) {
-            laidOut.get(currentPage + side).drawOverlay(mx, my);
-        }
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         frame.drawDust();
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         super.drawScreen(mx, my, f);
+        // Last of all, over the pages, the ribbons and the buttons
+        for (int side = 0; side < 2 && currentPage + side < pages; side++) {
+            List<String> tooltip = laidOut.get(currentPage + side).getTooltip();
+            if (tooltip != null && !tooltip.isEmpty()) {
+                drawTooltip(tooltip, mx, my);
+            }
+        }
         frame.end();
+    }
+
+    /** A tooltip kept inside the book rather than the screen, as the book is drawn in its own scale. */
+    private void drawTooltip(List<String> lines, int mx, int my) {
+        int screenWidth = this.width, screenHeight = this.height;
+        this.width = frame.width();
+        this.height = frame.height();
+        this.drawHoveringText(lines, mx, my, this.fontRendererObj);
+        this.width = screenWidth;
+        this.height = screenHeight;
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
     }
 
     private void drawPage(int mx, int my, float f, int num, int x, int y, boolean onTick) {
