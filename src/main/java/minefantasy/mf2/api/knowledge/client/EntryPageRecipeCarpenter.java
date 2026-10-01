@@ -41,6 +41,13 @@ public class EntryPageRecipeCarpenter extends EntryPageRecipe {
     }
 
     @Override
+    protected boolean isPresent(int variant) {
+        GridRecipe recipe = recipes[variant];
+        return (MFRecipes.KITCHEN.idOf(recipe) != null ? MFRecipes.KITCHEN.current(recipe)
+                : MFRecipes.CARPENTER.current(recipe)) != null;
+    }
+
+    @Override
     protected int stationY() {
         return 175;
     }

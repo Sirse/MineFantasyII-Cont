@@ -1,5 +1,7 @@
 package minefantasy.mf2.api.knowledge.client;
 
+import java.util.List;
+
 import net.minecraft.client.gui.GuiScreen;
 
 import cpw.mods.fml.relauncher.Side;
@@ -15,8 +17,13 @@ public abstract class EntryPage {
 
     public abstract void preRender(GuiScreen parent, int x, int y, float f, int posX, int posY, boolean onTick);
 
-    /** Drawn over both pages once they are drawn, such as a tooltip, which the other page must not cover. */
-    public void drawOverlay(int mx, int my) {}
+    /**
+     * The tooltip for what is under the mouse, as it was last drawn; null for none. The screen draws it last, over both
+     * pages and everything else, kept inside the book.
+     */
+    public List<String> getTooltip() {
+        return null;
+    }
 
     /** A click on the page, where it was last drawn; true when the page took it. */
     public boolean mouseClicked(int mx, int my, int button) {
