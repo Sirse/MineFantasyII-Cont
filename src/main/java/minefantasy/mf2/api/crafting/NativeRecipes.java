@@ -1,5 +1,10 @@
 package minefantasy.mf2.api.crafting;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -56,7 +61,55 @@ public final class NativeRecipes {
 
     /** A {@link #variant} named after an item, for recipes generated per source item. */
     public static Variant variantOf(Object source) {
-        return variant(describe(source));
+        return variant(variantName(source));
+    }
+
+    /** The stable source key used by {@link #variantOf(Object)}, useful for skipping duplicate generated inputs. */
+    public static String variantName(Object source) {
+        return describe(source);
+    }
+
+    /**
+     * Registers one recipe per distinct source item, for recipes generated from an ore name or other list another mod
+     * may add to: the preferred source (or, when it is not listed, the first) under the plain id, every other one
+     * inside a {@link #variantOf} scope named after it, and a source listed twice only once. So a second item under the
+     * same ore name neither clashes with the first recipe nor renames it.
+     */
+    public static void perSource(List<ItemStack> sources, ItemStack preferred, Consumer<ItemStack> register) {
+        String base = null;
+        if (preferred != null) {
+            String wanted = variantName(preferred);
+            for (ItemStack source : sources) {
+                if (variantName(source).equals(wanted)) base = wanted;
+            }
+        }
+        if (base == null && !sources.isEmpty()) base = variantName(sources.get(0));
+        Set<String> seen = new HashSet<>();
+        for (ItemStack source : sources) {
+            String name = variantName(source);
+            if (!seen.add(name)) continue;
+            if (name.equals(base)) {
+                register.accept(source);
+            } else {
+                try (Variant v = variantOf(source)) {
+                    register.accept(source);
+                }
+            }
+        }
+    }
+
+    /**
+     * Registers one recipe per distinct source item, each inside a {@link #variantOf} scope named after it, and a
+     * source listed twice only once.
+     */
+    public static void eachSource(List<ItemStack> sources, Consumer<ItemStack> register) {
+        Set<String> seen = new HashSet<>();
+        for (ItemStack source : sources) {
+            if (!seen.add(variantName(source))) continue;
+            try (Variant v = variantOf(source)) {
+                register.accept(source);
+            }
+        }
     }
 
     /** The scope of {@link #variant}. */

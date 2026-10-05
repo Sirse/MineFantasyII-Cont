@@ -11,6 +11,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.crafting.NativeRecipes;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.basic.ConstructionBlockMF;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -217,41 +218,38 @@ public class BasicRecipesMF {
         if (!"RefinedWood".equals(material.name)) {
             ArrayList<ItemStack> list = OreDictionary.getOres("planks" + material.name);
             if (list.isEmpty()) {
-                for (ItemStack planks : OreDictionary.getOres("plankWood")) {
-                    if (planks.getItemDamage() == OreDictionary.WILDCARD_VALUE) {
-                        for (int i = 0; i < 16; i++) {
-                            ItemStack item = planks.copy();
-                            item.setItemDamage(i);
-                            tryAddWoodPlanks(item, material);
-                            CarpenterRecipes.tryAddSawPlanks(item, material);
-                        }
-                    } else {
-                        tryAddWoodPlanks(planks, material);
-                        CarpenterRecipes.tryAddSawPlanks(planks, material);
-                    }
-                }
-            } else for (ItemStack block : list) {
+                list = matchingPlanks(material);
+            }
+            for (ItemStack block : list) {
                 KnowledgeListMF.plankRecipe.add(
                         GameRegistry.addShapedRecipe(
                                 ComponentListMF.plank.construct(material.name, 4),
                                 new Object[] { "P", "P", 'P', block }));
-                CarpenterRecipes.addSawPlanks(block, material);
             }
+            // The first planks keep the saw recipe's plain id; other mods' planks of the same wood get their own
+            NativeRecipes.perSource(list, null, planks -> CarpenterRecipes.addSawPlanks(planks, material));
         }
     }
 
-    private static void tryAddWoodPlanks(ItemStack planks, CustomMaterial material) {
+    /** The planks under plankWood named like the material ("Oak" for OakWood), each metadata of a wildcard apart. */
+    private static ArrayList<ItemStack> matchingPlanks(CustomMaterial material) {
+        ArrayList<ItemStack> found = new ArrayList<ItemStack>();
         if (material == null || material.name == null || material.name.length() < 4) {
-            return;
+            return found;
         }
         String sub = material.name.substring(0, material.name.length() - 4).toLowerCase();
-
-        if (planks.getUnlocalizedName().toLowerCase().contains(sub)) {
-            KnowledgeListMF.plankRecipe.add(
-                    GameRegistry.addShapedRecipe(
-                            ComponentListMF.plank.construct(material.name, 4),
-                            new Object[] { "P", "P", 'P', planks.copy() }));
+        for (ItemStack planks : OreDictionary.getOres("plankWood")) {
+            int from = planks.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 0 : planks.getItemDamage();
+            int to = planks.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 15 : planks.getItemDamage();
+            for (int meta = from; meta <= to; meta++) {
+                ItemStack item = planks.copy();
+                item.setItemDamage(meta);
+                if (item.getUnlocalizedName().toLowerCase().contains(sub)) {
+                    found.add(item);
+                }
+            }
         }
+        return found;
     }
 
     private static void addFoodOutput() {

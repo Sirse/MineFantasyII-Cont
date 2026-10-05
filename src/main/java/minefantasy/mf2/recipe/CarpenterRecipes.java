@@ -632,24 +632,18 @@ public class CarpenterRecipes {
         KnowledgeListMF.eclairFillR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.eclair)).skill(provisioning)
                 .research("eclair").tool("knife", 2).time(20).sound(basic)
                 .shaped(new Object[] { "C", "E", 'C', FoodListMF.custard, 'E', FoodListMF.eclair_empty, });
-        for (ItemStack food : OreDictionary.getOres(meatRaw)) {
-            int size = getSize(food);
-            try (NativeRecipes.Variant v = NativeRecipes.variantOf(food)) {
-                KnowledgeListMF.meatRecipes.add(
-                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_uncooked, size))
+        NativeRecipes.eachSource(
+                OreDictionary.getOres(meatRaw),
+                food -> KnowledgeListMF.meatRecipes.add(
+                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_uncooked, getSize(food)))
                                 .skill(provisioning).tool("knife", -1).time(15).sound(chopping)
-                                .shaped(new Object[] { "M", 'M', food, }));
-            }
-        }
-        for (ItemStack food : OreDictionary.getOres(cookedMeat)) {
-            int size = 1;
-            try (NativeRecipes.Variant v = NativeRecipes.variantOf(food)) {
-                KnowledgeListMF.meatRecipes.add(
-                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_cooked, size))
+                                .shaped(new Object[] { "M", 'M', food, })));
+        NativeRecipes.eachSource(
+                OreDictionary.getOres(cookedMeat),
+                food -> KnowledgeListMF.meatRecipes.add(
+                        MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_cooked, 1))
                                 .skill(provisioning).tool("knife", -1).time(15).sound(chopping)
-                                .shaped(new Object[] { "M", 'M', food, }));
-            }
-        }
+                                .shaped(new Object[] { "M", 'M', food, })));
         KnowledgeListMF.meatStripR = MineFantasyAPI.kitchenRecipe(new ItemStack(FoodListMF.generic_meat_strip_uncooked))
                 .skill(provisioning).tool("knife", -1).time(5).sound(chopping)
                 .shaped(new Object[] { "M", 'M', FoodListMF.generic_meat_uncooked, });
@@ -1260,17 +1254,6 @@ public class CarpenterRecipes {
                             .skill(construction).research("paint_brush").tool("brush", -1).time(2).sound(sewing).shaped(
                                     new Object[] { " O  ", "PPPP", 'O', ComponentListMF.plant_oil, 'P',
                                             (ComponentListMF.plank) }));
-        }
-    }
-
-    static void tryAddSawPlanks(ItemStack planks, CustomMaterial material) {
-        if (material == null || material.name == null || material.name.length() < 4) {
-            return;
-        }
-        String sub = material.name.substring(0, material.name.length() - 4).toLowerCase();
-
-        if (planks.getUnlocalizedName().toLowerCase().contains(sub)) {
-            addSawPlanks(planks, material);
         }
     }
 

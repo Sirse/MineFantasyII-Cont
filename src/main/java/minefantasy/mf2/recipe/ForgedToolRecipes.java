@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.crafting.NativeRecipes;
 import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.Skill;
@@ -35,14 +36,14 @@ public class ForgedToolRecipes {
         ArrayList<CustomMaterial> metal = CustomMaterial.getList("metal");
         for (CustomMaterial customMat : metal) {
             ItemStack bar = ComponentListMF.bar.createComm(customMat.name);
-            for (ItemStack ingot : OreDictionary.getOres("ingot" + customMat.name)) {
-                KnowledgeListMF.barR.add(
-                        MineFantasyAPI.anvilRecipe(bar).hot().tool("hammer", -1)
-                                .time((int) (customMat.craftTimeModifier / 2F))
-                                .shaped(new Object[] { "I", 'I', ingot, }));
-            }
-
             ItemStack defaultIngot = customMat.getItem();
+            // The material's own ingot keeps the bar recipe's plain id; ingots other mods add under its ore name get
+            // their own
+            NativeRecipes.perSource(
+                    OreDictionary.getOres("ingot" + customMat.name),
+                    defaultIngot,
+                    ingot -> addBarRecipe(bar, customMat, ingot));
+
             if (defaultIngot != null) {
                 KnowledgeListMF.baringotR.add(
                         MineFantasyAPI.anvilRecipe(defaultIngot).hot().tool("hammer", -1)
@@ -61,6 +62,12 @@ public class ForgedToolRecipes {
                                 ComponentListMF.bar("Steel"), });
         Salvage.addSalvage(ToolListMF.tinderbox, Items.flint, Items.stick, Blocks.wool, ComponentListMF.bar("Iron"));
         Salvage.addSalvage(Items.flint_and_steel, Items.flint, ComponentListMF.bar("Steel"));
+    }
+
+    private static void addBarRecipe(ItemStack bar, CustomMaterial material, ItemStack ingot) {
+        KnowledgeListMF.barR.add(
+                MineFantasyAPI.anvilRecipe(bar).hot().tool("hammer", -1).time((int) (material.craftTimeModifier / 2F))
+                        .shaped(new Object[] { "I", 'I', ingot, }));
     }
 
     private static void addMetalComponents() {
