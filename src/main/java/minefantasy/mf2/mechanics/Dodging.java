@@ -3,6 +3,7 @@ package minefantasy.mf2.mechanics;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 
@@ -72,11 +73,15 @@ public class Dodging {
     private static final long DODGE_PENDING_TICKS = 3L;
     /** How long after leaving the ground a dodge is still part of that jump. */
     private static final long DODGE_JUMP_TICKS = 10L;
+    /** How far under the feet to look for ground, a little more than a position packet rounds away. */
+    private static final double GROUND_PROBE = 0.0625D;
 
     /**
-     * Watches for the ground to air transition, which is the server's own evidence that a jump happened:
-     * NetHandlerPlayServer writes onGround from every position packet. The transition both opens the window and
-     * releases a request that arrived before the server had seen it.
+     * Watches for the ground to air transition, which opens the window and releases a request that arrived before the
+     * server had seen it. The client's onGround alone cannot be trusted, as NetHandlerPlayServer writes it from every
+     * position packet. Standing counts only where the server finds something under the player's feet too, and leaving
+     * only where it finds nothing there any more: flipping the flag in mid-air, or in place on the floor, opens
+     * nothing.
      */
     public static void trackDodgeWindow(EntityPlayer user) {
         if (user == null) {
@@ -84,7 +89,8 @@ public class Dodging {
         }
         NBTTagCompound data = user.getEntityData();
         long now = user.worldObj.getTotalWorldTime();
-        if (data.getBoolean(DODGE_GROUND_NBT) && !user.onGround) {
+        boolean grounded = standsOnSomething(user);
+        if (data.getBoolean(DODGE_GROUND_NBT) && !user.onGround && !grounded) {
             data.setLong(DODGE_JUMP_NBT, now);
             long wanted = data.getLong(DODGE_WANT_TICK_NBT);
             if (isFresh(wanted, now, DODGE_PENDING_TICKS)) {
@@ -92,12 +98,23 @@ public class Dodging {
                 spendJump(user, data.getInteger(DODGE_WANT_DIR_NBT), now);
             }
         }
-        data.setBoolean(DODGE_GROUND_NBT, user.onGround);
+        data.setBoolean(DODGE_GROUND_NBT, user.onGround && grounded);
 
         long wanted = data.getLong(DODGE_WANT_TICK_NBT);
         if (wanted > 0L && !isFresh(wanted, now, DODGE_PENDING_TICKS)) {
             data.setLong(DODGE_WANT_TICK_NBT, 0L);
         }
+    }
+
+    /**
+     * Whether anything solid is just under the player's feet, as the server's own world has it: a thin slab under the
+     * soles only, so a wall beside the player does not count as ground.
+     */
+    static boolean standsOnSomething(EntityPlayer user) {
+        AxisAlignedBB box = user.boundingBox;
+        AxisAlignedBB below = AxisAlignedBB
+                .getBoundingBox(box.minX, box.minY - GROUND_PROBE, box.minZ, box.maxX, box.minY, box.maxZ);
+        return !user.worldObj.getCollidingBoundingBoxes(user, below).isEmpty();
     }
 
     /**

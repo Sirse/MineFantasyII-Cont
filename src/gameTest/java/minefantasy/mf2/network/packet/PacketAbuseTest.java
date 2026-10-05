@@ -231,11 +231,14 @@ public class PacketAbuseTest {
     // region dodge
 
     /** Stands the player, then lifts them off the ground, as the server sees a jump through position packets. */
+    /** A jump as the server sees one: standing, then a block up in the air, then back where it was. */
     private static void jump(FakePlayer player) {
         player.onGround = true;
         Dodging.trackDodgeWindow(player);
+        player.setPosition(player.posX, player.posY + 1, player.posZ);
         player.onGround = false;
         Dodging.trackDodgeWindow(player);
+        player.setPosition(player.posX, player.posY - 1, player.posZ);
     }
 
     private static boolean moved(FakePlayer player) {
@@ -254,6 +257,8 @@ public class PacketAbuseTest {
                 helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
             }
             DodgeCommand handler = new DodgeCommand();
+            // Ground the server can see under the player, as a real jump needs
+            helper.setBlock(1, 0, 1, Blocks.stone);
             FakePlayer player = player(helper, 1, 1, 1);
             player.setItemInUse(new ItemStack(Items.iron_sword), 72000);
             assertTrue("the fake player does not block", player.isBlocking());
@@ -264,8 +269,10 @@ public class PacketAbuseTest {
             handler.process(ints(1), player);
             later(player);
             assertFalse("a dodge came while standing", moved(player));
+            player.setPosition(player.posX, player.posY + 1, player.posZ);
             player.onGround = false;
             Dodging.trackDodgeWindow(player);
+            player.setPosition(player.posX, player.posY - 1, player.posZ);
             assertTrue("a request a tick before the jump was dropped", moved(player));
 
             handler.process(ints(-1), player);
@@ -277,6 +284,60 @@ public class PacketAbuseTest {
             handler.process(ints(0), player);
             later(player);
             assertFalse("a dodge came without blocking", moved(player));
+        } finally {
+            StaminaBar.isSystemActive = stamina;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void flippingOnGroundInPlaceOnTheFloorOpensNoDodge(GameTestHelper helper) {
+        boolean stamina = StaminaBar.isSystemActive;
+        StaminaBar.isSystemActive = false;
+        try {
+            if (helper.getWorld().getTotalWorldTime() < 100) {
+                helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
+            }
+            DodgeCommand handler = new DodgeCommand();
+            helper.setBlock(3, 0, 3, Blocks.stone);
+            FakePlayer player = player(helper, 3, 1, 3);
+            player.setItemInUse(new ItemStack(Items.iron_sword), 72000);
+            for (int i = 0; i < 4; i++) {
+                player.onGround = true;
+                Dodging.trackDodgeWindow(player);
+                player.onGround = false;
+                Dodging.trackDodgeWindow(player);
+                handler.process(ints(1), player);
+                later(player);
+                assertFalse("a dodge came from a jump that never left the floor", moved(player));
+            }
+            jump(player);
+            handler.process(ints(1), player);
+            assertTrue("a real jump still dodges", moved(player));
+        } finally {
+            StaminaBar.isSystemActive = stamina;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void flippingOnGroundInMidAirOpensNoDodge(GameTestHelper helper) {
+        boolean stamina = StaminaBar.isSystemActive;
+        StaminaBar.isSystemActive = false;
+        try {
+            if (helper.getWorld().getTotalWorldTime() < 100) {
+                helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
+            }
+            DodgeCommand handler = new DodgeCommand();
+            // High over air: nothing under the feet, whatever the client says
+            FakePlayer player = player(helper, 2, 4, 2);
+            player.setItemInUse(new ItemStack(Items.iron_sword), 72000);
+            for (int i = 0; i < 4; i++) {
+                jump(player);
+                handler.process(ints(1), player);
+                later(player);
+                assertFalse("a dodge came from a landing that never happened", moved(player));
+            }
         } finally {
             StaminaBar.isSystemActive = stamina;
         }
