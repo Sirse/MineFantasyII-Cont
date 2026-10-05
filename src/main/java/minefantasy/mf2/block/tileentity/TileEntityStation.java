@@ -83,11 +83,22 @@ public abstract class TileEntityStation extends TileEntityShown implements ISide
         return slots()[slot];
     }
 
+    /**
+     * Marks the chunk for saving after state changed in place, such as fuel burned or an item heated, without the
+     * neighbour and comparator updates of {@link #markDirty()}: cheap enough for every tick.
+     */
+    protected void saveLater() {
+        if (worldObj != null) {
+            worldObj.markTileEntityChunkModified(xCoord, yCoord, zCoord, this);
+        }
+    }
+
     @Override
     public ItemStack decrStackSize(int slot, int amount) {
         ItemStack taken = InventorySlots.take(slots(), slot, amount);
         if (taken != null) {
             onInventoryChanged();
+            markDirty();
         }
         return taken;
     }
@@ -101,6 +112,8 @@ public abstract class TileEntityStation extends TileEntityShown implements ISide
     public void setInventorySlotContents(int slot, ItemStack stack) {
         slots()[slot] = stack;
         onInventoryChanged();
+        // Marked for saving here, whoever changed the slot: a window, a hopper or the station itself
+        markDirty();
     }
 
     @Override

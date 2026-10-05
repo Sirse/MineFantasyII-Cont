@@ -140,11 +140,15 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
             if (forge.temperature < (temperature - share)) {
                 forge.temperature += share;
                 temperature -= share;
+                saveLater();
+                forge.saveLater();
             }
             share = 1200;
             if (forge.fuel < (fuel - share)) {
                 forge.fuel += share;
                 fuel -= share;
+                saveLater();
+                forge.saveLater();
             }
         }
     }
@@ -152,6 +156,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     private void tickFuel() {
         if (fuel > 0) {
             fuel -= 0.2F;
+            saveLater();
         }
 
         if (fuel < 0) fuel = 0;
@@ -187,6 +192,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
                     this.setInventorySlotContents(slot, null);
                 } else {
                     ItemHeated.setTemp(item, Math.max(0, temp));
+                    saveLater();
                 }
             }
         } else if (temperature > 0) {

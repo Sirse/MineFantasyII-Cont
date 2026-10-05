@@ -46,6 +46,11 @@ public final class ResearchStudy {
         return true;
     }
 
+    /** The world time of the last strike. */
+    public long lastStrike() {
+        return lastStrike;
+    }
+
     /** A strike at the table at this world time, sped up by the boost; gives what it added. */
     public float strike(long now, float boost) {
         float gained = pace(now - lastStrike) * boost;

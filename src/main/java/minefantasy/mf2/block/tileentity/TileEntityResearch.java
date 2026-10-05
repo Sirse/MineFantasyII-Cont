@@ -51,7 +51,10 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         if (worldObj.isRemote) {
             return true;
         }
-        study.startOverIfChanged(items[0], user.getUniqueID().toString());
+        // Whatever study changes below is saved with the chunk, even when nothing else in it changed
+        if (study.startOverIfChanged(items[0], user.getUniqueID().toString())) {
+            markDirty();
+        }
         ArrayList<String> research = this.getInfo(items[0]);
         int result = canResearch(user, research);
 
@@ -69,6 +72,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
                     addResearch(research, user);
                     study.progress = 0;
                 }
+                markDirty();
 
                 return true;
             }
@@ -78,6 +82,7 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
                     user.addChatComponentMessage(new ChatComponentTranslation("research.null", new Object[0]));
             }
             study.progress = 0;
+            markDirty();
         }
 
         return items[0] != null;
@@ -161,8 +166,12 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         }
         // Paced by the world's clock, not by how fast the player can click
         long now = worldObj.getTotalWorldTime();
-        Sounds.at(this, "minefantasy2:block.flipPage", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+        float paced = ResearchStudy.pace(now - study.lastStrike());
         study.strike(now, shelfBoost(study.shelves(now, this::countShelves)));
+        // A page turns as often as study goes on, not once for every click a client can send in a tick
+        if (paced >= 1.0F) {
+            Sounds.at(this, "minefantasy2:block.flipPage", 1.0F, rand.nextFloat() * 0.4F + 0.8F);
+        }
     }
 
     /** The bookshelves around the table. */
