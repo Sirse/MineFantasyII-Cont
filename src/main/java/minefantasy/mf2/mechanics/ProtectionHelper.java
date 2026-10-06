@@ -28,9 +28,6 @@ public class ProtectionHelper {
     /** Set while a placement waits on its event and check; a placement asked for meanwhile is refused. */
     private static boolean deciding;
 
-    /** Set while a break event is raised only to ask about protection, so mining effects can tell it from a break. */
-    private static boolean querying;
-
     private ProtectionHelper() {}
 
     /**
@@ -215,11 +212,6 @@ public class ProtectionHelper {
         return interactEvent(player, world, x, y, z);
     }
 
-    /** Whether the break event being handled was raised by a protection question rather than by a break. */
-    static boolean isProtectionQuery() {
-        return querying;
-    }
-
     /**
      * The break event as Forge settles it, or null for a player that is not a server player, who is allowed nothing. A
      * connected player goes through vanilla's hook; one with no connection gets the event posted directly, which Forge
@@ -228,26 +220,20 @@ public class ProtectionHelper {
     private static BlockEvent.BreakEvent breakEvent(EntityPlayer player, World world, int x, int y, int z) {
         if (!(player instanceof EntityPlayerMP)) return null;
         EntityPlayerMP playerMP = (EntityPlayerMP) player;
-        boolean previous = querying;
-        querying = true;
-        try {
-            if (playerMP.playerNetServerHandler != null && playerMP.theItemInWorldManager != null) {
-                WorldSettings.GameType gameType = playerMP.theItemInWorldManager.getGameType();
-                return ForgeHooks.onBlockBreakEvent(world, gameType, playerMP, x, y, z);
-            }
-            BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(
-                    x,
-                    y,
-                    z,
-                    world,
-                    world.getBlock(x, y, z),
-                    world.getBlockMetadata(x, y, z),
-                    player);
-            MinecraftForge.EVENT_BUS.post(event);
-            return event;
-        } finally {
-            querying = previous;
+        if (playerMP.playerNetServerHandler != null && playerMP.theItemInWorldManager != null) {
+            WorldSettings.GameType gameType = playerMP.theItemInWorldManager.getGameType();
+            return ForgeHooks.onBlockBreakEvent(world, gameType, playerMP, x, y, z);
         }
+        BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(
+                x,
+                y,
+                z,
+                world,
+                world.getBlock(x, y, z),
+                world.getBlockMetadata(x, y, z),
+                player);
+        MinecraftForge.EVENT_BUS.post(event);
+        return event;
     }
 
     /** Whether the place event was cancelled; always so for a player that is not a server player. */

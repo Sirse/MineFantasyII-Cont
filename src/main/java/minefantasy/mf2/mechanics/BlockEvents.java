@@ -1,9 +1,5 @@
 package minefantasy.mf2.mechanics;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeavesBase;
 import net.minecraft.entity.*;
@@ -14,15 +10,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.world.BlockEvent;
 
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.stamina.StaminaBar;
@@ -38,31 +30,6 @@ import minefantasy.mf2.util.XSTRandom;
 public class BlockEvents {
 
     private static final XSTRandom random = new XSTRandom();
-    /** Breaks noted this tick in each world, by position: the block, and who broke it holding what. */
-    private static final Map<World, Map<ChunkCoordinates, Mined>> pendingBreaks = new WeakHashMap<World, Map<ChunkCoordinates, Mined>>();
-
-    /**
-     * Notes a player's break as it is about to happen; protection questions and fake players are not breaks. A break
-     * raises no Forge event once it succeeds (stone by hand drops nothing), so it is settled at the end of the tick.
-     */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void breaking(BlockEvent.BreakEvent event) {
-        World world = event.world;
-        EntityPlayer player = event.getPlayer();
-        if (world.isRemote || player == null || player instanceof FakePlayer || ProtectionHelper.isProtectionQuery())
-            return;
-        // Nothing to mine, and it must not take the place of a real break at the same spot this tick
-        if (event.block == null || event.block.isAir(world, event.x, event.y, event.z)) return;
-        Map<ChunkCoordinates, Mined> here = pendingBreaks.get(world);
-        if (here == null) {
-            here = new HashMap<ChunkCoordinates, Mined>();
-            pendingBreaks.put(world, here);
-        }
-        ItemStack held = player.getHeldItem();
-        here.put(
-                new ChunkCoordinates(event.x, event.y, event.z),
-                new Mined(event.block, event.blockMetadata, player, held == null ? null : held.copy(), event));
-    }
 
     @SubscribeEvent
     public void useHoe(UseHoeEvent event) {
@@ -81,50 +48,28 @@ public class BlockEvents {
     }
 
     /**
-     * Pays what the breaks noted this tick give, for each block gone by now. Known limit: if the player's break failed
-     * and something else removed the block in the same tick, the player is still rewarded. Exact settling would need a
-     * hook on tryHarvestBlock.
+     * Settles what mining gives once a block was really broken: called on vanilla's harvest by the mixin on
+     * tryHarvestBlock when it succeeded, and by MineFantasy's own tools after their own removal.
      */
-    @SubscribeEvent
-    public void settleBreaks(TickEvent.WorldTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || event.world.isRemote) return;
-        Map<ChunkCoordinates, Mined> here = pendingBreaks.remove(event.world);
-        if (here == null) return;
-        for (Map.Entry<ChunkCoordinates, Mined> entry : here.entrySet()) {
-            ChunkCoordinates at = entry.getKey();
-            BlockEvent.BreakEvent asked = entry.getValue().event;
-            // A handler after this one may have cancelled the break: then whatever removed the block, it was not this
-            if (asked != null && asked.isCanceled()) continue;
-            if (event.world.blockExists(at.posX, at.posY, at.posZ)
-                    && event.world.isAirBlock(at.posX, at.posY, at.posZ)) {
-                minedBlock(event.world, at.posX, at.posY, at.posZ, entry.getValue());
-            }
-        }
-    }
-
-    /** Settles MineFantasy mining effects after a caller has confirmed its own block removal. */
     public static void successfulPlayerBreak(World world, int x, int y, int z, Block block, int meta,
             EntityPlayer player, ItemStack held) {
         if (world == null || world.isRemote) return;
-        minedBlock(world, x, y, z, new Mined(block, meta, player, held == null ? null : held.copy(), null));
+        minedBlock(world, x, y, z, new Mined(block, meta, player, held == null ? null : held.copy()));
     }
 
-    /** A break as it was asked about: the block, and who broke it holding what. */
+    /** A break: the block, and who broke it holding what. */
     private static final class Mined {
 
         final Block block;
         final int meta;
         final EntityPlayer player;
         final ItemStack held;
-        /** The break event it was noted from, if any: a handler after this one may still cancel it. */
-        final BlockEvent.BreakEvent event;
 
-        Mined(Block block, int meta, EntityPlayer player, ItemStack held, BlockEvent.BreakEvent event) {
+        Mined(Block block, int meta, EntityPlayer player, ItemStack held) {
             this.block = block;
             this.meta = meta;
             this.player = player;
             this.held = held;
-            this.event = event;
         }
     }
 

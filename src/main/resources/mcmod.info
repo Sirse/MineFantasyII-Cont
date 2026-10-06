@@ -2,7 +2,7 @@
 {
   "modid": "minefantasy2",
   "name": "MineFantasyII",
-  "description": "Unofficial continuation of MineFantasy 2: medieval crafting, smithing, archery and RPG mechanics. A recipe guide is recommended - not all items are obtainable through vanilla means.",
+  "description": "Unofficial continuation of MineFantasy 2: medieval crafting, smithing, archery and RPG mechanics. A recipe guide is recommended - not all items are obtainable through vanilla means. Requires UniMixins.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://github.com/Sirse/MineFantasyII-Cont",
@@ -14,6 +14,7 @@
   "credits": "Original mod by Anonymous Productions. Continuation maintained by Sirse.",
   "logoFile": "",
   "screenshots": [],
-  "dependencies": []
+  "requiredMods": ["unimixins"],
+  "dependencies": ["unimixins"]
 }
 ]

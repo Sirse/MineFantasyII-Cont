@@ -50,6 +50,7 @@ import minefantasy.mf2.util.MFLogUtil;
         modid = MineFantasyII.MODID,
         name = MineFantasyII.NAME,
         dependencies = "required-after:Forge@[7.0,);" + "required-after:FML@[5.0.5,);"
+                + "required-after:unimixins;"
                 + "after:NotEnoughItems;"
                 + "after:MineTweaker3;"
                 + "after:BuildCraft|Core;"

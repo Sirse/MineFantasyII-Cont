@@ -137,7 +137,7 @@ public class MiningRewardTest {
         helper.succeed();
     }
 
-    /** Cancels a break after MineFantasy has noted it, as a later handler of the same priority can. */
+    /** Cancels every break as the last handler, after any other has had its say. */
     public static final class CancelLate {
 
         @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -147,7 +147,7 @@ public class MiningRewardTest {
     }
 
     @GameTest
-    public static void aBreakCancelledAfterItWasNotedGivesNothing(GameTestHelper helper) {
+    public static void aRefusedBreakGivesNothingWhateverRemovesTheBlockAfter(GameTestHelper helper) {
         boolean rocks = ConfigHardcore.HCCallowRocks;
         ConfigHardcore.HCCallowRocks = true;
         CancelLate late = new CancelLate();
@@ -155,22 +155,73 @@ public class MiningRewardTest {
         try {
             helper.setBlock(1, 1, 1, Blocks.stone);
             TestPos at = helper.absolute(1, 1, 1);
-            BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(
-                    at.x(),
-                    at.y(),
-                    at.z(),
-                    helper.getWorld(),
-                    Blocks.stone,
-                    0,
-                    unconnected(helper));
-            MinecraftForge.EVENT_BUS.post(event);
-            assertTrue("the break was refused", event.isCanceled());
-            // Something else takes the block away in the same tick
+            EntityPlayerMP player = miner(helper, at);
+            assertFalse("the break was refused", player.theItemInWorldManager.tryHarvestBlock(at.x(), at.y(), at.z()));
+            // Something else takes the block away in the same tick: that is no break of the player's
             helper.getWorld().setBlockToAir(at.x(), at.y(), at.z());
             endOfTick(helper);
             assertEquals("a refused break gives no rocks", 0, rocksAround(helper, at));
         } finally {
             MinecraftForge.EVENT_BUS.unregister(late);
+            ConfigHardcore.HCCallowRocks = rocks;
+        }
+        helper.succeed();
+    }
+
+    /** Turns the stone being broken into dirt without cancelling, as another mod's break handler might. */
+    public static final class StoneToDirt {
+
+        @SubscribeEvent
+        public void swap(BlockEvent.BreakEvent event) {
+            event.world.setBlock(event.x, event.y, event.z, Blocks.dirt);
+        }
+    }
+
+    /** Puts a pickaxe in the breaking player's hand without cancelling. */
+    public static final class HandAPickaxe {
+
+        @SubscribeEvent
+        public void swap(BlockEvent.BreakEvent event) {
+            event.getPlayer().inventory.setInventorySlotContents(
+                    event.getPlayer().inventory.currentItem,
+                    new ItemStack(Items.iron_pickaxe));
+        }
+    }
+
+    @GameTest
+    public static void aBlockChangedDuringTheEventIsRewardedAsWhatWasBroken(GameTestHelper helper) {
+        boolean rocks = ConfigHardcore.HCCallowRocks;
+        ConfigHardcore.HCCallowRocks = true;
+        StoneToDirt swap = new StoneToDirt();
+        MinecraftForge.EVENT_BUS.register(swap);
+        try {
+            helper.setBlock(1, 1, 1, Blocks.stone);
+            TestPos at = helper.absolute(1, 1, 1);
+            EntityPlayerMP player = miner(helper, at);
+            assertTrue(player.theItemInWorldManager.tryHarvestBlock(at.x(), at.y(), at.z()));
+            assertEquals(Blocks.air, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
+            assertEquals("dirt was broken, not stone: no rocks", 0, rocksAround(helper, at));
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(swap);
+            ConfigHardcore.HCCallowRocks = rocks;
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aToolChangedDuringTheEventIsRewardedAsTheToolUsed(GameTestHelper helper) {
+        boolean rocks = ConfigHardcore.HCCallowRocks;
+        ConfigHardcore.HCCallowRocks = true;
+        HandAPickaxe swap = new HandAPickaxe();
+        MinecraftForge.EVENT_BUS.register(swap);
+        try {
+            helper.setBlock(1, 1, 1, Blocks.stone);
+            TestPos at = helper.absolute(1, 1, 1);
+            EntityPlayerMP player = miner(helper, at);
+            assertTrue(player.theItemInWorldManager.tryHarvestBlock(at.x(), at.y(), at.z()));
+            assertEquals("broken with a pickaxe, not by hand: no rocks", 0, rocksAround(helper, at));
+        } finally {
+            MinecraftForge.EVENT_BUS.unregister(swap);
             ConfigHardcore.HCCallowRocks = rocks;
         }
         helper.succeed();

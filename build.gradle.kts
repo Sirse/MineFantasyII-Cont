@@ -20,6 +20,10 @@ val versionBattlegear = "1.6.8-backhand"
 val versionThaumcraft = "1.7.10-4.2.3.5"
 val versionBaubles = "1.0.1.10"
 val versionHorizonQA = "0.15.0"
+// Mixin runtime (UniMixins), a required dependency: one hook on vanilla's block harvesting. Published on JitPack
+val mixinProvider = "com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.3.2:dev"
+val mixinRefMap = "mixins.minefantasy2.refmap.json"
+val coreModClass = "minefantasy.mf2.coremod.MineFantasyCore"
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(8))
@@ -34,6 +38,20 @@ minecraft {
   username.set(System.getProperty("user.name"))
   injectedTags.put("VERSION", project.version)
   extraRunJvmArguments.add("-ea:${project.group}")
+  // The coremod that registers the mixins is not in a jar during development
+  extraRunJvmArguments.add("-Dfml.coreMods.load=$coreModClass")
+}
+
+tasks.jar.configure {
+  manifest {
+    attributes(
+      mapOf(
+        "FMLCorePlugin" to coreModClass,
+        "FMLCorePluginContainsFMLMod" to "true",
+        "ForceLoadAsMod" to "true"
+      )
+    )
+  }
 }
 
 tasks.injectTags.configure {
@@ -51,6 +69,16 @@ tasks.processResources.configure {
         "mcversion" to mcVersion
       )
     )
+  }
+}
+
+// One Mixin runtime only: older UniMixins and Mixin jars other dependencies bring (GTNHLib's) give way to ours
+configurations.configureEach {
+  resolutionStrategy.dependencySubstitution {
+    substitute(module("io.github.legacymoddingmc:unimixins"))
+      .using(module(mixinProvider.removeSuffix(":dev")))
+      .withClassifier("dev")
+      .because("a single, current Mixin runtime")
   }
 }
 
@@ -96,6 +124,12 @@ repositories {
 }
 
 dependencies {
+  annotationProcessor("org.ow2.asm:asm-debug-all:5.0.4")
+  annotationProcessor("com.google.guava:guava:24.1.1-jre")
+  annotationProcessor("com.google.code.gson:gson:2.8.6")
+  annotationProcessor(mixinProvider)
+  implementation(modUtils.enableMixins(mixinProvider, mixinRefMap))
+
   api("com.github.GTNewHorizons:NotEnoughItems:${versionNEI}:dev")
   // Kept for the Waila support still to be written; nothing references it yet. Not transitive: it drags in
   // cofh-core from the CurseForge repository, which this build does not declare, and its own older NEI.
