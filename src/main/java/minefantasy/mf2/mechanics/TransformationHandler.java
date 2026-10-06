@@ -13,13 +13,11 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipe;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.util.BukkitUtils;
 
 /**
  * Applies block transformation recipes when a player hits a block with the proper tool. Left click chops: the event is
@@ -58,6 +56,7 @@ public class TransformationHandler {
         int x = event.x;
         int y = event.y;
         int z = event.z;
+        if (!world.blockExists(x, y, z)) return;
         Block block = world.getBlock(x, y, z);
         int meta = world.getBlockMetadata(x, y, z);
 
@@ -79,11 +78,7 @@ public class TransformationHandler {
         if (recipe == null) {
             return;
         }
-        // Bukkit-side protection plugins decide through their own event pipeline
-        if (MineFantasyII.isBukkitServer() && BukkitUtils.cantBreakBlock(player, x, y, z)) {
-            return;
-        }
-
+        final TransformationRecipe matchedRecipe = recipe;
         event.setCanceled(true);
 
         long[] last = lastTransform.get(player);
@@ -91,54 +86,54 @@ public class TransformationHandler {
         if (last != null && last[0] == x && last[1] == y && last[2] == z && now - last[3] < REPEAT_DELAY) {
             return;
         }
-
-        if (recipe.research != null && !recipe.research.isEmpty()
-                && !ResearchLogic.hasInfoUnlocked(player, recipe.research)) {
+        if (matchedRecipe.research != null && !matchedRecipe.research.isEmpty()
+                && !ResearchLogic.hasInfoUnlocked(player, matchedRecipe.research)) {
             world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "step.stone", 1.0F, 0.5F);
             return;
         }
-
-        if (recipe.consumable != null && !player.capabilities.isCreativeMode) {
-            if (!consumeFromInventory(player, recipe.consumable)) {
-                world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "note.hat", 1.0F, 0.5F);
-                return;
-            }
+        if (matchedRecipe.consumable != null && !player.capabilities.isCreativeMode
+                && consumableSlot(player, matchedRecipe.consumable) < 0) {
+            world.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, "note.hat", 1.0F, 0.5F);
+            return;
         }
+        boolean finalHit = matchedRecipe.hits <= 1 || meta - matchedRecipe.inputMeta + 1 >= matchedRecipe.hits;
+        int resultMeta = finalHit ? matchedRecipe.getOutputMeta(meta) : meta + 1;
+        Block resultBlock = finalHit ? matchedRecipe.output : block;
+        boolean applied = ProtectionHelper
+                .replaceBlock(player, world, x, y, z, resultBlock, resultMeta, new ProtectionHelper.CommitCheck() {
+
+                    @Override
+                    public boolean beforeCommit() {
+                        // The tool and the payment are looked at again: protection handlers may have changed them
+                        if (player.getHeldItem() != held) {
+                            return false;
+                        }
+                        return matchedRecipe.consumable == null || player.capabilities.isCreativeMode
+                                || consume(player, matchedRecipe.consumable);
+                    }
+                });
+        if (!applied) return;
 
         world.playSoundEffect(
                 x + 0.5D,
                 y + 0.5D,
                 z + 0.5D,
-                recipe.sound != null ? recipe.sound : "dig.wood",
+                matchedRecipe.sound != null ? matchedRecipe.sound : "dig.wood",
                 1.0F,
                 1.0F);
 
-        if (recipe.dropPerHit != null) {
-            dropStack(world, x, y, z, recipe.dropPerHit.copy());
-        }
-
-        boolean finalHit;
-        if (recipe.hits <= 1) {
-            finalHit = true;
-        } else {
-            // Metadata holds the hit counter: inputMeta is stage 0, each non-final hit increments it
-            int stage = meta - recipe.inputMeta + 1;
-            finalHit = stage >= recipe.hits;
-            if (!finalHit) {
-                world.setBlockMetadataWithNotify(x, y, z, meta + 1, 3);
-            }
+        if (matchedRecipe.dropPerHit != null) {
+            dropStack(world, x, y, z, matchedRecipe.dropPerHit.copy());
         }
 
         lastTransform.put(player, new long[] { x, y, z, now });
 
         if (finalHit) {
-            int outMeta = recipe.getOutputMeta(meta);
-            world.setBlock(x, y, z, recipe.output, outMeta, 3);
-            for (int count = 1; count < recipe.outputCount; count++) {
-                dropStack(world, x, y, z, new ItemStack(recipe.output, 1, outMeta));
+            for (int count = 1; count < matchedRecipe.outputCount; count++) {
+                dropStack(world, x, y, z, new ItemStack(resultBlock, 1, resultMeta));
             }
-            if (recipe.skill != null && recipe.skillXp > 0) {
-                recipe.skill.addXP(player, recipe.skillXp);
+            if (matchedRecipe.skill != null && matchedRecipe.skillXp > 0) {
+                matchedRecipe.skill.addXP(player, matchedRecipe.skillXp);
             }
         }
 
@@ -150,20 +145,30 @@ public class TransformationHandler {
         }
     }
 
-    private boolean consumeFromInventory(EntityPlayer player, ItemStack required) {
+    /** The inventory slot holding enough of the consumable, or -1. */
+    private static int consumableSlot(EntityPlayer player, ItemStack required) {
         ItemStack[] inventory = player.inventory.mainInventory;
         for (int slot = 0; slot < inventory.length; slot++) {
             ItemStack stack = inventory[slot];
             if (stack != null && required.isItemEqual(stack) && stack.stackSize >= required.stackSize) {
-                stack.stackSize -= required.stackSize;
-                if (stack.stackSize <= 0) {
-                    inventory[slot] = null;
-                }
-                player.inventory.markDirty();
-                return true;
+                return slot;
             }
         }
-        return false;
+        return -1;
+    }
+
+    private static boolean consume(EntityPlayer player, ItemStack required) {
+        int slot = consumableSlot(player, required);
+        if (slot < 0) {
+            return false;
+        }
+        ItemStack[] inventory = player.inventory.mainInventory;
+        inventory[slot].stackSize -= required.stackSize;
+        if (inventory[slot].stackSize <= 0) {
+            inventory[slot] = null;
+        }
+        player.inventory.markDirty();
+        return true;
     }
 
     private void dropStack(World world, int x, int y, int z, ItemStack stack) {

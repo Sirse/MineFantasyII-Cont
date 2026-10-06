@@ -113,6 +113,7 @@ public class HeavyHarvest {
 
     /** How hard the block at the spot is for the player to break. */
     public static float strength(EntityPlayer player, World world, int x, int y, int z) {
+        if (world == null || !world.blockExists(x, y, z)) return 0F;
         return ForgeHooks.blockStrength(world.getBlock(x, y, z), player, world, x, y, z);
     }
 
@@ -123,6 +124,7 @@ public class HeavyHarvest {
      */
     public static boolean breakExtra(ItemStack tool, EntityPlayer player, World world, int x, int y, int z,
             float hitStrength) {
+        if (world == null || !world.blockExists(x, y, z)) return false;
         Block block = world.getBlock(x, y, z);
         int meta = world.getBlockMetadata(x, y, z);
         if (block.isAir(world, x, y, z) || player.getHeldItem() != tool || lastUse(tool, player)) {
@@ -146,6 +148,8 @@ public class HeavyHarvest {
         if (!block.removedByPlayer(world, player, x, y, z, harvest)) {
             return false;
         }
+        // Its own break, confirmed here: mining effects are paid now, not by the end-of-tick check
+        BlockEvents.successfulPlayerBreak(world, x, y, z, block, meta, player, player.getHeldItem());
         block.onBlockDestroyedByPlayer(world, x, y, z, meta);
         world.playAuxSFX(2001, x, y, z, Block.getIdFromBlock(block) + (meta << 12));
         if (harvest) {

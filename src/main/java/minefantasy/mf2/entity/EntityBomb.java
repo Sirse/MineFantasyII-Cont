@@ -19,14 +19,12 @@ import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.item.gadget.EnumCasingType;
 import minefantasy.mf2.item.gadget.EnumExplosiveType;
 import minefantasy.mf2.item.gadget.EnumFuseType;
 import minefantasy.mf2.item.gadget.EnumPowderType;
 import minefantasy.mf2.mechanics.CombatMechanics;
 import minefantasy.mf2.mechanics.MobTactics;
-import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityBomb extends Entity {
 
@@ -293,11 +291,6 @@ public class EntityBomb extends Entity {
 
                 while (splashDamage.hasNext()) {
                     Entity entityHit = (Entity) splashDamage.next();
-
-                    if (MineFantasyII.isBukkitServer()
-                            && BukkitUtils.cantDamage(thrower != null ? thrower : this, entityHit)) {
-                        continue;
-                    }
 
                     double distanceToEntity = this.getDistanceToEntity(entityHit);
                     double radius = getRangeOfBlast();

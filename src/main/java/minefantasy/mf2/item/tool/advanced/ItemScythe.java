@@ -84,34 +84,35 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
         for (int x2 = -r; x2 <= r; x2++) {
             for (int y2 = -r; y2 <= r; y2++) {
                 for (int z2 = -r; z2 <= r; z2++) {
-                    Block block = world.getBlock(x + x2, y + y2, z + z2);
-                    int meta = world.getBlockMetadata(x + x2, y + y2, z + z2);
+                    int targetX = x + x2;
+                    int targetY = y + y2;
+                    int targetZ = z + z2;
+                    if (!world.blockExists(targetX, targetY, targetZ)) continue;
+                    Block block = world.getBlock(targetX, targetY, targetZ);
+                    int meta = world.getBlockMetadata(targetX, targetY, targetZ);
                     if (block != null) {
                         Material m = block.getMaterial();
-                        if (canCutMaterial(m, block.getBlockHardness(world, x + x2, y + y2, z + z2), leaf)) {
-                            if (!ProtectionHelper.canBreak(entity, world, x + x2, y + y2, z + z2)) {
-                                continue;
-                            }
-
+                        if (canCutMaterial(m, block.getBlockHardness(world, targetX, targetY, targetZ), leaf)) {
                             if (getDistance(x + x2, y + y2, z + z2, x, y, z) < r * 1) {
+                                ArrayList<ItemStack> items = block.getDrops(world, targetX, targetY, targetZ, meta, 0);
+                                if (!ProtectionHelper.breakBlock(entity, world, targetX, targetY, targetZ)) {
+                                    continue;
+                                }
                                 flag = true;
 
-                                ArrayList<ItemStack> items = block.getDrops(world, x + x2, y + y2, z + z2, meta, 0);
-                                world.setBlockToAir(x + x2, y + y2, z + z2);
                                 world.playAuxSFXAtEntity(
                                         entity,
                                         2001,
-                                        x + x2,
-                                        y + y2,
-                                        z + z2,
-                                        Block.getIdFromBlock(block)
-                                                + (world.getBlockMetadata(x + x2, y + y2, z + z2) << 16));
-                                tryBreakFarmland(world, x + x2, y + y2 - 1, z + z2);
+                                        targetX,
+                                        targetY,
+                                        targetZ,
+                                        Block.getIdFromBlock(block) + (meta << 12));
+                                tryBreakFarmland(entity, world, targetX, targetY - 1, targetZ);
                                 if (!entity.capabilities.isCreativeMode) {
                                     ItemLumberAxe.tirePlayer(entity, 1F);
                                     for (ItemStack drop : items) {
                                         if (world.rand.nextFloat() <= 1.0F) {
-                                            dropBlockAsItem_do(world, x + x2, y + y2, z + z2, drop);
+                                            dropBlockAsItem_do(world, targetX, targetY, targetZ, drop);
                                         }
                                     }
                                 }
@@ -125,11 +126,12 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
         return flag;
     }
 
-    private void tryBreakFarmland(World world, int x, int y, int z) {
+    private void tryBreakFarmland(EntityPlayer player, World world, int x, int y, int z) {
+        if (!world.blockExists(x, y, z)) return;
         Block base = world.getBlock(x, y, z);
 
         if (base != null && base == Blocks.farmland && FarmingHelper.didHarvestRuinBlock(world, true)) {
-            world.setBlock(x, y, z, Blocks.dirt);
+            ProtectionHelper.replaceBlock(player, world, x, y, z, Blocks.dirt, 0);
         }
     }
 

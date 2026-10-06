@@ -11,24 +11,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.item.gadget.EnumCasingType;
 import minefantasy.mf2.item.gadget.EnumExplosiveType;
 import minefantasy.mf2.item.gadget.EnumFuseType;
 import minefantasy.mf2.item.gadget.EnumPowderType;
 import minefantasy.mf2.item.list.ToolListMF;
-import minefantasy.mf2.util.BukkitUtils;
 
 public class EntityMine extends Entity {
 
-    private static DamageSource mineDmg = new DamageSource("mine").setExplosion();
-    private static DamageSource mineFireDmg = new DamageSource("mine").setExplosion().setFireDamage();
     private final int typeId = 2;
     /**
      * How long the fuse is
@@ -261,11 +258,6 @@ public class EntityMine extends Entity {
                 while (splashDamage.hasNext()) {
                     Entity entityHit = (Entity) splashDamage.next();
 
-                    if (MineFantasyII.isBukkitServer()
-                            && BukkitUtils.cantDamage(getPlacer() != null ? getPlacer() : this, entityHit)) {
-                        continue;
-                    }
-
                     double distanceToEntity = this.getDistanceToEntity(entityHit);
 
                     double radius = getRangeOfBlast() * getPowderType().rangeModifier;
@@ -283,9 +275,12 @@ public class EntityMine extends Entity {
                             continue;
                         }
                         if (!(entityHit instanceof EntityItem)) {
-                            DamageSource source = mineDmg;
+                            // Dealt by whoever placed the mine, so protection (and a hybrid server's damage event)
+                            // weighs that player
+                            DamageSource source = new EntityDamageSourceIndirect("mine", this, getPlacer())
+                                    .setExplosion();
                             if (getFilling() == 2) {
-                                source = mineFireDmg;
+                                source.setFireDamage();
                             }
                             if (entityHit.attackEntityFrom(source, dam)) {
                                 applyEffects(entityHit);

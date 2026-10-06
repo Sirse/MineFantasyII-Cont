@@ -6,9 +6,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.MathHelper;
 
-import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.config.ConfigArmour;
-import minefantasy.mf2.util.BukkitUtils;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 /**
  * What a moving cogwork suit does to the ground under it: kicks up its dust, and, where griefing is allowed, tramples
@@ -25,6 +24,7 @@ final class CogworkTrampling {
             int i = MathHelper.floor_double(cog.posX);
             int j = MathHelper.floor_double(cog.posY - 0.20000000298023224D - cog.yOffset);
             int k = MathHelper.floor_double(cog.posZ);
+            if (!cog.worldObj.blockExists(i, j, k)) return;
             Block block = cog.worldObj.getBlock(i, j, k);
 
             if (block.getMaterial() != Material.air) {
@@ -37,83 +37,51 @@ final class CogworkTrampling {
                         0.5D,
                         (cog.getRNG().nextFloat() - 0.5D) * 4.0D);
             }
+            // Only a rider's tread changes blocks, each asked about on its own just before it changes
             if (!cog.worldObj.isRemote && ConfigArmour.cogworkGrief
                     && cog.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing")
-                    && !isProtectedBlock(cog, i, j, k)) {
-                damageBlock(cog, block, i, j, k, cog.worldObj.getBlockMetadata(i, j, k));
-                block = cog.worldObj.getBlock(i, j + 1, k);
-                damageSurface(cog, block, i, j + 1, k, cog.worldObj.getBlockMetadata(i, j, k));
+                    && cog.riddenByEntity instanceof EntityPlayer) {
+                EntityPlayer rider = (EntityPlayer) cog.riddenByEntity;
+                damageBlock(cog, rider, block, i, j, k);
+                if (cog.worldObj.blockExists(i, j + 1, k)) {
+                    damageSurface(cog, rider, cog.worldObj.getBlock(i, j + 1, k), i, j + 1, k);
+                }
             }
         }
     }
 
-    /**
-     * Bukkit protection plugins may forbid the rider from breaking blocks under the suit
-     */
-    private static boolean isProtectedBlock(EntityCogwork cog, int x, int y, int z) {
-        if (!MineFantasyII.isBukkitServer() || !(cog.riddenByEntity instanceof EntityPlayer)) {
-            return false;
-        }
-        return BukkitUtils.cantBreakBlock((EntityPlayer) cog.riddenByEntity, x, y, z);
-    }
-
-    private static void damageBlock(EntityCogwork cog, Block block, int x, int y, int z, int blockMetadata) {
+    private static void damageBlock(EntityCogwork cog, EntityPlayer rider, Block block, int x, int y, int z) {
         if (block == Blocks.grass || block == Blocks.farmland) {
-            cog.worldObj.setBlock(x, y, z, Blocks.dirt, 0, 2);
+            ProtectionHelper.replaceBlock(rider, cog.worldObj, x, y, z, Blocks.dirt, 0);
         }
         if (block.getMaterial() == Material.glass) {
-            cog.worldObj.setBlockToAir(x, y, z);
-            cog.worldObj.playSoundEffect(
-                    x + 0.5D,
-                    y + 0.5D,
-                    z + 0.5D,
-                    "dig.glass",
-                    1.0F,
-                    0.9F + (cog.getRNG().nextFloat() * 0.2F));
+            if (ProtectionHelper.breakBlock(rider, cog.worldObj, x, y, z)) {
+                crunch(cog, x, y, z, "dig.glass");
+            }
         }
         if (block == Blocks.ice) {
-            cog.worldObj.setBlock(x, y, z, Blocks.water, 0, 2);
-            cog.worldObj.playSoundEffect(
-                    x + 0.5D,
-                    y + 0.5D,
-                    z + 0.5D,
-                    "dig.glass",
-                    1.0F,
-                    0.9F + (cog.getRNG().nextFloat() * 0.2F));
+            if (ProtectionHelper.replaceBlock(rider, cog.worldObj, x, y, z, Blocks.water, 0)) {
+                crunch(cog, x, y, z, "dig.glass");
+            }
         }
         if (block.getMaterial() == Material.leaves) {
-            cog.worldObj.setBlockToAir(x, y, z);
-            cog.worldObj.playSoundEffect(
-                    x + 0.5D,
-                    y + 0.5D,
-                    z + 0.5D,
-                    "dig.grass",
-                    1.0F,
-                    0.9F + (cog.getRNG().nextFloat() * 0.2F));
+            if (ProtectionHelper.breakBlock(rider, cog.worldObj, x, y, z)) {
+                crunch(cog, x, y, z, "dig.grass");
+            }
         }
     }
 
-    private static void damageSurface(EntityCogwork cog, Block block, int x, int y, int z, int blockMetadata) {
+    private static void damageSurface(EntityCogwork cog, EntityPlayer rider, Block block, int x, int y, int z) {
         if (block.getBlockHardness(cog.worldObj, x, y, z) == 0
                 && (block.getMaterial() == Material.vine || block.getMaterial() == Material.plants)) {
-            cog.worldObj.setBlockToAir(x, y, z);
-            cog.worldObj.playSoundEffect(
-                    x + 0.5D,
-                    y + 0.5D,
-                    z + 0.5D,
-                    "dig.grass",
-                    1.0F,
-                    0.9F + (cog.getRNG().nextFloat() * 0.2F));
+            if (ProtectionHelper.breakBlock(rider, cog.worldObj, x, y, z)) crunch(cog, x, y, z, "dig.grass");
         }
         if (block == Blocks.snow_layer) {
-            cog.worldObj.setBlockToAir(x, y, z);
-            cog.worldObj.playSoundEffect(
-                    x + 0.5D,
-                    y + 0.5D,
-                    z + 0.5D,
-                    "dig.cloth",
-                    1.0F,
-                    0.9F + (cog.getRNG().nextFloat() * 0.2F));
+            if (ProtectionHelper.breakBlock(rider, cog.worldObj, x, y, z)) crunch(cog, x, y, z, "dig.cloth");
         }
+    }
+
+    private static void crunch(EntityCogwork cog, int x, int y, int z, String sound) {
+        cog.worldObj.playSoundEffect(x + 0.5D, y + 0.5D, z + 0.5D, sound, 1.0F, 0.9F + cog.getRNG().nextFloat() * 0.2F);
     }
 }

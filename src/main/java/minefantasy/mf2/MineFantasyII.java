@@ -41,7 +41,6 @@ import minefantasy.mf2.network.CommonProxyMF;
 import minefantasy.mf2.network.packet.PacketHandlerMF;
 import minefantasy.mf2.recipe.BasicRecipesMF;
 import minefantasy.mf2.recipe.RecipeRemover;
-import minefantasy.mf2.util.BukkitUtils;
 import minefantasy.mf2.util.MFLogUtil;
 
 /**
@@ -74,23 +73,8 @@ public class MineFantasyII {
     @Instance(MODID)
     public static MineFantasyII instance;
 
-    private static boolean isBukkitServer;
-
     private static Configuration getCfg(FMLPreInitializationEvent event, String name) {
         return new Configuration(new File(event.getModConfigurationDirectory(), "MineFantasyII/" + name + ".cfg"));
-    }
-
-    public static boolean isBukkitServer() {
-        return isBukkitServer;
-    }
-
-    public static boolean setIsBukkitServer() {
-        try {
-            Class.forName("org.spigotmc.SpigotConfig");
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-        return true;
     }
 
     public static boolean isDebug() {
@@ -128,7 +112,6 @@ public class MineFantasyII {
         MineFantasyAPI.isInDebugMode = isDebug();
         MFLogUtil.log("API Debug mode updated: " + MineFantasyAPI.isInDebugMode);
 
-        addModFlags();
         proxy.preInit();
 
         RecipeRemover.removeRecipes();
@@ -199,11 +182,6 @@ public class MineFantasyII {
 
     @EventHandler
     public final void serverStarted(FMLServerStartedEvent event) {
-        if (event.getSide() != Side.CLIENT && isBukkitServer()) {
-            MFLogUtil.log("Bukkit has been detected");
-            BukkitUtils.onServerStarted();
-        }
-
         if (Loader.isModLoaded("MineTweaker3") && ConfigIntegration.mtIntegration) {
             MTCompat.registerCommands();
         }
@@ -218,9 +196,5 @@ public class MineFantasyII {
                 ConfigWorldGen.berryMaxRain)) {
             biome.addFlower(BlockListMF.berryBush, 0, 5);
         }
-    }
-
-    private void addModFlags() {
-        isBukkitServer = setIsBukkitServer();
     }
 }

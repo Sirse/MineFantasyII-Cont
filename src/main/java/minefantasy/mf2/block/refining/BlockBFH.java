@@ -7,8 +7,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IIcon;
@@ -90,6 +92,18 @@ public class BlockBFH extends BlockStation<TileEntityBlastFH> {
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
         return new TileEntityBlastFH();
+    }
+
+    /** Remember who built the heater, so the fire it sets and the blasts it throws act for its owner. */
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase placer, ItemStack item) {
+        super.onBlockPlacedBy(world, x, y, z, placer, item);
+        if (!world.isRemote && placer instanceof EntityPlayer) {
+            TileEntityBlastFH tile = getTile(world, x, y, z);
+            if (tile != null) {
+                tile.setOwner((EntityPlayer) placer);
+            }
+        }
     }
 
     @Override

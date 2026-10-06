@@ -13,8 +13,7 @@ import net.minecraft.util.*;
 import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 
-import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.util.BukkitUtils;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class Shockwave {// Explosion
 
@@ -89,6 +88,12 @@ public class Shockwave {// Explosion
                             int j1 = MathHelper.floor_double(d5);
                             int k1 = MathHelper.floor_double(d6);
                             int l1 = MathHelper.floor_double(d7);
+                            if (!this.worldObj.blockExists(j1, k1, l1)) {
+                                d5 += d0 * f2;
+                                d6 += d1 * f2;
+                                d7 += d2 * f2;
+                                continue;
+                            }
                             Block block = this.worldObj.getBlock(j1, k1, l1);
 
                             if (block.getMaterial() == Material.glass) {
@@ -121,11 +126,6 @@ public class Shockwave {// Explosion
             double d4 = entity.getDistance(this.explosionX, this.explosionY, this.explosionZ) / this.explosionSize;
 
             if (d4 <= 1.0D && !(entity instanceof EntityItem)) {
-                // Bukkit protection plugins decide whether the exploder may damage this entity
-                if (this.exploder != null && MineFantasyII.isBukkitServer()
-                        && BukkitUtils.cantDamage(this.exploder, entity)) {
-                    continue;
-                }
                 d5 = entity.posX - this.explosionX;
                 d6 = entity.posY + entity.getEyeHeight() - this.explosionY;
                 d7 = entity.posZ - this.explosionZ;
@@ -138,7 +138,10 @@ public class Shockwave {// Explosion
                     double d10 = this.worldObj.getBlockDensity(vec3, entity.boundingBox);
                     double d11 = (1.0D - d4) * d10;
                     float damage = ((int) ((d11 * d11 + d11) / 2.0D * 8.0D * this.explosionSize + 1.0D));
-                    entity.attackEntityFrom(getExplosionSource(), Math.min(64F, 4F + (damage / 2F)));
+                    // An attack refused (by protection, or as the entity is still recovering) pushes no one either
+                    if (!entity.attackEntityFrom(getExplosionSource(), Math.min(64F, 4F + (damage / 2F)))) {
+                        continue;
+                    }
                     double d8 = EnchantmentProtection.func_92092_a(entity, d11);
                     entity.motionX += d5 * d8;
                     entity.motionY += d6 * d8;
@@ -188,6 +191,7 @@ public class Shockwave {// Explosion
                 i = chunkposition.chunkPosX;
                 j = chunkposition.chunkPosY;
                 k = chunkposition.chunkPosZ;
+                if (!this.worldObj.blockExists(i, j, k)) continue;
                 block = this.worldObj.getBlock(i, j, k);
 
                 if (flag) {
@@ -217,8 +221,7 @@ public class Shockwave {// Explosion
                     this.worldObj.spawnParticle("smoke", d0, d1, d2, d3, d4, d5);
                 }
 
-                if (isGriefing && allowsBlockDamage() && block.getMaterial() == Material.glass) {
-                    this.worldObj.setBlockToAir(i, j, k);
+                if (isGriefing && block.getMaterial() == Material.glass && breakBlock(i, j, k)) {
                     this.worldObj
                             .playSoundEffect(i, j, k, "break.glass", 1.0F, 0.75F + (explosionRNG.nextFloat() * 0.5F));
                 }
@@ -233,12 +236,15 @@ public class Shockwave {// Explosion
                 i = chunkposition.chunkPosX;
                 j = chunkposition.chunkPosY;
                 k = chunkposition.chunkPosZ;
+                if (j <= 0 || !this.worldObj.blockExists(i, j, k) || !this.worldObj.blockExists(i, j - 1, k)) {
+                    continue;
+                }
                 block = this.worldObj.getBlock(i, j, k);
                 Block block1 = this.worldObj.getBlock(i, j - 1, k);
 
                 if (block.getMaterial() == Material.air && block1.func_149730_j()
                         && this.explosionRNG.nextInt(3) == 0) {
-                    this.worldObj.setBlock(i, j, k, Blocks.fire);
+                    placeFire(i, j, k);
                 }
             }
         }
@@ -248,12 +254,18 @@ public class Shockwave {// Explosion
         return this.field_77288_k;
     }
 
-    /**
-     * Block damage from the wave is allowed for players and, for other causes, only while mobGriefing permits it
-     */
+    /** Whether the player or creature behind the wave may change blocks at all. */
     private boolean allowsBlockDamage() {
-        return this.exploder instanceof EntityPlayer
-                || this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
+        return ProtectionHelper.griefs(this.exploder, this.worldObj);
+    }
+
+    private boolean breakBlock(int x, int y, int z) {
+        return ProtectionHelper.breakBlock(this.exploder, this.worldObj, x, y, z);
+    }
+
+    /** Sets fire here as the player or creature behind the wave may. */
+    private boolean placeFire(int x, int y, int z) {
+        return ProtectionHelper.placeBlock(this.exploder, this.worldObj, x, y, z, Blocks.fire, 0);
     }
 
     public DamageSource getExplosionSource() {

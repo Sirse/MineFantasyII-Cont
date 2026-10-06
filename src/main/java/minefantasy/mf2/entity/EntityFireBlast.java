@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.config.ConfigMobs;
 import minefantasy.mf2.entity.mob.EntityDragon;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class EntityFireBlast extends EntityFireball {
 
@@ -29,6 +30,15 @@ public class EntityFireBlast extends EntityFireball {
         super(world, shooter, xv, yv, zv);
         this.setInvisible(true);
         this.setSize(size, size);
+    }
+
+    /**
+     * Sets who the blast acts for, whose rights protection weighs. Like vanilla fireballs it is not saved: a blast
+     * loaded from disk acts for no one and so changes no block.
+     */
+    public EntityFireBlast setShooter(EntityLivingBase shooter) {
+        shootingEntity = shooter;
+        return this;
     }
 
     public EntityFireBlast(World world, double x, double y, double z, double xv, double yv, double zv) {
@@ -59,7 +69,7 @@ public class EntityFireBlast extends EntityFireball {
                         if (!worldObj.isRemote && canBlockCatchFire(i, j - 1, k)
                                 && worldObj.isAirBlock(i, j, k)
                                 && rand.nextFloat() < getPyro()) {
-                            this.worldObj.setBlock(i, j, k, Blocks.fire);
+                            placeFire(i, j, k);
                         }
                     }
                 }
@@ -112,12 +122,13 @@ public class EntityFireBlast extends EntityFireball {
                 }
 
                 if (!worldObj.isRemote && this.worldObj.isAirBlock(i, j, k) && rand.nextFloat() < getPyro()) {
-                    this.worldObj.setBlock(i, j, k, Blocks.fire);
+                    placeFire(i, j, k);
                 }
-                boolean tnt = worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ).getMaterial() == Material.tnt;
+                boolean tnt = worldObj.blockExists(pos.blockX, pos.blockY, pos.blockZ)
+                        && worldObj.getBlock(pos.blockX, pos.blockY, pos.blockZ).getMaterial() == Material.tnt;
                 if (isPreset("BlastFurnace") && (rand.nextInt(50) == 0) || tnt) {
                     boolean solid = worldObj.isBlockNormalCubeDefault(pos.blockX, pos.blockY, pos.blockZ, false);
-                    worldObj.newExplosion(this, posX, posY, posZ, solid ? 1.5F : 0.5F, true, true);
+                    worldObj.newExplosion(this, posX, posY, posZ, solid ? 1.5F : 0.5F, true, explosionGriefs());
                 }
             }
 
@@ -204,6 +215,24 @@ public class EntityFireBlast extends EntityFireball {
         return this;
     }
 
+    /**
+     * Whether the blast may break this block, as its shooter may: a player as protection allows, a creature while
+     * mobGriefing allows. A blast with no one behind it, such as one loaded from disk, changes no block.
+     */
+    public boolean mayChange(int x, int y, int z) {
+        return ProtectionHelper.canBreak(shootingEntity, worldObj, x, y, z);
+    }
+
+    /** Sets fire here as the shooter may place it. */
+    public boolean placeFire(int x, int y, int z) {
+        return ProtectionHelper.placeBlock(shootingEntity, worldObj, x, y, z, Blocks.fire, 0);
+    }
+
+    /** Whether an explosion it sets off may break blocks; protection then weighs each block through its events. */
+    private boolean explosionGriefs() {
+        return ProtectionHelper.griefs(shootingEntity, worldObj);
+    }
+
     private boolean destroyBlocksInAABB(AxisAlignedBB box) {
         int var2 = MathHelper.floor_double(box.minX);
         int var3 = MathHelper.floor_double(box.minY);
@@ -217,16 +246,15 @@ public class EntityFireBlast extends EntityFireball {
         for (int var10 = var2; var10 <= var5; ++var10) {
             for (int var11 = var3; var11 <= var6; ++var11) {
                 for (int var12 = var4; var12 <= var7; ++var12) {
+                    if (!this.worldObj.blockExists(var10, var11, var12)) continue;
                     Material var13 = this.worldObj.getBlock(var10, var11, var12).getMaterial();
 
                     if (var13 != null) {
-                        if (var13 == Material.glass) {
+                        if (var13 == Material.glass && breakBlockAt(var10, var11, var12)) {
                             var9 = true;
-                            this.worldObj.setBlockToAir(var10, var11, var12);
-                        } else if (var13 == Material.tnt) {
+                        } else if (var13 == Material.tnt && breakBlockAt(var10, var11, var12)) {
                             var9 = true;
-                            this.worldObj.setBlockToAir(var10, var11, var12);
-                            this.worldObj.createExplosion(this, var10, var11, var12, 4.0F, true);
+                            this.worldObj.newExplosion(this, var10, var11, var12, 4.0F, false, explosionGriefs());
                         } else {
                             var8 = true;
                         }
@@ -246,11 +274,16 @@ public class EntityFireBlast extends EntityFireball {
         return var8;
     }
 
+    private boolean breakBlockAt(int x, int y, int z) {
+        return ProtectionHelper.breakBlock(shootingEntity, worldObj, x, y, z);
+    }
+
     public DamageSource causeFireblastDamage() {
         if (isPreset("BlastFurnace")) {
             return blastDamage;
         }
-        return shootingEntity == null ? basicDamage
-                : (new EntityDamageSourceIndirect("fireblast", this, shootingEntity)).setFireDamage().setProjectile();
+        EntityLivingBase shooter = shootingEntity;
+        return shooter == null ? basicDamage
+                : (new EntityDamageSourceIndirect("fireblast", this, shooter)).setFireDamage().setProjectile();
     }
 }

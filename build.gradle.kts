@@ -102,7 +102,6 @@ dependencies {
   api("com.github.GTNewHorizons:waila:${versionWaila}:dev") {
     isTransitive = false
   }
-  compileOnly(files("lib/bukkit-1.7.10.jar"))
 
   compileOnly("com.github.GTNewHorizons:CraftTweaker:${versionCraftTweaker}:dev") {
     isTransitive = false

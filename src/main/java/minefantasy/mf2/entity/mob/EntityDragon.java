@@ -807,7 +807,8 @@ public class EntityDragon extends EntityFlyingMF
     public Shockwave newShockwave(double x, double y, double z, float power, boolean fire, boolean smoke) {
         Shockwave explosion = new Shockwave("dragonstomp", worldObj, this, x, y, z, power);
         explosion.isFlaming = fire;
-        explosion.isGriefing = worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
+        // mobGriefing is weighed for each block the wave would break
+        explosion.isGriefing = true;
         explosion.isSmoking = smoke;
         explosion.initiate();
         explosion.decorateWave(true);

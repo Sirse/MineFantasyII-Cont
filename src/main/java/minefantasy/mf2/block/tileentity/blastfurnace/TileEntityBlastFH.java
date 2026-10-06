@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,6 +24,7 @@ import minefantasy.mf2.block.refining.BlockBFH;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.entity.EntityFireBlast;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class TileEntityBlastFH extends TileEntityBlastFC {
 
@@ -104,6 +106,25 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         startFire(0, 0, -1);
     }
 
+    private void startFire(int x, int y, int z) {
+        // x/y/z are offsets: resolve them once so the test and the write look at the same block
+        int blockX = xCoord + x;
+        int blockY = yCoord + y;
+        int blockZ = zCoord + z;
+        if (!worldObj.isRemote && worldObj.isAirBlock(blockX, blockY, blockZ)) {
+            setFire(blockX, blockY, blockZ);
+        }
+    }
+
+    /**
+     * Whether the furnace may set fire at the spot: as its owner could place a block there. A furnace with no known
+     * owner sets no fire, since no one's rights can be asked.
+     */
+    public boolean setFire(int x, int y, int z) {
+        EntityPlayer owner = owner();
+        return owner != null && ProtectionHelper.placeBlock(owner, worldObj, x, y, z, Blocks.fire, 0);
+    }
+
     /**
      * Without a crucible below, Hardcore Ingots keeps a third of what the furnace smelts; the rest is lost.
      */
@@ -142,16 +163,6 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         }
     }
 
-    private void startFire(int x, int y, int z) {
-        // x/y/z are offsets: resolve them once so the test and the write look at the same block
-        int blockX = xCoord + x;
-        int blockY = yCoord + y;
-        int blockZ = zCoord + z;
-        if (!worldObj.isRemote && worldObj.isAirBlock(blockX, blockY, blockZ)) {
-            worldObj.setBlock(blockX, blockY, blockZ, Blocks.fire);
-        }
-    }
-
     private void shootFire() {
         if (!worldObj.isRemote) {
             shootFire(-1, 0, 0);
@@ -172,6 +183,8 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
                 y * v,
                 z * v);
         fireball.getEntityData().setString("Preset", "BlastFurnace");
+        // The blast acts for the furnace's owner, whose rights it asks; with no owner it changes no block
+        fireball.setShooter(owner());
         fireball.modifySpeed(0.5F);
         worldObj.spawnEntityInWorld(fireball);
     }

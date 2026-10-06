@@ -19,6 +19,7 @@ import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityStation;
+import minefantasy.mf2.mechanics.ActionOwner;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class TileEntityBlastFC extends TileEntityStation implements ISidedInventory, ISmokeCarrier {
@@ -26,10 +27,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     public int ticksExisted;
     public boolean isBuilt = false;
     public int fireTime;
-    /**
-     * Name of the player who placed this block; empty when unknown (pre-existing blocks)
-     */
-    private String ownerName = "";
+    private final ActionOwner owner = new ActionOwner();
     public int tempUses;
     protected ItemStack[] items = new ItemStack[2];
     protected int smokeStorage;
@@ -71,9 +69,19 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
             SmokeMechanics.emitSmokeFromCarrier(worldObj, xCoord, yCoord, zCoord, this, 5);
         }
         if (!worldObj.isRemote && smokeStorage > getMaxSmokeStorage() && rand.nextInt(1000) == 0) {
-            // Attribute the blast to the block's owner, so protection plugins evaluate the right permissions
-            worldObj.newExplosion(getExplosionCause(), xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 5F, true, true);
+            explodeFromSmoke();
         }
+    }
+
+    /**
+     * The blast of a furnace choked with smoke, attributed to its owner so protection weighs the owner's rights. With
+     * no owner known no one's rights can be asked, so it neither breaks nor sets alight anything: vanilla sets fire
+     * apart from breaking, so both are turned off.
+     */
+    public void explodeFromSmoke() {
+        EntityPlayer cause = owner();
+        boolean changesWorld = cause != null;
+        worldObj.newExplosion(cause, xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 5F, changesWorld, changesWorld);
     }
 
     /**
@@ -81,14 +89,17 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
      * stand nearby and protection plugins evaluate the right permissions. Called from the block on placement.
      */
     public void setOwner(EntityPlayer player) {
-        ownerName = player == null ? "" : player.getCommandSenderName();
+        owner.set(player);
+        saveLater();
     }
 
-    private EntityPlayer getExplosionCause() {
-        if (ownerName == null || ownerName.isEmpty()) {
-            return null;
-        }
-        return worldObj.getPlayerEntityByName(ownerName);
+    /**
+     * The player the furnace acts for, whose rights protection weighs for what it does to the world: the owner when
+     * online, otherwise a stand-in with the owner's profile, as machines act for absent owners. None when no owner is
+     * known, and then the furnace changes nothing around it that needs rights.
+     */
+    public EntityPlayer owner() {
+        return owner.resolve(worldObj);
     }
 
     protected void interact(TileEntityBlastFC tile) {
@@ -148,7 +159,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        nbt.setString("Owner", ownerName == null ? "" : ownerName);
+        owner.writeToNBT(nbt);
         nbt.setInteger("fireTime", fireTime);
         nbt.setInteger("CarbonUses", tempUses);
         nbt.setBoolean("isBuilt", isBuilt);
@@ -161,7 +172,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        ownerName = nbt.getString("Owner");
+        owner.readFromNBT(nbt);
         fireTime = nbt.getInteger("fireTime");
         tempUses = nbt.getInteger("CarbonUses");
         isBuilt = nbt.getBoolean("isBuilt");
