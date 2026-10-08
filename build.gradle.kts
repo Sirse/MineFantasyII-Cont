@@ -82,7 +82,7 @@ configurations.configureEach {
   }
 }
 
-val runtimeOnlyNonPublishable: Configuration by configurations.creating {
+val runtimeOnlyNonPublishable: Configuration = configurations.create("runtimeOnlyNonPublishable") {
   description = "Runtime only dependencies that are not published alongside the jar"
   isCanBeConsumed = false
   isCanBeResolved = false
@@ -94,7 +94,7 @@ listOf(configurations.runtimeClasspath).forEach {
 }
 
 // Game tests (Horizon-QA): their own source set, never in the mod jar, loaded by runServer alongside the mod
-val gameTestMods: Configuration by configurations.creating {
+val gameTestMods: Configuration = configurations.create("gameTestMods") {
   description = "Mods the game tests need on the development server, never published"
   isCanBeConsumed = false
 }
