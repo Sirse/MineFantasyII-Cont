@@ -57,11 +57,6 @@ public class RecipeHandlerBombBench extends MFNEIRecipeHandler {
         return "minefantasy2:textures/gui/bombCraft.png";
     }
 
-    @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
     public static int getWidth() {
         return WIDTH;
     }

@@ -29,11 +29,6 @@ public class RecipeHandlerQuern extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void drawBackground(int recipe) {
         GL11.glColor4f(1, 1, 1, 1);
         GuiDraw.changeTexture(getGuiTexture());

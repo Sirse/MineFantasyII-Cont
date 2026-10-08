@@ -60,11 +60,6 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void drawBackground(int recipe) {
         GL11.glColor4f(1, 1, 1, 1);
         GuiDraw.changeTexture(getGuiTexture());
@@ -142,6 +137,8 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
             this.result = NEIHelper.positionedStack(recipe.getOutput(), 134, 34);
         }
 
+        // Deprecated in GTNH NEI without a replacement; its own handlers still cycle ingredients this way
+        @SuppressWarnings("deprecation")
         @Override
         public List<PositionedStack> getIngredients() {
             return getCycledIngredients(cycleticks / 48, Arrays.asList(ingred));

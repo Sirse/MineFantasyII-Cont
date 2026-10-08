@@ -59,11 +59,6 @@ public class RecipeHandlerCrossbowBench extends MFNEIRecipeHandler {
         return "minefantasy2:textures/gui/crossbowCraft.png";
     }
 
-    @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
     public static int getWidth() {
         return WIDTH;
     }

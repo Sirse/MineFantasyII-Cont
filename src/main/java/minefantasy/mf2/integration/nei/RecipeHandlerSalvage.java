@@ -34,16 +34,8 @@ public class RecipeHandlerSalvage extends MFNEIRecipeHandler {
         return "minefantasy2:textures/gui/icons.png";
     }
 
-    /**
-     * Shared with the handler info in NEIConfig. GTNH NEI reads that one (still capped by what fits on screen) and only
-     * falls back to recipiesPerPage when a handler has no info, so both carry the same value.
-     */
+    /** The handler info cap in NEIConfig; NEI still lowers it to what fits on screen. */
     public static final int RECIPES_PER_PAGE = 5;
-
-    @Override
-    public int recipiesPerPage() {
-        return RECIPES_PER_PAGE;
-    }
 
     @Override
     public void drawBackground(int recipe) {

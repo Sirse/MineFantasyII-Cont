@@ -36,11 +36,6 @@ public class RecipeHandlerBlastFurnace extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void loadCraftingRecipes(ItemStack result) {
         if (NEIHelper.isValidStack(result)) {
             loadRecipesFor(result);

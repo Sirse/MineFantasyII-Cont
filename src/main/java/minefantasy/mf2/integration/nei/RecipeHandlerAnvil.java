@@ -61,11 +61,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void drawExtras(int recipe) {
         CachedAnvilRecipe cachedRecipe = (CachedAnvilRecipe) arecipes.get(recipe);
         cachedRecipe.drawHotOverlays(this);
@@ -369,6 +364,8 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             this.specialCatalyst = specialCatalyst.copy();
         }
 
+        // Deprecated in GTNH NEI without a replacement; its own handlers still cycle ingredients this way
+        @SuppressWarnings("deprecation")
         @Override
         public List<PositionedStack> getIngredients() {
             return getCycledIngredients(cycleticks / 20, ingredients);

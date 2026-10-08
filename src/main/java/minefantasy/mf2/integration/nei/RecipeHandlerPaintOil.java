@@ -32,11 +32,6 @@ public class RecipeHandlerPaintOil extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void drawBackground(int recipe) {
         // Oiling happens in hand, with no GUI to borrow, so draw bare slot frames with an arrow to the result
         GL11.glColor4f(1F, 1F, 1F, 1F);

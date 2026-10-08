@@ -45,11 +45,6 @@ public abstract class RecipeHandlerBench extends MFNEIRecipeHandler {
     }
 
     @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
-    @Override
     public void loadCraftingRecipes(ItemStack result) {
         if (NEIHelper.isValidStack(result)) {
             loadRecipesFor(result);
@@ -218,6 +213,8 @@ public abstract class RecipeHandlerBench extends MFNEIRecipeHandler {
             }
         }
 
+        // Deprecated in GTNH NEI without a replacement; its own handlers still cycle ingredients this way
+        @SuppressWarnings("deprecation")
         @Override
         public List<PositionedStack> getIngredients() {
             return getCycledIngredients(cycleticks / 20, ingredients);

@@ -92,11 +92,6 @@ public class RecipeHandlerTanning extends MFNEIRecipeHandler {
                 false);
     }
 
-    @Override
-    public int recipiesPerPage() {
-        return 1;
-    }
-
     private class TanningPair extends CachedRecipe {
 
         private PositionedStack input;

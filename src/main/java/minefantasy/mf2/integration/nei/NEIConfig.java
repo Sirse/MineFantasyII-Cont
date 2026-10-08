@@ -205,6 +205,8 @@ public class NEIConfig implements IConfigureNEI {
     // Called explicitly instead of subscribed as an event: GTNH NEI may not fire NEIRegisterHandlerInfosEvent after
     // this plugin loads, and a live subscription would register everything a second time ("Replaced handler info"
     // log noise). registerHandlerInfo writes into a static map, so the event object is only used as a carrier.
+    // The per-page cap is deprecated without a replacement: without it NEI fits as many recipes as the height allows.
+    @SuppressWarnings("deprecation")
     private void registerHandlerInfos(NEIRegisterHandlerInfosEvent event) {
         register(
                 event,

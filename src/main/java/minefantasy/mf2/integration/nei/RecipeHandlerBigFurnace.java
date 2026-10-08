@@ -30,11 +30,6 @@ public class RecipeHandlerBigFurnace extends MFNEIRecipeHandler {
     static final int RECIPES_PER_PAGE = 5;
 
     @Override
-    public int recipiesPerPage() {
-        return RECIPES_PER_PAGE;
-    }
-
-    @Override
     public void drawBackground(int recipe) {
         GL11.glColor4f(1, 1, 1, 1);
         GuiDraw.changeTexture(getGuiTexture());
