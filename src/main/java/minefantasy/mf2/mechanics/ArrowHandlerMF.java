@@ -14,6 +14,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.config.ConfigStamina;
+import minefantasy.mf2.item.archery.ItemBowMF;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class ArrowHandlerMF {
@@ -65,12 +66,17 @@ public class ArrowHandlerMF {
     }
 
     /**
-     * This initates when firing a bow
-     *
-     * @param event
+     * A MineFantasy bow fires what is loaded into it, ahead of Battlegear, which would otherwise shoot any ItemBow from
+     * a carried quiver and leave the loaded arrow in place.
      */
-    @SubscribeEvent
-    public void fireArrow(ArrowLooseEvent event) {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void fireLoadedBow(ArrowLooseEvent event) {
+        if (event.bow != null && event.bow.getItem() instanceof ItemBowMF) {
+            fireArrow(event);
+        }
+    }
+
+    private void fireArrow(ArrowLooseEvent event) {
         float power = event.charge;
         EntityPlayer user = event.entityPlayer;
 
