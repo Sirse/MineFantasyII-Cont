@@ -33,6 +33,7 @@ import minefantasy.mf2.block.tileentity.TileEntityRoad;
 import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 import minefantasy.mf2.config.ConfigClient;
 import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.integration.Offhand;
 import minefantasy.mf2.item.gadget.IScope;
 import minefantasy.mf2.item.tool.advanced.ItemMattock;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
@@ -296,14 +297,20 @@ public class MineFantasyHUD extends Gui {
         mc.fontRenderer.drawStringWithShadow(text, x, y, Color.WHITE.getRGB());
     }
 
+    /** Ammunition of the weapons in hand: the held one, then the offhand one (Backhand) below it. */
     private void renderAmmo(EntityPlayer player, int width, int height) {
-        ItemStack held = player.getHeldItem();
-        if (held == null || !(held.getItem() instanceof IDisplayMFAmmo)) return;
-
         int[] orient = getOrientsFor(width, height, ConfigClient.AC_xOrient, ConfigClient.AC_yOrient);
         int xPos = orient[0] + ConfigClient.AC_xPos;
         int yPos = orient[1] + ConfigClient.AC_yPos;
+        for (ItemStack held : new ItemStack[] { player.getHeldItem(), Offhand.item(player) }) {
+            if (held != null && held.getItem() instanceof IDisplayMFAmmo) {
+                yPos = renderAmmo(held, xPos, yPos);
+            }
+        }
+    }
 
+    /** Draws one weapon's ammunition and returns where the next line goes. */
+    private int renderAmmo(ItemStack held, int xPos, int yPos) {
         ItemStack ammo = AmmoMechanicsMF.getAmmo(held);
         String text = (ammo != null) ? (ammo.getDisplayName() + " x" + ammo.stackSize)
                 : StatCollector.translateToLocal("info.bow.reload");
@@ -316,6 +323,7 @@ public class MineFantasyHUD extends Gui {
             String ammoString = StatCollector.translateToLocalFormatted("info.firearm.ammo", ammoCount, capacity);
             mc.fontRenderer.drawStringWithShadow(ammoString, xPos, yPos + 10, Color.WHITE.getRGB());
         }
+        return yPos + (capacity > 1 ? 20 : 10) + 4;
     }
 
     private void renderStaminaBar(EntityPlayer player, int width, int height) {

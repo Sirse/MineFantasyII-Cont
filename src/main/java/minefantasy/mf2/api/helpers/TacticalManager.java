@@ -23,6 +23,7 @@ import minefantasy.mf2.api.weapon.IParryable;
 import minefantasy.mf2.api.weapon.ISpecialCombatMob;
 import minefantasy.mf2.entity.EntityArrowMF;
 import minefantasy.mf2.mechanics.Parrying;
+import minefantasy.mf2.mixins.EntityPlayerAccessor;
 
 /**
  * This calculates different tactical contexts for combat like flanking and blocking
@@ -89,7 +90,7 @@ public class TacticalManager {
                 && !StaminaBar.isAnyStamina(user, false)) {
             return false;
         }
-        if (user.getHeldItem() != null && !canWeaponBlock(user.getHeldItem())) {
+        if (weapon != null && !canWeaponBlock(weapon)) {
             return false;
         }
         if (user instanceof EntityPlayer) {
@@ -139,6 +140,25 @@ public class TacticalManager {
             return false;
         }
         return arc > 0 && canBlock(entityHitting, user, arc);
+    }
+
+    /**
+     * The weapon a hit is parried with: what a blocking player holds up, which with an offhand (Backhand) need not be
+     * the held item, otherwise the held item.
+     */
+    public static ItemStack parryingWeapon(EntityLivingBase user) {
+        if (user instanceof EntityPlayer && ((EntityPlayer) user).isBlocking()) {
+            return itemInUse((EntityPlayer) user);
+        }
+        return user.getHeldItem();
+    }
+
+    /**
+     * The item a player holds in use, on either side. With an offhand (Backhand) it need not be the held item, and
+     * vanilla's getItemInUse exists on the client only.
+     */
+    public static ItemStack itemInUse(EntityPlayer player) {
+        return ((EntityPlayerAccessor) player).mf2$getItemInUse();
     }
 
     private static boolean canWeaponBlock(ItemStack item) {

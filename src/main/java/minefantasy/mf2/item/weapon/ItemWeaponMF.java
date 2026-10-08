@@ -16,6 +16,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -25,18 +26,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.*;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.crafting.exotic.ISpecialDesign;
+import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -49,20 +48,18 @@ import minefantasy.mf2.api.weapon.*;
 import minefantasy.mf2.api.weapon.ISpecialEffect;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.config.ConfigWeapon;
+import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.integration.Offhand;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.tool.crafting.ItemKnifeMF;
 import minefantasy.mf2.material.BaseMaterialMF;
 import minefantasy.mf2.util.MFLogUtil;
-import mods.battlegear2.api.shield.IShield;
-import mods.battlegear2.api.weapons.IBattlegearWeapon;
-import mods.battlegear2.api.weapons.WeaponRegistry;
 
 // Made this extend the sword class (allows them to be enchanted)
-@Optional.Interface(iface = "mods.battlegear2.api.weapons.IBattlegearWeapon", modid = "battlegear2")
 public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, IPowerAttack, IDamageType,
-        IKnockbackWeapon, IWeaponSpeed, IHeldStaminaItem, IStaminaWeapon, IBattlegearWeapon, IToolMaterial,
-        IWeightedWeapon, IParryable, ISpecialEffect, IDamageModifier, IWeaponClass, IRackItem {
+        IKnockbackWeapon, IWeaponSpeed, IHeldStaminaItem, IStaminaWeapon, IToolMaterial, IWeightedWeapon, IParryable,
+        ISpecialEffect, IDamageModifier, IWeaponClass, IRackItem {
 
     public static final DecimalFormat decimal_format = new DecimalFormat("#.#");
     public static float axeAPModifier = -0.1F;
@@ -146,13 +143,6 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
 
         if (material == ToolMaterial.WOOD) {
             baseDamage = 0F;
-        }
-        if (Loader.isModLoaded("battlegear2")) {
-            if (isHeavyWeapon()) {
-                WeaponRegistry.addTwoHanded(new ItemStack(this));
-            } else {
-                WeaponRegistry.addDualWeapon(new ItemStack(this));
-            }
         }
     }
 
@@ -308,56 +298,8 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
         }
     }
 
-    @Override
-    public boolean sheatheOnBack(ItemStack item) {
-        return isHeavyWeapon();
-    }
-
     public boolean isHeavyWeapon() {
         return false;
-    }
-
-    @Override
-    public boolean isOffhandHandDual(ItemStack off) {
-        return true;
-    }
-
-    @Override
-    @Optional.Method(modid = "battlegear2")
-    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event,
-            ItemStack mainhandItem, ItemStack offhandItem) {
-        return true;
-    }
-
-    @Override
-    public boolean offhandClickAir(PlayerInteractEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
-        return true;
-    }
-
-    @Override
-    public boolean offhandClickBlock(PlayerInteractEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
-        return true;
-    }
-
-    @Override
-    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {}
-
-    @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return offhand != null;
-    }
-
-    /**
-     * True when the offhand holds a Battlegear shield. The interface only exists while that mod is installed, so the
-     * instanceof has to stay behind the Loader check or it would throw when the class is absent.
-     */
-    @Optional.Method(modid = "battlegear2")
-    private static boolean isBattlegearShieldUnchecked(ItemStack offhand) {
-        return offhand.getItem() instanceof IShield;
-    }
-
-    protected static boolean isBattlegearShield(ItemStack offhand) {
-        return offhand != null && Loader.isModLoaded("battlegear2") && isBattlegearShieldUnchecked(offhand);
     }
 
     protected void addXp(EntityLivingBase user, int chance) {
@@ -370,7 +312,7 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
 
     @Override
     public void onParry(DamageSource source, EntityLivingBase user, Entity attacker, float dam) {
-        ItemStack weapon = user.getHeldItem();
+        ItemStack weapon = TacticalManager.parryingWeapon(user);
         int pd = getParryDamage(dam);
         if (pd > 0) {
             weapon.damageItem(pd, user);
@@ -435,6 +377,39 @@ public abstract class ItemWeaponMF extends ItemSword implements ISpecialDesign, 
     @Override
     public boolean canParry(DamageSource source, EntityLivingBase blocker, ItemStack item) {
         return canWeaponParry();
+    }
+
+    /**
+     * Whether this weapon is swung well with the given item in the offhand (Backhand); null is an empty offhand. Two
+     * handed weapons want it empty, or holding a shield.
+     */
+    public boolean allowOffhand(ItemStack offhand) {
+        return true;
+    }
+
+    /**
+     * Striking with a weapon that wants both hands while the offhand is full throws the player off balance and drains
+     * their stamina, as MineFantasy Reforged does on a swing. Only real blows count: a swing at the air or at a block
+     * does not.
+     */
+    @Override
+    public boolean onLeftClickEntity(ItemStack item, EntityPlayer player, Entity target) {
+        if (!(player.ridingEntity instanceof EntityCogwork) && !allowOffhand(Offhand.item(player))) {
+            if (!player.worldObj.isRemote) {
+                // Once a minute at most: the balance it throws off leaves no trace to tell a repeat by
+                if (player instanceof EntityPlayerMP && ((EntityPlayerMP) player).playerNetServerHandler != null
+                        && Cooldowns.pass(player, "MF_OffBalanceWarned", 1200)) {
+                    player.addChatMessage(new ChatComponentTranslation("info.offBalance.message"));
+                }
+                if (StaminaBar.isSystemActive && StaminaBar.doesAffectEntity(player)) {
+                    StaminaBar.modifyStaminaValue(player, -95F);
+                }
+            }
+            if (ConfigWeapon.useBalance) {
+                TacticalManager.throwPlayerOffBalance(player, 5F, true);
+            }
+        }
+        return false;
     }
 
     @Override

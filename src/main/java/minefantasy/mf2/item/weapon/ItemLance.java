@@ -35,11 +35,6 @@ public class ItemLance extends ItemSpearMF {
     }
 
     @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return offhand == null || isBattlegearShield(offhand);
-    }
-
-    @Override
     public float getReachModifierInBlocks(ItemStack stack) {
         return 3.0F;
     }

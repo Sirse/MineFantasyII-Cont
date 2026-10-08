@@ -225,7 +225,8 @@ public class AmmoMechanicsMF {
     }
 
     /**
-     * Damages a firearm, dropping inventory if broken
+     * Damages a firearm, dropping inventory if broken. The broken firearm is cleared from its own slot: fired from the
+     * offhand (Backhand), it is not the held item, which must not be lost instead.
      */
     public static void damageContainer(ItemStack item, EntityPlayer user, int dam) {
         item.damageItem(dam, user);
@@ -233,7 +234,12 @@ public class AmmoMechanicsMF {
             if (!user.worldObj.isRemote) {
                 dropContents(user.worldObj, item, user);
             }
-            user.setCurrentItemOrArmor(0, null);
+            ItemStack[] slots = user.inventory.mainInventory;
+            for (int i = 0; i < slots.length; i++) {
+                if (slots[i] == item) {
+                    slots[i] = null;
+                }
+            }
         }
     }
 }

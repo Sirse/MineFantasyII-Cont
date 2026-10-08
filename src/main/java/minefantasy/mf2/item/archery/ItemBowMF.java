@@ -21,9 +21,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
 import net.minecraftforge.event.entity.player.ArrowNockEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -32,10 +30,8 @@ import minefantasy.mf2.api.archery.*;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import mods.battlegear2.api.weapons.IBattlegearWeapon;
 
-@Optional.Interface(iface = "mods.battlegear2.api.weapons.IBattlegearWeapon", modid = "battlegear2")
-public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, IBattlegearWeapon, IFirearm {
+public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, IFirearm {
 
     public static final DecimalFormat decimal_format = new DecimalFormat("#.##");
     private final EnumBowType model;
@@ -307,41 +303,6 @@ public class ItemBowMF extends ItemBow implements ISpecialBow, IDisplayMFAmmo, I
         for (Item item : items) {
             list.add(new ItemStack(item));
         }
-    }
-
-    @Override
-    public boolean sheatheOnBack(ItemStack item) {
-        return true;
-    }
-
-    @Override
-    public boolean isOffhandHandDual(ItemStack off) {
-        return false;
-    }
-
-    @Override
-    @Optional.Method(modid = "battlegear2")
-    public boolean offhandAttackEntity(mods.battlegear2.api.PlayerEventChild.OffhandAttackEvent event,
-            ItemStack mainhandItem, ItemStack offhandItem) {
-        return false;
-    }
-
-    @Override
-    public boolean offhandClickAir(PlayerInteractEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
-        return false;
-    }
-
-    @Override
-    public boolean offhandClickBlock(PlayerInteractEvent event, ItemStack mainhandItem, ItemStack offhandItem) {
-        return false;
-    }
-
-    @Override
-    public void performPassiveEffects(Side effectiveSide, ItemStack mainhandItem, ItemStack offhandItem) {}
-
-    @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return false;
     }
 
     @Override

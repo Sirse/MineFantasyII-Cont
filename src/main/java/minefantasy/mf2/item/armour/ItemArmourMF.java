@@ -422,7 +422,8 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
             if (entityLiving instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) entityLiving;
                 ItemStack held = player.getHeldItem();
-                if (held != null && player.getItemInUseCount() > 0) {
+                // Only an item used in the right hand poses it: one used in the offhand (Backhand) is not the held item
+                if (held != null && player.getItemInUseCount() > 0 && player.getItemInUse() == held) {
                     EnumAction enumaction = held.getItemUseAction();
 
                     if (enumaction == EnumAction.block) {

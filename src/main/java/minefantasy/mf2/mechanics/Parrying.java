@@ -73,7 +73,7 @@ public class Parrying {
 
     /** Blocks what the held weapon can of a hit, returning the damage that gets through. */
     static float parry(EntityLivingBase user, Entity entityHitting, DamageSource source, float dam, boolean properHit) {
-        ItemStack weapon = user.getHeldItem();
+        ItemStack weapon = TacticalManager.parryingWeapon(user);
         if ((properHit || source.isProjectile()) && weapon != null
                 && !source.isUnblockable()
                 && !source.isExplosion()) {
@@ -199,7 +199,7 @@ public class Parrying {
         }
 
         boolean groundBlock = user.onGround;
-        ItemStack weapon = user.getHeldItem();
+        ItemStack weapon = TacticalManager.parryingWeapon(user);
 
         // Redirect
         if (!user.worldObj.isRemote && !TacticalManager.isRanged(source)) {

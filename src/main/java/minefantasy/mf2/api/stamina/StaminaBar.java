@@ -1,5 +1,8 @@
 package minefantasy.mf2.api.stamina;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,6 +16,7 @@ import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
+import minefantasy.mf2.integration.Offhand;
 
 public class StaminaBar {
 
@@ -411,8 +415,8 @@ public class StaminaBar {
         }
 
         if (countHeld) {
-            if (user.getHeldItem() != null && user.getHeldItem().getItem() instanceof IHeldStaminaItem) {
-                value *= (((IHeldStaminaItem) user.getHeldItem().getItem()).getDecayMod(user, user.getHeldItem()));
+            for (ItemStack held : heldStaminaItems(user)) {
+                value *= ((IHeldStaminaItem) held.getItem()).getDecayMod(user, held);
             }
         }
         if (countArmour) {
@@ -463,9 +467,8 @@ public class StaminaBar {
 
         if (!TacticalManager.isImmuneToWeight(user)) {
             if (countHeld) {
-                if (user.getHeldItem() != null && user.getHeldItem().getItem() instanceof IHeldStaminaItem) {
-                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem())
-                            .getRegenModifier(user, user.getHeldItem());
+                for (ItemStack held : heldStaminaItems(user)) {
+                    value *= ((IHeldStaminaItem) held.getItem()).getRegenModifier(user, held);
                 }
             }
             if (countArmour) {
@@ -497,14 +500,24 @@ public class StaminaBar {
         return value;
     }
 
+    /** Items in either hand that weigh on stamina: the held one, and the offhand one with Backhand. */
+    private static List<ItemStack> heldStaminaItems(EntityLivingBase user) {
+        List<ItemStack> items = new ArrayList<ItemStack>(2);
+        for (ItemStack held : new ItemStack[] { user.getHeldItem(), Offhand.item(user) }) {
+            if (held != null && held.getItem() instanceof IHeldStaminaItem) {
+                items.add(held);
+            }
+        }
+        return items;
+    }
+
     public static float getBaseIdleModifier(EntityLivingBase user, boolean countArmour, boolean countHeld) {
         float value = pauseModifier;
 
         if (!TacticalManager.isImmuneToWeight(user)) {
             if (countHeld) {
-                if (user.getHeldItem() != null && user.getHeldItem().getItem() instanceof IHeldStaminaItem) {
-                    value *= ((IHeldStaminaItem) user.getHeldItem().getItem())
-                            .getIdleModifier(user, user.getHeldItem());
+                for (ItemStack held : heldStaminaItems(user)) {
+                    value *= ((IHeldStaminaItem) held.getItem()).getIdleModifier(user, held);
                 }
             }
             if (countArmour) {

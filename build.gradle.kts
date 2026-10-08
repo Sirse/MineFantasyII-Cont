@@ -17,6 +17,7 @@ val versionNEI = "2.8.102-GTNH"
 val versionWaila = "1.19.32"
 val versionCraftTweaker = "3.4.8"
 val versionBattlegear = "1.6.8-backhand"
+val versionBackhand = "1.8.16"
 val versionThaumcraft = "1.7.10-4.2.3.5"
 val versionBaubles = "1.0.1.10"
 val versionHorizonQA = "0.15.0"
@@ -154,8 +155,13 @@ dependencies {
     isTransitive = false
   }
   // Present in runClient and runServer so the integration can actually be exercised, but kept off the published
-  // metadata because the mod stays optional. Transitive here: it needs Backhand to load at all.
+  // metadata because the mod stays optional. Transitive here: it needs Backhand to load at all, which is pinned to a current release.
   runtimeOnlyNonPublishable("com.github.GTNewHorizons:Battlegear2-for-Backhand:${versionBattlegear}:dev")
+  runtimeOnlyNonPublishable("com.github.GTNewHorizons:Backhand:${versionBackhand}:dev")
+  // Soft dependency for the offhand item: every call is guarded by Loader.isModLoaded("backhand")
+  compileOnly("com.github.GTNewHorizons:Backhand:${versionBackhand}:dev") {
+    isTransitive = false
+  }
 
   // Soft dependency, compile only: the API classes must not end up in the published jar, and every call is
   // guarded by Loader.isModLoaded("Thaumcraft"). Not transitive: the dev jar lists the whole Thaumcraft

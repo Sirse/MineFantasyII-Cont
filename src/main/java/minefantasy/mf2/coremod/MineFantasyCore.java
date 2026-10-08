@@ -1,6 +1,6 @@
 package minefantasy.mf2.coremod;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +24,7 @@ public class MineFantasyCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
-        return Collections.singletonList("ItemInWorldManagerMixin");
+        return Arrays.asList("EntityPlayerAccessor", "ItemInWorldManagerMixin");
     }
 
     @Override

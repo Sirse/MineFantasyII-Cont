@@ -2,6 +2,7 @@ package minefantasy.mf2.mechanics;
 
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
@@ -10,6 +11,7 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.weapon.*;
+import minefantasy.mf2.integration.Offhand;
 import minefantasy.mf2.item.weapon.*;
 import minefantasy.mf2.network.packet.DodgeCommand;
 
@@ -58,10 +60,22 @@ public class Dodging {
 
     /**
      * Shared by the client trigger and by the serverbound DodgeCommand, so a modified client cannot skip the
-     * raised-guard requirement by sending the command on its own.
+     * raised-guard requirement by sending the command on its own. Dual wielding stands in for the guard, as in
+     * MineFantasy Reforged: Backhand lets no sword block while the offhand holds anything.
      */
     public static boolean canDodge(EntityPlayer user) {
-        return user != null && user.isBlocking();
+        return user != null && (user.isBlocking() || dualWields(user));
+    }
+
+    /** A MineFantasy weapon in each hand (Backhand), neither of which wants the other hand free. */
+    static boolean dualWields(EntityPlayer user) {
+        ItemStack main = user.getHeldItem();
+        ItemStack off = Offhand.item(user);
+        return main != null && off != null
+                && main.getItem() instanceof ItemWeaponMF
+                && off.getItem() instanceof ItemWeaponMF
+                && ((ItemWeaponMF) main.getItem()).allowOffhand(off)
+                && ((ItemWeaponMF) off.getItem()).allowOffhand(main);
     }
 
     private static final String DODGE_GROUND_NBT = "MF2_DodgeGround";

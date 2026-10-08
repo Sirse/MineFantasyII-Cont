@@ -4,6 +4,7 @@
 forge.fuel.name=~燃料~
 vehicle.fuel.name=燃料：%1$s
 info.bow.reload=潜行状态下右键打开火器。
+info.offBalance.message=副手持物使双手武器的挥舞失去平衡。
 info.firearm.ammo=%1$s/%2$s
 info.tooltip.moreinfo=按住[%1$s]查看更多信息。
 

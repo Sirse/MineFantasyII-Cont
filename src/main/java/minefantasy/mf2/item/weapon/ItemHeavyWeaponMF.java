@@ -5,12 +5,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 
-import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.api.weapon.IExtendedReach;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
 
-@Optional.Interface(iface = "mods.battlegear2.api.weapons.IExtendedReachWeapon", modid = "battlegear2")
-public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtendedReach, IExtendedReachWeapon {
+public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtendedReach {
 
     /**
      * Heavy weapons are larger varients of their own counterparts(sword, waraxe, mace and spear). These have 2x the
@@ -24,23 +21,13 @@ public abstract class ItemHeavyWeaponMF extends ItemWeaponMF implements IExtende
     }
 
     @Override
-    public boolean sheatheOnBack(ItemStack item) {
-        return true;
-    }
-
-    @Override
     public boolean isHeavyWeapon() {
         return true;
     }
 
     @Override
-    public boolean isOffhandHandDual(ItemStack off) {
-        return false;
-    }
-
-    @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return false;
+    public boolean allowOffhand(ItemStack offhand) {
+        return offhand == null;
     }
 
     public int getParryCooldown(EntityLivingBase user) {

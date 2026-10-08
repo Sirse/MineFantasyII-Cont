@@ -88,8 +88,7 @@ public class StaminaMechanics {
                 entity.setAir(entity.getAir() - 1);
             }
             if (entity instanceof EntityPlayer && TacticalManager.shouldStaminaBlock) {
-                if (((EntityPlayer) entity).isUsingItem() && (entity.getHeldItem() != null
-                        && entity.getHeldItem().getItemUseAction() == EnumAction.block)) {
+                if (((EntityPlayer) entity).isBlocking()) {
                     ((EntityPlayer) entity).stopUsingItem();
                 }
             }
@@ -146,8 +145,10 @@ public class StaminaMechanics {
             value += (5F / sprintingSeconds) * ConfigStamina.sprintModifier;
         }
         if (user instanceof EntityPlayer) {
-            if (user.getHeldItem() != null && ((EntityPlayer) user).isUsingItem() && ConfigStamina.bowModifier > 0) {
-                if (user.getHeldItem().getItemUseAction() == EnumAction.bow) {
+            // The item in use, not the held one: a bow drawn in the offhand (Backhand) is not the held item
+            ItemStack using = TacticalManager.itemInUse((EntityPlayer) user);
+            if (using != null && ConfigStamina.bowModifier > 0) {
+                if (using.getItemUseAction() == EnumAction.bow) {
                     // Item gets factored in with bow
                     value += StaminaBar.getDefaultMax(user) / 20F / bowSeconds * ConfigStamina.bowModifier;
                 }

@@ -10,18 +10,16 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import cpw.mods.fml.common.Optional;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.weapon.IExtendedReach;
 import minefantasy.mf2.api.weapon.WeaponClass;
 import minefantasy.mf2.config.ConfigWeapon;
-import mods.battlegear2.api.weapons.IExtendedReachWeapon;
+import minefantasy.mf2.integration.Offhand;
 
 /**
  * @author Anonymous Productions
  */
-@Optional.Interface(iface = "mods.battlegear2.api.weapons.IExtendedReachWeapon", modid = "battlegear2")
-public class ItemSpearMF extends ItemWeaponMF implements IExtendedReach, IExtendedReachWeapon {
+public class ItemSpearMF extends ItemWeaponMF implements IExtendedReach {
 
     /**
      * The spear is for the defensive player, it has a long reach, knockback and can be thrown. Spears are good for
@@ -34,23 +32,13 @@ public class ItemSpearMF extends ItemWeaponMF implements IExtendedReach, IExtend
     }
 
     @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return offhand == null || isBattlegearShield(offhand);
-    }
-
-    @Override
     public boolean isHeavyWeapon() {
         return true;
     }
 
     @Override
-    public boolean isOffhandHandDual(ItemStack off) {
-        return false;
-    }
-
-    @Override
-    public boolean sheatheOnBack(ItemStack item) {
-        return true;
+    public boolean allowOffhand(ItemStack offhand) {
+        return offhand == null || Offhand.isShield(offhand);
     }
 
     @Override

@@ -80,8 +80,8 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
         return ToolHelper.setDuraOnQuality(stack, super.getMaxDamage());
     }
 
-    public boolean isInWall(EntityPlayer player, boolean init) {
-        if (player.getHeldItem() == null) return false;
+    /** The pick is passed in: held in the offhand (Backhand), it is not the player's held item. */
+    public boolean isInWall(ItemStack pick, EntityPlayer player, boolean init) {
 
         World world = player.worldObj;
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
@@ -94,7 +94,7 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
                 int y = movingobjectposition.blockY;
                 int z = movingobjectposition.blockZ;
 
-                NBTTagCompound nbt = getOrCreateNBT(player.getHeldItem());
+                NBTTagCompound nbt = getOrCreateNBT(pick);
                 if (init) {
                     nbt.setInteger("MF_HeldPosX", x);
                     nbt.setInteger("MF_HeldPosY", y);
@@ -134,8 +134,10 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
     @Override
     public void onUsingTick(ItemStack stack, EntityPlayer player, int count) {
         float cost = 0.5F;
-        if (stack.getItemDamage() >= stack.getMaxDamage()) {
-            player.destroyCurrentEquippedItem();
+        // A worn-out pick stops climbing; it is not necessarily the current item, which must not be destroyed instead
+        if (stack.stackSize <= 0 || stack.getItemDamage() >= stack.getMaxDamage()) {
+            player.stopUsingItem();
+            return;
         }
         World world = player.worldObj;
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
@@ -152,7 +154,7 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
                 int z = movingobjectposition.blockZ;
                 Block block = world.getBlock(x, y, z);
 
-                if (isInWall(player, false)) {
+                if (isInWall(stack, player, false)) {
                     if (!player.isSwingInProgress) {
                         cost *= 0.5F;
                         player.motionY = 0;
@@ -189,7 +191,7 @@ public class ItemClimbingPick extends ItemPickaxe implements IToolMaterial {
             return item;
         }
 
-        if (isInWall(user, true)) {
+        if (isInWall(item, user, true)) {
             user.setItemInUse(item, getMaxItemUseDuration(item));
             if (!world.isRemote) {
                 item.damageItem(1, user);

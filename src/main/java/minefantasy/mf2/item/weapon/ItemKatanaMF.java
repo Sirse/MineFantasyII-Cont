@@ -31,8 +31,9 @@ public class ItemKatanaMF extends ItemHeavyWeaponMF {
         return true;
     }
 
+    /** The katana is light enough for anything in the offhand. */
     @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
+    public boolean allowOffhand(ItemStack offhand) {
         return true;
     }
 

@@ -21,8 +21,8 @@ public class ItemHalbeardMF extends ItemSpearMF {
     }
 
     @Override
-    public boolean allowOffhand(ItemStack mainhand, ItemStack offhand) {
-        return false;
+    public boolean allowOffhand(ItemStack offhand) {
+        return offhand == null;
     }
 
     @Override
