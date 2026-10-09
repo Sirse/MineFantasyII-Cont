@@ -312,8 +312,18 @@ tasks.named<JavaExec>("runServer").configure {
     args("--world", "horizonqa")
     jvmArgs(
       "-Dhorizonqa.mode=ci",
-      "-Dhorizonqa.tests=minefantasy2",
+      // -PgameTestSelection narrows the run to some tests, for example one class: minefantasy2:PerSourceTest
+      "-Dhorizonqa.tests=" + (project.findProperty("gameTestSelection") ?: "minefantasy2"),
       "-Dhorizonqa.reportDir=" + layout.buildDirectory.dir("horizonqa").get().asFile.absolutePath,
     )
+    // A mod that fails to load stops the server before any test runs, and the run would still exit cleanly: only a
+    // fresh report proves the tests ran
+    val result = layout.buildDirectory.file("horizonqa/horizonqa-result.json").get().asFile
+    doFirst { result.delete() }
+    doLast {
+      if (!result.isFile) {
+        throw GradleException("The game tests did not run: no Horizon-QA report. Check the server log for a load error.")
+      }
+    }
   }
 }

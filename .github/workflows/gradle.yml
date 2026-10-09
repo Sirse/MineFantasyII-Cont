@@ -49,6 +49,14 @@ jobs:
           name: horizonqa-reports
           path: build/horizonqa/
 
+      # Recipes behind settings only load when the settings are changed: the first run wrote the default config, so
+      # turn every recipe setting around and check the mod still loads. Recipe ids differ there, so one quick test is
+      # enough; the run fails on its own when the mod does not load.
+      - name: Load with other recipe settings
+        run: |
+          sh .github/scripts/flip-recipe-settings.sh run/config/MineFantasyII
+          ./gradlew runServer -PgameTests -PgameTestSelection=minefantasy2:PerSourceTest --stacktrace -S
+
       - name: Upload JARs
         if: success()
         uses: actions/upload-artifact@v7
