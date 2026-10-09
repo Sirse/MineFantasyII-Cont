@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.ModContainer;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.Input;
@@ -19,6 +21,7 @@ import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistrationException;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.recipe.RecipeSource;
+import minefantasy.mf2.util.MFLogUtil;
 
 /**
  * Registration of the recipes mods declare in code: their stable ids, named after what a recipe takes or makes, and the
@@ -191,7 +194,12 @@ public final class NativeRecipes {
      */
     public static RecipeId nativeId(RecipeRegistry<?> registry, Object target) {
         String named = VARIANT.get();
-        RecipeId id = id(registry.getStation() + "/" + describe(target) + (named == null ? "" : "." + named));
+        String path = registry.getStation() + "/" + describe(target) + (named == null ? "" : "." + named);
+        String owner = registeringMod();
+        if (!NAMESPACE.equals(owner)) {
+            return addonId(registry, owner, path);
+        }
+        RecipeId id = id(path);
         if (registry.containsWorking(id)) {
             throw new RecipeRegistrationException(
                     "Native recipe " + id
@@ -237,6 +245,36 @@ public final class NativeRecipes {
             throw new IllegalArgumentException("Item is not registered: " + item);
         }
         return sanitize(name.replace(':', '.'));
+    }
+
+    /**
+     * The mod registering a recipe right now, as a recipe id namespace. Outside a mod's loading stage (game tests,
+     * reloads) there is none, and the recipe counts as MineFantasy's own.
+     */
+    private static String registeringMod() {
+        ModContainer mod = Loader.instance().activeModContainer();
+        return mod == null ? NAMESPACE : sanitize(mod.getModId());
+    }
+
+    /**
+     * Another mod's recipe: under that mod's namespace, so it never takes or clashes with a MineFantasy id. A second
+     * unnamed recipe for the same thing is numbered with a warning instead of stopping the game: the addon cannot be
+     * fixed by the player, and its numbered ids only depend on its own registration order.
+     */
+    private static RecipeId addonId(RecipeRegistry<?> registry, String owner, String path) {
+        RecipeId id = RecipeId.of(owner, path);
+        for (int n = 2; registry.containsWorking(id); n++) {
+            id = RecipeId.of(owner, path + "." + n);
+        }
+        if (!id.getPath().equals(path)) {
+            MFLogUtil.warnOnce(
+                    "addon_recipe_id|" + id,
+                    "{} registered another recipe for {} without NativeRecipes.variant; it was numbered {}",
+                    owner,
+                    path,
+                    id);
+        }
+        return id;
     }
 
     private static String sanitize(String name) {

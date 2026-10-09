@@ -2,6 +2,7 @@ package minefantasy.mf2.gametest;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
@@ -24,6 +25,8 @@ public final class TestItems {
     public static Item hot;
     /** Made carbon by a script only: the ore dictionary cannot take it back, so nothing else uses it. */
     public static Item fuel;
+    /** Another mod's copper ingot, listed under ingotCopper after MineFantasy's own. */
+    public static Item foreignCopper;
 
     /** A metal whose craft time modifier is 3 and whose tiers are 3; a second metal; a wood. */
     public static CustomMaterial steel, bronze, oak;
@@ -47,6 +50,8 @@ public final class TestItems {
         blade = item("blade", new Item().setMaxDamage(100).setMaxStackSize(1));
         hot = item("hot", new HotItem());
         fuel = item("fuel", new Item());
+        foreignCopper = item("foreign_copper", new Item());
+        OreDictionary.registerOre("ingotCopper", foreignCopper);
 
         // Carbon burns for four items
         MineFantasyFuels.addCarbon(carbon, 4);

@@ -46,6 +46,7 @@ native minefantasy2:anvil/minefantasy2.custom_bar.0.bronze
 native minefantasy2:anvil/minefantasy2.custom_bar.0.compositealloy
 native minefantasy2:anvil/minefantasy2.custom_bar.0.compositealloy.engineering
 native minefantasy2:anvil/minefantasy2.custom_bar.0.copper
+native minefantasy2:anvil/minefantasy2.custom_bar.0.copper.minefantasy2tests.foreign_copper.0
 native minefantasy2:anvil/minefantasy2.custom_bar.0.encrusted
 native minefantasy2:anvil/minefantasy2.custom_bar.0.encrusted.from_diamond_shards
 native minefantasy2:anvil/minefantasy2.custom_bar.0.ender
@@ -530,6 +531,7 @@ native minefantasy2:forge_heat/minefantasy2.mf_com_ingotsteel.0
 native minefantasy2:forge_heat/minefantasy2.mf_com_ingottin.0
 native minefantasy2:forge_heat/minefantasy2.mf_com_ingottungsten.0
 native minefantasy2:forge_heat/minefantasy2.mf_com_rivet
+native minefantasy2:forge_heat/minefantasy2tests.foreign_copper.0
 native minefantasy2:forge_heat/thaumcraft.itemresource.16
 native minefantasy2:forge_heat/thaumcraft.itemresource.2
 native minefantasy2:kitchen/minecraft.cake.0

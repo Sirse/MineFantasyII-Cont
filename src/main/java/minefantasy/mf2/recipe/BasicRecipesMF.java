@@ -2,6 +2,7 @@ package minefantasy.mf2.recipe;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -99,11 +100,19 @@ public class BasicRecipesMF {
         for (int id = 0; id < BlockListMF.metalBlocks.length; id++) {
             BaseMaterialMF material = BaseMaterialMF.getMaterial(BlockListMF.metalBlocks[id]);
 
-            for (ItemStack ingot : OreDictionary.getOres("ingot" + material.name)) {
+            // Any ingot of the metal packs into the block, but the block unpacks into one kind only: the material's own
+            List<ItemStack> ingots = OreDictionary.getOres("ingot" + material.name);
+            for (ItemStack ingot : ingots) {
                 GameRegistry.addRecipe(
                         new ItemStack(BlockListMF.storage[id]),
                         new Object[] { "III", "III", "III", 'I', ingot });
-                GameRegistry.addShapelessRecipe(copyWithSize(ingot, 9), new Object[] { BlockListMF.storage[id] });
+            }
+            ItemStack own = ComponentListMF.ingot(material.name.toLowerCase());
+            if (own == null || own.getItem() == null) {
+                own = ingots.isEmpty() ? null : ingots.get(0);
+            }
+            if (own != null) {
+                GameRegistry.addShapelessRecipe(copyWithSize(own, 9), new Object[] { BlockListMF.storage[id] });
             }
         }
 

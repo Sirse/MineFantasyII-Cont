@@ -126,16 +126,21 @@ public class ForgingRecipes {
 
         time = 2;
         material = BaseMaterialMF.iron;
+        // Resmelting bars: variants of their own, so the iron ore recipes registered below keep their ids
         if (ConfigCrafting.allowIronResmelt) {
-            MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.iron_prep)).skill(artisanry).research("blastfurn")
-                    .tool("hammer", material.hammerTier).stationTier(material.anvilTier)
-                    .time((int) (time * material.craftTimeModifier))
-                    .shaped(new Object[] { "IFI", 'I', ComponentListMF.bar("iron"), 'F', ComponentListMF.flux, });
-            MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.iron_prep, 2)).skill(artisanry)
-                    .research("blastfurn").tool("hammer", material.hammerTier).stationTier(material.anvilTier)
-                    .time((int) (time * material.craftTimeModifier)).shaped(
-                            new Object[] { "IFI", 'I', ComponentListMF.bar("iron"), 'F',
-                                    ComponentListMF.flux_strong, });
+            try (NativeRecipes.Variant v = NativeRecipes.variant("from_bar")) {
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.iron_prep)).skill(artisanry)
+                        .research("blastfurn").tool("hammer", material.hammerTier).stationTier(material.anvilTier)
+                        .time((int) (time * material.craftTimeModifier))
+                        .shaped(new Object[] { "IFI", 'I', ComponentListMF.bar("iron"), 'F', ComponentListMF.flux, });
+            }
+            try (NativeRecipes.Variant v = NativeRecipes.variant("from_bar_strong_flux")) {
+                MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.iron_prep, 2)).skill(artisanry)
+                        .research("blastfurn").tool("hammer", material.hammerTier).stationTier(material.anvilTier)
+                        .time((int) (time * material.craftTimeModifier)).shaped(
+                                new Object[] { "IFI", 'I', ComponentListMF.bar("iron"), 'F',
+                                        ComponentListMF.flux_strong, });
+            }
         }
         KnowledgeListMF.coalPrepR = MineFantasyAPI.anvilRecipe(new ItemStack(ComponentListMF.coal_prep))
                 .skill(engineering).research("coke").tool("hammer", material.hammerTier).stationTier(material.anvilTier)

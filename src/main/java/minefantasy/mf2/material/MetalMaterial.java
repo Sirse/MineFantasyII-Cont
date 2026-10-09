@@ -136,8 +136,16 @@ public class MetalMaterial extends CustomMaterial {
         MineFantasyAPI.setHeatableStats(ComponentListMF.bar, -1, -1, -1);
     }
 
+    /**
+     * The material's own ingot: MineFantasy's where it makes one, so bars and storage blocks turn back into it and not
+     * into whichever mod registered its ingot under the ore name first; otherwise the first one listed.
+     */
     @Override
     public ItemStack getItem() {
+        ItemStack own = ComponentListMF.ingot(name.toLowerCase());
+        if (own != null && own.getItem() != null) {
+            return own;
+        }
         ArrayList<ItemStack> list = OreDictionary.getOres("ingot" + name);
         if (list != null && !list.isEmpty()) {
             return list.get(0);
