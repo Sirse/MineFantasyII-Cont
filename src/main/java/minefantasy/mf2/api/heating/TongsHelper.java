@@ -120,31 +120,58 @@ public class TongsHelper {
         return item.getTagCompound();
     }
 
-    /** The water a quench takes from a tank: a trough unit, 62.5 mB, rounded up. */
-    public static final int QUENCH_WATER = 63;
+    /** The fluid a quench takes from a tank: a trough unit, 62.5 mB, rounded up. */
+    public static final int QUENCH_FLUID = 63;
+    /** How much riskier water out of a proper bath, a cauldron or open water, quenches. */
+    public static final float RAW_WATER_RISK = 1.5F;
 
     /**
-     * Quenches in the water here: a quench block, any tank of water (which loses {@link #QUENCH_WATER}), a water block
-     * (which boils away) or a cauldron (which loses a level). Returns the damage done, below 0 for no water. Only the
-     * server takes the water from a tank or cauldron.
+     * Where a piece can be quenched here, taking what the quench uses: a quench block, any tank of a quenching fluid
+     * (which loses {@link #QUENCH_FLUID}), a water block (which boils away) or a cauldron (which loses a level). Null
+     * when there is nothing to quench in. Only the server takes from a tank or cauldron.
      */
-    public static float getWaterSource(World world, int i, int j, int k) {
-        float special = TongsHelper.getQuenced(world, i, j, k);
-        if (special >= 0) {
-            return special;
+    public static Quench.Source findQuench(World world, int i, int j, int k) {
+        IQuenchBlock block = Tiles.get(world, i, j, k, IQuenchBlock.class);
+        if (block != null) {
+            // Asked before quenching: the last of it may go. A fluid that no longer quenches is not taken
+            QuenchMedium medium = QuenchMedium.of(block.quenchFluid());
+            if (medium == null && block.quenchFluid() != null) {
+                return null;
+            }
+            if (block.quench() >= 0) {
+                return new Quench.Source(medium == null ? QuenchMedium.WATER : medium, 1F);
+            }
         }
-        if (takeTankWater(world, i, j, k, QUENCH_WATER)) {
-            return 0F;
+        QuenchMedium tank = takeFromTank(world, i, j, k);
+        if (tank != null) {
+            return new Quench.Source(tank, 1F);
         }
         if (world.getBlock(i, j, k).getMaterial() == Material.water) {
             world.setBlockToAir(i, j, k);
-            return 25F;
+            return new Quench.Source(QuenchMedium.WATER, RAW_WATER_RISK);
         }
         if (isCauldron(world, i, j, k)) {
             lowerCauldron(world, i, j, k);
-            return 10F;
+            return new Quench.Source(QuenchMedium.WATER, RAW_WATER_RISK);
         }
-        return -1F;
+        return null;
+    }
+
+    /** Takes a quench's worth of a quenching fluid from a tank here; the client only asks. */
+    private static QuenchMedium takeFromTank(World world, int x, int y, int z) {
+        IFluidHandler tank = Tiles.get(world, x, y, z, IFluidHandler.class);
+        if (tank == null) {
+            return null;
+        }
+        FluidStack offered = tank.drain(ForgeDirection.UNKNOWN, QUENCH_FLUID, false);
+        QuenchMedium medium = offered == null ? null : QuenchMedium.of(offered.getFluid());
+        if (medium == null || offered.amount < QUENCH_FLUID) {
+            return null;
+        }
+        if (!world.isRemote) {
+            tank.drain(ForgeDirection.UNKNOWN, new FluidStack(offered.getFluid(), QUENCH_FLUID), true);
+        }
+        return medium;
     }
 
     /**
@@ -190,8 +217,4 @@ public class TongsHelper {
         return world.getBlock(x, y, z) == Blocks.cauldron && world.getBlockMetadata(x, y, z) > 0;
     }
 
-    public static float getQuenced(World world, int x, int y, int z) {
-        IQuenchBlock tile = Tiles.get(world, x, y, z, IQuenchBlock.class);
-        return tile != null ? tile.quench() : -1F;
-    }
 }

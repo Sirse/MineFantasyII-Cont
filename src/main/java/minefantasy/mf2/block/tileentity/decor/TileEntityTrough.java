@@ -11,6 +11,7 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import minefantasy.mf2.api.heating.IQuenchBlock;
+import minefantasy.mf2.api.heating.QuenchMedium;
 import minefantasy.mf2.api.helpers.FluidContainers;
 import minefantasy.mf2.fluid.FluidsMF;
 import minefantasy.mf2.item.food.FoodListMF;
@@ -55,10 +56,14 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
     /** The water one salt turns to salt water: a bucket. */
     public static final int SALT_WATER_PER_SALT = 1000;
 
-    /** Whether a trough holds this fluid: water, seed oil and salt water. */
+    /** Whether a trough holds this fluid: one pieces are quenched in, water, oils and salt water. */
     public static boolean holds(Fluid fluid) {
-        return fluid != null
-                && (fluid == FluidRegistry.WATER || fluid == FluidsMF.seedOil || fluid == FluidsMF.saltWater);
+        return QuenchMedium.of(fluid) != null;
+    }
+
+    @Override
+    public Fluid quenchFluid() {
+        return getFluid();
     }
 
     /** The fluid held, water when empty; null for one no longer registered. */

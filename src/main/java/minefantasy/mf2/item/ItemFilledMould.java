@@ -77,10 +77,9 @@ public class ItemFilledMould extends ItemComponentMF {
                     return item;
                 }
 
-                float water = TongsHelper.getWaterSource(world, i, j, k);
                 ItemStack drop = getHeldItem(item);
 
-                if (drop != null && water >= 0) {
+                if (drop != null && TongsHelper.findQuench(world, i, j, k) != null) {
                     Sounds.quench(player);
 
                     for (int a = 0; a < 5; a++) {

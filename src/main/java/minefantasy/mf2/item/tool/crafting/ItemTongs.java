@@ -28,7 +28,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.heating.Quench;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
@@ -37,6 +37,7 @@ import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.ISmithTongs;
 import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.mechanics.QuenchFlare;
 
 /**
  * @author Anonymous Productions
@@ -102,13 +103,16 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
                     return item;
                 }
 
-                float water = TongsHelper.getWaterSource(world, i, j, k);
+                Quench.Source source = TongsHelper.findQuench(world, i, j, k);
 
-                if (water >= 0) {
+                if (source != null) {
                     ItemStack drop = held.copy(), cooled = drop;
 
                     if (TongsHelper.isCoolableItem(drop)) {
-                        cooled = Heatable.getQuenchedItem(drop, water);
+                        if (QuenchFlare.flares(drop, source)) {
+                            QuenchFlare.flare(world, i, j, k, player);
+                        }
+                        cooled = Quench.cool(drop, source, player, world.rand);
                         cooled.stackSize = drop.stackSize;
 
                         Sounds.quench(player);

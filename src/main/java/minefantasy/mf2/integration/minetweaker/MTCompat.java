@@ -29,6 +29,7 @@ public class MTCompat {
         MineTweakerAPI.registerClass(SpecialForging.class);
         MineTweakerAPI.registerClass(TanningRack.class);
         MineTweakerAPI.registerClass(Quern.class);
+        MineTweakerAPI.registerClass(QuenchTweaker.class);
         MineTweakerAPI.registerClass(SalvageTweaker.class);
         MineTweakerAPI.registerRemover(new MFRecipeRemover());
         ScriptRecipes.hookReloads();

@@ -359,7 +359,9 @@ public class KnowledgePageRegistry {
                 new EntryPageText("knowledge.trough.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.woodTroughRecipe),
                 new EntryPageText("knowledge.trough.2"),
-                new EntryPageRecipeCarpenter(KnowledgeListMF.nailTroughR));
+                new EntryPageRecipeCarpenter(KnowledgeListMF.nailTroughR),
+                new EntryPageText("knowledge.trough.3"),
+                new EntryPageText("knowledge.trough.4"));
         KnowledgeListMF.forge.addPages(
                 assembleSimpleImgPage("forge_example", "knowledge.forge.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.forgeRecipe),

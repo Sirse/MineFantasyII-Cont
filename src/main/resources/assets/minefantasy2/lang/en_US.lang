@@ -1698,9 +1698,11 @@ knowledge.bellows.1=Sometimes the fire just isn't hot enough, or it may be takin
 knowledge.trough=Trough
 knowledge.trough.desc=Ready to Quench
 
-knowledge.trough.1=Having to walk to or build near water sources can be tricky, and regular water sources can damage smithed items. Troughs are simple containers capable of quenching hot items, just right-click tongs or hot items on this. To fill: Right-click with a bucket or water jug, but make sure not to overfill it.^It is recommended to quench items in a trough, they may be damaged otherwise.^Troughs can also be filled by right-clicking the block on water, you can also pick them up without losing contents.
+knowledge.trough.1=Troughs are simple containers for quenching hot items: right-click tongs or a hot item on one. A trough holds one fluid at a time: water, oil or brine. Fill it with buckets, jugs or pipes; right-click it on water to fill it whole. It can be picked up without losing its contents.^Salt turns its water into brine: one salt for each bucket, all at once.
 
 knowledge.trough.2=With some nails and a little bit of effort, troughs can be assembled properly with minimal leakage, which allows wooden materials to affect its quality.
+knowledge.trough.3=Quenching hardens steel, adding to its quality, but may crack it: a cracked piece becomes inferior and loses durability.^Oil is gentle: little gain, little risk. Water hardens more and risks more. Brine hardens most and cracks most often.^Quench from working heat: a cooled piece does not harden, an overheated one is brittle and cracks far more often. Skill in artisanry lowers the risk. Never put an overheated piece in oil: it flares up.
+knowledge.trough.4=Only steels harden. Iron barely does, pig iron only cracks, and copper, bronze, gold and silver simply cool.^Mythic metals have tempers of their own: mithril needs no quench, adamantium takes only oil, ignotumite wants the very middle of its working heat, and ender metal is unpredictable.^Open water and cauldrons quench too, but carelessly: their risk is higher.
 
 knowledge.repair_basic=Repair Kits
 knowledge.repair_basic.desc=Keeping tools in condition
@@ -2162,7 +2164,7 @@ knowledge.salt.2=Clay pots are able to handle constant carrying and drying of sa
 
 knowledge.jug=Jug
 knowledge.jug.desc=Liquid Storage
-knowledge.jug.1=Food can be picky with quantities, and liquids are particularly hard to carry efficiently. Jugs can store milk, water and oil.
+knowledge.jug.1=Food can be picky with quantities, and liquids are particularly hard to carry efficiently. Jugs can store milk, water and oil, and pour water or oil into troughs, a quarter of a bucket each.
 knowledge.jug.2=Water can be gathered similar to buckets through right-click, but can also be converted from buckets. Milk cannot be obtained directly from cows.
 
 knowledge.bread=Bread And Pastry
@@ -2429,3 +2431,7 @@ knowledge.help.home=Back to the start of the map (H)
 knowledge.status.needsSkill=Needs more skill
 fluid.seedoil=Seed Oil
 fluid.saltwater=Salt Water
+attribute.quench.oil=Quenched in oil
+attribute.quench.water=Quenched in water
+attribute.quench.brine=Quenched in brine
+attribute.quench.cracked=Cracked in quenching

@@ -22,10 +22,12 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
+import minefantasy.mf2.api.heating.Quench;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.GuiHelper;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.mechanics.QuenchFlare;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class ItemHeated extends Item implements IHotItem {
@@ -226,27 +228,20 @@ public class ItemHeated extends Item implements IHotItem {
                 if (!player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, item)) {
                     return item;
                 }
-                float water = TongsHelper.getWaterSource(world, i, j, k);
+                Quench.Source source = TongsHelper.findQuench(world, i, j, k);
 
-                if (water >= 0) {
+                if (source != null) {
                     Sounds.quench(player);
                     for (int a = 0; a < 5; a++) {
                         world.spawnParticle("largesmoke", i + 0.5F, j + 1, k + 0.5F, 0, 0.065F, 0);
                     }
 
-                    ItemStack originalItem = getItem(item);
-                    if (originalItem == null) {
-                        return item;
+                    if (QuenchFlare.flares(item, source)) {
+                        QuenchFlare.flare(world, i, j, k, player);
                     }
-                    ItemStack drop = originalItem.copy();
-
-                    if (Heatable.HCCquenchRuin) {
-                        float damageDone = 50F + (water > 0F ? water : 0F);
-                        if (damageDone > 99F) damageDone = 99F;
-
-                        if (drop.isItemStackDamageable()) {
-                            drop.setItemDamage((int) (drop.getMaxDamage() * damageDone / 100F));
-                        }
+                    ItemStack drop = Quench.cool(item, source, player, world.rand);
+                    if (drop == null) {
+                        return item;
                     }
                     drop.stackSize = item.stackSize;
                     item.stackSize = 0;

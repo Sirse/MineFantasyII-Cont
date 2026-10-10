@@ -17,6 +17,8 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import com.mojang.authlib.GameProfile;
 
 import minefantasy.mf2.api.heating.Heatable;
+import minefantasy.mf2.api.heating.Quench;
+import minefantasy.mf2.api.heating.QuenchMedium;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
@@ -47,9 +49,9 @@ public class HeatHazardTest {
         return hot;
     }
 
-    private static float waterAt(GameTestHelper helper, int x, int y, int z) {
+    private static Quench.Source quenchAt(GameTestHelper helper, int x, int y, int z) {
         TestPos pos = helper.absolute(x, y, z);
-        return TongsHelper.getWaterSource(helper.getWorld(), pos.x(), pos.y(), pos.z());
+        return TongsHelper.findQuench(helper.getWorld(), pos.x(), pos.y(), pos.z());
     }
 
     @GameTest
@@ -92,50 +94,31 @@ public class HeatHazardTest {
     }
 
     @GameTest
-    public static void aTroughQuenchesWithoutDamage(GameTestHelper helper) {
-        boolean ruin = Heatable.HCCquenchRuin;
-        try {
-            Heatable.HCCquenchRuin = true;
-            helper.setBlock(1, 1, 1, BlockListMF.trough_wood);
-            TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
-            trough.fill = 2;
-            float hazard = waterAt(helper, 1, 1, 1);
-            assertEquals("a filled trough is harmless", 0F, hazard, 0F);
-            assertEquals("the trough used no water", 1, trough.fill);
-            ItemStack cooled = Heatable.getQuenchedItem(hotSword(), hazard);
-            assertEquals(Items.iron_sword, cooled.getItem());
-            assertEquals("the trough damaged the piece", 0, cooled.getItemDamage());
+    public static void aTroughQuenchesInItsFluidAtNoExtraRisk(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.trough_wood);
+        TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
+        trough.fill = 2;
+        Quench.Source source = quenchAt(helper, 1, 1, 1);
+        assertNotNull("a filled trough does not quench", source);
+        assertSame(QuenchMedium.WATER, source.medium);
+        assertEquals("a trough is riskier than a bath", 1F, source.risk, 0F);
+        assertEquals("the trough used no water", 1, trough.fill);
+        ItemStack cooled = Quench.cool(hotSword(), source, null, new java.util.Random(0));
+        assertEquals(Items.iron_sword, cooled.getItem());
+        assertEquals("a metal that does not harden was damaged", 0, cooled.getItemDamage());
 
-            trough.fill = 0;
-            assertTrue("an empty trough still quenches", waterAt(helper, 1, 1, 1) < 0);
-        } finally {
-            Heatable.HCCquenchRuin = ruin;
-        }
+        trough.fill = 0;
+        assertNull("an empty trough still quenches", quenchAt(helper, 1, 1, 1));
         helper.succeed();
     }
 
     @GameTest
-    public static void openWaterDamagesThePieceUnlessTheRuleIsOff(GameTestHelper helper) {
-        boolean ruin = Heatable.HCCquenchRuin;
-        try {
-            helper.setBlock(1, 1, 1, Blocks.water);
-            float hazard = waterAt(helper, 1, 1, 1);
-            assertTrue("water is no quenching source", hazard > 0);
-            int max = Items.iron_sword.getMaxDamage();
-
-            Heatable.HCCquenchRuin = true;
-            assertEquals(
-                    "water took the wrong share of durability",
-                    (int) (max * hazard / 100F),
-                    Heatable.getQuenchedItem(hotSword(), hazard).getItemDamage());
-            Heatable.HCCquenchRuin = false;
-            assertEquals(
-                    "water damaged the piece with quench ruin off",
-                    0,
-                    Heatable.getQuenchedItem(hotSword(), hazard).getItemDamage());
-        } finally {
-            Heatable.HCCquenchRuin = ruin;
-        }
+    public static void openWaterIsRiskierWater(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, Blocks.water);
+        Quench.Source source = quenchAt(helper, 1, 1, 1);
+        assertNotNull("water is no quenching source", source);
+        assertSame(QuenchMedium.WATER, source.medium);
+        assertEquals(TongsHelper.RAW_WATER_RISK, source.risk, 0F);
         helper.succeed();
     }
 

@@ -70,6 +70,7 @@ public class TooltipEvents {
                 }
             }
 
+            showQuench(event.itemStack, event.toolTip);
             ItemQuality.Grade grade = ItemQuality.getGrade(event.itemStack);
             if (grade == ItemQuality.Grade.INFERIOR) {
                 event.toolTip.add(EnumChatFormatting.RED + StatCollector.translateToLocal("attribute.inferior.name"));
@@ -194,6 +195,22 @@ public class TooltipEvents {
                                 + rating
                                 + attatch);
             }
+        }
+    }
+
+    /** What the piece was quenched in, and whether it cracked. */
+    private static void showQuench(ItemStack item, List<String> list) {
+        if (item == null || !item.hasTagCompound()) {
+            return;
+        }
+        minefantasy.mf2.api.heating.QuenchMedium medium = minefantasy.mf2.api.heating.QuenchMedium
+                .byKey(item.getTagCompound().getString(minefantasy.mf2.api.heating.Quench.NBT_MEDIUM));
+        if (medium == null) {
+            return;
+        }
+        list.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("attribute.quench." + medium.key()));
+        if (item.getTagCompound().getBoolean(minefantasy.mf2.api.heating.Quench.NBT_CRACKED)) {
+            list.add(EnumChatFormatting.RED + StatCollector.translateToLocal("attribute.quench.cracked"));
         }
     }
 }

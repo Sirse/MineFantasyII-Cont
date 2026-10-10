@@ -35,7 +35,7 @@ public final class Heatable implements RecipeChecks.Validated {
     public static final String NBT_MaxTemp = "MFHeatable_MaxTemp";
     public static boolean requiresHeating = true;
     /**
-     * Hardcore Crafting: Should quencing in inproper sources damage items
+     * Hardcore Crafting: whether quenching can crack a piece (see {@link Quench})
      */
     public static boolean HCCquenchRuin = true;
     /**
@@ -164,26 +164,6 @@ public final class Heatable implements RecipeChecks.Validated {
         if (tag.hasKey(NBT_CurrentTemp)) return tag.getInteger(NBT_CurrentTemp);
 
         return 0;
-    }
-
-    /**
-     * Gets a hot item
-     *
-     * @param item   the hot item
-     * @param hazard the amount the source is hazardous (damaging the item): usually a percent dura loss
-     * @return what item is heated
-     */
-    public static ItemStack getQuenchedItem(ItemStack item, float hazard) {
-        ItemStack cold = Heatable.getItem(item);
-
-        if (cold == null) {
-            return null;
-        }
-        if (HCCquenchRuin && cold.isItemStackDamageable() && hazard > 0) {
-            cold.setItemDamage((int) (cold.getMaxDamage() * hazard / 100F));
-        }
-
-        return cold;
     }
 
     public static ItemStack getItem(ItemStack item) {

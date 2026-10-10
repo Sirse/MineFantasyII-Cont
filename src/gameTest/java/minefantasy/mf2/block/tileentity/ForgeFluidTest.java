@@ -245,9 +245,9 @@ public class ForgeFluidTest {
             world().setBlock(at.x(), at.y(), at.z(), Blocks.cauldron, 3, 2);
             assertTrue(TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
             assertEquals("drawing left the cauldron full", 2, world().getBlockMetadata(at.x(), at.y(), at.z()));
-            assertTrue(TongsHelper.getWaterSource(world(), at.x(), at.y(), at.z()) >= 0);
+            assertTrue(TongsHelper.findQuench(world(), at.x(), at.y(), at.z()) != null);
             assertEquals("quenching left the cauldron as it was", 1, world().getBlockMetadata(at.x(), at.y(), at.z()));
-            TongsHelper.getWaterSource(world(), at.x(), at.y(), at.z());
+            TongsHelper.findQuench(world(), at.x(), at.y(), at.z());
             assertFalse("an empty cauldron gave water", TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
         } finally {
             Stations.end();
@@ -264,7 +264,7 @@ public class ForgeFluidTest {
             world().setBlock(at.x(), at.y(), at.z(), Blocks.water, 0, 2);
             assertTrue(TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
             assertSame("the jug took the water block", Blocks.water, world().getBlock(at.x(), at.y(), at.z()));
-            assertTrue(TongsHelper.getWaterSource(world(), at.x(), at.y(), at.z()) >= 0);
+            assertTrue(TongsHelper.findQuench(world(), at.x(), at.y(), at.z()) != null);
             assertSame(Blocks.air, world().getBlock(at.x(), at.y(), at.z()));
         } finally {
             Stations.end();
