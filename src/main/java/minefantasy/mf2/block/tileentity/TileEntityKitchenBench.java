@@ -144,11 +144,9 @@ public class TileEntityKitchenBench extends TileEntityStation
                 return true;
             }
             boolean dirty = isDirty();
-            if (!dirty && held != null && !recipeRequiresHands()) {
-                held.damageItem(1, user);
-                if (held.getItemDamage() >= held.getMaxDamage()) {
-                    user.destroyCurrentEquippedItem();
-                }
+            // Only the tool the recipe works with wears: food, armour or a bottle in hand is no spoon
+            if (!dirty && !recipeRequiresHands() && toolType.equalsIgnoreCase(toolTypeRequired)) {
+                ToolHelper.wearCrafterTool(user);
             }
 
             if (dirty) {

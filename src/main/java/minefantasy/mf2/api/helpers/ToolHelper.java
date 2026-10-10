@@ -2,6 +2,7 @@ package minefantasy.mf2.api.helpers;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -46,6 +47,24 @@ public class ToolHelper {
     }
 
     // QUALITY//
+
+    /**
+     * Wears the held crafting tool by one use, breaking it when it is spent. Only an item that has durability wears:
+     * food, armour, a bucket or anything else held without any is never touched, let alone destroyed.
+     */
+    public static void wearCrafterTool(EntityPlayer user) {
+        ItemStack held = user.getHeldItem();
+        if (held == null || !held.isItemStackDamageable()) {
+            return;
+        }
+        held.damageItem(1, user);
+        if (held.stackSize <= 0 || held.getItemDamage() >= held.getMaxDamage()) {
+            if (user.worldObj.isRemote) {
+                user.renderBrokenItemStack(held);
+            }
+            user.destroyCurrentEquippedItem();
+        }
+    }
 
     public static String getCrafterTool(ItemStack tool) {
         if (tool == null) {

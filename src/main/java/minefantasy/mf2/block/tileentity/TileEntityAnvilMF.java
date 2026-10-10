@@ -173,14 +173,7 @@ public class TileEntityAnvilMF extends TileEntityStation
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
         if (toolType.equalsIgnoreCase("hammer") || toolType.equalsIgnoreCase("hvyHammer")) {
-            if (user.getHeldItem() != null) {
-                user.getHeldItem().damageItem(1, user);
-                if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
-                    if (worldObj.isRemote) user.renderBrokenItemStack(user.getHeldItem());
-
-                    user.destroyCurrentEquippedItem();
-                }
-            }
+            ToolHelper.wearCrafterTool(user);
             if (worldObj.isRemote) return true;
 
             Requirements.Verdict verdict = verdict(user);

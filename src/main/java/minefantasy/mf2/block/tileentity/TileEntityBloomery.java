@@ -224,11 +224,7 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
         if (toolType.equalsIgnoreCase("hammer") || toolType.equalsIgnoreCase("hvyHammer")) {
             if (user.worldObj.isRemote) return true;
 
-            held.damageItem(1, user);
-            if (held.getItemDamage() >= held.getMaxDamage()) {
-                user.destroyCurrentEquippedItem();
-                user.setCurrentItemOrArmor(0, null);
-            }
+            ToolHelper.wearCrafterTool(user);
 
             if (rand.nextFloat() * 10F < pwr) {
                 ItemStack drop = inv[2].copy();

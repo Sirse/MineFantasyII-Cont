@@ -83,10 +83,7 @@ public class TileEntityBombBench extends TileEntityStation implements IBasicMetr
                         "minefantasy2:block.twistbolt",
                         0.25F,
                         1.0F);
-                user.getHeldItem().damageItem(1, user);
-                if (user.getHeldItem().getItemDamage() >= user.getHeldItem().getMaxDamage()) {
-                    user.destroyCurrentEquippedItem();
-                }
+                ToolHelper.wearCrafterTool(user);
             }
             float efficiency = pressUsed ? maxProgress : ToolHelper.getCrafterEfficiency(user.getHeldItem());
 

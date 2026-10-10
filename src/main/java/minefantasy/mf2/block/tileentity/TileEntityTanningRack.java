@@ -90,10 +90,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
         if (items[1] != null && (leverPull || ToolHelper.getCrafterTool(held).equalsIgnoreCase(toolType))) {
             if (leverPull || requirements().check(Requirements.TANNING, player, 0).allows()) {
                 if (!leverPull) {
-                    held.damageItem(1, player);
-                    if (held.getItemDamage() >= held.getMaxDamage()) {
-                        player.destroyCurrentEquippedItem();
-                    }
+                    ToolHelper.wearCrafterTool(player);
                 } else {
                     Sounds.at(this, "tile.piston.out", 0.75F, 0.85F);
                     acTime = 1.0F;
