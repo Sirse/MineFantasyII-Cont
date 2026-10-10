@@ -90,6 +90,7 @@ public final class GridBuilder {
     private String sound = "";
     private double experience;
     private double dirt;
+    private boolean dirtGiven;
     private int priority;
     private boolean anywhere;
     private boolean registered;
@@ -223,6 +224,7 @@ public final class GridBuilder {
             problems.add("only the kitchen bench gets dirty");
         }
         this.dirt = dirt;
+        this.dirtGiven = true;
         return this;
     }
 
@@ -281,7 +283,9 @@ public final class GridBuilder {
             if (station != Station.KITCHEN) {
                 builder.stationTier(stationTier);
             } else {
-                builder.dirtyAmount(dirt > 0 ? (float) dirt : NativeGridRecipe.kitchenDirt(time));
+                // Without dirt the bench's default for the time; a given one goes as it is, so the recipe refuses a
+                // negative
+                builder.dirtyAmount(dirtGiven ? (float) dirt : NativeGridRecipe.kitchenDirt(time));
             }
             if (station == Station.ANVIL) {
                 builder.hot(hot);
@@ -345,7 +349,7 @@ public final class GridBuilder {
                 }
             }
         }
-        if (!filled && width > 0) {
+        if (!filled) {
             found.add("the pattern has no ingredients");
         }
         for (Map.Entry<Character, IIngredient> key : keys.entrySet()) {

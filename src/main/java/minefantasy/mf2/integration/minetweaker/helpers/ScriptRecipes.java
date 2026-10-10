@@ -122,6 +122,11 @@ public final class ScriptRecipes {
                 tx.commit();
             } catch (RecipeRegistrationException | IllegalArgumentException e) {
                 MineTweakerAPI.logError(description + ": " + e.getMessage() + ". " + NOTHING_CHANGED);
+            } catch (RuntimeException e) {
+                // A fault of ours, not of the script: the line is skipped like a refused one, the rest still loads, and
+                // the trace is kept to be reported
+                MineTweakerAPI
+                        .logError(description + ": internal error " + e + ", please report it. " + NOTHING_CHANGED, e);
             }
         }
 

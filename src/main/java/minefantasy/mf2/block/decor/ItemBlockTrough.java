@@ -16,6 +16,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -40,6 +43,10 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
             int stock = item.getTagCompound().getInteger(BlockTrough.NBT_fill);
             if (stock > 0) {
                 list.add(StatCollector.translateToLocalFormatted("attribute.fill", stock));
+                Fluid fluid = FluidRegistry.getFluid(item.getTagCompound().getString(BlockTrough.NBT_fluid));
+                if (fluid != null) {
+                    list.add(fluid.getLocalizedName(new FluidStack(fluid, 1)));
+                }
             }
         }
         CustomMaterial material = CustomMaterial.getMaterialFor(item, CustomToolHelper.slot_main);
@@ -95,7 +102,10 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
                     return super.onItemUse(item, player, world, x, y, z, side, f, f1, f2);
                 }
 
-                if (isWaterSource(world, i, j, k)) {
+                // A trough item holding another fluid is not topped up with water
+                if (isWaterSource(world, i, j, k)
+                        && !(item.hasTagCompound() && item.getTagCompound().getInteger(BlockTrough.NBT_fill) > 0
+                                && item.getTagCompound().hasKey(BlockTrough.NBT_fluid))) {
                     gather(player);
                     world.playSoundAtEntity(
                             player,
@@ -118,6 +128,7 @@ public class ItemBlockTrough extends ItemBlock implements IStorageBlock {
                 tier = material.tier;
             }
             NBTTagCompound nbt = getNBT(item);
+            nbt.removeTag(BlockTrough.NBT_fluid);
             nbt.setInteger(BlockTrough.NBT_fill, TileEntityTrough.getCapacity(tier) * TileEntityTrough.capacityScale);
         }
         player.swingItem();

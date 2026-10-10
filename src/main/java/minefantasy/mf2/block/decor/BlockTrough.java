@@ -18,6 +18,8 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 public class BlockTrough extends BlockWoodDecor<TileEntityTrough> {
 
     public static final String NBT_fill = "Fill_Level";
+    /** The registry name of the fluid a trough item holds; absent for water. */
+    public static final String NBT_fluid = "Fill_Fluid";
     public static int trough_RI = 107;
 
     public BlockTrough(String name) {
@@ -28,6 +30,17 @@ public class BlockTrough extends BlockWoodDecor<TileEntityTrough> {
         this.setHardness(1F);
         this.setResistance(0.5F);
         this.setCreativeTab(CreativeTabMF.tabUtil);
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride() {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(World world, int x, int y, int z, int side) {
+        TileEntityTrough tile = getTile(world, x, y, z);
+        return tile == null ? 0 : tile.comparatorSignal();
     }
 
     @Override
@@ -75,7 +88,9 @@ public class BlockTrough extends BlockWoodDecor<TileEntityTrough> {
         if (tile != null) {
             if (item.hasTagCompound() && item.getTagCompound().hasKey(NBT_fill)) {
                 // The tag may not be one this block wrote: keep the level within the trough
-                tile.fill = Math.max(0, Math.min(tile.getCapacity(), item.getTagCompound().getInteger(NBT_fill)));
+                tile.setContents(
+                        item.getTagCompound().getString(NBT_fluid),
+                        item.getTagCompound().getInteger(NBT_fill));
             }
         }
     }
@@ -114,6 +129,9 @@ public class BlockTrough extends BlockWoodDecor<TileEntityTrough> {
     private ItemStack modifyFill(TileEntityTrough tile, ItemStack item) {
         if (tile != null && item != null) {
             item.getTagCompound().setInteger(NBT_fill, tile.fill);
+            if (tile.fill > 0 && tile.getFluidName() != null) {
+                item.getTagCompound().setString(NBT_fluid, tile.getFluidName());
+            }
         }
         return item;
     }

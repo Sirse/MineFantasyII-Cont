@@ -24,6 +24,7 @@ import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.item.list.ArmourListMF;
+import minefantasy.mf2.item.list.ToolListMF;
 
 /**
  * What the research book promises about heat: a trough quenches without harm while open water may damage the piece, and
@@ -49,6 +50,45 @@ public class HeatHazardTest {
     private static float waterAt(GameTestHelper helper, int x, int y, int z) {
         TestPos pos = helper.absolute(x, y, z);
         return TongsHelper.getWaterSource(helper.getWorld(), pos.x(), pos.y(), pos.z());
+    }
+
+    @GameTest
+    public static void emptyTongsLeaveCauldronWaterAndLoadedTongsQuenchOnce(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, Blocks.cauldron);
+        TestPos at = helper.absolute(1, 1, 1);
+        helper.getWorld().setBlockMetadataWithNotify(at.x(), at.y(), at.z(), 3, 2);
+        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+        player.setPositionAndRotation(at.x() + 0.5, at.y() + 2, at.z() + 0.5, 0F, 90F);
+        ItemStack tongs = new ItemStack(ToolListMF.tongsStone);
+        player.setCurrentItemOrArmor(0, tongs);
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertEquals("empty tongs took water", 3, helper.getWorld().getBlockMetadata(at.x(), at.y(), at.z()));
+        assertTrue(TongsHelper.trySetHeldItem(tongs, hotSword()));
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertEquals("loaded tongs did not quench", 2, helper.getWorld().getBlockMetadata(at.x(), at.y(), at.z()));
+        assertNull(TongsHelper.getHeldItem(tongs));
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertEquals("repeated use took water", 2, helper.getWorld().getBlockMetadata(at.x(), at.y(), at.z()));
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void emptyTongsLeaveTankWater(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.trough_wood);
+        TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
+        trough.fill = 2;
+        TestPos at = helper.absolute(1, 1, 1);
+        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+        player.setPositionAndRotation(at.x() + 0.5, at.y() + 2, at.z() + 0.5, 0F, 90F);
+        ItemStack tongs = new ItemStack(ToolListMF.tongsStone);
+        player.setCurrentItemOrArmor(0, tongs);
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertEquals(2, trough.fill);
+        assertTrue(TongsHelper.trySetHeldItem(tongs, hotSword()));
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertEquals("loaded tongs did not quench in the tank", 1, trough.fill);
+        assertNull(TongsHelper.getHeldItem(tongs));
+        helper.succeed();
     }
 
     @GameTest

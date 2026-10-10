@@ -82,6 +82,7 @@ public class ClientProxyMF extends CommonProxyMF {
         MinecraftForge.EVENT_BUS.register(new ExtendedReachMF());
         MinecraftForge.EVENT_BUS.register(new HudHandlerMF());
         MinecraftForge.EVENT_BUS.register(new TooltipEvents());
+        MinecraftForge.EVENT_BUS.register(new minefantasy.mf2.fluid.FluidsMF.Icons());
         MinecraftForge.EVENT_BUS.register(new CogworkRenderEvents());
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
         FMLCommonHandler.instance().bus().register(new ItemUseSyncMF());

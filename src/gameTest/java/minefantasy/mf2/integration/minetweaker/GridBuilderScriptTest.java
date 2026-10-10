@@ -153,6 +153,12 @@ public class GridBuilderScriptTest {
                     { "mods.minefantasy.Anvil.shaped(\"reused\", <minecraft:diamond>)"
                             + ".pattern([\"I\"]).key(\"I\", <minecraft:stick>.reuse()).tool(\"hammer\", 0).time(10)"
                             + ".register();", "anvil/reused", "input I has transformers" },
+                    { "mods.minefantasy.Anvil.shaped(\"blank\", <minecraft:diamond>)"
+                            + ".pattern([\"\", \"\"]).tool(\"hammer\", 0).time(10).register();", "anvil/blank",
+                            "the pattern has no ingredients" },
+                    { "mods.minefantasy.CarpenterBench.shapeless(\"dirty\", <minecraft:diamond>)"
+                            + ".ingredients([<minecraft:stick>]).tool(\"hands\", 0).time(10).dirt(1.0).register();",
+                            "carpenter/dirty", "only the kitchen bench gets dirty" },
                     { "mods.minefantasy.Anvil.shapeless(\"mixed\", <minecraft:diamond>)"
                             + ".pattern([\"I\"]).ingredients([<minecraft:stick>]).tool(\"hammer\", 0).time(10)"
                             + ".register();", "anvil/mixed", "pattern is for shaped recipes" } };
@@ -165,6 +171,23 @@ public class GridBuilderScriptTest {
                                 .anyMatch(e -> e.contains(id) && e.contains(c[2]) && e.contains("Nothing changed.")));
                 RecipeRegistry<GridRecipe> registry = c[1].startsWith("anvil") ? MFRecipes.ANVIL : MFRecipes.CARPENTER;
                 assertNull(c[1] + " was added", registry.published().get(RecipeId.parse(id)));
+            }
+        });
+    }
+
+    /** A negative dirt is the script's mistake, refused, not quietly the bench's default. */
+    @GameTest
+    public static void negativeDirtIsRefused(GameTestHelper helper) throws Exception {
+        Scripts.around(helper, () -> {
+            for (String line : new String[] {
+                    "mods.minefantasy.KitchenBench.shapeless(\"minus\", <minecraft:mushroom_stew>)"
+                            + ".ingredients([<minecraft:apple>]).tool(\"spoon\", 0).time(40).dirt(-5.0).register();",
+                    "mods.minefantasy.KitchenBench.addShapeless(\"minus\", <minecraft:mushroom_stew>, \"\", \"\", \"\","
+                            + " \"spoon\", 40, -5.0, [<minecraft:apple>]);" }) {
+                List<String> errors = Scripts.run(line);
+                assertTrue(
+                        "a negative dirt was taken: " + errors,
+                        errors.stream().anyMatch(e -> e.contains("dirty amount must not be negative")));
             }
         });
     }

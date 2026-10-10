@@ -2427,3 +2427,5 @@ knowledge.controls=Drag the map, scroll to zoom. H: back to the start, F: the wh
 knowledge.help.search=Find an entry by name (/ or Ctrl+F)
 knowledge.help.home=Back to the start of the map (H)
 knowledge.status.needsSkill=Needs more skill
+fluid.seedoil=Seed Oil
+fluid.saltwater=Salt Water

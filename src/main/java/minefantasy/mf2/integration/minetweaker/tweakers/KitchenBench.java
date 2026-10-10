@@ -47,7 +47,8 @@ public class KitchenBench {
     }
 
     private static GridBuilder dirt(GridBuilder builder, float dirtyAmount) {
-        return dirtyAmount > 0 ? builder.dirt(dirtyAmount) : builder;
+        // 0 is the bench's default; anything else, a negative included, is the script's own
+        return dirtyAmount != 0 ? builder.dirt(dirtyAmount) : builder;
     }
 
     @ZenMethod

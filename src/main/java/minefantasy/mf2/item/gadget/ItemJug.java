@@ -13,6 +13,7 @@ import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.fluid.FluidsMF;
 import minefantasy.mf2.item.ItemComponentMF;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
@@ -102,7 +103,7 @@ public class ItemJug extends ItemComponentMF {
                     return super.onItemRightClick(item, world, player);
                 }
 
-                if (isWaterSource(world, i, j, k)) {
+                if (TongsHelper.drawWater(world, i, j, k, FluidsMF.JUG)) {
                     gather(item, world, player);
                     return item;
                 }
@@ -118,10 +119,6 @@ public class ItemJug extends ItemComponentMF {
             item.stackSize--;
             Drops.spawn(world, player.posX, player.posY, player.posZ, new ItemStack(FoodListMF.jug_water), 0);
         }
-    }
-
-    private boolean isWaterSource(World world, int i, int j, int k) {
-        return TongsHelper.getWaterSource(world, i, j, k) >= 0;
     }
 
     public ItemStack useFilled(ItemStack item, World world, EntityPlayer user) {

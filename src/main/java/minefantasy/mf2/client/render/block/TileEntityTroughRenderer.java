@@ -72,7 +72,14 @@ public class TileEntityTroughRenderer extends TileEntitySpecialRenderer {
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 bindTextureByName("textures/models/tileentity/" + tile.getTexName() + "_water.png");
-                GL11.glColor4f(1F, 1F, 1F, 0.5F);
+                // Water as it was; another fluid in its own colour
+                net.minecraftforge.fluids.Fluid fluid = tile.getFluid();
+                int colour = fluid == null ? 0xFFFFFF : fluid.getColor();
+                GL11.glColor4f(
+                        (colour >> 16 & 255) / 255F,
+                        (colour >> 8 & 255) / 255F,
+                        (colour & 255) / 255F,
+                        tile.getFluid() == minefantasy.mf2.fluid.FluidsMF.seedOil ? 0.8F : 0.5F);
                 GL11.glTranslatef(0F, -height * 0.35F, 0F);
                 model.renderWater(0.0625F);
             }

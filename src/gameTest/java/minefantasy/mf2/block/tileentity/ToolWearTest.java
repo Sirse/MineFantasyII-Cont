@@ -52,7 +52,7 @@ public class ToolWearTest {
         try {
             TileEntityKitchenBench bench = spoonBench();
             assertEquals("the bench does not ask for a spoon", "spoon", bench.getToolNeeded());
-            FakePlayer player = helper.spawnFakePlayer(Modders.SMITH);
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
             for (ItemStack held : new ItemStack[] { new ItemStack(Items.bread, 5), new ItemStack(Items.iron_chestplate),
                     new ItemStack(Items.cake), new ItemStack(Items.glass_bottle, 3) }) {
                 ItemStack before = held.copy();
@@ -73,7 +73,7 @@ public class ToolWearTest {
         Stations.begin(helper);
         try {
             TileEntityKitchenBench bench = spoonBench();
-            FakePlayer player = helper.spawnFakePlayer(Modders.SMITH);
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
             ItemStack spoon = new ItemStack(CustomToolListMF.standard_spoon);
             player.setCurrentItemOrArmor(0, spoon);
             bench.interact(player);
@@ -104,10 +104,60 @@ public class ToolWearTest {
             rack.setInventorySlotContents(0, new ItemStack(seed));
             rack.updateRecipe();
             assertEquals("hands", rack.toolType);
-            FakePlayer player = helper.spawnFakePlayer(Modders.SMITH);
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
             player.setCurrentItemOrArmor(0, null);
             rack.interact(player, false, false);
             assertNull(player.getHeldItem());
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    /** Water on a clean bench after a craft is kept: a bucket or bottle is neither a spoon nor used up. */
+    @GameTest
+    public static void waterOnACleanBenchIsKept(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            TileEntityKitchenBench bench = spoonBench();
+            bench.dirtyProgress = 0F;
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+            for (ItemStack held : new ItemStack[] { new ItemStack(Items.water_bucket),
+                    new ItemStack(Items.potionitem, 3, 0) }) {
+                ItemStack before = held.copy();
+                player.setCurrentItemOrArmor(0, held);
+                bench.interact(player);
+                ItemStack after = player.getHeldItem();
+                assertNotNull(before + " was destroyed", after);
+                assertTrue(before + " changed to " + after, ItemStack.areItemStacksEqual(before, after));
+            }
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    /** Water on a dirty bench washes it and leaves the empty container, never nothing. */
+    @GameTest
+    public static void waterWashesADirtyBenchAndLeavesTheContainer(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            TileEntityKitchenBench bench = spoonBench();
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+
+            bench.dirtyProgress = 40F;
+            player.setCurrentItemOrArmor(0, new ItemStack(Items.water_bucket));
+            bench.interact(player);
+            assertTrue("the bucket did not wash", bench.dirtyProgress < 40F);
+            assertNotNull("the bucket was destroyed", player.getHeldItem());
+            assertSame("the bucket was not emptied", Items.bucket, player.getHeldItem().getItem());
+
+            bench.dirtyProgress = 40F;
+            player.setCurrentItemOrArmor(0, new ItemStack(Items.potionitem, 2, 0));
+            bench.interact(player);
+            assertTrue("the bottle did not wash", bench.dirtyProgress < 40F);
+            assertEquals("not one bottle was used", 1, player.getHeldItem().stackSize);
+            assertTrue("the empty bottle was lost", player.inventory.hasItem(Items.glass_bottle));
         } finally {
             Stations.end();
         }

@@ -36,7 +36,8 @@ public class MineFantasyFuels {
     }
 
     /**
-     * Adds a carbon item for smelting
+     * Adds a carbon item for smelting. A stack names its own metadata only; its wildcard ({@code <item:*>}, an Item or
+     * a Block) names every one.
      *
      * @param input Item Block or ItemStack
      * @param uses
@@ -67,6 +68,7 @@ public class MineFantasyFuels {
         }
     }
 
+    /** As {@link #addCarbon}: the stack's metadata only, every one for a wildcard. */
     public static ScriptCarbon addScriptCarbon(ItemStack item, int uses) {
         ScriptCarbon carbon = new ScriptCarbon(item.copy(), uses);
         scriptCarbon.add(carbon);

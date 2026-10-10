@@ -59,7 +59,8 @@ public class ToolHelper {
         }
         held.damageItem(1, user);
         if (held.stackSize <= 0 || held.getItemDamage() >= held.getMaxDamage()) {
-            if (user.worldObj.isRemote) {
+            // damageItem shows the break itself when it spends the stack; this is only for the use before
+            if (user.worldObj.isRemote && held.stackSize > 0) {
                 user.renderBrokenItemStack(held);
             }
             user.destroyCurrentEquippedItem();

@@ -21,6 +21,7 @@ import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 
@@ -294,11 +295,17 @@ public class WorldCycleTest {
         TileEntityKitchenBench bench = helper.assertTileEntityPresent(TileEntityKitchenBench.class, 1, 1, 1);
         bench.dirtyProgress = ConfigKitchen.dirtyProgressMax;
         assertTrue(bench.isDirty());
-        FakePlayer cook = holding(helper, new ItemStack(Items.water_bucket));
+        FakePlayer cook = holding(helper, new ItemStack(FoodListMF.jug_water));
         bench.interact(cook);
         float washed = ConfigKitchen.dirtyProgressMax * ConfigKitchen.washStrengthFraction;
-        assertEquals(ConfigKitchen.dirtyProgressMax - washed, bench.dirtyProgress, 0.01F);
+        assertEquals("a jug is one wash", ConfigKitchen.dirtyProgressMax - washed, bench.dirtyProgress, 0.01F);
         assertFalse("half a wash leaves the bench usable", bench.isDirty());
+        assertTrue("the jug comes back empty", cook.inventory.hasItem(FoodListMF.jug_empty));
+
+        bench.dirtyProgress = ConfigKitchen.dirtyProgressMax;
+        cook.setCurrentItemOrArmor(0, new ItemStack(Items.water_bucket));
+        bench.interact(cook);
+        assertEquals("a bucket is four washes", 0F, bench.dirtyProgress, 0.01F);
         assertTrue("the bucket comes back empty", cook.inventory.hasItem(Items.bucket));
         assertFalse(cook.inventory.hasItem(Items.water_bucket));
         helper.succeed();

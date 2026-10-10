@@ -9,15 +9,19 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
-import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
+import minefantasy.mf2.api.helpers.FluidContainers;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -31,7 +35,7 @@ import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.container.ContainerKitchenBench;
 
 public class TileEntityKitchenBench extends TileEntityStation
-        implements GridProject.Bench, CraftBench, Diagnosis.Source {
+        implements GridProject.Bench, CraftBench, Diagnosis.Source, IFluidHandler {
 
     public final int width = 4;
     public final int height = 4;
@@ -46,6 +50,9 @@ public class TileEntityKitchenBench extends TileEntityStation
     private ContainerKitchenBench syncBench;
     private InventoryCrafting craftMatrix;
     private String lastPlayerHit = "";
+    /** The water of one wash: a jug's worth. Forge counts a water bottle as a whole bucket. */
+    private static final int WASH_WATER = 250;
+    private int washWater;
     private String toolTypeRequired = "hands";
     private String craftSound = "step.wood";
     private String researchRequired = "";
@@ -76,6 +83,7 @@ public class TileEntityKitchenBench extends TileEntityStation
         progress = nbt.getFloat("Progress");
         progressMax = nbt.getFloat("ProgressMax");
         dirtyProgress = nbt.getFloat("DirtyProgress");
+        washWater = Math.max(0, Math.min(WASH_WATER - 1, nbt.getInteger("WashWater")));
         toolTypeRequired = nbt.getString("toolTypeRequired");
         craftSound = nbt.getString("craftSound");
         researchRequired = nbt.getString("researchRequired");
@@ -91,6 +99,7 @@ public class TileEntityKitchenBench extends TileEntityStation
         nbt.setFloat("Progress", progress);
         nbt.setFloat("ProgressMax", progressMax);
         nbt.setFloat("DirtyProgress", dirtyProgress);
+        nbt.setInteger("WashWater", washWater);
         nbt.setString("toolTypeRequired", toolTypeRequired);
         nbt.setString("craftSound", craftSound);
         nbt.setString("researchRequired", researchRequired);
@@ -129,10 +138,19 @@ public class TileEntityKitchenBench extends TileEntityStation
     public boolean interact(EntityPlayer user) {
         ItemStack held = user.getHeldItem();
 
-        if (!worldObj.isRemote && isWaterContainer(held)) {
-            if (dirtyProgress > 0 || user.capabilities.isCreativeMode) {
-                washBench(user);
-                Sounds.at(this, "random.splash", 0.75F, 1.0F);
+        // Any water container Forge knows: a bucket, bottle or jug is emptied whole, a cell or tank gives what is
+        // needed
+        if (FluidContainers.amountIn(held, FluidRegistry.WATER) >= WASH_WATER) {
+            int wanted = Math.max(washesNeeded(), user.capabilities.isCreativeMode ? 1 : 0);
+            if (!worldObj.isRemote && wanted > 0) {
+                int poured = FluidContainers.drainHeld(
+                        user,
+                        FluidRegistry.WATER,
+                        WASH_WATER,
+                        FluidContainers.keepsOwn(held) ? wanted * WASH_WATER : Integer.MAX_VALUE);
+                if (poured > 0) {
+                    wash(poured / WASH_WATER);
+                }
             }
             return true;
         }
@@ -176,26 +194,79 @@ public class TileEntityKitchenBench extends TileEntityStation
         return toolTypeRequired.equalsIgnoreCase("hands");
     }
 
-    private boolean isWaterContainer(ItemStack held) {
-        if (held == null) {
-            return false;
-        }
-        FluidStack fluid = FluidContainerRegistry.getFluidForFilledItem(held);
-        return fluid != null && fluid.getFluid() == FluidRegistry.WATER;
+    private static float washStrength() {
+        return ConfigKitchen.dirtyProgressMax * ConfigKitchen.washStrengthFraction;
     }
 
-    private void washBench(EntityPlayer user) {
-        float strength = ConfigKitchen.dirtyProgressMax * ConfigKitchen.washStrengthFraction;
-        dirtyProgress = Math.max(0F, dirtyProgress - strength);
-
-        ItemStack held = user.getHeldItem();
-        ItemStack empty = FluidContainerRegistry.drainFluidContainer(held);
-        user.inventory.decrStackSize(user.inventory.currentItem, 1);
-        if (empty != null && !user.inventory.addItemStackToInventory(empty)) {
-            user.entityDropItem(empty, 0.0F);
+    /** How many portions of {@link #WASH_WATER} clean the bench. */
+    private int washesNeeded() {
+        if (dirtyProgress <= 0F) {
+            return 0;
         }
+        float strength = washStrength();
+        return strength <= 0F ? 1 : (int) Math.ceil(dirtyProgress / strength);
+    }
+
+    /** Washes the bench with this many portions of water. */
+    private void wash(int portions) {
+        if (portions <= 0) {
+            return;
+        }
+        dirtyProgress = Math.max(0F, dirtyProgress - washStrength() * portions);
+        Sounds.at(this, "random.splash", 0.75F, 1.0F);
         updateCraftingData();
+        markDirty();
     }
+
+    // region IFluidHandler: accumulates water while dirty, no more than cleans it
+
+    @Override
+    public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
+        if (resource == null || resource.getFluid() != FluidRegistry.WATER || resource.amount <= 0) {
+            return 0;
+        }
+        int accepted = (int) Math.min(resource.amount, Math.max(0L, (long) washesNeeded() * WASH_WATER - washWater));
+        if (accepted <= 0) {
+            return 0;
+        }
+        if (doFill && !worldObj.isRemote) {
+            long total = (long) washWater + accepted;
+            int portions = (int) (total / WASH_WATER);
+            washWater = (int) (total % WASH_WATER);
+            wash(portions);
+            markDirty();
+        }
+        return accepted;
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
+        return null;
+    }
+
+    @Override
+    public boolean canFill(ForgeDirection from, Fluid fluid) {
+        return fluid == FluidRegistry.WATER;
+    }
+
+    @Override
+    public boolean canDrain(ForgeDirection from, Fluid fluid) {
+        return false;
+    }
+
+    @Override
+    public FluidTankInfo[] getTankInfo(ForgeDirection from) {
+        return new FluidTankInfo[] { new FluidTankInfo(
+                washWater == 0 ? null : new FluidStack(FluidRegistry.WATER, washWater),
+                (int) Math.min(Integer.MAX_VALUE, Math.max(washWater, (long) washesNeeded() * WASH_WATER))) };
+    }
+
+    // endregion
 
     public boolean isDirty() {
         return dirtyProgress >= dirtyMax;

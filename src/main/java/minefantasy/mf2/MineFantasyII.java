@@ -26,6 +26,7 @@ import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.commands.CommandMF;
 import minefantasy.mf2.config.*;
+import minefantasy.mf2.fluid.FluidsMF;
 import minefantasy.mf2.integration.minetweaker.MTCompat;
 import minefantasy.mf2.integration.thaumcraft.TCCompat;
 import minefantasy.mf2.item.gadget.ItemLootSack;
@@ -138,6 +139,7 @@ public class MineFantasyII {
 
     @EventHandler
     public void modsLoaded(FMLPostInitializationEvent evt) {
+        FluidsMF.load();
         CustomArmourEntry.registerItem(Items.leather_helmet, ArmourDesign.LEATHER);
         CustomArmourEntry.registerItem(Items.leather_chestplate, ArmourDesign.LEATHER);
         CustomArmourEntry.registerItem(Items.leather_leggings, ArmourDesign.LEATHER);

@@ -18,6 +18,7 @@ import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.refine.Alloy;
+import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CustomToolListMF;
 
@@ -359,6 +360,36 @@ public class MaterialScriptTest {
             assertTrue("withTag was taken as a restriction", tagged.takes(bar("copper")));
             assertTrue(material.takes(bar("steel")));
             assertFalse("MF.input took another material", material.takes(bar("copper")));
+        });
+    }
+
+    /** Carbon added for one metadata is that metadata only; the wildcard adds every one. */
+    @GameTest
+    public static void carbonKeepsToItsMetadata(GameTestHelper helper) throws Exception {
+        Scripts.around(helper, () -> {
+            assertEquals(0, Scripts.run("mods.minefantasy.Fuel.addCarbon(<minefantasy2tests:meta_bar:3>, 2);").size());
+            assertTrue(minefantasy.mf2.api.crafting.MineFantasyFuels.isCarbon(new ItemStack(TestItems.metaBar, 1, 3)));
+            assertFalse(
+                    "another metadata became carbon",
+                    minefantasy.mf2.api.crafting.MineFantasyFuels.isCarbon(new ItemStack(TestItems.metaBar, 1, 2)));
+            assertEquals(0, Scripts.run("mods.minefantasy.Fuel.addCarbon(<minefantasy2tests:meta_bar:*>, 2);").size());
+            assertTrue(minefantasy.mf2.api.crafting.MineFantasyFuels.isCarbon(new ItemStack(TestItems.metaBar, 1, 2)));
+        });
+    }
+
+    /** A counted script ingredient takes its count out of a bigger stack, as CraftTweaker counts it exactly. */
+    @GameTest
+    public static void aCountedIngredientTakesFromABiggerStack(GameTestHelper helper) throws Exception {
+        Scripts.around(helper, () -> {
+            assertEquals(
+                    0,
+                    Scripts.run("mods.minefantasy.Quern.add(\"two_iron\", <minecraft:redstone>, <ore:ingotIron> * 2);")
+                            .size());
+            Input input = quern("two_iron");
+            assertTrue("two ingots were refused", input.matches(new ItemStack(Items.iron_ingot, 2)));
+            assertTrue("a stack of three was refused", input.matches(new ItemStack(Items.iron_ingot, 3)));
+            assertFalse("one ingot is enough", input.hasEnough(new ItemStack(Items.iron_ingot, 1)));
+            assertFalse(input.matches(new ItemStack(Items.gold_ingot, 3)));
         });
     }
 }

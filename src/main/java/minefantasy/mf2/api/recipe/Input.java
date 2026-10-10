@@ -353,7 +353,7 @@ public final class Input {
      * examples only show what it takes. Filed under a key every stack looks up with, as no item can be named for it.
      */
     public static Input matching(Predicate<ItemStack> test, Supplier<List<ItemStack>> examples, String description) {
-        return of(new TestMatcher(test, examples)).where(test, description);
+        return of(new TestMatcher(examples)).where(test, description);
     }
 
     /** Index keys under which a registry files this input. */
@@ -413,17 +413,16 @@ public final class Input {
 
     private static final class TestMatcher implements Matcher {
 
-        private final Predicate<ItemStack> test;
         private final Supplier<List<ItemStack>> examples;
 
-        TestMatcher(Predicate<ItemStack> test, Supplier<List<ItemStack>> examples) {
-            this.test = test;
+        TestMatcher(Supplier<List<ItemStack>> examples) {
             this.examples = examples;
         }
 
+        /** Any item: the test is the input's condition, run once on the stack sized to the input's amount. */
         @Override
         public boolean matches(ItemStack stack) {
-            return test.test(stack);
+            return true;
         }
 
         @Override

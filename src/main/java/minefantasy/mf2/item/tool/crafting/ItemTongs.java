@@ -80,6 +80,10 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
 
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
+        ItemStack held = TongsHelper.getHeldItem(item);
+        if (held == null || held.stackSize <= 0 || !TongsHelper.isCoolableItem(held)) {
+            return item;
+        }
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
 
         if (movingobjectposition == null) {
@@ -100,8 +104,8 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
 
                 float water = TongsHelper.getWaterSource(world, i, j, k);
 
-                if (TongsHelper.getHeldItem(item) != null && water >= 0) {
-                    ItemStack drop = TongsHelper.getHeldItem(item).copy(), cooled = drop;
+                if (water >= 0) {
+                    ItemStack drop = held.copy(), cooled = drop;
 
                     if (TongsHelper.isCoolableItem(drop)) {
                         cooled = Heatable.getQuenchedItem(drop, water);

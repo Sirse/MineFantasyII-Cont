@@ -2542,3 +2542,5 @@ knowledge.controls=Тяните карту мышью, колесо — масш
 knowledge.help.search=Найти исследование по названию (/ или Ctrl+F)
 knowledge.help.home=Вернуть карту к началу (H)
 knowledge.status.needsSkill=Не хватает навыка
+fluid.seedoil=Масло семян
+fluid.saltwater=Солёная вода

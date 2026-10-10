@@ -2425,3 +2425,5 @@ knowledge.controls=拖动地图，滚轮缩放。 H：回到起点，F：显示�
 knowledge.help.search=按名称查找研究（/ 或 Ctrl+F）
 knowledge.help.home=地图回到起点（H）
 knowledge.status.needsSkill=技能不足
+fluid.seedoil=种子油
+fluid.saltwater=盐水

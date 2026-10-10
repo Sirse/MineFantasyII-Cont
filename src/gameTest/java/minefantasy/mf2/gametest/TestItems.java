@@ -2,6 +2,10 @@ package minefantasy.mf2.gametest;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidContainerRegistry;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.ItemFluidContainer;
 import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -25,6 +29,10 @@ public final class TestItems {
     public static Item hot;
     /** Made carbon by a script only: the ore dictionary cannot take it back, so nothing else uses it. */
     public static Item fuel;
+    /** Another mod's water cell pair, registered with Forge's container registry: 500 mB, stacks to 16. */
+    public static Item cell, emptyCell;
+    /** A tank that keeps its own fluid, as universal cells do: up to 4000 mB, stacking to 4 while empty. */
+    public static Item tank;
     /** Another mod's copper ingot, listed under ingotCopper after MineFantasy's own. */
     public static Item foreignCopper;
 
@@ -51,6 +59,13 @@ public final class TestItems {
         hot = item("hot", new HotItem());
         fuel = item("fuel", new Item());
         foreignCopper = item("foreign_copper", new Item());
+        emptyCell = item("empty_cell", new Item().setMaxStackSize(16));
+        cell = item("cell", new Item().setMaxStackSize(16));
+        FluidContainerRegistry.registerFluidContainer(
+                new FluidStack(FluidRegistry.WATER, 500),
+                new ItemStack(cell),
+                new ItemStack(emptyCell));
+        tank = item("tank", new ItemFluidContainer(0, 4000).setMaxStackSize(4));
         OreDictionary.registerOre("ingotCopper", foreignCopper);
 
         // Carbon burns for four items
