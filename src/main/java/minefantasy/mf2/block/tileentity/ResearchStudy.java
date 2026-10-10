@@ -51,6 +51,11 @@ public final class ResearchStudy {
         return lastStrike;
     }
 
+    /** Whether the displayed progress belongs to this item and viewer, without starting study over. */
+    public boolean belongsTo(ItemStack item, String player) {
+        return player != null && player.equals(researcher) && ItemStack.areItemStacksEqual(studied, item);
+    }
+
     /** A strike at the table at this world time, sped up by the boost; gives what it added. */
     public float strike(long now, float boost) {
         float gained = pace(now - lastStrike) * boost;

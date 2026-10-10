@@ -250,6 +250,16 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
         return null;
     }
 
+    /** Inspection does not call currentPlan: that method restarts work after a changed recipe. */
+    public CraftPlan getShownPlan() {
+        CraftPlan plan = plan(MFRecipes.find(MFRecipes.TANNING, items[0]));
+        return craft.holds(plan) ? plan : null;
+    }
+
+    public boolean hasWorkProject() {
+        return craft.isRunning();
+    }
+
     /** Pays for the work and leaves the product on the rack; returned containers without room drop off it. */
     private boolean finish(CraftPlan plan) {
         List<ItemStack> spill = new ArrayList<>();

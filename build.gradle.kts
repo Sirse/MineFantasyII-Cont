@@ -132,7 +132,7 @@ dependencies {
   implementation(modUtils.enableMixins(mixinProvider, mixinRefMap))
 
   api("com.github.GTNewHorizons:NotEnoughItems:${versionNEI}:dev")
-  // Kept for the Waila support still to be written; nothing references it yet. Not transitive: it drags in
+  // Waila is optional: its provider is loaded only by Waila's IMC callback. Not transitive: it drags in
   // cofh-core from the CurseForge repository, which this build does not declare, and its own older NEI.
   api("com.github.GTNewHorizons:waila:${versionWaila}:dev") {
     isTransitive = false

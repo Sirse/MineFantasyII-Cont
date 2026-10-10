@@ -139,6 +139,7 @@ public class MineFantasyHUD extends Gui {
     }
 
     private void renderBlockHUD(EntityPlayer player, int x, int y, int z, int screenWidth, int screenHeight) {
+        if (!ConfigClient.showBlockHud) return;
         TileEntity tile = player.worldObj.getTileEntity(x, y, z);
         if (tile == null) return;
 

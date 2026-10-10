@@ -470,6 +470,14 @@ public class TileEntityAnvilMF extends TileEntityStation
         return canCraft() ? verdict.getPenalty() : CheckResult.Reason.OUTPUT_FULL;
     }
 
+    @Override
+    public CheckResult.Reason getWorkProblem(EntityPlayer player) {
+        if (project != null && project.getGeneration() != MFRecipes.ANVIL.published().getGeneration()) {
+            return CheckResult.Reason.of("checking");
+        }
+        return requirementProblem(player);
+    }
+
     private ItemStack findRepair() {
         return craftMatrix == null ? null : CraftingManagerAnvil.getInstance().findRepairResult(craftMatrix);
     }

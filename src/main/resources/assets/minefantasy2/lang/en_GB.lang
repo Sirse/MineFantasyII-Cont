@@ -106,5 +106,5 @@ knowledge.requires=After:
 knowledge.opens=Leads to:
 knowledge.learnableNow=Can be learned now:
 knowledge.andMore=...and %1$s more
-knowledge.controls=Drag the map, scroll to zoom. H: back to the start, F: the whole category, /: search. Double-click the map to let the chosen entry go.
+knowledge.controls=Drag the map, scroll to zoom. H: back to the start, F: the whole category, /: search. Double-click the map to let the chosen entry go. Right-click: back.
 knowledge.status.needsSkill=Needs more skill

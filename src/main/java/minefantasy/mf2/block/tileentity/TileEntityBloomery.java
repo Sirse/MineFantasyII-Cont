@@ -74,6 +74,15 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
         return lookup.find(RecipeLookup.keysOf(input), entry -> checkEntry(entry, user));
     }
 
+    /** A HUD may check the running project, but must never extinguish it or pay out its bloom. */
+    public CheckResult inspectWork(EntityPlayer player) {
+        CheckResult result = check(player);
+        if (isActive && result.isSuccess() && !project.holds(result)) {
+            return CheckResult.failure(CheckResult.Reason.of("checking"));
+        }
+        return result;
+    }
+
     /** What stops the bloomery before any recipe is looked at, or null. */
     private CheckResult.Reason stationProblem() {
         if (hasBloom()) {

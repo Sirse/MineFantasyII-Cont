@@ -110,6 +110,29 @@ public class DecorTest {
     }
 
     @GameTest
+    public static void pickingWoodenBlocksKeepsTheirMaterial(GameTestHelper helper) {
+        TestPos at = helper.absolute(1, 1, 1);
+        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+        for (Block block : new Block[] { BlockListMF.crate_basic, BlockListMF.trough_wood, BlockListMF.rack_wood }) {
+            for (String wood : new String[] { "RefinedWood", "IronbarkWood" }) {
+                place(helper, block, 0, wooden(block, wood));
+                ItemStack picked = block.getPickBlock(null, helper.getWorld(), at.x(), at.y(), at.z(), player);
+                assertEquals("pick lost material", wood.toLowerCase(), woodOf(picked));
+                assertEquals(
+                        "pick changed the block",
+                        wood.toLowerCase(),
+                        tile(helper, TileEntityWoodDecor.class).getMaterialName());
+                place(helper, block, 0, picked);
+                assertEquals(
+                        "picked block lost material on placement",
+                        wood.toLowerCase(),
+                        tile(helper, TileEntityWoodDecor.class).getMaterialName());
+            }
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void anAmmoBoxKeepsItsAmmoThroughTheItem(GameTestHelper helper) {
         Stations.begin(helper);
         try {

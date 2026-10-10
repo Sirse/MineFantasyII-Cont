@@ -521,6 +521,14 @@ public class TileEntityKitchenBench extends TileEntityStation
         return canCraft() ? null : CheckResult.Reason.OUTPUT_FULL;
     }
 
+    @Override
+    public CheckResult.Reason getWorkProblem(EntityPlayer player) {
+        if (project != null && project.getGeneration() != MFRecipes.KITCHEN.published().getGeneration()) {
+            return CheckResult.Reason.of("checking");
+        }
+        return requirementProblem(player);
+    }
+
     public void updateCraftingData() {
         if (!worldObj.isRemote) {
             if (craftMatrix != null) {

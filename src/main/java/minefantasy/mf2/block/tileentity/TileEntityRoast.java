@@ -229,6 +229,20 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
         return "";
     }
 
+    /** The cooking whose progress is still valid, read without restarting or finishing it. */
+    public CookRecipe.Found getShownCooking() {
+        CookRecipe.Found found = CookRecipe.find(items[0], isOven());
+        return craft.holds(plan(found, false)) ? found : null;
+    }
+
+    public boolean hasCookingProject() {
+        return craft.isRunning();
+    }
+
+    public int getWorkTemperature() {
+        return worldObj != null && worldObj.blockExists(xCoord, yCoord - 1, zCoord) ? getTemp() : 0;
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);

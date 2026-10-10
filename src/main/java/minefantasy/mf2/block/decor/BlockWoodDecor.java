@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
@@ -58,6 +59,13 @@ public abstract class BlockWoodDecor<T extends TileEntityWoodDecor> extends Bloc
             CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, tile.getMaterialName());
         }
         return item;
+    }
+
+    /** Waila and creative pick-block both need the placed wood, rather than an untagged "Any" item. */
+    @Override
+    public ItemStack getPickBlock(MovingObjectPosition target, World world, int x, int y, int z) {
+        T tile = getTile(world, x, y, z);
+        return construct(tile == null ? "RefinedWood" : tile.getMaterialName());
     }
 
     @Override

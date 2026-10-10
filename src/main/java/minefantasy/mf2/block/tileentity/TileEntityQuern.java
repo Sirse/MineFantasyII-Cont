@@ -89,6 +89,21 @@ public class TileEntityQuern extends TileEntityStation implements Diagnosis.Sour
         return item != null && item.getItem() == ComponentListMF.clay_pot;
     }
 
+    /** The same valid grind as check(), with an explanation when a pot or station tier prevents it. */
+    public CheckResult inspectWork() {
+        if (inv[0] == null) return CheckResult.failure(CheckResult.Reason.MISSING_INPUT);
+        CheckResult result = check();
+        if (result.isSuccess() || result.getReason() != CheckResult.Reason.NO_RECIPE) return result;
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.QUERN, inv[0]);
+        if (entry == null) return result;
+        if (entry.getRecipe().get(MFRecipeKeys.CONSUME_POT, true) && inv[1] == null) {
+            return CheckResult.failure(CheckResult.Reason.of("pot"));
+        }
+        CheckResult.Reason problem = Requirements.QUERN
+                .stationProblem(getTier(), entry.getRecipe().get(MFRecipeKeys.TIER, 0));
+        return problem == null ? result : CheckResult.failure(problem);
+    }
+
     @Override
     public void updateEntity() {
         int max = getMaxRevs();

@@ -34,9 +34,14 @@ public final class FluidsMF {
 
     private FluidsMF() {}
 
+    /** Whether this mod supplies the fluid's appearance rather than another mod. */
+    public static boolean isOwn(Fluid fluid) {
+        return OWN.contains(fluid);
+    }
+
     /** Takes or registers the fluids and their containers: after every mod has registered its own. */
     public static void load() {
-        seedOil = shared("seedoil", 0xFFFFA8, 885, 5000);
+        seedOil = shared("seedoil", 0x59431F, 885, 5000);
         saltWater = shared("saltwater", 0xD8ECF0, 1025, 1000);
         FluidContainerRegistry.registerFluidContainer(
                 new FluidStack(FluidRegistry.WATER, JUG),

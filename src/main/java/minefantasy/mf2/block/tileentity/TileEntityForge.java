@@ -29,6 +29,7 @@ import minefantasy.mf2.item.list.ComponentListMF;
 public class TileEntityForge extends TileEntityStation implements IBasicMetre, IHeatSource, IBellowsUseable {
 
     public static final float maxTemperature = 5000;
+    private static final float FUEL_PER_TICK = 0.2F;
     public float fuel;
     public float maxFuel = 6000;// 5m
     public float temperature, fuelTemperature;
@@ -155,11 +156,16 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     private void tickFuel() {
         if (fuel > 0) {
-            fuel -= 0.2F;
+            fuel -= FUEL_PER_TICK;
             saveLater();
         }
 
         if (fuel < 0) fuel = 0;
+    }
+
+    /** Remaining burn time at the same consumption rate the server ticks. */
+    public float getFuelSeconds() {
+        return Math.max(0F, fuel) / (20F * FUEL_PER_TICK);
     }
 
     private boolean isBurning() {

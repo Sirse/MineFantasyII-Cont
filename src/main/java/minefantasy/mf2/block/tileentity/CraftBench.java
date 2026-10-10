@@ -3,6 +3,8 @@ package minefantasy.mf2.block.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.recipe.CheckResult;
+
 /** A bench worked by hand, as its window shows it: the project, its progress and what it asks of tool and bench. */
 public interface CraftBench {
 
@@ -23,6 +25,9 @@ public interface CraftBench {
     float getProgress();
 
     float getProgressMax();
+
+    /** Reads the current project's refusal or penalty without refreshing recipes or changing progress. */
+    CheckResult.Reason getWorkProblem(EntityPlayer player);
 
     /** The bench tier the project needs; -1 for any. */
     int getBenchTierNeeded();

@@ -268,6 +268,11 @@ public class GuiKnowledgeEntry extends GuiScreen {
 
     @Override
     protected void mouseClicked(int screenX, int screenY, int button) {
+        if (button == 1) {
+            // A right click goes back to the map, as Esc does
+            this.mc.displayGuiScreen(parentGui);
+            return;
+        }
         int x = frame.toBook(screenX), y = frame.toBook(screenY);
         for (int side = 0; side < 2 && currentPage + side < pages; side++) {
             if (laidOut.get(currentPage + side).mouseClicked(x, y, button)) {

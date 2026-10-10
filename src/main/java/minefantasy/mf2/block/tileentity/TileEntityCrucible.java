@@ -19,6 +19,7 @@ import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
+import minefantasy.mf2.api.recipe.CheckResult;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.RecipeEntry;
@@ -174,6 +175,10 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             }
         }
 
+        return hasOutputRoom();
+    }
+
+    private boolean hasOutputRoom() {
         ItemStack result = this.cachedRecipeOutput;
         ItemStack outputSlot = inventory[OUTPUT_SLOT];
 
@@ -184,6 +189,35 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             return (outputSlot.stackSize + result.stackSize) <= outputSlot.getMaxStackSize();
         }
         return false;
+    }
+
+    /** Reads the last recipe lookup; a reload waits for the next normal station update. */
+    public ItemStack getShownResult() {
+        return cachedRecipeVersion == AlloyRecipes.getVersion() && cachedRecipeOutput != null
+                ? cachedRecipeOutput.copy()
+                : null;
+    }
+
+    /** HUD inspection must not rebuild the recipe or scan the structure. */
+    public CheckResult.Reason getWorkProblem() {
+        if (recipeCacheDirty || cachedTier < 0 || cachedRecipeVersion != AlloyRecipes.getVersion()) {
+            return CheckResult.Reason.of("checking");
+        }
+        if (cachedTier >= 1 && !cachedCoated) {
+            return CheckResult.Reason.of("not_built");
+        }
+        if (cachedRecipeOutput == null) {
+            return CheckResult.Reason.NO_RECIPE;
+        }
+        if (temperature <= 0) {
+            return CheckResult.Reason.of("no_heat");
+        }
+        for (int slot = 0; slot < GRID_SLOT_COUNT; slot++) {
+            if (inventory[slot] != null && inventory[slot].stackSize < getRequiredAmount(slot)) {
+                return CheckResult.Reason.MISSING_INPUT;
+            }
+        }
+        return hasOutputRoom() ? null : CheckResult.Reason.OUTPUT_FULL;
     }
 
     private void updateCachedRecipe() {

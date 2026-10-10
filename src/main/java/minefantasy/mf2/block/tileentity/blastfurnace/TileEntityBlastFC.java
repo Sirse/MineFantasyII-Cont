@@ -12,6 +12,8 @@ import net.minecraft.tileentity.TileEntity;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.recipe.CheckResult;
+import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.refine.ISmokeCarrier;
@@ -48,6 +50,22 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     protected static ItemStack getResult(ItemStack input) {
         RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.BLAST_FURNACE, input);
         return entry == null ? null : entry.getRecipe().getOutput();
+    }
+
+    /** Reads the shaft's next product without spending carbon charges or checking its surrounding blocks. */
+    public CheckResult inspectWork() {
+        if (getSizeInventory() < 2) return CheckResult.failure(CheckResult.Reason.MISSING_INPUT);
+        if (!isBuilt) return CheckResult.failure(CheckResult.Reason.of("not_built"));
+        ItemStack input = getStackInSlot(1);
+        if (input == null) return CheckResult.failure(CheckResult.Reason.MISSING_INPUT);
+        if (tempUses <= 0 && !isCarbon(getStackInSlot(0))) {
+            return CheckResult.failure(CheckResult.Reason.of("carbon", 0, 1));
+        }
+        RecipeEntry<ProcessRecipe> entry = MFRecipes.find(MFRecipes.BLAST_FURNACE, input);
+        if (entry == null) return CheckResult.failure(CheckResult.Reason.NO_RECIPE);
+        return CheckResult.success(
+                CraftPlan.builder(entry.getId(), MFRecipes.BLAST_FURNACE.published().getGeneration())
+                        .use(1, entry.getRecipe().getInput(), input).product(entry.getRecipe().getOutput()).build());
     }
 
     @Override

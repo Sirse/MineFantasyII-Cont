@@ -293,7 +293,7 @@ public class TileEntityBigFurnace extends TileEntityStation
         SmokeMechanics.emitSmokeIndirect(world, x + dir.offsetX, y + (isHeater() ? 2 : 1), z + dir.offsetZ, 1);
     }
 
-    private int getMaxTime() {
+    public int getMaxTime() {
         return (int) 1.0E+5;
     }
 
@@ -331,6 +331,11 @@ public class TileEntityBigFurnace extends TileEntityStation
      * smelting one item. Null when nothing smelts or the output has no room.
      */
     private CraftPlan planFor(int input, int output) {
+        CraftPlan plan = buildPlanFor(input, output);
+        return plan != null && plan.canApplySpilling(CraftInventory.of(this)) ? plan : null;
+    }
+
+    private CraftPlan buildPlanFor(int input, int output) {
         ItemStack in = inv[input];
         if (isHeater() || !built || in == null) {
             return null;
@@ -353,7 +358,17 @@ public class TileEntityBigFurnace extends TileEntityStation
                     .build();
         }
         // Returned containers without room are dropped, so only the product has to fit
-        return plan.canApplySpilling(CraftInventory.of(this)) ? plan : null;
+        return plan;
+    }
+
+    /** At most four current plans, including blocked outputs, without advancing the furnace. */
+    public List<CraftPlan> getShownPlans() {
+        List<CraftPlan> plans = new ArrayList<>();
+        for (int slot = 0; slot < 4; slot++) {
+            CraftPlan plan = buildPlanFor(slot, slot + 4);
+            if (plan != null) plans.add(plan);
+        }
+        return plans;
     }
 
     private TileEntityBigFurnace getHeater() {

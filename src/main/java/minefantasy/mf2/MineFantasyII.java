@@ -123,6 +123,7 @@ public class MineFantasyII {
 
     @EventHandler
     public void load(FMLInitializationEvent evt) {
+        FMLInterModComms.sendMessage("Waila", "register", "minefantasy.mf2.integration.waila.WailaProvider.register");
         proxy.registerMain();
         GameRegistry.registerWorldGenerator(worldGenManager, 0);
 

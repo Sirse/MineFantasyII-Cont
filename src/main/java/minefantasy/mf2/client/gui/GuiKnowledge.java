@@ -401,7 +401,15 @@ public class GuiKnowledge extends GuiScreen {
     protected void mouseClicked(int screenX, int screenY, int button) {
         int x = toBook(screenX), y = toBook(screenY);
         int ribbon = button == 0 ? ribbonAt(x, y) : -2;
-        if (button == 0 && overButton(x, y)) {
+        if (button == 1) {
+            // A right click steps back one level: out of the search, then off the chosen entry
+            if (search.isOpen()) {
+                search.close();
+            } else if (pinned != null) {
+                pinned = null;
+                search.choseElsewhere();
+            }
+        } else if (button == 0 && overButton(x, y)) {
             // A button over the map takes the click, not the seal beneath it
         } else if (button == 0 && switchArrowAt(x, y) != 0) {
             stepMatch(switchArrowAt(x, y));

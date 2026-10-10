@@ -25,6 +25,7 @@ public class ConfigClient extends ConfigurationBaseMF {
     public static boolean playBreath;
     public static boolean playHitsound;
     public static boolean customModel;
+    public static boolean showBlockHud = true;
     public static int stam_xOrient;
     public static int stam_yOrient;
     public static int stam_xPos;
@@ -45,6 +46,13 @@ public class ConfigClient extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
+        showBlockHud = config
+                .get(
+                        CATEGORY_GUI,
+                        "Show Native Block HUD",
+                        true,
+                        "Shows MineFantasy's block meters. Disable when using Waila for station information.")
+                .getBoolean();
         playBreath = config.get(
                 CATEGORY_AESTHETIC,
                 "Make Breathe Sound",
