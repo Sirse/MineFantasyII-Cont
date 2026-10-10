@@ -63,7 +63,17 @@ final class Scripts {
 
     /** Reloads with the script made of these lines; returns the errors CraftTweaker logged. */
     static List<String> run(String... lines) {
+        return run(false, lines);
+    }
+
+    /** Reloads with the script made of these lines; returns the warnings CraftTweaker logged. */
+    static List<String> warnings(String... lines) {
+        return run(true, lines);
+    }
+
+    private static List<String> run(boolean warnings, String... lines) {
         List<String> errors = new ArrayList<>();
+        List<String> warned = new ArrayList<>();
         ILogger capture = new ILogger() {
 
             @Override
@@ -73,7 +83,9 @@ final class Scripts {
             public void logInfo(String message) {}
 
             @Override
-            public void logWarning(String message) {}
+            public void logWarning(String message) {
+                warned.add(message);
+            }
 
             @Override
             public void logError(String message) {
@@ -94,7 +106,31 @@ final class Scripts {
         } finally {
             MineTweakerImplementationAPI.logger.removeLogger(capture);
         }
-        return errors;
+        return warnings ? warned : errors;
+    }
+
+    /**
+     * The recipe a script line builds, through CraftTweaker's own reload, with the server's scripts back in place
+     * afterwards. A test over ticks hands it to {@link Stations#reload} as its layer: a CraftTweaker reload by a test
+     * running alongside would otherwise drop it before the station gets to it.
+     */
+    static <R> R build(RecipeRegistry<R> registry, String id, String... lines) throws Exception {
+        IScriptProvider server = serverScripts();
+        try {
+            List<String> errors = run(lines);
+            if (!errors.isEmpty()) {
+                throw new IllegalStateException("the script failed: " + errors);
+            }
+            RecipeEntry<R> entry = registry.published().get(RecipeId.parse(id));
+            if (entry == null) {
+                throw new IllegalStateException("the script built no " + id);
+            }
+            return entry.getRecipe();
+        } finally {
+            MineTweakerImplementationAPI.setScriptProvider(server);
+            MineTweakerImplementationAPI.reload();
+            Stations.publish();
+        }
     }
 
     /** Runs the body, then reloads the server's own scripts and the running tests' recipes. */

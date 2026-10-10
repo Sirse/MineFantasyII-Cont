@@ -40,8 +40,14 @@ public class PaintOil {
     }
 
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        ScriptProcess.removeByOutput(MFRecipes.PAINT_OIL, output, input);
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        ScriptProcess.removeByOutput(MFRecipes.PAINT_OIL, output, expected);
+    }
+
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        ScriptProcess.removeAccepting(MFRecipes.PAINT_OIL, input, expected);
     }
 
     private static ProcessRecipe recipe(IItemStack input, IItemStack output) {

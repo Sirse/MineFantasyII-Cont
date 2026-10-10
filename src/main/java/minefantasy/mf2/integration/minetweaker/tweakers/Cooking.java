@@ -1,18 +1,13 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.List;
-
-import net.minecraft.item.ItemStack;
-
 import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -64,39 +59,32 @@ public class Cooking {
         ScriptRecipes.apply("Removing cooking recipe " + recipeId, tx -> CookRecipe.removeFrom(tx, recipeId));
     }
 
-    /** Removes the recipes making the output (with a matching input, if given) and their burn stages. */
+    /** Removes the recipes making the output and their burn stages; with {@code expected}, only if that many. */
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        ScriptRecipes.apply("Removing cooking recipes for " + output, tx -> {
-            List<RecipeId> removed = tx.removeWhere(
-                    MFRecipes.COOKING,
-                    entry -> !entry.getId().getPath().endsWith(CookRecipe.BURNT_SUFFIX)
-                            && output.matches(MineTweakerMC.getIItemStack(entry.getRecipe().getOutput()))
-                            && inputMatches(entry.getRecipe(), input));
-            for (RecipeId id : removed) {
-                RecipeId burnt = CookRecipe.burntId(id);
-                if (MFRecipes.COOKING.containsWorking(burnt)) {
-                    tx.remove(MFRecipes.COOKING, burnt);
-                }
-            }
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No cooking recipes for " + output);
-            } else {
-                MineTweakerAPI.logInfo("Removed cooking recipes " + removed);
-            }
-        });
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        removeWhere("for " + output, recipe -> TweakedIngredients.names(output, recipe.getOutput()), expected);
     }
 
-    private static boolean inputMatches(CookRecipe recipe, IIngredient input) {
-        if (input == null) {
-            return true;
-        }
-        for (ItemStack example : recipe.getInput().examples()) {
-            if (input.matches(MineTweakerMC.getIItemStack(example))) {
-                return true;
-            }
-        }
-        return false;
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        removeWhere("taking " + input, recipe -> TweakedIngredients.takes(recipe.getInput(), input), expected);
+    }
+
+    private static void removeWhere(String what, java.util.function.Predicate<CookRecipe> filter, int expected) {
+        ScriptRecipes.removeWhere(
+                MFRecipes.COOKING,
+                what,
+                entry -> !entry.getId().getPath().endsWith(CookRecipe.BURNT_SUFFIX) && filter.test(entry.getRecipe()),
+                expected,
+                (tx, removed) -> {
+                    for (RecipeId id : removed) {
+                        RecipeId burnt = CookRecipe.burntId(id);
+                        if (MFRecipes.COOKING.containsWorking(burnt)) {
+                            tx.remove(MFRecipes.COOKING, burnt);
+                        }
+                    }
+                });
     }
 
     private static CookRecipe recipe(IItemStack output, IIngredient input, int minTemp, int maxTemp, int time,

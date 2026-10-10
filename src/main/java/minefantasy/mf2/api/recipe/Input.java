@@ -7,10 +7,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -207,6 +209,31 @@ public final class Input {
         return new Input(matcher, amount, usage, main, haft, true, exactNbt, condition, conditionDescription);
     }
 
+    /**
+     * Whether {@code have} holds everything in {@code want}, nested compounds key by key; other tags may be there too.
+     */
+    public static boolean containsTag(NBTTagCompound have, NBTTagCompound want) {
+        if (want == null || want.hasNoTags()) {
+            return true;
+        }
+        if (have == null) {
+            return false;
+        }
+        for (Object key : want.func_150296_c()) {
+            String name = (String) key;
+            NBTBase wanted = want.getTag(name);
+            NBTBase held = have.getTag(name);
+            if (wanted instanceof NBTTagCompound && held instanceof NBTTagCompound) {
+                if (!containsTag((NBTTagCompound) held, (NBTTagCompound) wanted)) {
+                    return false;
+                }
+            } else if (!wanted.equals(held)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** Requires the stack's whole tag to equal {@code tag}. Use only when every tag counts. */
     public Input exactNbt(NBTTagCompound tag) {
         return new Input(
@@ -313,6 +340,22 @@ public final class Input {
         return conditionDescription;
     }
 
+    /**
+     * Any carbon the bloomery and blast furnace burn, judged when looked up: carbon added later, by a script line after
+     * the recipe or by a reload, still counts.
+     */
+    public static Input carbon() {
+        return of(new CarbonMatcher());
+    }
+
+    /**
+     * Whatever the test accepts, judged when looked up, as a script ingredient with conditions or alternatives is: the
+     * examples only show what it takes. Filed under a key every stack looks up with, as no item can be named for it.
+     */
+    public static Input matching(Predicate<ItemStack> test, Supplier<List<ItemStack>> examples, String description) {
+        return of(new TestMatcher(test, examples)).where(test, description);
+    }
+
     /** Index keys under which a registry files this input. */
     public Set<Object> indexKeys() {
         Set<Object> keys = new LinkedHashSet<>();
@@ -349,6 +392,10 @@ public final class Input {
             return;
         }
         keys.add(stack.getItem());
+        keys.add(ANY_KEY);
+        if (minefantasy.mf2.api.crafting.MineFantasyFuels.isCarbon(stack)) {
+            keys.add(CARBON_KEY);
+        }
         for (String name : OreNames.get().namesOf(stack)) {
             keys.add(oreKey(name));
         }
@@ -359,6 +406,60 @@ public final class Input {
 
     private static String oreKey(String name) {
         return "ore:" + name;
+    }
+
+    private static final String CARBON_KEY = "carbon";
+    private static final String ANY_KEY = "any";
+
+    private static final class TestMatcher implements Matcher {
+
+        private final Predicate<ItemStack> test;
+        private final Supplier<List<ItemStack>> examples;
+
+        TestMatcher(Predicate<ItemStack> test, Supplier<List<ItemStack>> examples) {
+            this.test = test;
+            this.examples = examples;
+        }
+
+        @Override
+        public boolean matches(ItemStack stack) {
+            return test.test(stack);
+        }
+
+        @Override
+        public void indexKeys(Set<Object> keys) {
+            keys.add(ANY_KEY);
+        }
+
+        @Override
+        public void examples(List<ItemStack> out, int amount) {
+            for (ItemStack stack : examples.get()) {
+                ItemStack copy = stack.copy();
+                copy.stackSize = amount;
+                out.add(copy);
+            }
+        }
+    }
+
+    private static final class CarbonMatcher implements Matcher {
+
+        @Override
+        public boolean matches(ItemStack stack) {
+            return minefantasy.mf2.api.crafting.MineFantasyFuels.isCarbon(stack);
+        }
+
+        @Override
+        public void indexKeys(Set<Object> keys) {
+            keys.add(CARBON_KEY);
+        }
+
+        @Override
+        public void examples(List<ItemStack> out, int amount) {
+            for (ItemStack stack : minefantasy.mf2.api.crafting.MineFantasyFuels.carbonItems()) {
+                stack.stackSize = amount;
+                out.add(stack);
+            }
+        }
     }
 
     private static final class ItemMatcher implements Matcher {

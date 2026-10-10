@@ -1,6 +1,7 @@
 package minefantasy.mf2.integration.minetweaker;
 
 import cpw.mods.fml.common.Optional;
+import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minefantasy.mf2.integration.minetweaker.tweakers.*;
 import minetweaker.MineTweakerAPI;
@@ -22,6 +23,8 @@ public class MTCompat {
         MineTweakerAPI.registerClass(Crucible.class);
         MineTweakerAPI.registerClass(Forge.class);
         MineTweakerAPI.registerClass(Fuels.class);
+        MineTweakerAPI.registerClass(GridBuilder.class);
+        MineTweakerAPI.registerClass(MaterialStacks.class);
         MineTweakerAPI.registerClass(PaintOil.class);
         MineTweakerAPI.registerClass(SpecialForging.class);
         MineTweakerAPI.registerClass(TanningRack.class);
@@ -41,15 +44,15 @@ public class MTCompat {
         @Optional.Method(modid = "MineTweaker3")
         @Override
         public void remove(IIngredient iIngredient) {
-            Anvil.removeByOutput(iIngredient, null);
-            CarpentersBench.removeByOutput(iIngredient, null);
-            BigFurnace.removeByOutput(iIngredient, null);
-            Cooking.removeByOutput(iIngredient, null);
-            Crucible.removeByOutput(iIngredient, null);
+            Anvil.removeByOutput(iIngredient, 0);
+            CarpentersBench.removeByOutput(iIngredient, 0);
+            BigFurnace.removeByOutput(iIngredient, 0);
+            Cooking.removeByOutput(iIngredient, 0);
+            Crucible.removeByOutput(iIngredient, 0);
             SalvageTweaker.removeByPart(iIngredient, null);
-            Bloomery.removeByOutput(iIngredient, null);
-            Quern.removeByOutput(iIngredient, null);
-            TanningRack.removeByOutput(iIngredient, null);
+            Bloomery.removeByOutput(iIngredient, 0);
+            Quern.removeByOutput(iIngredient, 0);
+            TanningRack.removeByOutput(iIngredient, 0);
         }
     }
 }

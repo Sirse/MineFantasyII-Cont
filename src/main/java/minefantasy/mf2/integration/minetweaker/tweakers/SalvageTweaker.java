@@ -9,10 +9,10 @@ import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -32,18 +32,10 @@ public class SalvageTweaker {
             for (int i = 0; i < parts.length; i++) {
                 components[i] = ScriptInputs.toOutput(parts[i]);
             }
-            int count = 0;
-            for (IItemStack item : input.getItems()) {
-                ItemStack stack = MineTweakerMC.getItemStack(item);
-                if (stack == null || stack.getItem() == null) {
-                    continue;
-                }
+            // Salvage is kept per item and material, with nowhere to keep a condition such as onlyWithTag
+            for (ItemStack stack : TweakedIngredients.plainItems("Salvage", input, true)) {
                 Salvage.SalvageRecipe recipe = Salvage.SalvageRecipe.parts(stack, components);
                 tx.set(MFRecipes.SALVAGE, Salvage.partsId(stack), recipe, Salvage.priorityOf(recipe));
-                count++;
-            }
-            if (count == 0) {
-                throw new IllegalArgumentException("Ingredient " + input + " lists no valid items");
             }
         });
     }
@@ -67,11 +59,11 @@ public class SalvageTweaker {
                 if (recipe.getAlias() != null) {
                     return false;
                 }
-                if (input != null && !input.matches(MineTweakerMC.getIItemStack(recipe.getDisplayInput()))) {
+                if (input != null && !TweakedIngredients.names(input, recipe.getDisplayInput())) {
                     return false;
                 }
-                return part == null || recipe.getParts().stream()
-                        .anyMatch(stack -> part.matches(MineTweakerMC.getIItemStack(stack)));
+                return part == null
+                        || recipe.getParts().stream().anyMatch(stack -> TweakedIngredients.names(part, stack));
             });
             if (removed.isEmpty()) {
                 MineTweakerAPI.logWarning("No salvage entries for " + (input != null ? input : part));

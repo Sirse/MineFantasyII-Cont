@@ -75,9 +75,9 @@ public abstract class RecipeHandlerBench extends MFNEIRecipeHandler {
                     || !NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, recipe.getResearch())) {
                 continue;
             }
-            CachedBenchRecipe cached = new CachedBenchRecipe(recipe);
-            if (cached.contains(cached.ingredients, ingredient.getItem())
-                    && cached.contains(cached.ingredients, ingredient)) {
+            // The recipe's own rule, not its examples: a script ingredient may take more than it lists
+            if (recipe.takes(ingredient)) {
+                CachedBenchRecipe cached = new CachedBenchRecipe(recipe);
                 cached.setIngredientPermutation(cached.ingredients, ingredient);
                 arecipes.add(cached);
             }

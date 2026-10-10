@@ -7,6 +7,8 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.event.ClickEvent;
+import net.minecraft.event.HoverEvent;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.ChatStyle;
@@ -19,12 +21,14 @@ import minefantasy.mf2.api.recipe.Diagnosis;
 /**
  * {@code /mf recipes [station] [page]}: shows a pack maker which recipe a station picks and why the others lose.
  * Looking at a station, it lists the candidates for what the station holds; with a station name, those for the held
- * item. A long list comes a page at a time.
+ * item. A long list comes a page at a time; clicking a candidate puts the script line removing it in the chat box.
  */
 final class RecipesCommand {
 
     static final String USAGE = "command.mf.recipes.usage";
     static final int PAGE_SIZE = 8;
+    /** The longest line the chat box takes. */
+    static final int CHAT_LIMIT = 100;
 
     private RecipesCommand() {}
 
@@ -45,22 +49,25 @@ final class RecipesCommand {
                 page = parsePageOrStation(player, args[0]);
             }
         }
-        Diagnosis diagnosis;
+        report(player, diagnosis(player, station), station, page);
+    }
+
+    /** The lookup of the station looked at, or of the named one for the held item. */
+    private static Diagnosis diagnosis(EntityPlayer player, String station) {
         if (station == null) {
-            diagnosis = RecipeDiagnostics.lookedAt(player);
+            Diagnosis diagnosis = RecipeDiagnostics.lookedAt(player);
             if (diagnosis == null) {
                 throw new CommandException("command.mf.recipes.no_station");
             }
-        } else {
-            if (!RecipeDiagnostics.isStation(station)) {
-                throw new CommandException("command.mf.recipes.unknown_station", station);
-            }
-            if (player.getHeldItem() == null) {
-                throw new CommandException("command.mf.recipes.no_item");
-            }
-            diagnosis = RecipeDiagnostics.forStack(station, player.getHeldItem());
+            return diagnosis;
         }
-        report(player, diagnosis, station, page);
+        if (!RecipeDiagnostics.isStation(station)) {
+            throw new CommandException("command.mf.recipes.unknown_station", station);
+        }
+        if (player.getHeldItem() == null) {
+            throw new CommandException("command.mf.recipes.no_item");
+        }
+        return RecipeDiagnostics.forStack(station, player.getHeldItem());
     }
 
     /** A lone argument is a page of the station looked at when it is a number, and else an unknown station. */
@@ -79,8 +86,11 @@ final class RecipesCommand {
         if (page > pages) {
             throw new CommandException("command.mf.recipes.no_page", page, pages);
         }
-        player.addChatMessage(
-                new ChatComponentTranslation("command.mf.recipes.header", diagnosis.getStation(), candidates.size()));
+        IChatComponent header = new ChatComponentTranslation(
+                "command.mf.recipes.header",
+                diagnosis.getStation(),
+                candidates.size());
+        player.addChatMessage(header);
         if (diagnosis.getProblem() != null) {
             player.addChatMessage(color(reason(diagnosis.getProblem()), EnumChatFormatting.RED));
             return;
@@ -91,7 +101,17 @@ final class RecipesCommand {
             Diagnosis.Candidate candidate = candidates.get(n);
             IChatComponent line = new ChatComponentText(
                     "#" + (n + 1) + " " + candidate.getId() + " [" + candidate.getPriority() + "] ");
-            player.addChatMessage(line.appendSibling(verdict(candidate.getReason())));
+            line.appendSibling(verdict(candidate.getReason()));
+            String remove = ItemScript.removeLine(candidate.getId());
+            if (remove != null) {
+                ChatStyle style = new ChatStyle()
+                        .setChatHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ChatComponentText(remove)));
+                if (remove.length() <= CHAT_LIMIT) {
+                    style.setChatClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, remove));
+                }
+                line.setChatStyle(style);
+            }
+            player.addChatMessage(line);
         }
         if (pages > 1) {
             String next = "/mf recipes " + (station == null ? "" : station + " ") + Math.min(page + 1, pages);

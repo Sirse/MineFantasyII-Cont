@@ -1,16 +1,12 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
-import java.util.List;
 import java.util.function.Supplier;
-
-import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
-import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
-import minetweaker.api.minecraft.MineTweakerMC;
+import minetweaker.api.item.IItemStack;
 
 /**
  * The script operations shared by every one-input station: add, replace, remove by id and remove by output. Recipes are
@@ -45,30 +41,21 @@ public final class ScriptProcess {
                 tx -> tx.remove(registry, recipeId));
     }
 
-    /** Removes every recipe with a matching output (and an input example matching, if given); logs the ids. */
-    public static void removeByOutput(RecipeRegistry<ProcessRecipe> registry, IIngredient output, IIngredient input) {
-        String station = registry.getStation();
-        ScriptRecipes.apply("Removing " + station + " recipes for " + output, tx -> {
-            List<RecipeId> removed = tx.removeWhere(registry, entry -> {
-                ProcessRecipe recipe = entry.getRecipe();
-                if (!output.matches(MineTweakerMC.getIItemStack(recipe.getOutput()))) {
-                    return false;
-                }
-                if (input == null) {
-                    return true;
-                }
-                for (ItemStack example : recipe.getInput().examples()) {
-                    if (input.matches(MineTweakerMC.getIItemStack(example))) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No " + station + " recipes for " + output);
-            } else {
-                MineTweakerAPI.logInfo("Removed " + station + " recipes " + removed);
-            }
-        });
+    /** Removes every recipe with a matching output; logs the ids. */
+    public static void removeByOutput(RecipeRegistry<ProcessRecipe> registry, IIngredient output, int expected) {
+        ScriptRecipes.removeWhere(
+                registry,
+                "for " + output,
+                recipe -> TweakedIngredients.names(output, recipe.getOutput()),
+                expected);
+    }
+
+    /** Removes every recipe whose input would take the stack; logs the ids. */
+    public static void removeAccepting(RecipeRegistry<ProcessRecipe> registry, IItemStack input, int expected) {
+        ScriptRecipes.removeWhere(
+                registry,
+                "taking " + input,
+                recipe -> TweakedIngredients.takes(recipe.getInput(), input),
+                expected);
     }
 }

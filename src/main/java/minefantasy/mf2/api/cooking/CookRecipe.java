@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
+import net.minecraft.nbt.NBTTagCompound;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.NativeRecipes;
@@ -89,17 +90,15 @@ public final class CookRecipe implements RecipeChecks.Validated {
         if (!canBurn) {
             return null;
         }
-        // The whole cooked result burns, however many it is
-        return new CookRecipe(
-                Input.of(output.getItem(), output.getItemDamage()).amount(output.stackSize),
-                burnt.copy(),
-                null,
-                minTemperature,
-                maxTemperature,
-                burnTime,
-                0,
-                baking,
-                false);
+        // The whole cooked result burns, however many it is; a tagged result only, other tags allowed, so foods told
+        // apart
+        // by NBT keep their own heat
+        Input cooked = Input.of(output.getItem(), output.getItemDamage()).amount(output.stackSize);
+        if (output.hasTagCompound() && !output.getTagCompound().hasNoTags()) {
+            NBTTagCompound tag = (NBTTagCompound) output.getTagCompound().copy();
+            cooked = cooked.where(stack -> Input.containsTag(stack.getTagCompound(), tag), "nbt " + tag);
+        }
+        return new CookRecipe(cooked, burnt.copy(), null, minTemperature, maxTemperature, burnTime, 0, baking, false);
     }
 
     /** Stages the recipe and its burn stage in the transaction. */

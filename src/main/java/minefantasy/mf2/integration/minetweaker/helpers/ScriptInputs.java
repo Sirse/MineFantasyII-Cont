@@ -17,37 +17,63 @@ public final class ScriptInputs {
     private ScriptInputs() {}
 
     /**
-     * An ore entry stays an ore name, resolved at lookup time. Anything else becomes the alternatives it lists, with
-     * the ingredient itself as the condition, so NBT, material and transformer checks written in the script hold.
+     * An ore entry stays an ore name, resolved at lookup time, and {@code MF.input} and {@code MF.carbon} keep their
+     * native rules. A plain stack is its item, checked by the stack itself; alternatives and conditions are checked by
+     * the ingredient alone, its listed items only showing what it takes.
      */
     public static Input toInput(IIngredient ingredient) {
+        try {
+            return convert(ingredient);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("input: " + e.getMessage(), e);
+        }
+    }
+
+    private static Input convert(IIngredient ingredient) {
         if (ingredient == null) {
             throw new IllegalArgumentException("Ingredient must not be null");
         }
+        ScriptWarnings.inputTag(ingredient);
+        TweakedIngredients.requireNoTransformers(ingredient);
         int amount = Math.max(1, ingredient.getAmount());
+        if (ingredient instanceof ExplicitIngredient) {
+            return ((ExplicitIngredient) ingredient).toInput();
+        }
         if (ingredient instanceof IOreDictEntry) {
             return Input.ore(((IOreDictEntry) ingredient).getName()).amount(amount);
         }
-        List<Input> alternatives = new ArrayList<>();
-        for (IItemStack item : ingredient.getItems()) {
+        if (ingredient instanceof IItemStack) {
+            ItemStack stack = MineTweakerMC.getItemStack((IItemStack) ingredient);
+            if (stack == null || stack.getItem() == null) {
+                throw new IllegalArgumentException("Ingredient " + ingredient + " is not an item");
+            }
+            return Input.of(stack.getItem(), stack.getItemDamage()).amount(amount)
+                    .where(item -> ingredient.matches(MineTweakerMC.getIItemStack(item)), String.valueOf(ingredient));
+        }
+        // Alternatives and conditions are judged by the ingredient itself when looked up; the items it lists now only
+        // show what it takes, so a part that grows later, such as MF.carbon(), still counts
+        return Input.matching(
+                item -> ingredient.matches(MineTweakerMC.getIItemStack(item)),
+                () -> listed(ingredient),
+                String.valueOf(ingredient)).amount(amount);
+    }
+
+    private static List<ItemStack> listed(IIngredient ingredient) {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (IItemStack item : TweakedIngredients.items(ingredient)) {
             ItemStack stack = MineTweakerMC.getItemStack(item);
             if (stack != null && stack.getItem() != null) {
-                alternatives.add(Input.of(stack.getItem(), stack.getItemDamage()));
+                stacks.add(stack);
             }
         }
-        if (alternatives.isEmpty()) {
-            throw new IllegalArgumentException("Ingredient " + ingredient + " lists no valid items");
-        }
-        Input base = alternatives.size() == 1 ? alternatives.get(0) : Input.anyOf(alternatives.toArray(new Input[0]));
-        return base.amount(amount)
-                .where(stack -> ingredient.matches(MineTweakerMC.getIItemStack(stack)), String.valueOf(ingredient));
+        return stacks;
     }
 
     /** A script output, checked. */
     public static ItemStack toOutput(IItemStack output) {
         ItemStack stack = MineTweakerMC.getItemStack(output);
         if (stack == null || stack.getItem() == null) {
-            throw new IllegalArgumentException("Invalid output " + output);
+            throw new IllegalArgumentException("output " + output + " is not an item");
         }
         return stack;
     }

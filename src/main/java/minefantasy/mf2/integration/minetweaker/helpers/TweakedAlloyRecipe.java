@@ -16,12 +16,15 @@ public class TweakedAlloyRecipe extends Alloy {
         super(MineTweakerMC.getItemStack(output), requiredLevel, items);
     }
 
-    /**
-     * Carbon sources are interchangeable, so any carbon item satisfies a carbon ingredient
-     */
-    private boolean matchesCarbon(IIngredient ingred, ItemStack stack) {
-        for (IItemStack i : ingred.getItems()) {
-            if (areBothCarbon(MineTweakerMC.getItemStack(i), stack)) {
+    @Override
+    public boolean takes(ItemStack stack) {
+        if (stack == null || stack.getItem() == null) {
+            return false;
+        }
+        for (Object ingredient : getIngredients()) {
+            ItemStack probe = stack.copy();
+            probe.stackSize = Math.max(stack.stackSize, ((IIngredient) ingredient).getAmount());
+            if (TweakedIngredients.matches((IIngredient) ingredient, probe)) {
                 return true;
             }
         }
@@ -59,8 +62,7 @@ public class TweakedAlloyRecipe extends Alloy {
             IIngredient ingred = (IIngredient) ingredients.get(i);
             for (int slot = 0; slot < inv.length; slot++) {
                 ItemStack stack = inv[slot];
-                fits[i][slot] = stack != null
-                        && (TweakedIngredients.matches(ingred, stack) || matchesCarbon(ingred, stack));
+                fits[i][slot] = stack != null && TweakedIngredients.matches(ingred, stack);
             }
         }
         int[] owner = GridMatch.pairAll(fits, inv.length);

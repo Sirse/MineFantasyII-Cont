@@ -1,20 +1,15 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.List;
-import java.util.function.Supplier;
-
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
-import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.mc1710.item.MCItemStack;
+import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -24,31 +19,32 @@ import stanhebben.zenscript.annotations.ZenMethod;
 public class CarpentersBench {
 
     /** Adds {@code crafttweaker:carpenter/<name>}; the grid is at most 4 by 4. */
+    /** A shaped recipe built step by step; see {@link GridBuilder}. Nothing is added before register(). */
+    @ZenMethod
+    public static GridBuilder shaped(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.CARPENTER, name, output, true);
+    }
+
+    /** A shapeless recipe built step by step; see {@link GridBuilder}. */
+    @ZenMethod
+    public static GridBuilder shapeless(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.CARPENTER, name, output, false);
+    }
+
     @ZenMethod
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, double exp, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds,
             @Optional int priority) {
-        if (!TweakedIngredients.fitsGrid(ingreds, 4, 4, "carpenter")) {
-            return;
-        }
-        add(
-                name,
-                () -> TweakedIngredients.shaped(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, hammer)
-                        .stationTier(anvil).time(time).experience((float) exp).sound(sound).research(research)
-                        .skill(getSkillOrWarn(skill, output)).build(),
-                priority);
+        shaped(name, output).cells(ingreds).skill(skill).research(research).sound(sound).experience(exp)
+                .tool(tool, hammer).stationTier(anvil).time(time).priority(priority).register();
     }
 
     @ZenMethod
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, double exp, String tool, int hammer, int anvil, int time, IIngredient[] ingreds,
             @Optional int priority) {
-        add(
-                name,
-                () -> TweakedIngredients.shapeless(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, hammer)
-                        .stationTier(anvil).time(time).experience((float) exp).sound(sound).research(research)
-                        .skill(getSkillOrWarn(skill, output)).build(),
-                priority);
+        shapeless(name, output).ingredients(ingreds).skill(skill).research(research).sound(sound).experience(exp)
+                .tool(tool, hammer).stationTier(anvil).time(time).priority(priority).register();
     }
 
     @ZenMethod
@@ -57,14 +53,14 @@ public class CarpentersBench {
     }
 
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        removeByOutput(MFRecipes.CARPENTER, output, input);
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        removeByOutput(MFRecipes.CARPENTER, output, expected);
     }
 
-    private static void add(String name, Supplier<GridRecipe> recipe, int priority) {
-        RecipeId id = ScriptRecipes.scriptId(MFRecipes.CARPENTER.getStation(), name);
-        ScriptRecipes
-                .apply("Adding carpenter recipe " + id, tx -> tx.add(MFRecipes.CARPENTER, id, recipe.get(), priority));
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        removeAccepting(MFRecipes.CARPENTER, input, expected);
     }
 
     static void removeById(RecipeRegistry<GridRecipe> registry, String id) {
@@ -74,28 +70,21 @@ public class CarpentersBench {
                 tx -> tx.remove(registry, recipeId));
     }
 
-    /** Removes every recipe with a matching output (and a matching ingredient, if given); logs the ids. */
-    static void removeByOutput(RecipeRegistry<GridRecipe> registry, IIngredient output, IIngredient input) {
-        ScriptRecipes.apply("Removing " + registry.getStation() + " recipes for " + output, tx -> {
-            List<RecipeId> removed = tx.removeWhere(registry, entry -> {
-                GridRecipe recipe = entry.getRecipe();
-                return recipe.getRecipeOutput() != null && output.matches(new MCItemStack(recipe.getRecipeOutput()))
-                        && (input == null || TweakedIngredients.usesIngredient(recipe, input));
-            });
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No " + registry.getStation() + " recipes for " + output);
-            } else {
-                MineTweakerAPI.logInfo("Removed " + registry.getStation() + " recipes " + removed);
-            }
-        });
+    static void removeByOutput(RecipeRegistry<GridRecipe> registry, IIngredient output, int expected) {
+        ScriptRecipes.removeWhere(
+                registry,
+                "for " + output,
+                recipe -> recipe.getRecipeOutput() != null
+                        && TweakedIngredients.names(output, recipe.getRecipeOutput()),
+                expected);
     }
 
-    private static Skill getSkillOrWarn(String skill, IItemStack output) {
-        Skill s = RPGElements.getSkillByName(skill);
-        if (s == null && skill != null && !skill.isEmpty()) {
-            MineTweakerAPI.logWarning("Unknown MineFantasy skill '" + skill + "' for carpenter recipe -> " + output);
-        }
-        return s;
+    static void removeAccepting(RecipeRegistry<GridRecipe> registry, IItemStack input, int expected) {
+        ScriptRecipes.removeWhere(
+                registry,
+                "taking " + input,
+                recipe -> recipe.takes(MineTweakerMC.getItemStack(input)),
+                expected);
     }
 
 }

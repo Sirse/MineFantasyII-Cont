@@ -54,6 +54,9 @@ public class CommandMF extends CommandBase {
             case "recipes":
                 RecipesCommand.run(player, rest);
                 break;
+            case "zs":
+                ZsCommand.run(player, rest);
+                break;
             default:
                 throw new WrongUsageException(USAGE);
         }
@@ -62,7 +65,7 @@ public class CommandMF extends CommandBase {
     @Override
     public List<String> addTabCompletionOptions(ICommandSender sender, String[] args) {
         if (args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, "edit", "recipes");
+            return getListOfStringsMatchingLastWord(args, "edit", "recipes", "zs");
         }
         String[] rest = Arrays.copyOfRange(args, 1, args.length);
         switch (args[0].toLowerCase(Locale.ROOT)) {

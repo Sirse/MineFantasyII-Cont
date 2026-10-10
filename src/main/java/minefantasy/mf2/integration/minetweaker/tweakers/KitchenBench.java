@@ -1,18 +1,10 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.function.Supplier;
-
 import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
-import minefantasy.mf2.api.crafting.NativeGridRecipe;
-import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
-import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
-import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import stanhebben.zenscript.annotations.NotNull;
@@ -27,27 +19,35 @@ public class KitchenBench {
      * Adds {@code crafttweaker:kitchen/<name>} (or {@code carpenter/<name>} when the kitchen bench is disabled and food
      * is made on the carpenter's bench); the grid is at most 4 by 4. A dirty amount of 0 uses the bench's default.
      */
+    /** A shaped recipe built step by step; see {@link GridBuilder}. Nothing is added before register(). */
+    @ZenMethod
+    public static GridBuilder shaped(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.KITCHEN, name, output, true);
+    }
+
+    /** A shapeless recipe built step by step; see {@link GridBuilder}. */
+    @ZenMethod
+    public static GridBuilder shapeless(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.KITCHEN, name, output, false);
+    }
+
+    /** A dirty amount of 0 uses the bench's default. */
     @ZenMethod
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, String tool, int time, float dirtyAmount, IIngredient[][] ingreds, @Optional int priority) {
-        if (!TweakedIngredients.fitsGrid(ingreds, 4, 4, "kitchen bench")) {
-            return;
-        }
-        add(name, () -> {
-            return TweakedIngredients.shaped(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, -1).time(time)
-                    .sound(sound).research(research).skill(getSkillOrWarn(skill, output))
-                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : NativeGridRecipe.kitchenDirt(time)).build();
-        }, priority);
+        dirt(shaped(name, output).cells(ingreds), dirtyAmount).skill(skill).research(research).sound(sound)
+                .tool(tool, -1).time(time).priority(priority).register();
     }
 
     @ZenMethod
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, String tool, int time, float dirtyAmount, IIngredient[] ingreds, @Optional int priority) {
-        add(name, () -> {
-            return TweakedIngredients.shapeless(GridRecipe.Grid.BENCH, ingreds, output).tool(tool, -1).time(time)
-                    .sound(sound).research(research).skill(getSkillOrWarn(skill, output))
-                    .dirtyAmount(dirtyAmount > 0 ? dirtyAmount : NativeGridRecipe.kitchenDirt(time)).build();
-        }, priority);
+        dirt(shapeless(name, output).ingredients(ingreds), dirtyAmount).skill(skill).research(research).sound(sound)
+                .tool(tool, -1).time(time).priority(priority).register();
+    }
+
+    private static GridBuilder dirt(GridBuilder builder, float dirtyAmount) {
+        return dirtyAmount > 0 ? builder.dirt(dirtyAmount) : builder;
     }
 
     @ZenMethod
@@ -56,28 +56,17 @@ public class KitchenBench {
     }
 
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        CarpentersBench.removeByOutput(target(), output, input);
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        CarpentersBench.removeByOutput(target(), output, expected);
     }
 
-    private static void add(String name, Supplier<GridRecipe> recipe, int priority) {
-        RecipeRegistry<GridRecipe> registry = target();
-        RecipeId id = ScriptRecipes.scriptId(registry.getStation(), name);
-        ScriptRecipes.apply(
-                "Adding " + registry.getStation() + " recipe " + id,
-                tx -> tx.add(registry, id, recipe.get(), priority));
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        CarpentersBench.removeAccepting(target(), input, expected);
     }
 
     private static RecipeRegistry<GridRecipe> target() {
         return ConfigKitchen.enableBench ? MFRecipes.KITCHEN : MFRecipes.CARPENTER;
-    }
-
-    private static Skill getSkillOrWarn(String skill, IItemStack output) {
-        Skill s = RPGElements.getSkillByName(skill);
-        if (s == null && skill != null && !skill.isEmpty()) {
-            MineTweakerAPI
-                    .logWarning("Unknown MineFantasy skill '" + skill + "' for kitchen bench recipe -> " + output);
-        }
-        return s;
     }
 }

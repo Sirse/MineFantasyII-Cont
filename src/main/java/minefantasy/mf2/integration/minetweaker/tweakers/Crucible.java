@@ -12,12 +12,12 @@ import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedAlloyRecipe;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -36,7 +36,17 @@ public class Crucible {
     public static void add(@NotNull String name, @NotNull IItemStack out, int level, int dupe,
             @NotNull IIngredient[] ingred, @Optional int priority) {
         RecipeId id = ScriptRecipes.scriptId(STATION, name);
+        for (IIngredient ingredient : ingred) {
+            ScriptWarnings.inputTag(ingredient);
+        }
         ScriptRecipes.apply("Adding alloy " + id, tx -> {
+            for (int i = 0; i < ingred.length; i++) {
+                try {
+                    TweakedIngredients.requireNoTransformers(ingred[i]);
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("ingredient " + (i + 1) + ": " + e.getMessage(), e);
+                }
+            }
             List<IIngredient> ingredients = new ArrayList<IIngredient>();
             Collections.addAll(ingredients, ingred);
             ItemStack output = ScriptInputs.toOutput(out);
@@ -62,42 +72,23 @@ public class Crucible {
         ScriptRecipes.apply("Removing alloy " + recipeId, tx -> tx.remove(MFRecipes.ALLOY, recipeId));
     }
 
-    /** Removes every alloy with a matching output (and ingredient, if given), ratio copies included. */
+    /** Removes every alloy with a matching output, ratio copies included; with {@code expected}, only if that many. */
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        ScriptRecipes.apply("Removing alloys for " + output, tx -> {
-            List<RecipeId> removed = tx.removeWhere(MFRecipes.ALLOY, entry -> {
-                Alloy alloy = entry.getRecipe();
-                return alloy.getRecipeOutput() != null && output.matches(new MCItemStack(alloy.getRecipeOutput()))
-                        && (input == null || matchesInput(alloy, input));
-            });
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No alloys for " + output);
-            } else {
-                MineTweakerAPI.logInfo("Removed alloys " + removed);
-            }
-        });
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        ScriptRecipes.removeWhere(
+                MFRecipes.ALLOY,
+                "for " + output,
+                alloy -> alloy.getRecipeOutput() != null && TweakedIngredients.names(output, alloy.getRecipeOutput()),
+                expected);
     }
 
-    private static boolean matchesInput(Alloy alloy, IIngredient input) {
-        for (Object object : alloy.getIngredients()) {
-            if (object instanceof IIngredient) {
-                IIngredient ingredient = (IIngredient) object;
-                for (IItemStack stack : ingredient.getItems()) {
-                    if (input.matches(stack)) {
-                        return true;
-                    }
-                }
-            } else if (object instanceof IItemStack) {
-                if (input.matches((IItemStack) object)) {
-                    return true;
-                }
-            } else if (object instanceof ItemStack) {
-                if (input.matches(new MCItemStack((ItemStack) object))) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        ScriptRecipes.removeWhere(
+                MFRecipes.ALLOY,
+                "taking " + input,
+                alloy -> alloy.takes(MineTweakerMC.getItemStack(input)),
+                expected);
     }
 }

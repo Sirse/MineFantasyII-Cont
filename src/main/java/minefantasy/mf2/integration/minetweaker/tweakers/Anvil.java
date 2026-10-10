@@ -1,18 +1,11 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.List;
-
-import minefantasy.mf2.api.crafting.GridRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
-import minefantasy.mf2.api.rpg.RPGElements;
-import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
-import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
-import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.mc1710.item.MCItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -24,32 +17,31 @@ public class Anvil {
     private static final String STATION = "anvil";
 
     /** Adds {@code crafttweaker:anvil/<name>}; the grid is at most 6 wide and 4 high. */
+    /** A shaped recipe built step by step; see {@link GridBuilder}. Nothing is added before register(). */
+    @ZenMethod
+    public static GridBuilder shaped(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.ANVIL, name, output, true);
+    }
+
+    /** A shapeless recipe built step by step; see {@link GridBuilder}. */
+    @ZenMethod
+    public static GridBuilder shapeless(@NotNull String name, @NotNull IItemStack output) {
+        return new GridBuilder(GridBuilder.Station.ANVIL, name, output, false);
+    }
+
     @ZenMethod
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             boolean hot, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds,
             @Optional int priority) {
-        if (!TweakedIngredients.fitsGrid(ingreds, 6, 4, "anvil")) {
-            return;
-        }
-        RecipeId id = ScriptRecipes.scriptId(STATION, name);
-        ScriptRecipes.apply("Adding anvil recipe " + id, tx -> {
-            GridRecipe recipe = TweakedIngredients.shaped(GridRecipe.Grid.ANVIL, ingreds, output).tool(tool, hammer)
-                    .stationTier(anvil).time(time).hot(hot).research(research).skill(getSkillOrWarn(skill, output))
-                    .build();
-            tx.add(MFRecipes.ANVIL, id, recipe, 1000 + recipe.getRecipeSize() + priority * 10000);
-        });
+        shaped(name, output).cells(ingreds).skill(skill).research(research).hot(hot).tool(tool, hammer)
+                .stationTier(anvil).time(time).priority(priority).register();
     }
 
     @ZenMethod
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             boolean hot, String tool, int hammer, int anvil, int time, IIngredient[] ingreds, @Optional int priority) {
-        RecipeId id = ScriptRecipes.scriptId(STATION, name);
-        ScriptRecipes.apply("Adding anvil recipe " + id, tx -> {
-            GridRecipe recipe = TweakedIngredients.shapeless(GridRecipe.Grid.ANVIL, ingreds, output).tool(tool, hammer)
-                    .stationTier(anvil).time(time).hot(hot).research(research).skill(getSkillOrWarn(skill, output))
-                    .build();
-            tx.add(MFRecipes.ANVIL, id, recipe, recipe.getRecipeSize() + priority * 10000);
-        });
+        shapeless(name, output).ingredients(ingreds).skill(skill).research(research).hot(hot).tool(tool, hammer)
+                .stationTier(anvil).time(time).priority(priority).register();
     }
 
     @ZenMethod
@@ -58,28 +50,15 @@ public class Anvil {
         ScriptRecipes.apply("Removing anvil recipe " + recipeId, tx -> tx.remove(MFRecipes.ANVIL, recipeId));
     }
 
-    /** Removes every recipe with a matching output (and a matching ingredient, if given); logs the ids. */
+    /** Removes every recipe with a matching output; with {@code expected}, only if that many match. */
     @ZenMethod
-    public static void removeByOutput(@NotNull IIngredient output, @Optional IIngredient input) {
-        ScriptRecipes.apply("Removing anvil recipes for " + output, tx -> {
-            List<RecipeId> removed = tx.removeWhere(MFRecipes.ANVIL, entry -> {
-                GridRecipe recipe = entry.getRecipe();
-                return recipe.getRecipeOutput() != null && output.matches(new MCItemStack(recipe.getRecipeOutput()))
-                        && (input == null || TweakedIngredients.usesIngredient(recipe, input));
-            });
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No anvil recipes for " + output);
-            } else {
-                MineTweakerAPI.logInfo("Removed anvil recipes " + removed);
-            }
-        });
+    public static void removeByOutput(@NotNull IIngredient output, @Optional int expected) {
+        CarpentersBench.removeByOutput(MFRecipes.ANVIL, output, expected);
     }
 
-    private static Skill getSkillOrWarn(String skill, IItemStack output) {
-        Skill s = RPGElements.getSkillByName(skill);
-        if (s == null && skill != null && !skill.isEmpty()) {
-            MineTweakerAPI.logWarning("Unknown MineFantasy skill '" + skill + "' for anvil recipe -> " + output);
-        }
-        return s;
+    /** Removes every recipe that would take the given stack; with {@code expected}, only if that many match. */
+    @ZenMethod
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        CarpentersBench.removeAccepting(MFRecipes.ANVIL, input, expected);
     }
 }

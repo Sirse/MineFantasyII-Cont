@@ -31,7 +31,7 @@ public final class TweakedNEIStacks {
         }
         IIngredient ingredient = (IIngredient) entry;
         int amount = Math.max(1, ingredient.getAmount());
-        for (IItemStack item : ingredient.getItems()) {
+        for (IItemStack item : TweakedIngredients.items(ingredient)) {
             ItemStack stack = MineTweakerMC.getItemStack(item);
             if (stack == null || stack.getItem() == null) {
                 continue;

@@ -69,14 +69,7 @@ public class Alloy implements RecipeChecks.Validated {
                 while (iterator.hasNext()) {
                     ItemStack checkItem = (ItemStack) iterator.next();
 
-                    if (itemstack.isItemEqual(checkItem) && areMaterialsEqual(itemstack, checkItem)
-                            && (checkItem.getItemDamage() == OreDictionary.WILDCARD_VALUE
-                                    || itemstack.getItemDamage() == checkItem.getItemDamage())) {
-                        matches = true;
-                        checkRecipe.remove(checkItem);
-                        break;
-                    }
-                    if (areBothCarbon(itemstack, checkItem)) {
+                    if (takesAs(itemstack, checkItem)) {
                         matches = true;
                         checkRecipe.remove(checkItem);
                         break;
@@ -90,6 +83,26 @@ public class Alloy implements RecipeChecks.Validated {
         }
 
         return checkRecipe.isEmpty();
+    }
+
+    /** Whether one of the alloy's ingredients would take this stack. */
+    public boolean takes(ItemStack stack) {
+        if (stack == null || stack.getItem() == null) {
+            return false;
+        }
+        for (Object entry : recipeItems) {
+            if (entry instanceof ItemStack && takesAs(stack, (ItemStack) entry)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean takesAs(ItemStack itemstack, ItemStack checkItem) {
+        return itemstack.isItemEqual(checkItem) && areMaterialsEqual(itemstack, checkItem)
+                && (checkItem.getItemDamage() == OreDictionary.WILDCARD_VALUE
+                        || itemstack.getItemDamage() == checkItem.getItemDamage())
+                || areBothCarbon(itemstack, checkItem);
     }
 
     /**

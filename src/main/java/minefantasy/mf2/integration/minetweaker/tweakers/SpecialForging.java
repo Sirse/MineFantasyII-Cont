@@ -7,9 +7,10 @@ import minefantasy.mf2.api.crafting.exotic.SpecialForging.SpecialCraft;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
-import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -25,16 +26,13 @@ public class SpecialForging {
     @ZenMethod
     public static void set(@NotNull String design, @NotNull IIngredient base, @NotNull IItemStack output,
             @Optional int priority) {
+        ScriptWarnings.itemsOnly("SpecialForging", base);
+        ScriptWarnings.itemsOnly("SpecialForging", output);
         ScriptRecipes.apply("Setting " + design + " craft of " + base, tx -> {
             Item outputItem = ScriptInputs.toOutput(output).getItem();
-            int count = 0;
             for (Item baseItem : items(base)) {
                 minefantasy.mf2.api.crafting.exotic.SpecialForging
                         .stage(tx, new SpecialCraft(design, baseItem, outputItem), priority);
-                count++;
-            }
-            if (count == 0) {
-                throw new IllegalArgumentException("Ingredient " + base + " lists no valid items");
             }
         });
     }
@@ -62,10 +60,10 @@ public class SpecialForging {
 
     private static java.util.List<Item> items(IIngredient ingredient) {
         java.util.List<Item> items = new java.util.ArrayList<>();
-        for (IItemStack stack : ingredient.getItems()) {
-            ItemStack mc = MineTweakerMC.getItemStack(stack);
-            if (mc != null && mc.getItem() != null && !items.contains(mc.getItem())) {
-                items.add(mc.getItem());
+        // Crafts are kept per item: no conditions, materials or damage
+        for (ItemStack stack : TweakedIngredients.plainItems("SpecialForging", ingredient, false)) {
+            if (!items.contains(stack.getItem())) {
+                items.add(stack.getItem());
             }
         }
         return items;

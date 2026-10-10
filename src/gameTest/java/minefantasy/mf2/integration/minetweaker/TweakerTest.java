@@ -165,7 +165,9 @@ public class TweakerTest {
                                 + args
                                 + ");",
                         call + ".add(\"t_gone\", " + item("bar") + ", " + item("ore") + args + ");",
-                        call + ".removeByOutput(" + item("bar") + ");",
+                        call + ".removeByOutput(" + item("bar") + ", 1);",
+                        call + ".add(\"t_taken\", " + item("junk") + ", " + item("pot") + args + ");",
+                        call + ".removeAccepting(" + item("pot") + ", 1);",
                         call + ".replace(\""
                                 + natives.get(0)
                                 + "\", "
@@ -183,6 +185,7 @@ public class TweakerTest {
         assertEquals("the script's output amount", made, output.apply(add).stackSize);
 
         absent(registry, ScriptRecipes.scriptId(registry.getStation(), "t_gone"));
+        absent(registry, ScriptRecipes.scriptId(registry.getStation(), "t_taken"));
         R replaced = recipe(registry, natives.get(0));
         assertNotNull("the replaced recipe is gone", replaced);
         assertEquals(junk, output.apply(replaced).getItem());
@@ -277,7 +280,15 @@ public class TweakerTest {
                                 + ", ["
                                 + item("seed")
                                 + "]);",
-                        call + ".removeByOutput(" + item("flour") + ");",
+                        call + ".removeByOutput(" + item("flour") + ", 1);",
+                        call + ".addShapeless(\"t_taken\", "
+                                + item("junk")
+                                + ", \"\", \"\""
+                                + terms
+                                + ", ["
+                                + item("pot")
+                                + " * 3]);",
+                        call + ".removeAccepting(" + item("pot") + ", 1);",
                         call + ".remove(\"" + native0 + "\");"));
 
         GridRecipe shaped = added(registry, "t_shaped");
@@ -288,6 +299,7 @@ public class TweakerTest {
         assertFalse(shapeless.isShaped());
         assertEquals(2, shapeless.getRecipeSize());
         absent(registry, ScriptRecipes.scriptId(registry.getStation(), "t_gone"));
+        absent(registry, ScriptRecipes.scriptId(registry.getStation(), "t_taken"));
         absent(registry, native0);
     }
 
@@ -379,13 +391,16 @@ public class TweakerTest {
                                     + "]);",
                             call + ".remove(\"t_alloy_x2\");",
                             call + ".add(\"t_gone\", " + item("flour") + ", 0, 1, [" + item("ore") + "]);",
-                            call + ".removeByOutput(" + item("flour") + ");",
+                            call + ".removeByOutput(" + item("flour") + ", 1);",
+                            call + ".add(\"t_taken\", " + item("junk") + ", 0, 1, [" + item("pot") + "]);",
+                            call + ".removeAccepting(" + item("pot") + ", 1);",
                             call + ".remove(\"" + native0 + "\");"));
             Alloy alloy = added(MFRecipes.ALLOY, "t_alloy");
             assertEquals(bar, alloy.getRecipeOutput().getItem());
             assertEquals(2, alloy.getIngredients().size());
             absent(MFRecipes.ALLOY, ScriptRecipes.scriptId("alloy", "t_alloy_x2"));
             absent(MFRecipes.ALLOY, ScriptRecipes.scriptId("alloy", "t_gone"));
+            absent(MFRecipes.ALLOY, ScriptRecipes.scriptId("alloy", "t_taken"));
             absent(MFRecipes.ALLOY, native0);
         });
     }
@@ -399,7 +414,7 @@ public class TweakerTest {
                     run(
                             call + ".add(\"t_heat\", " + item("ore") + ", 100, 500, 900);",
                             call + ".add(\"t_gone\", " + item("flour") + ", 100, 500, 900);",
-                            call + ".removeFor(" + item("flour") + ");",
+                            call + ".removeAccepting(" + item("flour") + ", 1);",
                             call + ".replace(\"" + natives.get(0) + "\", " + item("seed") + ", 150, 600, 1000);",
                             call + ".remove(\"" + natives.get(1) + "\");"));
             ItemStack piece = new ItemStack(ore);

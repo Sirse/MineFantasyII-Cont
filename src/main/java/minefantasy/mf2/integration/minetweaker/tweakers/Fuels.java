@@ -3,8 +3,8 @@ package minefantasy.mf2.integration.minetweaker.tweakers;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
-import minetweaker.OneWayAction;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -19,13 +19,14 @@ public class Fuels {
     }
 
     /**
-     * One way on purpose: carbon fuel is stored as an OreDictionary entry, and 1.7.10 Forge has no API for taking an
-     * entry back out again. A script reload logs this as stuck instead of silently half undoing it.
+     * Script carbon is kept apart from the ore names MineFantasy and other mods register carbon under, so a reload can
+     * take it back out: 1.7.10 Forge cannot remove an ore dictionary entry.
      */
-    private static class AddCarbonAction extends OneWayAction {
+    private static class AddCarbonAction implements IUndoableAction {
 
         private final IItemStack stack;
         private final int uses;
+        private MineFantasyFuels.ScriptCarbon added;
 
         public AddCarbonAction(IItemStack stack, int uses) {
             this.stack = stack;
@@ -39,12 +40,30 @@ public class Fuels {
                 MineTweakerAPI.logWarning("Skipping carbon fuel with invalid item " + stack);
                 return;
             }
-            MineFantasyFuels.addCarbon(mcStack, uses);
+            added = MineFantasyFuels.addScriptCarbon(mcStack, uses);
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            if (added != null) {
+                MineFantasyFuels.removeScriptCarbon(added);
+                added = null;
+            }
         }
 
         @Override
         public String describe() {
             return "Adding carbon fuel source: " + stack.getDisplayName() + " (" + uses + " uses)";
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Removing carbon fuel source: " + stack.getDisplayName();
         }
 
         @Override

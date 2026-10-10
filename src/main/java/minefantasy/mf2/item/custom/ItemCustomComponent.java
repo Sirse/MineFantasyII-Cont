@@ -154,7 +154,7 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
 
     public ItemStack createComm(String base, int stack, float damage) {
         ItemStack item = new ItemStack(this, stack);
-        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, base);
+        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, registered(base));
         int maxdam = this.getMaxDamage(item);
 
         item.setItemDamage((int) (maxdam * damage));
@@ -171,8 +171,14 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
 
     public ItemStack createComm(String base, int stack, int damage) {
         ItemStack item = new ItemStack(this, stack, damage);
-        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, base);
+        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, registered(base));
         return item;
+    }
+
+    /** The name the material was registered with, however it was asked for: "bronze" and "Bronze" bars never stack. */
+    private static String registered(String base) {
+        CustomMaterial material = CustomMaterial.getMaterial(base);
+        return material != null ? material.name : base;
     }
 
     @Override

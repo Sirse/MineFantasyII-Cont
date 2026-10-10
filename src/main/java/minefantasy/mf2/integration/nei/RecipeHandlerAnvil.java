@@ -114,16 +114,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                     || CustomToolHelper.areEqual(irecipe.getRecipeOutput(), inputStack)
                     || CustomToolHelper.areEqual(specialStack, inputStack)) {
                 if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
-                    CachedAnvilRecipe recipe = handleRecipe(
-                            irecipe,
-                            inputStack,
-                            getSpecialCatalyst(irecipe, inputStack));
-
-                    if (recipe == null) {
-                        continue;
-                    }
-
-                    arecipes.add(recipe);
+                    arecipes.add(new CachedAnvilRecipe(irecipe, inputStack, getSpecialCatalyst(irecipe, inputStack)));
                 }
             }
         }
@@ -137,10 +128,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                     || !NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                 continue;
             }
-            CachedAnvilRecipe recipe = handleRecipe(irecipe, null, null);
-            if (recipe != null) {
-                arecipes.add(recipe);
-            }
+            arecipes.add(new CachedAnvilRecipe(irecipe, null, null));
         }
     }
 
@@ -199,13 +187,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                     continue;
                 }
                 ItemStack ornateOutput = createSpecialResult("ornate", irecipe.getRecipeOutput());
-                CachedAnvilRecipe recipe = handleRecipe(
-                        irecipe,
-                        ornateOutput,
-                        new ItemStack(ComponentListMF.ornate_items));
-                if (recipe != null) {
-                    arecipes.add(recipe);
-                }
+                arecipes.add(new CachedAnvilRecipe(irecipe, ornateOutput, new ItemStack(ComponentListMF.ornate_items)));
             }
             return;
         }
@@ -218,10 +200,11 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                 continue;
             }
 
-            CachedAnvilRecipe recipe = handleRecipe(irecipe, null, null);
-            if (recipe == null || !recipe.contains(recipe.ingredients, ingredient)) {
+            // The recipe's own rule, not its examples: a script ingredient may take more than it lists
+            if (!irecipe.takes(ingredient)) {
                 continue;
             }
+            CachedAnvilRecipe recipe = new CachedAnvilRecipe(irecipe, null, null);
 
             recipe.setIngredientPermutation(recipe.ingredients, ingredient);
             arecipes.add(recipe);
@@ -240,10 +223,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             return null;
         }
         return new ItemStack(ComponentListMF.ornate_items);
-    }
-
-    private CachedAnvilRecipe handleRecipe(GridRecipe irecipe, ItemStack inputStack, ItemStack specialCatalyst) {
-        return new CachedAnvilRecipe(irecipe, inputStack, specialCatalyst);
     }
 
     // TODO: Implement wood permutations, add additional helper method for custom material support in crafting and usage

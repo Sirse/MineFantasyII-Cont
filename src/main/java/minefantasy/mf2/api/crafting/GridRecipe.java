@@ -113,6 +113,8 @@ public final class GridRecipe implements RecipeChecks.Validated {
     private final int height;
     private final Object[] entries;
     private final GridMatch.Cell[] cells;
+    /** The cells as given, before anvil heat handling: what each would take cold. */
+    private final GridMatch.Cell[] coldCells;
     private final ItemStack output;
     private final Tiers tiers;
     private final String tool;
@@ -134,6 +136,7 @@ public final class GridRecipe implements RecipeChecks.Validated {
         this.height = b.height;
         this.entries = b.entries;
         this.cells = b.cells;
+        this.coldCells = b.coldCells;
         this.output = b.output;
         this.tiers = b.tiers;
         this.tool = b.tool;
@@ -186,6 +189,7 @@ public final class GridRecipe implements RecipeChecks.Validated {
         private final int height;
         private final Object[] entries;
         private final GridMatch.Cell[] cells;
+        private final GridMatch.Cell[] coldCells;
         private final ItemStack output;
         private boolean anchored;
         private Tiers tiers = Tiers.FIXED;
@@ -208,6 +212,7 @@ public final class GridRecipe implements RecipeChecks.Validated {
             this.height = height;
             this.entries = new Object[entries.length];
             this.cells = new GridMatch.Cell[entries.length];
+            this.coldCells = new GridMatch.Cell[entries.length];
             for (int i = 0; i < entries.length; i++) {
                 Object entry = entries[i];
                 this.entries[i] = entry instanceof ItemStack ? ((ItemStack) entry).copy() : entry;
@@ -218,6 +223,7 @@ public final class GridRecipe implements RecipeChecks.Validated {
                 if (entry != null && cell == null) {
                     throw new IllegalArgumentException("No cell for recipe entry " + entry);
                 }
+                this.coldCells[i] = cell;
                 // Native anvil stacks are judged hot; script cells bring their own heat handling
                 this.cells[i] = grid.heat && entry instanceof ItemStack && cell != null ? GridMatch.anvil(cell) : cell;
             }
@@ -432,6 +438,26 @@ public final class GridRecipe implements RecipeChecks.Validated {
             copy.add(entry instanceof ItemStack ? ((ItemStack) entry).copy() : entry);
         }
         return Collections.unmodifiableList(copy);
+    }
+
+    /**
+     * Whether one of the recipe's cells would take this stack, given as many as the cell asks for. Anvil cells are
+     * asked about the stack itself, as it goes into the forge, not about it hot.
+     */
+    public boolean takes(ItemStack stack) {
+        if (stack == null || stack.getItem() == null) {
+            return false;
+        }
+        for (GridMatch.Cell cell : coldCells) {
+            if (cell != null) {
+                ItemStack probe = stack.copy();
+                probe.stackSize = Math.max(stack.stackSize, cell.amount());
+                if (cell.accepts(probe)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** One entry, as {@link #getEntries} gives it. */

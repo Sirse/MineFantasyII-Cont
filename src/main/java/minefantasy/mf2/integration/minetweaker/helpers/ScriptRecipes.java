@@ -1,13 +1,20 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistrationException;
 import minefantasy.mf2.api.recipe.RecipeRegistries;
+import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.recipe.RecipeSource;
 import minefantasy.mf2.api.recipe.RecipeTransaction;
+import minefantasy.mf2.api.rpg.RPGElements;
+import minefantasy.mf2.api.rpg.Skill;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.MineTweakerImplementationAPI;
@@ -19,7 +26,21 @@ import minetweaker.MineTweakerImplementationAPI;
  */
 public final class ScriptRecipes {
 
+    /** The named skill, none for an empty name; an unknown name stops the recipe. */
+    public static Skill skill(String name) {
+        if (name == null || name.isEmpty()) {
+            return null;
+        }
+        Skill skill = RPGElements.getSkillByName(name);
+        if (skill == null) {
+            throw new IllegalArgumentException("unknown skill " + name);
+        }
+        return skill;
+    }
+
     public static final String NAMESPACE = "crafttweaker";
+    /** How every refused script action ends its error: a transaction applies whole or not at all. */
+    public static final String NOTHING_CHANGED = "Nothing changed.";
     public static final RecipeSource SOURCE = RecipeSource.script("");
 
     private ScriptRecipes() {}
@@ -41,6 +62,38 @@ public final class ScriptRecipes {
     /** A full id (for replacing or removing someone else's recipe), or a bare name for a script recipe. */
     public static RecipeId parseId(String station, String id) {
         return id.indexOf(':') >= 0 ? RecipeId.parse(id) : scriptId(station, id);
+    }
+
+    /**
+     * Removes every recipe the filter picks, logging their ids. With {@code expected} above 0 the count must match, or
+     * nothing is removed: a script meaning to drop one recipe that finds ten stops instead.
+     */
+    public static <R> void removeWhere(RecipeRegistry<R> registry, String what, Predicate<R> filter, int expected) {
+        removeWhere(registry, what, entry -> filter.test(entry.getRecipe()), expected, (tx, removed) -> {});
+    }
+
+    /** As above, judging whole entries, with {@code after} removing what goes with the recipes removed. */
+    public static <R> void removeWhere(RecipeRegistry<R> registry, String what, Predicate<RecipeEntry<R>> filter,
+            int expected, BiConsumer<RecipeTransaction, List<RecipeId>> after) {
+        String station = registry.getStation();
+        apply("Removing " + station + " recipes " + what, tx -> {
+            List<RecipeId> removed = tx.removeWhere(registry, filter);
+            if (expected > 0 && removed.size() != expected) {
+                throw new IllegalArgumentException(
+                        "expected " + expected
+                                + " recipes, found "
+                                + removed.size()
+                                + " "
+                                + removed
+                                + "; nothing removed");
+            }
+            after.accept(tx, removed);
+            if (removed.isEmpty()) {
+                MineTweakerAPI.logWarning("No " + station + " recipes " + what);
+            } else {
+                MineTweakerAPI.logInfo("Removed " + station + " recipes " + removed);
+            }
+        });
     }
 
     /** Applies the body as one transaction; errors go to the CraftTweaker log and leave nothing behind. */
@@ -68,7 +121,7 @@ public final class ScriptRecipes {
                 body.accept(tx);
                 tx.commit();
             } catch (RecipeRegistrationException | IllegalArgumentException e) {
-                MineTweakerAPI.logError(description + ": " + e.getMessage());
+                MineTweakerAPI.logError(description + ": " + e.getMessage() + ". " + NOTHING_CHANGED);
             }
         }
 

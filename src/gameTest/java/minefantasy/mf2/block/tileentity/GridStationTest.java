@@ -389,7 +389,8 @@ public class GridStationTest {
             GridRecipe recipe = TweakedIngredients.shaped(
                     GridRecipe.Grid.BENCH,
                     new IIngredient[][] { { script(new ItemStack(seed)), script(new ItemStack(ore)) } },
-                    script(new ItemStack(bar))).build();
+                    script(new ItemStack(bar)),
+                    true).build();
             // slot, 0 = seed / 1 = ore, count
             assertTrue(hasProject(bench(recipe, 0, 0, 1, 1, 1, 1)));
             assertFalse("shifted", hasProject(bench(recipe, 5, 0, 1, 6, 1, 1)));
@@ -453,7 +454,7 @@ public class GridStationTest {
     }
 
     @GameTest
-    public static void usesIngredientSeesStacksAndScriptEntries(GameTestHelper helper) throws Exception {
+    public static void takesSeesStacksAndScriptEntries(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {
             GridRecipe nativeRecipe = shapeless(GridRecipe.Grid.BENCH, new ItemStack(bar), new ItemStack(ore)).build();
@@ -461,9 +462,9 @@ public class GridStationTest {
                     GridRecipe.Grid.BENCH,
                     new IIngredient[] { script(new ItemStack(seed)) },
                     script(new ItemStack(bar))).build();
-            assertTrue(TweakedIngredients.usesIngredient(nativeRecipe, script(new ItemStack(ore))));
-            assertFalse(TweakedIngredients.usesIngredient(nativeRecipe, script(new ItemStack(seed))));
-            assertTrue(TweakedIngredients.usesIngredient(scriptRecipe, script(new ItemStack(seed))));
+            assertTrue(nativeRecipe.takes(new ItemStack(ore)));
+            assertFalse(nativeRecipe.takes(new ItemStack(seed)));
+            assertTrue(scriptRecipe.takes(new ItemStack(seed)));
             assertNotNull(scriptRecipe.getEntries().get(0));
         } finally {
             Stations.end();

@@ -1,14 +1,13 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
-import java.util.List;
-
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
-import minetweaker.MineTweakerAPI;
+import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
+import minetweaker.api.item.IItemStack;
 import stanhebben.zenscript.annotations.NotNull;
 import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
@@ -48,20 +47,14 @@ public class Forge {
         ScriptRecipes.apply("Removing heat profile " + profileId, tx -> tx.remove(MFRecipes.HEATING, profileId));
     }
 
-    /** Removes every profile that takes an item the ingredient matches; logs the ids. */
+    /** Removes every profile that takes the given stack; with {@code expected}, only if that many match. */
     @ZenMethod
-    public static void removeFor(@NotNull IIngredient input) {
-        ScriptRecipes.apply("Removing heat profiles for " + input, tx -> {
-            List<RecipeId> removed = tx.removeWhere(
-                    MFRecipes.HEATING,
-                    entry -> entry.getRecipe().getInput().examples().stream().anyMatch(
-                            example -> input.matches(minetweaker.api.minecraft.MineTweakerMC.getIItemStack(example))));
-            if (removed.isEmpty()) {
-                MineTweakerAPI.logWarning("No heat profiles for " + input);
-            } else {
-                MineTweakerAPI.logInfo("Removed heat profiles " + removed);
-            }
-        });
+    public static void removeAccepting(@NotNull IItemStack input, @Optional int expected) {
+        ScriptRecipes.removeWhere(
+                MFRecipes.HEATING,
+                "taking " + input,
+                profile -> TweakedIngredients.takes(profile.getInput(), input),
+                expected);
     }
 
     private static Heatable profile(IIngredient input, int min, int unstable, int max) {
