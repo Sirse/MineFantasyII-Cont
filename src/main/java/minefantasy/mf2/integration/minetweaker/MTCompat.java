@@ -24,6 +24,7 @@ public class MTCompat {
         MineTweakerAPI.registerClass(Forge.class);
         MineTweakerAPI.registerClass(Fuels.class);
         MineTweakerAPI.registerClass(GridBuilder.class);
+        MineTweakerAPI.registerClass(ItemTraits.class);
         MineTweakerAPI.registerClass(MaterialStacks.class);
         MineTweakerAPI.registerClass(PaintOil.class);
         MineTweakerAPI.registerClass(SpecialForging.class);

@@ -25,6 +25,11 @@ public class CustomHoeEntry {
         this.efficiency = efficiency;
     }
 
+    /** An entry not yet registered. */
+    public static CustomHoeEntry of(Item piece, float efficiency) {
+        return new CustomHoeEntry(piece, efficiency);
+    }
+
     /**
      * Registeres a piece (called by code or config)
      *

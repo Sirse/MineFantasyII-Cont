@@ -28,6 +28,11 @@ public class CustomCrafterEntry {
         this.tier = tier;
     }
 
+    /** An entry not yet registered. */
+    public static CustomCrafterEntry of(Item piece, String type, float efficiency, int tier) {
+        return new CustomCrafterEntry(piece, type, efficiency, tier);
+    }
+
     /**
      * Registeres a piece (called by code or config)
      *

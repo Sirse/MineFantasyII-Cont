@@ -39,6 +39,11 @@ public class CustomArmourEntry {
         this.AC = AC;
     }
 
+    /** An entry not yet registered: a piece's weight (Kg) and bulk, slowing its wearer. */
+    public static CustomArmourEntry of(Item piece, float weight, float bulk, String AC) {
+        return new CustomArmourEntry(piece, weight, bulk, true, AC);
+    }
+
     /**
      * Registers an item to a template of an ArmourDesign, while dividing the suit into the 4 pieces If it's unable to
      * divide it, it simply quarters it's value

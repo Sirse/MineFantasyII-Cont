@@ -19,6 +19,11 @@ public class CustomDamageRatioEntry {
         this.vars = vars;
     }
 
+    /** An entry not yet registered, of the ratio cutting, blunt, piercing. */
+    public static CustomDamageRatioEntry of(float[] vars) {
+        return new CustomDamageRatioEntry(vars);
+    }
+
     /**
      * Register a weapon to give variables
      *
