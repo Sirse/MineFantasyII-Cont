@@ -226,7 +226,7 @@ public class PlayerTickHandlerMF {
         }
         for (int a = 0; a < player.inventory.getSizeInventory(); a++) {
             ItemStack item = player.inventory.getStackInSlot(a);
-            if (item != null && item.getItem() instanceof IHotItem) {
+            if (item != null && item.getItem() instanceof IHotItem && ((IHotItem) item.getItem()).isHot(item)) {
                 player.setFire(ConfigCrafting.hotBurnSeconds);
                 player.attackEntityFrom(DamageSource.onFire, ConfigCrafting.hotBurnDamage);
                 return true;

@@ -50,7 +50,12 @@ public class SmeltingRulesTest {
         }
         TileEntityCrucible bare = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 2, 1);
         TileEntityCrucible walled = helper.assertTileEntityPresent(TileEntityCrucible.class, 5, 2, 1);
-        assertEquals("a crucible without firebricks heats", 0F, bare.getTemperature(), 0F);
+        assertEquals(
+                "a crucible without firebricks takes source heat",
+                minefantasy.mf2.api.heating.AmbientTemperature
+                        .get(helper.getWorld(), bare.xCoord, bare.yCoord, bare.zCoord),
+                bare.getTemperature(),
+                0F);
         assertEquals("the walled crucible does not take the lava's heat", 750F, walled.getTemperature(), 0F);
         helper.succeed();
     }

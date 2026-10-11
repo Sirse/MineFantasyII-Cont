@@ -207,6 +207,6 @@ public class EventManagerMF {
     }
 
     private boolean isHotItem(ItemStack item) {
-        return item != null && (item.getItem() instanceof IHotItem);
+        return item != null && item.getItem() instanceof IHotItem && ((IHotItem) item.getItem()).isHot(item);
     }
 }

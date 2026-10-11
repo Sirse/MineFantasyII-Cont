@@ -16,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
@@ -100,7 +101,12 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         }
 
         if (wasHot != getIsHot()) {
-            BlockCrucible.updateFurnaceBlockState(this.temperature > 0, worldObj, xCoord, yCoord, zCoord);
+            BlockCrucible.updateFurnaceBlockState(
+                    this.temperature > getAmbientTemperature(),
+                    worldObj,
+                    xCoord,
+                    yCoord,
+                    zCoord);
         }
     }
 
@@ -119,7 +125,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (this.getTier() >= 2) {
             return this.isCoated();
         }
-        return this.temperature > 0;
+        return this.temperature > getAmbientTemperature();
     }
 
     private void onAutoSmelt() {
@@ -168,7 +174,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
 
     private boolean canSmelt() {
         ensureRecipeIsCurrent();
-        if (this.temperature <= 0 || this.cachedRecipeOutput == null) {
+        if (this.temperature <= getAmbientTemperature() || this.cachedRecipeOutput == null) {
             return false;
         }
         for (int i = 0; i < GRID_SLOT_COUNT; i++) {
@@ -211,7 +217,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (cachedRecipeOutput == null) {
             return CheckResult.Reason.NO_RECIPE;
         }
-        if (temperature <= 0) {
+        if (temperature <= getAmbientTemperature()) {
             return CheckResult.Reason.of("no_heat");
         }
         for (int slot = 0; slot < GRID_SLOT_COUNT; slot++) {
@@ -295,7 +301,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
 
     public float getTemperature() {
         if (this.getTier() >= 1 && !isCoated()) {
-            return 0F;
+            return getAmbientTemperature();
         }
         if (getTier() >= 2) {
             return 5000F;
@@ -312,7 +318,12 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         }
 
         TileEntityForge forge = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityForge.class);
-        return forge != null ? Math.min(forge.getBlockTemperature(), 2500F) : 0F;
+        float heat = forge == null ? 0F : forge.getBlockTemperature();
+        return heat > 0F ? Math.max(getAmbientTemperature(), Math.min(heat, 2500F)) : getAmbientTemperature();
+    }
+
+    private float getAmbientTemperature() {
+        return AmbientTemperature.get(worldObj, xCoord, yCoord, zCoord);
     }
 
     public boolean isCoated() {

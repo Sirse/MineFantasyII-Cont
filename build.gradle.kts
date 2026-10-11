@@ -21,6 +21,9 @@ val versionBackhand = "1.8.16"
 val versionThaumcraft = "1.7.10-4.2.3.5"
 val versionBaubles = "1.0.1.10"
 val versionHorizonQA = "0.15.0"
+val versionEnviroMine = "1.3.148-ESE-0x05"
+val versionSereneSeasons = "1.3.1"
+val climateLibrariesCommit = "f51137614349ec0cfc88a902a7df9e63d568dc58"
 // Mixin runtime (UniMixins), a required dependency: one hook on vanilla's block harvesting. Published on JitPack
 val mixinProvider = "com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.3.2:dev"
 val mixinRefMap = "mixins.minefantasy2.refmap.json"
@@ -105,6 +108,21 @@ val gameTest: SourceSet = sourceSets.create("gameTest") {
 }
 
 repositories {
+  // These legacy mods publish jars rather than Maven metadata. Pin both artifact versions and the library commit.
+  ivy {
+    name = "EnviroMine Continuation Releases"
+    url = uri("https://github.com/kotmatross28729/EnviroMine-continuation/releases/download/")
+    patternLayout { artifact("[revision]/[artifact]-[revision](-[classifier]).[ext]") }
+    metadataSources { artifact() }
+    content { includeModule("enviromine", "enviromine") }
+  }
+  ivy {
+    name = "Serene Seasons 1.7.10 Libraries"
+    url = uri("https://raw.githubusercontent.com/kotmatross28729/EnviroMine-continuation/$climateLibrariesCommit/libs/")
+    patternLayout { artifact("[artifact]-1.7.10-[revision].[ext]") }
+    metadataSources { artifact() }
+    content { includeModule("sereneseasons", "SereneSeasons") }
+  }
   mavenCentral()
   maven {
     name = "GTNH Maven"
@@ -125,6 +143,10 @@ repositories {
 }
 
 dependencies {
+  // Optional climate integrations: compile against their real APIs, never ship or load the mods automatically.
+  compileOnly("enviromine:enviromine:$versionEnviroMine:dev") { isTransitive = false }
+  compileOnly(modUtils.deobfuscate("sereneseasons:SereneSeasons:$versionSereneSeasons"))
+
   annotationProcessor("org.ow2.asm:asm-debug-all:5.0.4")
   annotationProcessor("com.google.guava:guava:24.1.1-jre")
   annotationProcessor("com.google.code.gson:gson:2.8.6")

@@ -1,6 +1,7 @@
 package minefantasy.mf2.config;
 
 import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.Quench;
 import minefantasy.mf2.api.heating.TongsHelper;
@@ -18,6 +19,7 @@ public class ConfigCrafting extends ConfigurationBaseMF {
     public static final String CATEGORY_COOKING = "Cooking";
     public static final String CATEGORY_TRANSFORMATIONS = "Transformations";
     public static final String CATEGORY_SMITHING = "Smithing";
+    public static final String CATEGORY_CLIMATE = "Climate";
     public static final String CATEGORY_BLOCKS = "Blocks";
     public static boolean allowIronResmelt;
     public static boolean hotBurn = true;
@@ -31,8 +33,57 @@ public class ConfigCrafting extends ConfigurationBaseMF {
     public static boolean transformationCobbleHammering;
     public static boolean transformationRefinedPlankSawing;
 
+    /** Keeps existing values when moving older Crafting/Smithing options into Climate. */
+    static void migrateClimateSettings(net.minecraftforge.common.config.Configuration configuration) {
+        net.minecraftforge.common.config.ConfigCategory old = configuration
+                .getCategory(CATEGORY_SMITHING.toLowerCase(java.util.Locale.ROOT));
+        net.minecraftforge.common.config.ConfigCategory climate = configuration
+                .getCategory(CATEGORY_CLIMATE.toLowerCase(java.util.Locale.ROOT));
+        String[] names = { "Use EnviroMine Climate", "Use Serene Seasons Climate",
+                "Use EnviroMine Nearby Block Climate", "Temperate Ambient Celsius", "Biome Celsius Scale" };
+        for (String name : names) {
+            if (old.containsKey(name)) {
+                net.minecraftforge.common.config.Property property = old.remove(name);
+                if (!climate.containsKey(name)) climate.put(name, property);
+            }
+        }
+    }
+
     @Override
     protected void loadConfig() {
+        migrateClimateSettings(config);
+        minefantasy.mf2.integration.enviromine.EnviroMineCompat.enabled = config.get(
+                CATEGORY_CLIMATE,
+                "Use EnviroMine Climate",
+                true,
+                "Use EnviroMine biome, altitude, day/night and weather climate when installed. Does not use body temperature. Nearby block profiles use the separate Use EnviroMine Nearby Block Climate setting.")
+                .getBoolean();
+        minefantasy.mf2.integration.sereneseasons.SereneSeasonsCompat.enabled = config.get(
+                CATEGORY_CLIMATE,
+                "Use Serene Seasons Climate",
+                true,
+                "Use seasonal biome temperature from Serene Seasons; with EnviroMine use its seasonal Celsius adjustments.")
+                .getBoolean();
+        minefantasy.mf2.api.heating.NearbyBlockTemperature.enabled = config.get(
+                CATEGORY_CLIMATE,
+                "Use EnviroMine Nearby Block Climate",
+                true,
+                "Use nearby block temperature profiles only when EnviroMine is installed. Thermal MineFantasy stations are excluded.")
+                .getBoolean();
+        AmbientTemperature.temperate = config.getFloat(
+                "Temperate Ambient Celsius",
+                CATEGORY_CLIMATE,
+                20F,
+                -50F,
+                50F,
+                "Air temperature at vanilla biome temperature 0.8. Used when no temperature integration supplies it.");
+        AmbientTemperature.biomeScale = config.getFloat(
+                "Biome Celsius Scale",
+                CATEGORY_CLIMATE,
+                25F,
+                0F,
+                100F,
+                "Degrees Celsius per unit of biome temperature; includes vanilla altitude adjustment.");
         allowIronResmelt = config
                 .get(
                         CATEGORY_REFINING,

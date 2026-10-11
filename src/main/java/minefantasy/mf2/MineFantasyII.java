@@ -176,6 +176,8 @@ public class MineFantasyII {
     /** Every mod has registered its recipes by now; publish them for stations and NEI. */
     @EventHandler
     public void loadComplete(FMLLoadCompleteEvent event) {
+        minefantasy.mf2.integration.sereneseasons.SereneSeasonsCompat.load();
+        minefantasy.mf2.integration.enviromine.EnviroMineCompat.load();
         MFRecipes.REGISTRIES.finishLoading();
     }
 

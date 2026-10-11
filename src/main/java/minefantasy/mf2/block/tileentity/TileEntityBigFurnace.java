@@ -22,6 +22,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.SafeStacks;
@@ -58,6 +59,7 @@ public class TileEntityBigFurnace extends TileEntityStation
     public int doorAngle;
     // HEATER
     public float heat;
+    private boolean thermalInitialized;
     public float maxHeat;
     public int justShared;
     // FURNACE
@@ -128,6 +130,12 @@ public class TileEntityBigFurnace extends TileEntityStation
 
     @Override
     public void updateEntity() {
+        float previousHeat = heat;
+        if (!worldObj.isRemote && !thermalInitialized) {
+            if (heat == 0F) heat = getAmbientTemperature();
+            thermalInitialized = true;
+            saveLater();
+        }
         super.updateEntity();
 
         if (!worldObj.isRemote) {
@@ -160,6 +168,7 @@ public class TileEntityBigFurnace extends TileEntityStation
             sendPacketToClients();
         }
         wasBurning = isBurning();
+        if (!worldObj.isRemote && previousHeat != heat) saveLater();
     }
 
     private void updateFurnace() {
@@ -186,10 +195,11 @@ public class TileEntityBigFurnace extends TileEntityStation
         if (heater != null) {
             heat = heater.heat;
         } else {
-            heat -= 4;
-            if (heat < 0) {
-                heat = 0;
-            }
+            heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 4F);
+        }
+        if (heat <= getAmbientTemperature()) {
+            progress = 0;
+            return;
         }
         boolean canSmelt = false;
         boolean smelted = false;
@@ -389,13 +399,15 @@ public class TileEntityBigFurnace extends TileEntityStation
             aboveType = furn.getType();
         }
         if (!built) {
-            heat = maxHeat = fuel = maxFuel = 0;
+            heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 4F);
+            maxHeat = fuel = maxFuel = 0;
             return;
         }
-        if (heat < maxHeat) {
+        float target = Math.max(getAmbientTemperature(), maxHeat);
+        if (heat < target) {
             heat++;
         }
-        if (heat > maxHeat) {
+        if (heat > target) {
             heat--;
         }
         if (fuel > 0) {
@@ -418,7 +430,7 @@ public class TileEntityBigFurnace extends TileEntityStation
                 }
             }
             if (fuel <= 0) {
-                if (heat > 0) heat--;
+                heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 1F);
                 maxHeat = 0;
             }
         }
@@ -522,13 +534,14 @@ public class TileEntityBigFurnace extends TileEntityStation
         maxFuel = nbt.hasKey("maxFuel") ? nbt.getInteger("maxFuel") : nbt.getInteger("MaxFuel");
 
         heat = nbt.getFloat("heat");
+        thermalInitialized = nbt.getBoolean("AmbientHeat");
         maxHeat = nbt.getFloat("maxHeat");
 
         progress = nbt.getInteger("progress");
         aboveType = nbt.getInteger("Level");
         // Earlier versions let an unheated furnace accumulate negative heat and progress; clamp on load so a saved
         // debt does not have to be worked off before the first smelt
-        if (heat < 0F) heat = 0F;
+        if (!thermalInitialized && heat < 0F) heat = 0F;
         if (progress < 0) progress = 0;
     }
 
@@ -543,6 +556,7 @@ public class TileEntityBigFurnace extends TileEntityStation
         nbt.setInteger("maxFuel", maxFuel);
 
         nbt.setFloat("heat", heat);
+        nbt.setBoolean("AmbientHeat", thermalInitialized);
         nbt.setFloat("maxHeat", maxHeat);
 
         nbt.setInteger("progress", progress);
@@ -558,9 +572,13 @@ public class TileEntityBigFurnace extends TileEntityStation
             return isBurningClient;
         }
         if (isHeater()) {
-            return heat > 0;
+            return heat > getAmbientTemperature();
         }
-        return progress > 0 && heat > 0;
+        return progress > 0 && heat > getAmbientTemperature();
+    }
+
+    public float getAmbientTemperature() {
+        return AmbientTemperature.get(worldObj, xCoord, yCoord, zCoord);
     }
 
     public boolean isHeater() {

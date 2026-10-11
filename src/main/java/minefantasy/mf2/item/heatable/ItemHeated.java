@@ -4,6 +4,8 @@ import java.awt.*;
 import java.util.List;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumRarity;
@@ -20,6 +22,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.heating.Quench;
@@ -33,6 +36,46 @@ import minefantasy.mf2.util.MFLogUtil;
 public class ItemHeated extends Item implements IHotItem {
 
     public static boolean renderDynamicHotIngotRendering = true;
+
+    /** Passive cooling runs only on the server, once per second, wherever the piece is carried. */
+    public static void coolInAir(ItemStack item, World world, Entity entity) {
+        if (world.isRemote || world.getTotalWorldTime() % 20 != 0) return;
+        float ambient = AmbientTemperature.getForEntity(
+                world,
+                (int) Math.floor(entity.posX),
+                (int) Math.floor(entity.posY),
+                (int) Math.floor(entity.posZ));
+        int temp = getTemp(item);
+        setTemp(
+                item,
+                Math.round(AmbientTemperature.approach(temp, ambient, Math.max(1F, Math.abs(temp - ambient) * 0.02F))));
+        unwrapIfCold(item);
+    }
+
+    /** Restores the saved item without quenching, preserving the current stack count. Invalid saves stay untouched. */
+    public static boolean unwrapIfCold(ItemStack item) {
+        if (item == null || !(item.getItem() instanceof ItemHeated) || getTemp(item) > 100) return false;
+        ItemStack cold = getItem(item);
+        if (cold == null || cold.getItem() == null || cold.stackSize <= 0 || cold.getItem() instanceof ItemHeated)
+            return false;
+        item.func_150996_a(cold.getItem());
+        item.setItemDamage(cold.getItemDamage());
+        item.setTagCompound(cold.hasTagCompound() ? (NBTTagCompound) cold.getTagCompound().copy() : null);
+        return true;
+    }
+
+    @Override
+    public void onUpdate(ItemStack item, World world, Entity entity, int slot, boolean held) {
+        coolInAir(item, world, entity);
+    }
+
+    @Override
+    public boolean onEntityItemUpdate(EntityItem entity) {
+        coolInAir(entity.getEntityItem(), entity.worldObj, entity);
+        if (!entity.worldObj.isRemote && entity.worldObj.getTotalWorldTime() % 20 == 0)
+            entity.setEntityItemStack(entity.getEntityItem());
+        return false;
+    }
 
     public ItemHeated() {
         GameRegistry.registerItem(this, "MF_Hot_Item", MineFantasyII.MODID);
@@ -211,6 +254,8 @@ public class ItemHeated extends Item implements IHotItem {
     }
 
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
+        if (!world.isRemote && unwrapIfCold(item)) return item;
+        if (!isHot(item)) return item;
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);
 
         if (movingobjectposition == null) {
@@ -321,7 +366,7 @@ public class ItemHeated extends Item implements IHotItem {
 
     @Override
     public boolean isHot(ItemStack item) {
-        return true;
+        return getTemp(item) > 100;
     }
 
     @Override

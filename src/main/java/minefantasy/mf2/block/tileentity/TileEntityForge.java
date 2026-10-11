@@ -15,6 +15,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.Functions;
@@ -44,6 +45,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     private ItemStack[] inv = new ItemStack[1];
     private Random rand = new Random();
     private int ticksExisted;
+    private boolean thermalInitialized;
     private boolean isBurning = false;
 
     public TileEntityForge(Block block, String type) {
@@ -56,6 +58,11 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     @Override
     public void updateEntity() {
+        if (!worldObj.isRemote && !thermalInitialized) {
+            if (temperature == 0F) temperature = getAmbientTemperature();
+            thermalInitialized = true;
+            saveLater();
+        }
         ++ticksExisted;
 
         if (worldObj.isRemote) return;
@@ -75,8 +82,12 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         }
 
         if (!isLit() && !worldObj.isRemote) {
-            if (temperature > 0 && ticksExisted % 5 == 0) {
-                temperature = 0;
+            if (ticksExisted % 5 == 0) {
+                float next = AmbientTemperature.approach(temperature, getAmbientTemperature(), 10F);
+                if (next != temperature) {
+                    temperature = next;
+                    saveLater();
+                }
             }
             return;
         }
@@ -183,27 +194,25 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (item.getItem() == ComponentListMF.hotItem) {
             int temp = ItemHeated.getTemp(item);
             if (temp > temperature) {
-                int i = (int) (temperature / 5F);
-                temp -= i;
+                temp = (int) AmbientTemperature.approach(temp, temperature, Math.max(1F, (temp - temperature) / 5F));
             } else {
-                int increase = (int) (temperature / (20F * getStackModifier(item.stackSize)));
+                int increase = Math
+                        .max(1, (int) (Math.max(0F, temperature) / (20F * getStackModifier(item.stackSize))));
                 if (temp >= (temperature - increase)) {
                     temp = (int) temperature;
                 } else {
                     temp += increase;
                 }
             }
-            if (temp <= 0) {} else {
-                int maxTemp = ItemHeated.getMaxTemp(item);
-                if (maxTemp > 0 && temp >= maxTemp) {
-                    Sounds.at(this, "random.fizz", 0.7F, 0.5F);
-                    this.setInventorySlotContents(slot, null);
-                } else {
-                    ItemHeated.setTemp(item, Math.max(0, temp));
-                    saveLater();
-                }
+            int maxTemp = ItemHeated.getMaxTemp(item);
+            if (maxTemp > 0 && temp >= maxTemp) {
+                Sounds.at(this, "random.fizz", 0.7F, 0.5F);
+                this.setInventorySlotContents(slot, null);
+            } else {
+                ItemHeated.setTemp(item, temp);
+                saveLater();
             }
-        } else if (temperature > 0) {
+        } else if (temperature > Math.max(100F, getAmbientTemperature())) {
             this.setInventorySlotContents(slot, ItemHeated.createHotItem(item));
 
         }
@@ -240,6 +249,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         super.writeToNBT(nbt);
 
         nbt.setFloat("temperature", temperature);
+        nbt.setBoolean("AmbientHeat", thermalInitialized);
         nbt.setFloat("fuelTemperature", fuelTemperature);
         nbt.setFloat("dragonHeartPower", dragonHeartPower);
         nbt.setFloat("fuel", fuel);
@@ -253,6 +263,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         super.readFromNBT(nbt);
 
         temperature = nbt.getFloat("temperature");
+        thermalInitialized = nbt.getBoolean("AmbientHeat");
         fuelTemperature = nbt.getFloat("fuelTemperature");
         dragonHeartPower = nbt.getFloat("dragonHeartPower");
         fuel = nbt.getFloat("fuel");
@@ -454,6 +465,10 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         return 0;
     }
 
+    public float getAmbientTemperature() {
+        return AmbientTemperature.get(worldObj, xCoord, yCoord, zCoord);
+    }
+
     /*
      * private void averageAllItems() { /* int temp = 0; int items = 0; for(ItemStack item: inv) { if(item != null &&
      * item.getItem() instanceof IHotItem) { ++items; temp += ItemHeated.getTemp(item); } } int average =
@@ -511,6 +526,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (worldObj.isRemote) {
             return exactTemperature;
         }
+        if (temperature <= getAmbientTemperature()) return 0;
         int mx = (int) (temperature * 1.2F);
         int mn = (int) (temperature * 0.8F);
         return Functions.getIntervalWave1_i(ticksExisted, 400, mx, mn);

@@ -60,7 +60,7 @@ public final class WailaData {
             TileEntityCrucible crucible = (TileEntityCrucible) tile;
             data.setString("Kind", "heat");
             progress(data, crucible.progress, crucible.progressMax);
-            data.setFloat("Temperature", finite(crucible.temperature));
+            data.setFloat("Temperature", temperature(crucible.temperature));
             item(data, crucible.getShownResult());
             reason(data, crucible.getWorkProblem());
         } else if (tile instanceof TileEntityForge) {
@@ -68,7 +68,7 @@ public final class WailaData {
             data.setString("Kind", "heat");
             data.setBoolean("Burning", forge.isLit() && forge.fuel > 0);
             data.setFloat("FuelSeconds", finite(forge.getFuelSeconds()));
-            data.setFloat("Temperature", finite(forge.temperature));
+            data.setFloat("Temperature", temperature(forge.temperature));
             ItemStack held = forge.getStackInSlot(0);
             if (held != null) {
                 ItemStack shown = held.copy();
@@ -81,6 +81,11 @@ public final class WailaData {
             data.setString("Kind", "heat");
             data.setBoolean("Burning", fire.isBurning());
             data.setFloat("FuelSeconds", Math.max(0, fire.fuel) / 20F);
+            data.setFloat(
+                    "Temperature",
+                    fire.isBurning() ? fire.getHeat()
+                            : minefantasy.mf2.api.heating.AmbientTemperature
+                                    .get(tile.getWorldObj(), tile.xCoord, tile.yCoord, tile.zCoord));
         } else if (tile instanceof TileEntityTrough) {
             TileEntityTrough trough = (TileEntityTrough) tile;
             FluidTankInfo tank = trough.getTankInfo(ForgeDirection.UNKNOWN)[0];
@@ -100,6 +105,10 @@ public final class WailaData {
 
     static float finite(float value) {
         return Float.isNaN(value) || Float.isInfinite(value) ? 0F : Math.max(0F, value);
+    }
+
+    static float temperature(float value) {
+        return Float.isNaN(value) || Float.isInfinite(value) ? 0F : value;
     }
 
     static void progress(NBTTagCompound data, float progress, float max) {

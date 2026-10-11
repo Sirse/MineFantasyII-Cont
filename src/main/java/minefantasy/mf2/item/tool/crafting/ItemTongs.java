@@ -7,6 +7,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -36,6 +37,7 @@ import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.ISmithTongs;
+import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.mechanics.QuenchFlare;
 
@@ -43,6 +45,24 @@ import minefantasy.mf2.mechanics.QuenchFlare;
  * @author Anonymous Productions
  */
 public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
+
+    @Override
+    public void onUpdate(ItemStack tongs, World world, Entity entity, int slot, boolean held) {
+        if (world.isRemote || world.getTotalWorldTime() % 20 != 0) return;
+        ItemStack piece = TongsHelper.getHeldItem(tongs);
+        if (piece != null && piece.getItem() instanceof ItemHeated) {
+            ItemHeated.coolInAir(piece, world, entity);
+            tongs.getTagCompound().setTag("Saved", piece.writeToNBT(new net.minecraft.nbt.NBTTagCompound()));
+        }
+    }
+
+    @Override
+    public boolean onEntityItemUpdate(net.minecraft.entity.item.EntityItem entity) {
+        onUpdate(entity.getEntityItem(), entity.worldObj, entity, 0, false);
+        if (!entity.worldObj.isRemote && entity.worldObj.getTotalWorldTime() % 20 == 0)
+            entity.setEntityItemStack(entity.getEntityItem());
+        return false;
+    }
 
     protected int itemRarity;
     private ToolMaterial material;
@@ -82,7 +102,13 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player) {
         ItemStack held = TongsHelper.getHeldItem(item);
-        if (held == null || held.stackSize <= 0 || !TongsHelper.isCoolableItem(held)) {
+        if (held == null || held.stackSize <= 0) return item;
+        if (!world.isRemote) ItemHeated.unwrapIfCold(held);
+        if (!TongsHelper.isCoolableItem(held)) {
+            if (!world.isRemote) {
+                player.entityDropItem(held.copy(), 0);
+                TongsHelper.clearHeldItem(item, player);
+            }
             return item;
         }
         MovingObjectPosition movingobjectposition = this.getMovingObjectPositionFromPlayer(world, player, true);

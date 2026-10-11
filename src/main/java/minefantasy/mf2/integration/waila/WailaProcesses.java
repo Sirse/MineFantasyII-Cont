@@ -55,13 +55,14 @@ final class WailaProcesses {
     private static void furnace(NBTTagCompound data, TileEntityBigFurnace furnace) {
         data.setString("Kind", "heat");
         data.setBoolean("Built", furnace.built);
-        data.setFloat("Temperature", finite(furnace.heat));
+        data.setFloat("Temperature", temperature(furnace.heat));
         if (!furnace.built) {
             reason(data, CheckResult.Reason.of("not_built"));
         } else if (furnace.isHeater()) {
             data.setBoolean("Burning", furnace.fuel > 0);
             data.setFloat("FuelSeconds", Math.max(0, furnace.fuel) / 20F);
-            if (furnace.fuel <= 0 && furnace.heat <= 0) reason(data, CheckResult.Reason.of("no_heat"));
+            if (furnace.fuel <= 0 && furnace.heat <= furnace.getAmbientTemperature())
+                reason(data, CheckResult.Reason.of("no_heat"));
         } else {
             List<CraftPlan> plans = furnace.getShownPlans();
             NBTTagList results = new NBTTagList();
@@ -76,7 +77,7 @@ final class WailaProcesses {
             data.setBoolean("ShowProgress", !plans.isEmpty());
             if (plans.isEmpty()) reason(data, CheckResult.Reason.NO_RECIPE);
             else if (!canWork) reason(data, CheckResult.Reason.OUTPUT_FULL);
-            else if (furnace.heat < 1) reason(data, CheckResult.Reason.of("no_heat"));
+            else if (furnace.heat <= furnace.getAmbientTemperature()) reason(data, CheckResult.Reason.of("no_heat"));
         }
     }
 

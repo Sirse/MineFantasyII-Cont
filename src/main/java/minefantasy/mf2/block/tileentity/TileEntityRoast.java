@@ -240,7 +240,9 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
     }
 
     public int getWorkTemperature() {
-        return worldObj != null && worldObj.blockExists(xCoord, yCoord - 1, zCoord) ? getTemp() : 0;
+        int heat = worldObj != null && worldObj.blockExists(xCoord, yCoord - 1, zCoord) ? getTemp() : 0;
+        return heat > 0 ? heat
+                : Math.round(minefantasy.mf2.api.heating.AmbientTemperature.get(worldObj, xCoord, yCoord, zCoord));
     }
 
     @Override
