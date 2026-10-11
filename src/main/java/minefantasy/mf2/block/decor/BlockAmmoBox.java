@@ -130,10 +130,11 @@ public class BlockAmmoBox extends BlockWoodDecor<TileEntityAmmoBox> {
         if (!world.isRemote) {
             TileEntityAmmoBox tile = getTile(world, x, y, z);
             if (tile != null) {
-                return tile.interact(user);
+                tile.interact(user);
             }
         }
-        return false;
+        // Consume the click on both sides, including rejected deposits: never fall through to ItemBlock placement.
+        return true;
     }
 
     @Override
