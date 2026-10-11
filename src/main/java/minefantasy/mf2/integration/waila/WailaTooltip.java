@@ -26,11 +26,17 @@ final class WailaTooltip {
         ItemStack item = data.hasKey("Item") ? ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")) : null;
         if (item != null)
             tip.add(data.hasKey("Count") ? item.getDisplayName() : text("item", item.getDisplayName(), item.stackSize));
-        if (data.hasKey("Count") && !(advanced && data.getTagList("Contents", 10).tagCount() > 0)) tip.add(
-                text(
-                        data.hasKey("Contents") ? "storage_occupied" : "storage_count",
-                        data.getInteger("Count"),
-                        data.getInteger("Limit")));
+        if (data.hasKey("Count") && !(advanced && data.getTagList("Contents", 10).tagCount() > 0)) {
+            int count = data.getInteger("Count");
+            if (data.hasKey("Contents")) {
+                tip.add(text("storage_occupied", count, data.getInteger("Limit")));
+            } else {
+                int limit = data.getInteger("Limit");
+                if (count <= 0) tip.add(text("empty"));
+                else if (limit > 0 && count >= limit) tip.add(text("storage_full", count));
+                else tip.add(text("storage_count", count, limit));
+            }
+        }
         if (advanced && data.hasKey("Material")) {
             String material = StatCollector.translateToLocal(data.getString("Material"));
             if (item == null || !item.getDisplayName().toLowerCase(java.util.Locale.ROOT)
@@ -38,9 +44,15 @@ final class WailaTooltip {
                 tip.add(text("material", material));
             }
         }
-        NBTTagList research = data.getTagList("Research", 8);
-        for (int i = 0; advanced && i < Math.min(4, research.tagCount()); i++)
-            tip.add(StatCollector.translateToLocal(research.getStringTagAt(i)));
+        NBTTagList research = data.getTagList("Research", 10);
+        for (int i = 0; advanced && i < Math.min(4, research.tagCount()); i++) {
+            NBTTagCompound entry = research.getCompoundTagAt(i);
+            tip.add(
+                    text(
+                            entry.getBoolean("Learned") ? "research_learned" : "research_available",
+                            StatCollector.translateToLocal(entry.getString("Name"))));
+        }
+        if (advanced && data.getBoolean("ResearchHidden")) tip.add(text("research_hidden"));
         if (data.hasKey("BerryReady")) tip.add(text(data.getBoolean("BerryReady") ? "berry_ready" : "grow"));
         if (advanced && data.hasKey("Surface")) {
             ItemStack surface = ItemStack.loadItemStackFromNBT(data.getCompoundTag("Surface"));

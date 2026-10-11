@@ -2472,6 +2472,7 @@ minefantasy2.waila.storage=储存
 minefantasy2.waila.research=研究
 minefantasy2.waila.world=世界方块
 minefantasy2.waila.storage_count=储量：%s / %s
+minefantasy2.waila.storage_full=已满（%s）
 minefantasy2.waila.grow=生长中
 minefantasy2.waila.berry_ready=可以采摘
 minefantasy2.waila.surface=表面：%s
@@ -2482,3 +2483,7 @@ minefantasy2.waila.material=材料：%s
 
 minefantasy2.waila.storage_occupied=已占用：%s / %s
 minefantasy2.waila.reason.tool_tier=需要：%s（等级 %s）
+
+minefantasy2.waila.research_available=可研究：%s
+minefantasy2.waila.research_learned=已研究：%s
+minefantasy2.waila.research_hidden=有尚不可用的研究

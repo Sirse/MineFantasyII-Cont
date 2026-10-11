@@ -7,7 +7,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 
 import minefantasy.mf2.api.knowledge.InformationBase;
@@ -59,13 +58,18 @@ final class WailaWorld {
             if (names != null && player != null) for (String name : names) {
                 InformationBase base = ResearchLogic.getResearch(name);
                 if (base == null) continue;
-                if (ResearchLogic.hasInfoUnlocked(player, base) || ResearchLogic.canPurchase(player, base)) {
-                    if (visible.tagCount() < 4)
-                        visible.appendTag(new NBTTagString("knowledge." + base.getUnlocalisedName()));
+                boolean learned = ResearchLogic.hasInfoUnlocked(player, base);
+                if (learned || ResearchLogic.canPurchase(player, base)) {
+                    if (visible.tagCount() < 4) {
+                        NBTTagCompound entry = new NBTTagCompound();
+                        entry.setString("Name", "knowledge." + base.getUnlocalisedName());
+                        entry.setBoolean("Learned", learned);
+                        visible.appendTag(entry);
+                    }
                 } else hidden = true;
             }
             data.setTag("Research", visible);
-            data.setBoolean("Unknown", hidden);
+            data.setBoolean("ResearchHidden", hidden);
             if (player != null && table.study.belongsTo(artifact, player.getUniqueID().toString())) {
                 WailaData.progress(data, table.study.progress, table.maxProgress);
                 data.setBoolean("ShowProgress", true);

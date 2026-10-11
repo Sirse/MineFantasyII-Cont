@@ -136,14 +136,18 @@ public class WailaWorldTest {
         TileEntityResearch table = helper.assertTileEntityPresent(TileEntityResearch.class, 2, 2, 2);
         table.setInventorySlotContents(0, artifact);
         NBTTagCompound data = inspect(helper, table, player);
-        assertTrue(data.getBoolean("Unknown"));
-        assertEquals(0, data.getTagList("Research", 8).tagCount());
+        assertTrue(data.getBoolean("ResearchHidden"));
+        assertEquals(0, data.getTagList("Research", 10).tagCount());
         for (InformationBase parent = hidden.parentInfo; parent != null; parent = parent.parentInfo) {
             ResearchLogic.forceUnlock(player, parent);
         }
         data = inspect(helper, table, player);
-        assertFalse(data.getBoolean("Unknown"));
-        assertEquals(1, data.getTagList("Research", 8).tagCount());
+        assertFalse(data.getBoolean("ResearchHidden"));
+        assertEquals(1, data.getTagList("Research", 10).tagCount());
+        assertFalse(data.getTagList("Research", 10).getCompoundTagAt(0).getBoolean("Learned"));
+        ResearchLogic.forceUnlock(player, hidden);
+        data = inspect(helper, table, player);
+        assertTrue(data.getTagList("Research", 10).getCompoundTagAt(0).getBoolean("Learned"));
         helper.succeed();
     }
 

@@ -2474,6 +2474,7 @@ minefantasy2.waila.storage=Storage
 minefantasy2.waila.research=Research
 minefantasy2.waila.world=World blocks
 minefantasy2.waila.storage_count=Stored: %s / %s
+minefantasy2.waila.storage_full=Full (%s)
 minefantasy2.waila.grow=Growing
 minefantasy2.waila.berry_ready=Ready to harvest
 minefantasy2.waila.surface=Surface: %s
@@ -2485,3 +2486,7 @@ minefantasy2.waila.material=Material: %s
 minefantasy2.waila.reason.tool_tier=Requires: %s (tier %s)
 
 minefantasy2.waila.storage_occupied=Occupied: %s / %s
+
+minefantasy2.waila.research_available=Can study: %s
+minefantasy2.waila.research_learned=Studied: %s
+minefantasy2.waila.research_hidden=Some research is unavailable

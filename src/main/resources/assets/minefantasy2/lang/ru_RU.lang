@@ -2589,6 +2589,7 @@ minefantasy2.waila.storage=Хранилища
 minefantasy2.waila.research=Исследования
 minefantasy2.waila.world=Блоки мира
 minefantasy2.waila.storage_count=Запас: %s / %s
+minefantasy2.waila.storage_full=Заполнено (%s)
 minefantasy2.waila.grow=Созревает
 minefantasy2.waila.berry_ready=Можно собирать
 minefantasy2.waila.surface=Покрытие: %s
@@ -2600,3 +2601,7 @@ minefantasy2.waila.material=Материал: %s
 minefantasy2.waila.reason.tool_tier=Нужен: %s (уровень %s)
 
 minefantasy2.waila.storage_occupied=Занято: %s / %s
+
+minefantasy2.waila.research_available=Можно изучить: %s
+minefantasy2.waila.research_learned=Изучено: %s
+minefantasy2.waila.research_hidden=Есть недоступные исследования
