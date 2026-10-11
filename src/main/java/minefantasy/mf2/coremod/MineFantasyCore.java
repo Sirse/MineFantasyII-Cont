@@ -1,5 +1,6 @@
 package minefantasy.mf2.coremod;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Set;
 
 import com.gtnewhorizon.gtnhmixins.IEarlyMixinLoader;
 
+import cpw.mods.fml.relauncher.FMLLaunchHandler;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 
 /**
@@ -24,7 +26,12 @@ public class MineFantasyCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
 
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
-        return Arrays.asList("EntityPlayerAccessor", "ItemInWorldManagerMixin");
+        List<String> mixins = new ArrayList<>(Arrays.asList("EntityPlayerAccessor", "ItemInWorldManagerMixin"));
+        // The player controller is client only: its accessor would not resolve on a dedicated server
+        if (FMLLaunchHandler.side().isClient()) {
+            mixins.add("PlayerControllerAccessor");
+        }
+        return mixins;
     }
 
     @Override

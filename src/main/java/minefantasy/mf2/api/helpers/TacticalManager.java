@@ -278,6 +278,9 @@ public class TacticalManager {
      * Modifies the movement of an entity based on armour
      */
     public static void applyArmourWeight(EntityLivingBase entityLiving) {
+        if (PlayerModeHelper.isSpectator(entityLiving)) {
+            return;
+        }
         if (entityLiving instanceof EntityPlayer && ((EntityPlayer) entityLiving).capabilities.isCreativeMode) {
             return;
         }

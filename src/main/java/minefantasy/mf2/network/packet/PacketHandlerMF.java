@@ -13,7 +13,9 @@ import cpw.mods.fml.common.network.FMLEventChannel;
 import cpw.mods.fml.common.network.FMLNetworkEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
+import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.MineFantasyII;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class PacketHandlerMF {
@@ -44,14 +46,22 @@ public class PacketHandlerMF {
         if (handler == null) {
             return;
         }
+        dispatchServerbound(handler, event.packet.payload(), ((NetHandlerPlayServer) event.handler).playerEntity);
+    }
+
+    /**
+     * The single entry for serverbound packets: every one of them is an action request, and a spectator may only watch.
+     * Et Futurum lets spectators open inventories to look in, and drops their clicks on slots itself; requests through
+     * here change nothing.
+     */
+    public void dispatchServerbound(PacketMF handler, ByteBuf payload, EntityPlayerMP player) {
+        if (PlayerModeHelper.isSpectator(player)) {
+            return;
+        }
         try {
-            handler.process(event.packet.payload(), ((NetHandlerPlayServer) event.handler).playerEntity);
+            handler.process(payload, player);
         } catch (Throwable t) {
-            logPacketError(
-                    event.packet.channel(),
-                    "SERVERBOUND",
-                    ((NetHandlerPlayServer) event.handler).playerEntity,
-                    t);
+            logPacketError(handler.getChannel(), "SERVERBOUND", player, t);
         }
     }
 

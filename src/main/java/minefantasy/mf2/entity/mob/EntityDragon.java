@@ -22,6 +22,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.armour.IArmourPenetrationMob;
 import minefantasy.mf2.api.armour.IArmouredEntity;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.config.ConfigMobs;
@@ -502,6 +503,9 @@ public class EntityDragon extends EntityFlyingMF
             return false;
         }
         if (target instanceof EntityPlayer && ((EntityPlayer) target).capabilities.isCreativeMode) {
+            return false;
+        }
+        if (PlayerModeHelper.isSpectator(target)) {
             return false;
         }
         if (this.getType().isBlind() && !this.canHearEntity(target)) {

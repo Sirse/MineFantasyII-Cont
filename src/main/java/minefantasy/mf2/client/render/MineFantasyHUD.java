@@ -83,6 +83,11 @@ public class MineFantasyHUD extends Gui {
     private static final int ROAD_LOCK_ICON_WIDTH = 8;
     private static final int ROAD_LOCK_ICON_HEIGHT = 12;
 
+    /** Whether the local player is in spectator mode, through the same helper every other check uses. */
+    private static boolean isSpectator() {
+        return PlayerModeHelper.isSpectator(mc.thePlayer);
+    }
+
     private static int[] getOrientsFor(int screenX, int screenY, int cfgX, int cfgY) {
         int xOrient = cfgX == -1 ? 0 : cfgX == 1 ? screenX : screenX / 2;
         int yOrient = cfgY == -1 ? 0 : cfgY == 1 ? screenY : screenY / 2;
@@ -121,7 +126,9 @@ public class MineFantasyHUD extends Gui {
             renderAmmo(player, width, height);
         }
 
-        if (StaminaBar.isSystemActive && !player.capabilities.isCreativeMode && !PowerArmour.isWearingCogwork(player)) {
+        if (StaminaBar.isSystemActive && !player.capabilities.isCreativeMode
+                && !isSpectator()
+                && !PowerArmour.isWearingCogwork(player)) {
             renderStaminaBar(player, width, height);
         }
 

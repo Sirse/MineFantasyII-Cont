@@ -13,6 +13,7 @@ import net.minecraftforge.fluids.IFluidHandler;
 import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.api.heating.QuenchMedium;
 import minefantasy.mf2.api.helpers.FluidContainers;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.fluid.FluidsMF;
 import minefantasy.mf2.item.food.FoodListMF;
 
@@ -90,7 +91,7 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
      * millibucket. Salt turns the water to salt water, one for each bucket of it.
      */
     public boolean interact(EntityPlayer user, ItemStack held) {
-        if (held == null) {
+        if (held == null || PlayerModeHelper.isSpectator(user)) {
             return false;
         }
         if (held.getItem() == FoodListMF.salt) {

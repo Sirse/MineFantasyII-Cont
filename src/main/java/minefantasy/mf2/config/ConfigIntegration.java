@@ -8,6 +8,8 @@ public class ConfigIntegration extends ConfigurationBaseMF {
     public static boolean tcIntegration;
     public static boolean tcAspects;
     public static boolean tcInfusion;
+    public static boolean etfuturumIntegration;
+    public static boolean etfuturumBlastBlacklist;
 
     @Override
     protected void loadConfig() {
@@ -26,5 +28,17 @@ public class ConfigIntegration extends ConfigurationBaseMF {
                 "Thaumcraft Infusion",
                 false,
                 "Enable the shared research and infusion recipes (unfinished)").getBoolean();
+        etfuturumIntegration = config.get(
+                CATEGORY_MODS,
+                "Et Futurum Integration",
+                true,
+                "Enable Et Futurum Requiem integration: composter and bee bridges, working stations hidden from spectators, and blast furnace guards. Spectator safety stays on regardless of this setting")
+                .getBoolean();
+        etfuturumBlastBlacklist = config.get(
+                CATEGORY_MODS,
+                "Et Futurum Blast Furnace Blacklist",
+                true,
+                "Keep MineFantasy raw ore, ore blocks and coal refining out of Et Futurum's blast furnace, so metals stay on the crucible and bloom")
+                .getBoolean();
     }
 }

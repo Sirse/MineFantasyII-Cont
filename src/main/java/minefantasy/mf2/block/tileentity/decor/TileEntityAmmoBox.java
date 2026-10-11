@@ -10,6 +10,7 @@ import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.archery.IAmmo;
 import minefantasy.mf2.api.archery.IFirearm;
 import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tool.IStorageBlock;
 import minefantasy.mf2.block.decor.BlockAmmoBox;
@@ -33,6 +34,9 @@ public class TileEntityAmmoBox extends TileEntityWoodDecor implements IBasicMetr
     }
 
     public boolean interact(EntityPlayer user) {
+        if (PlayerModeHelper.isSpectator(user)) {
+            return false;
+        }
         ItemStack held = user.getHeldItem();
 
         if (held != null) {

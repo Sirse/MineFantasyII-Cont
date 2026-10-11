@@ -152,9 +152,10 @@ public final class FluidContainers {
         return given;
     }
 
-    /** Whether this call changes the inventory: on the server, outside creative mode. */
+    /** Whether this call changes the inventory: on the server, outside creative mode, never for a spectator. */
     private static boolean changes(EntityPlayer player) {
-        return !player.worldObj.isRemote && !player.capabilities.isCreativeMode;
+        return !player.worldObj.isRemote && !player.capabilities.isCreativeMode
+                && !PlayerModeHelper.isSpectator(player);
     }
 
     private static ItemStack one(ItemStack stack) {

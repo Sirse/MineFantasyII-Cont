@@ -92,6 +92,9 @@ public class CombatMechanics {
 
     @SubscribeEvent
     public void initAttack(LivingAttackEvent event) {
+        if (PlayerModeHelper.isSpectator(event.entityLiving)) {
+            return;
+        }
         EntityLivingBase hitter = getHitter(event.source);
         int spd = EventManagerMF.getHitspeedTime(hitter);
         if (hitter != null && !hitter.worldObj.isRemote) {
@@ -167,6 +170,9 @@ public class CombatMechanics {
 
     @SubscribeEvent
     public void onHit(LivingHurtEvent event) {
+        if (PlayerModeHelper.isSpectator(event.entityLiving)) {
+            return;
+        }
         DamageSource src = event.source;
         EntityLivingBase hit = event.entityLiving;
 

@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
 import minefantasy.mf2.api.helpers.Cooldowns;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -559,7 +560,7 @@ public class StaminaBar {
         }
         if (entity instanceof EntityPlayer) {
             EntityPlayer p = (EntityPlayer) entity;
-            return !p.capabilities.isCreativeMode;
+            return !p.capabilities.isCreativeMode && !PlayerModeHelper.isSpectator(p);
         } else if (restrictSystem) {
             return false;
         }

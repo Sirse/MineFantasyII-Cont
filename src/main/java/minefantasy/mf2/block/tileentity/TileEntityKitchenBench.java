@@ -22,6 +22,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.crafting.kitchen.CraftingManagerKitchen;
 import minefantasy.mf2.api.helpers.FluidContainers;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -136,6 +137,9 @@ public class TileEntityKitchenBench extends TileEntityStation
      * Right-click interaction: crafting hits with the proper tool, washing with a water container.
      */
     public boolean interact(EntityPlayer user) {
+        if (PlayerModeHelper.isSpectator(user)) {
+            return false;
+        }
         ItemStack held = user.getHeldItem();
 
         // Any water container Forge knows: a bucket, bottle or jug is emptied whole, a cell or tank gives what is

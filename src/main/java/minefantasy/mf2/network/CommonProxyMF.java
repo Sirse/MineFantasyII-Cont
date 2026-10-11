@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
 import net.minecraftforge.common.MinecraftForge;
 
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -158,6 +159,11 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
 
     public EntityPlayer getClientPlayer() {
         return null;
+    }
+
+    /** Whether the local client player is in the given gametype; only the client proxy can know. */
+    public boolean clientIsInGameType(WorldSettings.GameType type) {
+        return false;
     }
 
     @Override

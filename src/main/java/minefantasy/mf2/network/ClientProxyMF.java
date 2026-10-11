@@ -1,10 +1,12 @@
 package minefantasy.mf2.network;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -41,6 +43,7 @@ import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.list.styles.DragonforgedStyle;
 import minefantasy.mf2.item.list.styles.OrnateStyle;
 import minefantasy.mf2.mechanics.ExtendedReachMF;
+import minefantasy.mf2.mixins.PlayerControllerAccessor;
 
 /**
  * @author Anonymous Productions
@@ -173,6 +176,15 @@ public class ClientProxyMF extends CommonProxyMF {
     @Override
     public EntityPlayer getClientPlayer() {
         return Minecraft.getMinecraft().thePlayer;
+    }
+
+    @Override
+    public boolean clientIsInGameType(WorldSettings.GameType type) {
+        if (type == null) {
+            return false;
+        }
+        PlayerControllerMP controller = Minecraft.getMinecraft().playerController;
+        return controller != null && ((PlayerControllerAccessor) controller).mf2$getCurrentGameType() == type;
     }
 
     @Override

@@ -178,6 +178,7 @@ public class MineFantasyII {
     public void loadComplete(FMLLoadCompleteEvent event) {
         minefantasy.mf2.integration.sereneseasons.SereneSeasonsCompat.load();
         minefantasy.mf2.integration.enviromine.EnviroMineCompat.load();
+        minefantasy.mf2.integration.etfuturum.EtFuturumCompat.load();
         MFRecipes.REGISTRIES.finishLoading();
     }
 

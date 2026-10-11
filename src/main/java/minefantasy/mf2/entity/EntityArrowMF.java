@@ -26,6 +26,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.archery.IArrowMF;
 import minefantasy.mf2.api.archery.IArrowRetrieve;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.weapon.IDamageType;
 import minefantasy.mf2.config.ConfigWeapon;
@@ -663,6 +664,9 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
      */
     @Override
     public void onCollideWithPlayer(EntityPlayer player) {
+        if (PlayerModeHelper.isSpectator(player)) {
+            return;
+        }
         if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0) {
             boolean canPickUp = this.canBePickedUp == 1
                     || this.canBePickedUp == 2 && player.capabilities.isCreativeMode;

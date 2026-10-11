@@ -21,6 +21,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.tool.ILighter;
 import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.tileentity.InventorySlots;
@@ -51,6 +52,9 @@ public class BlockFirepit extends BlockTiled<TileEntityFirepit> {
     @Override
     public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int i, float f, float f1,
             float f2) {
+        if (PlayerModeHelper.isSpectator(player)) {
+            return super.onBlockActivated(world, x, y, z, player, i, f, f1, f2);
+        }
         TileEntityFirepit firepit = getTile(world, x, y, z);
 
         if (firepit != null) {

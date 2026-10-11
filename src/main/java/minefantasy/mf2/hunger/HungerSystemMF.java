@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import minefantasy.mf2.api.MineFantasyAPI;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 
 public class HungerSystemMF {
 
@@ -68,7 +69,7 @@ public class HungerSystemMF {
     }
 
     public void slowHunger(EntityPlayer player) {
-        if (player.capabilities.isCreativeMode) {
+        if (player.capabilities.isCreativeMode || PlayerModeHelper.isSpectator(player)) {
             return;
         }
         // init vars

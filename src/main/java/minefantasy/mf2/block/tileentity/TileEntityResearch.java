@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentTranslation;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.knowledge.IArtefact;
 import minefantasy.mf2.api.knowledge.InformationBase;
@@ -152,6 +153,9 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
     }
 
     private void addProgress(EntityPlayer user) {
+        if (PlayerModeHelper.isSpectator(user)) {
+            return;
+        }
         ItemStack held = user.getHeldItem();
         if (held != null && (held.getItem() == ComponentListMF.talisman_lesser
                 || held.getItem() == ComponentListMF.talisman_greater)) {

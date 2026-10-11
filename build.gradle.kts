@@ -23,6 +23,7 @@ val versionBaubles = "1.0.1.10"
 val versionHorizonQA = "0.15.0"
 val versionEnviroMine = "1.3.148-ESE-0x05"
 val versionSereneSeasons = "1.3.1"
+val versionEtFuturum = "2.6.62-GTNH"
 val climateLibrariesCommit = "f51137614349ec0cfc88a902a7df9e63d568dc58"
 // Mixin runtime (UniMixins), a required dependency: one hook on vanilla's block harvesting. Published on JitPack
 val mixinProvider = "com.github.LegacyModdingMC.UniMixins:unimixins-all-1.7.10:0.3.2:dev"
@@ -123,6 +124,13 @@ repositories {
     metadataSources { artifact() }
     content { includeModule("sereneseasons", "SereneSeasons") }
   }
+  ivy {
+    name = "Et Futurum Requiem Releases"
+    url = uri("https://github.com/GTNewHorizons/Et-Futurum-Requiem/releases/download/")
+    patternLayout { artifact("[revision]/[artifact]-[revision](-[classifier]).[ext]") }
+    metadataSources { artifact() }
+    content { includeModule("etfuturum", "etfuturum") }
+  }
   mavenCentral()
   maven {
     name = "GTNH Maven"
@@ -146,6 +154,8 @@ dependencies {
   // Optional climate integrations: compile against their real APIs, never ship or load the mods automatically.
   compileOnly("enviromine:enviromine:$versionEnviroMine:dev") { isTransitive = false }
   compileOnly(modUtils.deobfuscate("sereneseasons:SereneSeasons:$versionSereneSeasons"))
+  // Same for Et Futurum Requiem: its registries are filled one way at load completion, never queried back.
+  compileOnly("etfuturum:etfuturum:$versionEtFuturum:dev") { isTransitive = false }
 
   annotationProcessor("org.ow2.asm:asm-debug-all:5.0.4")
   annotationProcessor("com.google.guava:guava:24.1.1-jre")

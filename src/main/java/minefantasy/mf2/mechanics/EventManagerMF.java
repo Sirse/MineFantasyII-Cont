@@ -99,8 +99,9 @@ public class EventManagerMF {
         float lowHp = entity.getMaxHealth() / 5F;
         int injury = getInjuredTime(entity);
 
-        if (ConfigHardcore.critLimp && (entity instanceof EntityLiving
-                || !(entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode))) {
+        if (ConfigHardcore.critLimp && !PlayerModeHelper.isSpectator(entity)
+                && (entity instanceof EntityLiving
+                        || !(entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode))) {
             if (entity.getHealth() <= lowHp || injury > 0) {
                 if (entity.getRNG().nextInt(10) == 0 && entity.onGround && !entity.isRiding()) {
                     entity.motionX = 0F;
@@ -172,6 +173,9 @@ public class EventManagerMF {
 
     @SubscribeEvent
     public void itemEvent(EntityItemPickupEvent event) {
+        if (event.isCanceled()) {
+            return;
+        }
         EntityPlayer player = event.entityPlayer;
 
         EntityItem drop = event.item;

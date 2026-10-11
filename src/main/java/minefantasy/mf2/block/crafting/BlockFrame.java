@@ -6,6 +6,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.basic.BasicBlockMF;
@@ -123,6 +124,9 @@ public class BlockFrame extends BasicBlockMF {
     }
 
     private boolean tryBuild(EntityPlayer player, World world, int x, int y, int z) {
+        if (PlayerModeHelper.isSpectator(player)) {
+            return false;
+        }
         if (PowerArmour.isBasicStationFrame(world, x, y, z)
                 && (player.capabilities.isCreativeMode || player.inventory.hasItem(ComponentListMF.cogwork_pulley))) {
             if (!player.capabilities.isCreativeMode) {

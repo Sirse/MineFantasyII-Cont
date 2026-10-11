@@ -24,6 +24,7 @@ import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -119,11 +120,11 @@ public class BlockForge extends BlockStation<TileEntityForge> {
         ItemStack held = user.getHeldItem();
         TileEntityForge tile = stationAt(world, x, y, z);
         if (tile != null) {
-            if (tile.isLit() && !ItemApron.isUserProtected(user)) {
+            if (tile.isLit() && !ItemApron.isUserProtected(user) && !PlayerModeHelper.isSpectator(user)) {
                 user.setFire(5);
                 user.attackEntityFrom(DamageSource.onFire, 1.0F);
             }
-            if (held != null) {
+            if (held != null && !PlayerModeHelper.isSpectator(user)) {
                 if (side == 1 && held != null
                         && held.getItem() instanceof ItemTongs
                         && onUsedTongs(world, user, held, tile)) {

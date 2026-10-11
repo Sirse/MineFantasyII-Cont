@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 
 import minefantasy.mf2.api.heating.Quench;
 import minefantasy.mf2.api.heating.QuenchMedium;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.item.armour.ItemApron;
 
 /**
@@ -48,7 +49,7 @@ public final class QuenchFlare {
             return;
         }
         world.playSoundEffect(x + 0.5D, y + 1D, z + 0.5D, "mob.ghast.fireball", 0.8F, 0.8F);
-        if (smith == null || smith.capabilities.isCreativeMode) {
+        if (smith == null || smith.capabilities.isCreativeMode || PlayerModeHelper.isSpectator(smith)) {
             return;
         }
         boolean apron = ItemApron.isUserProtected(smith);

@@ -16,6 +16,7 @@ import minefantasy.mf2.api.archery.AmmoMechanicsMF;
 import minefantasy.mf2.api.archery.IFirearm;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.PlayerTagData;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
@@ -216,11 +217,15 @@ public class PlayerTickHandlerMF {
     // 4 missing bars)
     // EXHAUSTION SCALE = 3.0F = 1hunger
     /**
-     * Sets a player carrying a hot item on fire. Blacksmith attire protects, unless hardcore hot burns are on.
+     * Sets a player carrying a hot item on fire. Blacksmith attire protects, unless hardcore hot burns are on; creative
+     * players and spectators carry items without ever burning.
      *
      * @return whether the player was set on fire
      */
     public static boolean burnWithHotItems(EntityPlayer player) {
+        if (player.capabilities.isCreativeMode || PlayerModeHelper.isSpectator(player)) {
+            return false;
+        }
         if (!ConfigCrafting.hotBurn && ItemApron.isUserProtected(player)) {
             return false;
         }
@@ -334,6 +339,9 @@ public class PlayerTickHandlerMF {
     }
 
     private void tickDragonSpawner(EntityPlayer player) {
+        if (PlayerModeHelper.isSpectator(player)) {
+            return;
+        }
         if (player.worldObj.difficultySetting != EnumDifficulty.PEACEFUL && player.dimension == 0) {
             int i = ConfigMobs.dragonInterval;
             float chance = ConfigMobs.dragonChance;
@@ -410,7 +418,7 @@ public class PlayerTickHandlerMF {
         ResearchLogic.syncData(player);
 
         if (ConfigHardcore.giveStarterBook && !persist.hasKey("MF_HasBook")) {
-            if (player.capabilities.isCreativeMode) return;
+            if (player.capabilities.isCreativeMode || PlayerModeHelper.isSpectator(player)) return;
             ItemStack book = new ItemStack(ToolListMF.researchBook);
             if (player.inventory.addItemStackToInventory(book)) {
                 persist.setBoolean("MF_HasBook", true);
