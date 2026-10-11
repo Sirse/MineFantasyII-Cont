@@ -98,17 +98,20 @@ public class BlockRoad extends BlockContainer {
         super.updateTick(world, x, y, z, random);
     }
 
+    /** The speed level a road gives, from the config: 0 gives none. */
+    public static int speedLevel = 1;
+
     /**
      * Walking on a maintained road grants a short speed boost, refreshed only when the previous one is about to expire,
      * so effect sync packets aren't spammed every step.
      */
     @Override
     public void onEntityWalking(World world, int x, int y, int z, Entity entity) {
-        if (!world.isRemote && entity instanceof EntityLivingBase) {
+        if (!world.isRemote && speedLevel > 0 && entity instanceof EntityLivingBase) {
             EntityLivingBase living = (EntityLivingBase) entity;
             PotionEffect speed = living.getActivePotionEffect(Potion.moveSpeed);
             if (speed == null || speed.getDuration() <= 10) {
-                living.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, 0));
+                living.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 20, speedLevel - 1));
             }
         }
     }

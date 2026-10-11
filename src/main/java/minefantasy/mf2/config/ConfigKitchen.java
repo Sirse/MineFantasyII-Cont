@@ -22,16 +22,26 @@ public class ConfigKitchen extends ConfigurationBaseMF {
         enableBench = config
                 .get(basic, "Enable Kitchen Bench", true, "Master switch for the kitchen bench block and recipes")
                 .getBoolean(true);
-        dirtyProgressMax = (float) config.get(
-                basic,
+        dirtyProgressMax = config.getFloat(
                 "Dirty Progress Max",
-                100D,
-                "Crafting stops when the bench reaches this much dirt until it is washed").getDouble(100D);
-        washStrengthFraction = (float) config
-                .get(basic, "Wash Strength Fraction", 0.5D, "Fraction of the dirt meter removed per water container")
-                .getDouble(0.5D);
-        dirtyProgressSkillModifier = config
-                .get(basic, "Dirty Progress Skill Mod", 2, "How much the provisioning skill reduces mess per level")
-                .getInt(2);
+                basic,
+                100F,
+                1F,
+                100000F,
+                "Crafting stops when the bench reaches this much dirt until it is washed");
+        washStrengthFraction = config.getFloat(
+                "Wash Strength Fraction",
+                basic,
+                0.5F,
+                0F,
+                1F,
+                "Fraction of the dirt meter removed per water container");
+        dirtyProgressSkillModifier = config.getInt(
+                "Dirty Progress Skill Mod",
+                basic,
+                2,
+                0,
+                100,
+                "How much the provisioning skill reduces mess per level");
     }
 }

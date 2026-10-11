@@ -30,7 +30,8 @@ import minefantasy.mf2.api.knowledge.ResearchLogic;
 public class TransformationHandler {
 
     /** Ticks after a transformation during which the same block ignores the player, so a held click does not chain */
-    private static final int REPEAT_DELAY = 10;
+    /** Ticks before the same block takes another hit, from the config. */
+    public static int REPEAT_DELAY = 10;
 
     private Random rand = new Random();
     private final Map<EntityPlayer, long[]> lastTransform = new WeakHashMap<EntityPlayer, long[]>();

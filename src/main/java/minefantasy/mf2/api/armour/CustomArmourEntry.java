@@ -64,11 +64,21 @@ public class CustomArmourEntry {
      * @param weightMod the multiplier for the tier weight if a tier is heavier or lighter
      */
     public static void registerItem(Item piece, ArmourDesign template, float weightMod, String weightType) {
-        float divider = 0.25F;
+        registerItem(piece, template.getWeight() * weightMod, template.getBulk() * slotShare(piece), weightType);
+    }
+
+    /**
+     * The share of a suit the piece's slot holds; a quarter for anything that is not armour in one of the four slots,
+     * such as a mod's extra slot past the boots.
+     */
+    public static float slotShare(Item piece) {
         if (piece instanceof ItemArmor) {
-            divider = ArmourCalculator.sizes[((ItemArmor) piece).armorType];
+            int slot = ((ItemArmor) piece).armorType;
+            if (slot >= 0 && slot < ArmourCalculator.sizes.length) {
+                return ArmourCalculator.sizes[slot];
+            }
         }
-        registerItem(piece, template.getWeight() * weightMod, template.getBulk() * divider, weightType);
+        return 0.25F;
     }
 
     /**

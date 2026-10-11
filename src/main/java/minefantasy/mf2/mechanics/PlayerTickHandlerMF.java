@@ -21,6 +21,7 @@ import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.config.ConfigCrafting;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.config.ConfigMobs;
 import minefantasy.mf2.config.ConfigWeapon;
@@ -220,14 +221,14 @@ public class PlayerTickHandlerMF {
      * @return whether the player was set on fire
      */
     public static boolean burnWithHotItems(EntityPlayer player) {
-        if (!ConfigHardcore.HCChotBurn && ItemApron.isUserProtected(player)) {
+        if (!ConfigCrafting.hotBurn && ItemApron.isUserProtected(player)) {
             return false;
         }
         for (int a = 0; a < player.inventory.getSizeInventory(); a++) {
             ItemStack item = player.inventory.getStackInSlot(a);
             if (item != null && item.getItem() instanceof IHotItem) {
-                player.setFire(5);
-                player.attackEntityFrom(DamageSource.onFire, 1.0F);
+                player.setFire(ConfigCrafting.hotBurnSeconds);
+                player.attackEntityFrom(DamageSource.onFire, ConfigCrafting.hotBurnDamage);
                 return true;
             }
         }

@@ -77,14 +77,19 @@ public class ItemLumberAxe extends ItemAxeMF implements IRackItem {
     }
 
     /** Fells the tree the log belongs to, up to 32 more logs, clearing the leaves close around each. */
+    /** Whether the axe fells whole trees, and how many logs at most, from the config. */
+    public static boolean fellsTrees = true;
+    public static int treeLimit = 32;
+
     @Override
     public boolean onBlockStartBreak(ItemStack item, int x, int y, int z, EntityPlayer player) {
         World world = player.worldObj;
-        if (HeavyHarvest.breaksMore(player) && world.getBlock(x, y, z).getMaterial() == Material.wood
+        if (fellsTrees && HeavyHarvest.breaksMore(player)
+                && world.getBlock(x, y, z).getMaterial() == Material.wood
                 && canAcceptCost(player)) {
             float hit = HeavyHarvest.strength(player, world, x, y, z);
             clearLeaves(item, player, world, x, y, z);
-            for (int[] log : HeavyHarvest.tree(world, x, y, z, 32)) {
+            for (int[] log : HeavyHarvest.tree(world, x, y, z, treeLimit)) {
                 if (HeavyHarvest.breakExtra(item, player, world, log[0], log[1], log[2], hit)) {
                     clearLeaves(item, player, world, log[0], log[1], log[2]);
                     tirePlayer(player, 0.5F);

@@ -16,7 +16,6 @@ import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.weapon.*;
-import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.item.weapon.*;
 import minefantasy.mf2.network.packet.ParryPacket;
 import minefantasy.mf2.util.MFLogUtil;
@@ -98,7 +97,7 @@ public class Parrying {
                 threshold = ArmourCalculator.adjustACForDamage(source, threshold, 1.0F, 0.75F, 0.5F);
             }
 
-            if (ConfigExperiment.debugParry && !user.worldObj.isRemote) {
+            if (MineFantasyII.isDebug() && !user.worldObj.isRemote) {
                 MFLogUtil.logDebug("Init Parry: Damage = " + dam + " Threshold = " + threshold);
             }
 

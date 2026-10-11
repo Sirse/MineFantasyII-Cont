@@ -80,7 +80,7 @@ public class MineFantasyII {
     }
 
     public static boolean isDebug() {
-        return ConfigExperiment.debug.equals("AU32-Db42-Acf6-Ggh9-9E8d");
+        return ConfigExperiment.debug;
     }
 
     /**

@@ -7,6 +7,7 @@ import minefantasy.mf2.entity.EntityCogwork;
 public class ConfigArmour extends ConfigurationBaseMF {
 
     public static final String CATEGORY_BONUS = "Bonuses";
+    public static final String CATEGORY_DAMAGE_TYPES = "Damage Types";
     public static final String CATEGORY_PENALTIES = "Penalties";
     public static final String CATEGORY_COGWORK = "Cogwork Features";
     public static boolean resistArrow;
@@ -21,62 +22,79 @@ public class ConfigArmour extends ConfigurationBaseMF {
                 true,
                 "With this option; arrows have a chance to deflect off armour. It compares the arrow damage and armour rating. Chain and plate have higher rates. Arrows bounced off can hurt enemies")
                 .getBoolean();
-        TacticalManager.arrowDeflectChance = (float) config.get(
-                CATEGORY_BONUS,
+        TacticalManager.arrowDeflectChance = config.getFloat(
                 "Deflect Arrows Modifier",
+                CATEGORY_BONUS,
                 1.0F,
-                "This modifies the chance for arrows to deflect off armour: Increasing this increases the deflect chance, decreasing decreases the chance, 0 means it's impossible")
-                .getDouble();
+                0F,
+                100F,
+                "This modifies the chance for arrows to deflect off armour: Increasing this increases the deflect chance, decreasing decreases the chance, 0 means it's impossible");
 
         TacticalManager.shouldSlow = config.get(
                 CATEGORY_PENALTIES,
                 "Armour Slow Movement",
                 true,
-                "With this: Heavier armours slow your movement down acrosss both walking and sprinting. Speed is affected by design and material")
+                "With this: Heavier armours slow your movement down across both walking and sprinting. Speed is affected by design and material")
                 .getBoolean();
-        TacticalManager.minWeightSpeed = (float) config.get(
-                CATEGORY_PENALTIES,
+        TacticalManager.minWeightSpeed = config.getFloat(
                 "Min armour weigh speed",
-                10F,
-                "The minimal speed percent capable from weight (10 = 10%), MF armours don't go lower than 75% anyway")
-                .getDouble();
-        ArmourCalculator.slowRate = (float) config.get(
                 CATEGORY_PENALTIES,
+                10F,
+                0F,
+                100F,
+                "The minimal speed percent capable from weight (10 = 10%), MF armours don't go lower than 75% anyway");
+        ArmourCalculator.slowRate = config.getFloat(
                 "Slowdown Rate",
+                CATEGORY_PENALTIES,
                 1.0F,
-                "A modifier for the rate armours slow down movement, increasing this slows you more, decreasing it slows less, just keep it above 0")
-                .getDouble();
+                0F,
+                100F,
+                "A modifier for the rate armours slow down movement, increasing this slows you more, decreasing it slows less");
 
-        ArmourCalculator.useConfigIndirectDmg = config.get(
-                "Misc",
-                "Use config indrect damage",
-                true,
-                "Allows config for indirect projectiles, disable if you get problems when getting hit by modded projectiles")
-                .getBoolean();
+        dropCategory("Misc");
+        String AADesc = "This feature Sets supported armours to calculate weapons differently: \n"
+                + "Damage is divided into cutting and blunt, and MF armours will alter their ratings depending \n"
+                + "Both weapons and ranged entities can be registered to deliver a certain ratio \n"
+                + "Armours can't be registered, all coding needs to be hardwired into the code themselves \n"
+                + "So this means mod armours can not support this, they need to have a system built-in to their own coding"
+                + "But this ratio only effects armours that are told to. so it should have no effect on unsupported armours, being balanced as usual \n"
+                + "Undefined weapon damages however have no effect either, but it will try and guess \n"
+                + "This will also change axes and blunt weapons to match blade damage (since armour is vulnerable to blunt";
+        ArmourCalculator.advancedDamageTypes = config
+                .get(CATEGORY_DAMAGE_TYPES, "Advanced Armour Calculator", true, AADesc).getBoolean();
 
         cogworkGrief = config.get(
                 CATEGORY_COGWORK,
                 "Cogwork Grief",
                 true,
-                "Should cogwork armour cause envionmental damage when impact landing").getBoolean();
-        cogworkFuelUnits = (float) config
-                .get(CATEGORY_COGWORK, "Cogwork Fuel Modifier", 1F, "Modify the amount of fuel added to cogworks")
-                .getDouble();
-        EntityCogwork.health_modifier = (float) config.get(
+                "Should cogwork armour cause environmental damage when impact landing").getBoolean();
+        cogworkFuelUnits = config.getFloat(
+                "Cogwork Fuel Modifier",
                 CATEGORY_COGWORK,
+                1F,
+                0F,
+                100F,
+                "Modify the amount of fuel added to cogworks");
+        EntityCogwork.health_modifier = config.getFloat(
                 "Cogwork Durability Modifier",
-                1.0F,
-                "Modify the relative durability of cogwork armour").getDouble();
-        EntityCogwork.rating_modifier = (float) config.get(
                 CATEGORY_COGWORK,
+                1.0F,
+                0F,
+                100F,
+                "Modify the relative durability of cogwork armour");
+        EntityCogwork.rating_modifier = config.getFloat(
                 "Cogwork Armour Modifier",
-                1.0F,
-                "Modify the relative armour rating of cogwork armour").getDouble();
-        EntityCogwork.allowedBulk = config.get(
                 CATEGORY_COGWORK,
+                1.0F,
+                0F,
+                100F,
+                "Modify the relative armour rating of cogwork armour");
+        EntityCogwork.allowedBulk = config.getInt(
                 "Worn Apparel Restrict",
+                CATEGORY_COGWORK,
                 0,
-                "-1: can't wear armour with cogwork, 0=Can enter cogwork with light armour, 1=can enter with medium, 2=can enter in any armour")
-                .getInt();
+                -1,
+                2,
+                "-1: can't wear armour with cogwork, 0=Can enter cogwork with light armour, 1=can enter with medium, 2=can enter in any armour");
     }
 }

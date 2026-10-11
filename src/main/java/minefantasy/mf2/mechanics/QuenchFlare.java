@@ -16,12 +16,12 @@ import minefantasy.mf2.item.armour.ItemApron;
 public final class QuenchFlare {
 
     /** How long the smith burns. */
-    public static final int BURN_SECONDS = 3;
+    public static int BURN_SECONDS = 3;
     /** The scald of the burst itself. */
-    public static final float SCALD = 3F;
+    public static float SCALD = 3F;
     /** The scald and the burning through a blacksmith's apron. */
-    public static final float APRON_SCALD = 1F;
-    public static final int APRON_BURN_SECONDS = 1;
+    public static float APRON_SCALD = 1F;
+    public static int APRON_BURN_SECONDS = 1;
 
     private QuenchFlare() {}
 

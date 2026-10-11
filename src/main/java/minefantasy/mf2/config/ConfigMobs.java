@@ -27,43 +27,49 @@ public class ConfigMobs extends ConfigurationBaseMF {
             bossminotaurGC, bossminotaurGCB, bossminotaurTC;
     public static int lightminotaurAR, mediumminotaurAR, heavyminotaurAR, frostminotaurAR, dreadminotaurAR;
     public static int minotaurSpawnrate, minotaurSpawnrateNether;
+    public static boolean minotaurBombs = true;
 
     @Override
     protected void loadConfig() {
-        youngdragonHP = config.get(MOB_DRAGON, "2Aa: Health", 60, "Young Dragon Stats").getInt();
-        youngdragonMD = config.get(MOB_DRAGON, "2Ab: Bite dmg", 4).getInt();
-        youngdragonFD = config.get(MOB_DRAGON, "2Ab: Fire dmg", 2).getInt();
-        youngdragonFT = config.get(MOB_DRAGON, "2Ac: Fire time", 10).getInt();
+        youngdragonHP = config.getInt("2Aa: Health", MOB_DRAGON, 60, 1, 100000, "Young Dragon Stats");
+        youngdragonMD = config.getInt("2Ab: Bite dmg", MOB_DRAGON, 4, 0, 10000, "");
+        youngdragonFD = config.getInt("2Ab: Fire dmg", MOB_DRAGON, 2, 0, 10000, "");
+        youngdragonFT = config.getInt("2Ac: Fire time", MOB_DRAGON, 10, 0, 10000, "");
 
-        dragonHP = config.get(MOB_DRAGON, "2Ba: Health", 100, "Adult Dragon Stats").getInt();
-        dragonMD = config.get(MOB_DRAGON, "2Bb: Bite dmg", 7).getInt();
-        dragonFD = config.get(MOB_DRAGON, "2Bb: Fire dmg", 5).getInt();
-        dragonFT = config.get(MOB_DRAGON, "2Bc: Fire time", 40).getInt();
+        dragonHP = config.getInt("2Ba: Health", MOB_DRAGON, 100, 1, 100000, "Adult Dragon Stats");
+        dragonMD = config.getInt("2Bb: Bite dmg", MOB_DRAGON, 7, 0, 10000, "");
+        dragonFD = config.getInt("2Bb: Fire dmg", MOB_DRAGON, 5, 0, 10000, "");
+        dragonFT = config.getInt("2Bc: Fire time", MOB_DRAGON, 40, 0, 10000, "");
 
-        diredragonHP = config.get(MOB_DRAGON, "2Ca: Health", 200, "Dire Dragon Stats").getInt();
-        diredragonMD = config.get(MOB_DRAGON, "2Cb: Bite dmg", 8).getInt();
-        diredragonFD = config.get(MOB_DRAGON, "2Cb: Fire dmg", 8).getInt();
-        diredragonFT = config.get(MOB_DRAGON, "2Cc: Fire time", 40).getInt();
+        diredragonHP = config.getInt("2Ca: Health", MOB_DRAGON, 200, 1, 100000, "Dire Dragon Stats");
+        diredragonMD = config.getInt("2Cb: Bite dmg", MOB_DRAGON, 8, 0, 10000, "");
+        diredragonFD = config.getInt("2Cb: Fire dmg", MOB_DRAGON, 8, 0, 10000, "");
+        diredragonFT = config.getInt("2Cc: Fire time", MOB_DRAGON, 40, 0, 10000, "");
 
-        elderdragonHP = config.get(MOB_DRAGON, "2Da: Health", 500, "Elder Dragon Stats").getInt();
-        elderdragonMD = config.get(MOB_DRAGON, "2Db: Bite dmg", 14).getInt();
-        elderdragonFD = config.get(MOB_DRAGON, "2Db: Fire dmg", 10).getInt();
-        elderdragonFT = config.get(MOB_DRAGON, "2Dc: Fire time", 50).getInt();
+        elderdragonHP = config.getInt("2Da: Health", MOB_DRAGON, 500, 1, 100000, "Elder Dragon Stats");
+        elderdragonMD = config.getInt("2Db: Bite dmg", MOB_DRAGON, 14, 0, 10000, "");
+        elderdragonFD = config.getInt("2Db: Fire dmg", MOB_DRAGON, 10, 0, 10000, "");
+        elderdragonFT = config.getInt("2Dc: Fire time", MOB_DRAGON, 50, 0, 10000, "");
 
-        ancientdragonHP = config.get(MOB_DRAGON, "2Ea: Health", 1000, "Ancient Dragon Stats").getInt();
-        ancientdragonMD = config.get(MOB_DRAGON, "2Eb: Bite dmg", 20).getInt();
-        ancientdragonFD = config.get(MOB_DRAGON, "2Eb: Fire dmg", 10).getInt();
-        ancientdragonFT = config.get(MOB_DRAGON, "2Ec: Fire time", 100).getInt();
+        ancientdragonHP = config.getInt("2Ea: Health", MOB_DRAGON, 1000, 1, 100000, "Ancient Dragon Stats");
+        ancientdragonMD = config.getInt("2Eb: Bite dmg", MOB_DRAGON, 20, 0, 10000, "");
+        ancientdragonFD = config.getInt("2Eb: Fire dmg", MOB_DRAGON, 10, 0, 10000, "");
+        ancientdragonFT = config.getInt("2Ec: Fire time", MOB_DRAGON, 100, 0, 10000, "");
 
-        dragonInterval = config.get(
-                MOB_DRAGON,
+        dragonInterval = config.getInt(
                 "3A: Dragon Spawn Interval",
+                MOB_DRAGON,
                 12000,
-                "How many ticks between visits (12000 means 4 times a day), there is a chance for a dragon each time")
-                .getInt();
-        dragonChance = (float) config
-                .get(MOB_DRAGON, "3B: Spawn Chance", 5F, "A Percent (0-100) chance that a dragon spawns at set times")
-                .getDouble();
+                1,
+                10000000,
+                "How many ticks between visits (12000 means 4 times a day), there is a chance for a dragon each time");
+        dragonChance = config.getFloat(
+                "3B: Spawn Chance",
+                MOB_DRAGON,
+                5F,
+                0F,
+                100F,
+                "A Percent (0-100) chance that a dragon spawns at set times");
 
         dragonKillNPC = config.get(
                 MOB_DRAGON,
@@ -81,62 +87,72 @@ public class ConfigMobs extends ConfigurationBaseMF {
         dragonMSG = config
                 .get(MOB_DRAGON, "4D: Spawn Message", true, "Will players get a message when dragons enter/leave")
                 .getBoolean();
-        EntityDragon.interestTimeSeconds = config.get(
-                MOB_DRAGON,
+        EntityDragon.interestTimeSeconds = config.getInt(
                 "4E: Dragon Interest Time",
+                MOB_DRAGON,
                 90,
-                "How many seconds until a dragon leaves (2x as long if wounded) ").getInt();
-        EntityDragon.heartChance = (float) config
-                .get(MOB_DRAGON, "4F: Heart Drop chance modifier", 1F, "Modify chance of getting a heart").getDouble();
+                1,
+                100000,
+                "How many seconds until a dragon leaves (2x as long if wounded) ");
+        EntityDragon.heartChance = config.getFloat(
+                "4F: Heart Drop chance modifier",
+                MOB_DRAGON,
+                1F,
+                0F,
+                100F,
+                "Modify chance of getting a heart");
 
-        minotaurSpawnrate = config.get(MOB_MINOTAUR, "5Aa: Overworld Spawnrate", 5).getInt();
-        minotaurSpawnrateNether = config.get(MOB_MINOTAUR, "5Ab: Nether Spawnrate", 25).getInt();
+        minotaurSpawnrate = config.getInt("5Aa: Overworld Spawnrate", MOB_MINOTAUR, 5, 0, 1000, "");
+        minotaurSpawnrateNether = config.getInt("5Ab: Nether Spawnrate", MOB_MINOTAUR, 25, 0, 1000, "");
+        minotaurBombs = config
+                .get(MOB_MINOTAUR, "5Ac: Throw Bombs", true, "Minotaurs that carry bombs throw them at their target")
+                .getBoolean();
 
-        minotaurHP = config.get(MOB_MINOTAUR, "5Ba: Health", 30, "Lesser Minotaur").getInt();
-        minotaurMD = config.get(MOB_MINOTAUR, "5Bb: Pound dmg", 5).getInt();
-        minotaurGD = config.get(MOB_MINOTAUR, "5Bc: Gore dmg", 5).getInt();
-        minotaurBD = config.get(MOB_MINOTAUR, "5Bd: Beserk dmg", 7).getInt();
-        minotaurBT = config.get(MOB_MINOTAUR, "5Be: Beserk threshold (% health)", 25).getInt();
-        minotaurDC = config.get(MOB_MINOTAUR, "5Bf: Disarm chance when mob power attacks", 10).getInt();
-        minotaurGC = config.get(MOB_MINOTAUR, "5Bg: Grab Chance", 5).getInt();
-        minotaurGCB = config.get(MOB_MINOTAUR, "5Bh: Grab Chance (Beserk)", 10).getInt();
-        minotaurTC = config.get(MOB_MINOTAUR, "5Bi: Throw Chance", 20).getInt();
+        minotaurHP = config.getInt("5Ba: Health", MOB_MINOTAUR, 30, 1, 100000, "Lesser Minotaur");
+        minotaurMD = config.getInt("5Bb: Pound dmg", MOB_MINOTAUR, 5, 0, 10000, "");
+        minotaurGD = config.getInt("5Bc: Gore dmg", MOB_MINOTAUR, 5, 0, 10000, "");
+        minotaurBD = config.getInt("5Bd: Beserk dmg", MOB_MINOTAUR, 7, 0, 10000, "");
+        minotaurBT = config.getInt("5Be: Beserk threshold (% health)", MOB_MINOTAUR, 25, 0, 100, "");
+        minotaurDC = config.getInt("5Bf: Disarm chance when mob power attacks", MOB_MINOTAUR, 10, 0, 100, "");
+        minotaurGC = config.getInt("5Bg: Grab Chance", MOB_MINOTAUR, 5, 0, 100, "");
+        minotaurGCB = config.getInt("5Bh: Grab Chance (Beserk)", MOB_MINOTAUR, 10, 0, 100, "");
+        minotaurTC = config.getInt("5Bi: Throw Chance", MOB_MINOTAUR, 20, 0, 100, "");
 
-        guardminotaurHP = config.get(MOB_MINOTAUR, "5Ca: Health", 30, "Minotaur Warrior").getInt();
-        guardminotaurMD = config.get(MOB_MINOTAUR, "5Cb: Pound dmg", 6).getInt();
-        guardminotaurGD = config.get(MOB_MINOTAUR, "5Cc: Gore dmg", 7).getInt();
-        guardminotaurBD = config.get(MOB_MINOTAUR, "5Cd: Beserk dmg", 8).getInt();
-        guardminotaurBT = config.get(MOB_MINOTAUR, "5Ce: Beserk threshold (% health)", 35).getInt();
-        guardminotaurDC = config.get(MOB_MINOTAUR, "5Cf: Disarm chance when mob power attacks", 10).getInt();
-        guardminotaurGC = config.get(MOB_MINOTAUR, "5Cg: Grab Chance", 5).getInt();
-        guardminotaurGCB = config.get(MOB_MINOTAUR, "5Ch: Grab Chance (Beserk)", 10).getInt();
-        guardminotaurTC = config.get(MOB_MINOTAUR, "5Ci: Throw Chance", 20).getInt();
-        lightminotaurAR = config.get(MOB_MINOTAUR, "5Cj: Armour rating", 100).getInt();
+        guardminotaurHP = config.getInt("5Ca: Health", MOB_MINOTAUR, 30, 1, 100000, "Minotaur Warrior");
+        guardminotaurMD = config.getInt("5Cb: Pound dmg", MOB_MINOTAUR, 6, 0, 10000, "");
+        guardminotaurGD = config.getInt("5Cc: Gore dmg", MOB_MINOTAUR, 7, 0, 10000, "");
+        guardminotaurBD = config.getInt("5Cd: Beserk dmg", MOB_MINOTAUR, 8, 0, 10000, "");
+        guardminotaurBT = config.getInt("5Ce: Beserk threshold (% health)", MOB_MINOTAUR, 35, 0, 100, "");
+        guardminotaurDC = config.getInt("5Cf: Disarm chance when mob power attacks", MOB_MINOTAUR, 10, 0, 100, "");
+        guardminotaurGC = config.getInt("5Cg: Grab Chance", MOB_MINOTAUR, 5, 0, 100, "");
+        guardminotaurGCB = config.getInt("5Ch: Grab Chance (Beserk)", MOB_MINOTAUR, 10, 0, 100, "");
+        guardminotaurTC = config.getInt("5Ci: Throw Chance", MOB_MINOTAUR, 20, 0, 100, "");
+        lightminotaurAR = config.getInt("5Cj: Armour rating", MOB_MINOTAUR, 100, 0, 10000, "");
 
-        eliteminotaurHP = config.get(MOB_MINOTAUR, "5Da: Health", 50, "Elite Minotaur").getInt();
-        eliteminotaurMD = config.get(MOB_MINOTAUR, "5Db: Pound dmg", 6).getInt();
-        eliteminotaurGD = config.get(MOB_MINOTAUR, "5Dc: Gore dmg", 6).getInt();
-        eliteminotaurBD = config.get(MOB_MINOTAUR, "5Dd: Beserk dmg", 8).getInt();
-        eliteminotaurBT = config.get(MOB_MINOTAUR, "5De: Beserk threshold (% health)", 40).getInt();
-        eliteminotaurDC = config.get(MOB_MINOTAUR, "5Df: Disarm chance when mob power attacks", 20).getInt();
-        eliteminotaurGC = config.get(MOB_MINOTAUR, "5Dg: Grab Chance", 10).getInt();
-        eliteminotaurGCB = config.get(MOB_MINOTAUR, "5Dh: Grab Chance (Beserk)", 20).getInt();
-        eliteminotaurTC = config.get(MOB_MINOTAUR, "5Di: Throw Chance", 20).getInt();
-        mediumminotaurAR = config.get(MOB_MINOTAUR, "5Dj: Armour rating", 400).getInt();
+        eliteminotaurHP = config.getInt("5Da: Health", MOB_MINOTAUR, 50, 1, 100000, "Elite Minotaur");
+        eliteminotaurMD = config.getInt("5Db: Pound dmg", MOB_MINOTAUR, 6, 0, 10000, "");
+        eliteminotaurGD = config.getInt("5Dc: Gore dmg", MOB_MINOTAUR, 6, 0, 10000, "");
+        eliteminotaurBD = config.getInt("5Dd: Beserk dmg", MOB_MINOTAUR, 8, 0, 10000, "");
+        eliteminotaurBT = config.getInt("5De: Beserk threshold (% health)", MOB_MINOTAUR, 40, 0, 100, "");
+        eliteminotaurDC = config.getInt("5Df: Disarm chance when mob power attacks", MOB_MINOTAUR, 20, 0, 100, "");
+        eliteminotaurGC = config.getInt("5Dg: Grab Chance", MOB_MINOTAUR, 10, 0, 100, "");
+        eliteminotaurGCB = config.getInt("5Dh: Grab Chance (Beserk)", MOB_MINOTAUR, 20, 0, 100, "");
+        eliteminotaurTC = config.getInt("5Di: Throw Chance", MOB_MINOTAUR, 20, 0, 100, "");
+        mediumminotaurAR = config.getInt("5Dj: Armour rating", MOB_MINOTAUR, 400, 0, 10000, "");
 
-        bossminotaurHP = config.get(MOB_MINOTAUR, "5Ea: Health", 60, "Minotaur Warlord").getInt();
-        bossminotaurMD = config.get(MOB_MINOTAUR, "5Eb: Pound dmg", 8).getInt();
-        bossminotaurGD = config.get(MOB_MINOTAUR, "5Ec: Gore dmg", 10).getInt();
-        bossminotaurBD = config.get(MOB_MINOTAUR, "5Ed: Beserk dmg", 10).getInt();
-        bossminotaurBT = config.get(MOB_MINOTAUR, "5Ee: Beserk threshold (% health)", 40).getInt();
-        bossminotaurDC = config.get(MOB_MINOTAUR, "5Ef: Disarm chance when mob power attacks", 40).getInt();
-        bossminotaurGC = config.get(MOB_MINOTAUR, "5Eg: Grab Chance", 20).getInt();
-        bossminotaurGCB = config.get(MOB_MINOTAUR, "5Eh: Grab Chance (Beserk)", 40).getInt();
-        bossminotaurTC = config.get(MOB_MINOTAUR, "5Ei: Throw Chance", 20).getInt();
-        heavyminotaurAR = config.get(MOB_MINOTAUR, "5Ej: Armour rating", 600).getInt();
+        bossminotaurHP = config.getInt("5Ea: Health", MOB_MINOTAUR, 60, 1, 100000, "Minotaur Warlord");
+        bossminotaurMD = config.getInt("5Eb: Pound dmg", MOB_MINOTAUR, 8, 0, 10000, "");
+        bossminotaurGD = config.getInt("5Ec: Gore dmg", MOB_MINOTAUR, 10, 0, 10000, "");
+        bossminotaurBD = config.getInt("5Ed: Beserk dmg", MOB_MINOTAUR, 10, 0, 10000, "");
+        bossminotaurBT = config.getInt("5Ee: Beserk threshold (% health)", MOB_MINOTAUR, 40, 0, 100, "");
+        bossminotaurDC = config.getInt("5Ef: Disarm chance when mob power attacks", MOB_MINOTAUR, 40, 0, 100, "");
+        bossminotaurGC = config.getInt("5Eg: Grab Chance", MOB_MINOTAUR, 20, 0, 100, "");
+        bossminotaurGCB = config.getInt("5Eh: Grab Chance (Beserk)", MOB_MINOTAUR, 40, 0, 100, "");
+        bossminotaurTC = config.getInt("5Ei: Throw Chance", MOB_MINOTAUR, 20, 0, 100, "");
+        heavyminotaurAR = config.getInt("5Ej: Armour rating", MOB_MINOTAUR, 600, 0, 10000, "");
 
-        frostminotaurAR = config.get(MOB_MINOTAUR, "5Fa: Frost armour bonus", 50, "Species Bonus").getInt();
-        dreadminotaurAR = config.get(MOB_MINOTAUR, "5Fb: Dread armour bonus", 100).getInt();
+        frostminotaurAR = config.getInt("5Fa: Frost armour bonus", MOB_MINOTAUR, 50, 0, 10000, "Species Bonus");
+        dreadminotaurAR = config.getInt("5Fb: Dread armour bonus", MOB_MINOTAUR, 100, 0, 10000, "");
 
     }
 

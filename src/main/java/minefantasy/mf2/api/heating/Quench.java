@@ -24,9 +24,9 @@ public final class Quench {
     /** NBT key set when quenching cracked the piece. */
     public static final String NBT_CRACKED = "MF_QuenchCracked";
     /** The share of durability a crack takes. */
-    public static final float CRACK_WEAR = 0.25F;
+    public static float CRACK_WEAR = 0.25F;
     /** The share of the crack chance the greatest skill takes away. */
-    public static final float SKILL_SAFETY = 0.6F;
+    public static float SKILL_SAFETY = 0.6F;
 
     private Quench() {}
 
@@ -80,6 +80,10 @@ public final class Quench {
         return at >= 0.4F && at <= 0.6F;
     }
 
+    /** Config multipliers of every metal's quality gain and crack chance. */
+    public static float hardening = 1F;
+    public static float cracking = 1F;
+
     /**
      * Cools the hot piece in the source, returning the cold piece, or null when the stack holds none. Cracks only
      * happen under the hardcore quench rule; the smith may be null.
@@ -94,8 +98,8 @@ public final class Quench {
         if (!response.matters()) {
             return cold;
         }
-        float bonus = response.bonus(source.medium);
-        float crack = response.crack(source.medium) / 100F * source.risk;
+        float bonus = response.bonus(source.medium) * hardening;
+        float crack = response.crack(source.medium) / 100F * source.risk * cracking;
         Heat heat = heatOf(hot);
         if (heat == Heat.COLD) {
             bonus = 0F;

@@ -138,335 +138,486 @@ public class ConfigWorldGen extends ConfigurationBaseMF {
 
     @Override
     protected void loadConfig() {
-        copperRarity = (float) config.get(
-                copper,
+        copperRarity = config.getFloat(
                 "Copper Rarity",
-                1.0D,
-                "The chance for copper to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any copper")
-                .getDouble();
-        copperFrequencyMin = config
-                .get(copper, "Copper Frequency Min", 8, "Copper will try spawn between this and max veins per chunk")
-                .getInt();
-        copperFrequencyMax = config
-                .get(copper, "Copper Frequency Max", 8, "Copper will try spawn between min and this veins per chunk")
-                .getInt();
-        copperLayerMin = config.get(copper, "Copper Layer Min", 48, "Copper veins spawn above this layer").getInt();
-        copperLayerMax = config.get(copper, "Copper Layer Max", 96, "Copper veins spawn below this layer").getInt();
-        copperSize = config.get(copper, "Copper Size", 8, "How many blocks consist of the vein").getInt();
+                copper,
+                1.0F,
+                0F,
+                1F,
+                "The chance for copper to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any copper");
+        copperFrequencyMin = config.getInt(
+                "Copper Frequency Min",
+                copper,
+                8,
+                0,
+                256,
+                "Copper will try spawn between this and max veins per chunk");
+        copperFrequencyMax = config.getInt(
+                "Copper Frequency Max",
+                copper,
+                8,
+                0,
+                256,
+                "Copper will try spawn between min and this veins per chunk");
+        copperLayerMin = config.getInt("Copper Layer Min", copper, 48, 0, 255, "Copper veins spawn above this layer");
+        copperLayerMax = config.getInt("Copper Layer Max", copper, 96, 0, 255, "Copper veins spawn below this layer");
+        copperSize = config.getInt("Copper Size", copper, 8, 0, 512, "How many blocks consist of the vein");
 
-        tinRarity = (float) config.get(
-                tin,
+        tinRarity = config.getFloat(
                 "Tin Rarity",
-                1.0D,
-                "The chance for tin to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any tin")
-                .getDouble();
+                tin,
+                1.0F,
+                0F,
+                1F,
+                "The chance for tin to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any tin");
         tinFrequencyMin = config
-                .get(tin, "Tin Frequency Min", 8, "Tin will try spawn between this and max veins per chunk").getInt();
+                .getInt("Tin Frequency Min", tin, 8, 0, 256, "Tin will try spawn between this and max veins per chunk");
         tinFrequencyMax = config
-                .get(tin, "Tin Frequency Max", 8, "Tin will try spawn between min and this veins per chunk").getInt();
-        tinLayerMin = config.get(tin, "Tin Layer Min", 48, "Tin veins spawn above this layer").getInt();
-        tinLayerMax = config.get(tin, "Tin Layer Max", 96, "Tin veins spawn below this layer").getInt();
-        tinSize = config.get(tin, "Tin Size", 5, "How many blocks consist of the vein").getInt();
+                .getInt("Tin Frequency Max", tin, 8, 0, 256, "Tin will try spawn between min and this veins per chunk");
+        tinLayerMin = config.getInt("Tin Layer Min", tin, 48, 0, 255, "Tin veins spawn above this layer");
+        tinLayerMax = config.getInt("Tin Layer Max", tin, 96, 0, 255, "Tin veins spawn below this layer");
+        tinSize = config.getInt("Tin Size", tin, 5, 0, 512, "How many blocks consist of the vein");
 
-        silverRarity = (float) config.get(
-                silver,
+        silverRarity = config.getFloat(
                 "Silver Rarity",
-                1.0D,
-                "The chance for silver to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any ")
-                .getDouble();
-        silverFrequencyMin = config
-                .get(silver, "Silver Frequency Min", 3, "Silver will try spawn between this and max veins per chunk")
-                .getInt();
-        silverFrequencyMax = config
-                .get(silver, "Silver Frequency Max", 4, "Silver will try spawn between min and this veins per chunk")
-                .getInt();
-        silverLayerMin = config.get(silver, "Silver Layer Min", 0, "Silver veins spawn above this layer").getInt();
-        silverLayerMax = config.get(silver, "Silver Layer Max", 32, "Silver veins spawn below this layer").getInt();
-        silverSize = config.get(silver, "Silver Size", 8, "How many blocks consist of the vein").getInt();
+                silver,
+                1.0F,
+                0F,
+                1F,
+                "The chance for silver to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any ");
+        silverFrequencyMin = config.getInt(
+                "Silver Frequency Min",
+                silver,
+                3,
+                0,
+                256,
+                "Silver will try spawn between this and max veins per chunk");
+        silverFrequencyMax = config.getInt(
+                "Silver Frequency Max",
+                silver,
+                4,
+                0,
+                256,
+                "Silver will try spawn between min and this veins per chunk");
+        silverLayerMin = config.getInt("Silver Layer Min", silver, 0, 0, 255, "Silver veins spawn above this layer");
+        silverLayerMax = config.getInt("Silver Layer Max", silver, 32, 0, 255, "Silver veins spawn below this layer");
+        silverSize = config.getInt("Silver Size", silver, 8, 0, 512, "How many blocks consist of the vein");
 
-        wolframiteRarity = (float) config.get(
-                wolframite,
+        wolframiteRarity = config.getFloat(
                 "Wolframite Rarity",
-                1.0D,
-                "The chance for wolframite to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any ")
-                .getDouble();
-        wolframiteFrequencyMin = config.get(
                 wolframite,
+                1.0F,
+                0F,
+                1F,
+                "The chance for wolframite to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any ");
+        wolframiteFrequencyMin = config.getInt(
                 "Wolframite Frequency Min",
-                1,
-                "Wolframite will try spawn between this and max veins per chunk").getInt();
-        wolframiteFrequencyMax = config.get(
                 wolframite,
+                1,
+                0,
+                256,
+                "Wolframite will try spawn between this and max veins per chunk");
+        wolframiteFrequencyMax = config.getInt(
                 "Wolframite Frequency Max",
+                wolframite,
                 1,
-                "Wolframite will try spawn between min and this veins per chunk").getInt();
+                0,
+                256,
+                "Wolframite will try spawn between min and this veins per chunk");
         wolframiteLayerMin = config
-                .get(wolframite, "Wolframite Layer Min", 0, "Wolframite veins spawn above this layer").getInt();
+                .getInt("Wolframite Layer Min", wolframite, 0, 0, 255, "Wolframite veins spawn above this layer");
         wolframiteLayerMax = config
-                .get(wolframite, "Wolframite Layer Max", 16, "Wolframite veins spawn below this layer").getInt();
-        wolframiteSize = config.get(wolframite, "Wolframite Size", 7, "How many blocks consist of the vein").getInt();
+                .getInt("Wolframite Layer Max", wolframite, 16, 0, 255, "Wolframite veins spawn below this layer");
+        wolframiteSize = config.getInt("Wolframite Size", wolframite, 7, 0, 512, "How many blocks consist of the vein");
 
-        mythicRarity = (float) config.get(
-                mythic,
+        mythicRarity = config.getFloat(
                 "Mythic Rarity",
-                0.05D,
-                "The chance for mythic to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any mythic")
-                .getDouble();
-        mythicFrequencyMin = config
-                .get(mythic, "Mythic Frequency Min", 2, "Mythic will try spawn between this and max veins per chunk")
-                .getInt();
-        mythicFrequencyMax = config
-                .get(mythic, "Mythic Frequency Max", 5, "Mythic will try spawn between min and this veins per chunk")
-                .getInt();
-        mythicLayerMin = config.get(mythic, "Mythic Layer Min", 4, "Mythic veins spawn above this layer").getInt();
-        mythicLayerMax = config.get(mythic, "Mythic Layer Max", 6, "Mythic veins spawn below this layer").getInt();
-        mythicSize = config.get(mythic, "Mythic Size", 8, "How many blocks consist of the vein").getInt();
+                mythic,
+                0.05F,
+                0F,
+                1F,
+                "The chance for mythic to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any mythic");
+        mythicFrequencyMin = config.getInt(
+                "Mythic Frequency Min",
+                mythic,
+                2,
+                0,
+                256,
+                "Mythic will try spawn between this and max veins per chunk");
+        mythicFrequencyMax = config.getInt(
+                "Mythic Frequency Max",
+                mythic,
+                5,
+                0,
+                256,
+                "Mythic will try spawn between min and this veins per chunk");
+        mythicLayerMin = config.getInt("Mythic Layer Min", mythic, 4, 0, 255, "Mythic veins spawn above this layer");
+        mythicLayerMax = config.getInt("Mythic Layer Max", mythic, 6, 0, 255, "Mythic veins spawn below this layer");
+        mythicSize = config.getInt("Mythic Size", mythic, 8, 0, 512, "How many blocks consist of the vein");
 
-        kaoliniteRarity = (float) config.get(
-                kaolinite,
+        kaoliniteRarity = config.getFloat(
                 "Kaolinite Rarity",
-                0.25D,
-                "The chance for kaolinite to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any kaolinite")
-                .getDouble();
-        kaoliniteFrequencyMin = config.get(
                 kaolinite,
+                0.25F,
+                0F,
+                1F,
+                "The chance for kaolinite to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any kaolinite");
+        kaoliniteFrequencyMin = config.getInt(
                 "Kaolinite Frequency Min",
-                1,
-                "Kaolinite will try spawn between this and max deposits per chunk").getInt();
-        kaoliniteFrequencyMax = config.get(
                 kaolinite,
-                "Kaolinite Frequency Max",
                 1,
-                "Kaolinite will try spawn between min and this deposits per chunk").getInt();
+                0,
+                256,
+                "Kaolinite will try spawn between this and max deposits per chunk");
+        kaoliniteFrequencyMax = config.getInt(
+                "Kaolinite Frequency Max",
+                kaolinite,
+                1,
+                0,
+                256,
+                "Kaolinite will try spawn between min and this deposits per chunk");
         kaoliniteLayerMin = config
-                .get(kaolinite, "Kaolinite Layer Min", 48, "Kaolinite deposits spawn above this layer").getInt();
+                .getInt("Kaolinite Layer Min", kaolinite, 48, 0, 255, "Kaolinite deposits spawn above this layer");
         kaoliniteLayerMax = config
-                .get(kaolinite, "Kaolinite Layer Max", 72, "Kaolinite deposits spawn below this layer").getInt();
-        kaoliniteSize = config.get(kaolinite, "Kaolinite Size", 16, "How many blocks consist of the deposit").getInt();
+                .getInt("Kaolinite Layer Max", kaolinite, 72, 0, 255, "Kaolinite deposits spawn below this layer");
+        kaoliniteSize = config
+                .getInt("Kaolinite Size", kaolinite, 16, 0, 512, "How many blocks consist of the deposit");
 
         // Coal: 20 deposits of 16: Up to 320 coal value per chunk
         // Rich Coal: 10 deposits of 8: up to 80 coal value
-        coalRarity = (float) config.get(
-                coal,
+        coalRarity = config.getFloat(
                 "Rich Coal Rarity",
+                coal,
                 1F,
-                "The chance for rich coal to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any rich coal deposits")
-                .getDouble();
-        coalFrequencyMin = config.get(
-                coal,
+                0F,
+                1F,
+                "The chance for rich coal to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any rich coal deposits");
+        coalFrequencyMin = config.getInt(
                 "Rich Coal Frequency Min",
-                5,
-                "Rich Coal will try spawn between this and max deposits per chunk").getInt();
-        coalFrequencyMax = config.get(
                 coal,
-                "Rich Coal Frequency Max",
                 5,
-                "Rich Coal will try spawn between min and this deposits per chunk").getInt();
-        coalLayerMin = config.get(coal, "Rich Coal Layer Min", 0, "Rich Coal deposits spawn above this layer").getInt();
-        coalLayerMax = config.get(coal, "Rich Coal Layer Max", 64, "Rich Coal deposits spawn below this layer")
-                .getInt();
-        coalSize = config.get(coal, "Rich Coal Size", 8, "How many blocks consist of the deposit").getInt();
+                0,
+                256,
+                "Rich Coal will try spawn between this and max deposits per chunk");
+        coalFrequencyMax = config.getInt(
+                "Rich Coal Frequency Max",
+                coal,
+                5,
+                0,
+                256,
+                "Rich Coal will try spawn between min and this deposits per chunk");
+        coalLayerMin = config
+                .getInt("Rich Coal Layer Min", coal, 0, 0, 255, "Rich Coal deposits spawn above this layer");
+        coalLayerMax = config
+                .getInt("Rich Coal Layer Max", coal, 64, 0, 255, "Rich Coal deposits spawn below this layer");
+        coalSize = config.getInt("Rich Coal Size", coal, 8, 0, 512, "How many blocks consist of the deposit");
 
-        clayRarity = (float) config.get(
-                clay,
+        clayRarity = config.getFloat(
                 "Clay Rarity",
-                0.15D,
-                "The chance for clay to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any clay")
-                .getDouble();
-        clayFrequencyMin = config
-                .get(clay, "Clay Frequency Min", 1, "Clay will try spawn between this and max deposits per chunk")
-                .getInt();
-        clayFrequencyMax = config
-                .get(clay, "Clay Frequency Max", 1, "Clay will try spawn between min and this deposits per chunk")
-                .getInt();
-        clayLayerMin = config.get(clay, "Clay Layer Min", 60, "Clay deposits spawn above this layer").getInt();
-        clayLayerMax = config.get(clay, "Clay Layer Max", 68, "Clay deposits spawn below this layer").getInt();
-        claySize = config.get(clay, "Clay Size", 32, "How many blocks consist of the deposit").getInt();
+                clay,
+                0.15F,
+                0F,
+                1F,
+                "The chance for clay to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any clay");
+        clayFrequencyMin = config.getInt(
+                "Clay Frequency Min",
+                clay,
+                1,
+                0,
+                256,
+                "Clay will try spawn between this and max deposits per chunk");
+        clayFrequencyMax = config.getInt(
+                "Clay Frequency Max",
+                clay,
+                1,
+                0,
+                256,
+                "Clay will try spawn between min and this deposits per chunk");
+        clayLayerMin = config.getInt("Clay Layer Min", clay, 60, 0, 255, "Clay deposits spawn above this layer");
+        clayLayerMax = config.getInt("Clay Layer Max", clay, 68, 0, 255, "Clay deposits spawn below this layer");
+        claySize = config.getInt("Clay Size", clay, 32, 0, 512, "How many blocks consist of the deposit");
 
-        nitreRarity = (float) config.get(
-                nitre,
+        nitreRarity = config.getFloat(
                 "Nitre Rarity",
-                1.0D,
-                "The chance for nitre to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any nitre")
-                .getDouble();
-        nitreFrequencyMin = config
-                .get(nitre, "Nitre Frequency Min", 2, "Nitre will try spawn between this and max deposits per chunk")
-                .getInt();
-        nitreFrequencyMax = config
-                .get(nitre, "Nitre Frequency Max", 5, "Nitre will try spawn between min and this deposits per chunk")
-                .getInt();
-        nitreLayerMin = config.get(nitre, "Nitre Layer Min", 16, "Nitre deposits spawn above this layer").getInt();
-        nitreLayerMax = config.get(nitre, "Nitre Layer Max", 64, "Nitre deposits spawn below this layer").getInt();
-        nitreSize = config.get(nitre, "Nitre Size", 8, "How many blocks consist of the deposit").getInt();
+                nitre,
+                1.0F,
+                0F,
+                1F,
+                "The chance for nitre to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any nitre");
+        nitreFrequencyMin = config.getInt(
+                "Nitre Frequency Min",
+                nitre,
+                2,
+                0,
+                256,
+                "Nitre will try spawn between this and max deposits per chunk");
+        nitreFrequencyMax = config.getInt(
+                "Nitre Frequency Max",
+                nitre,
+                5,
+                0,
+                256,
+                "Nitre will try spawn between min and this deposits per chunk");
+        nitreLayerMin = config.getInt("Nitre Layer Min", nitre, 16, 0, 255, "Nitre deposits spawn above this layer");
+        nitreLayerMax = config.getInt("Nitre Layer Max", nitre, 64, 0, 255, "Nitre deposits spawn below this layer");
+        nitreSize = config.getInt("Nitre Size", nitre, 8, 0, 512, "How many blocks consist of the deposit");
 
-        sulfurRarity = (float) config.get(
-                sulfur,
+        sulfurRarity = config.getFloat(
                 "Sulfur Rarity",
-                1.0D,
-                "The chance for sulfur to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any sulfur")
-                .getDouble();
-        sulfurFrequencyMin = config
-                .get(sulfur, "Sulfur Frequency Min", 6, "Sulfur will try spawn between this and max deposits per chunk")
-                .getInt();
-        sulfurFrequencyMax = config.get(
                 sulfur,
+                1.0F,
+                0F,
+                1F,
+                "The chance for sulfur to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any sulfur");
+        sulfurFrequencyMin = config.getInt(
+                "Sulfur Frequency Min",
+                sulfur,
+                6,
+                0,
+                256,
+                "Sulfur will try spawn between this and max deposits per chunk");
+        sulfurFrequencyMax = config.getInt(
                 "Sulfur Frequency Max",
+                sulfur,
                 12,
-                "Sulfur will try spawn between min and this deposits per chunk").getInt();
-        sulfurLayerMin = config.get(sulfur, "Sulfur Layer Min", 0, "Sulfur deposits spawn above this layer").getInt();
-        sulfurLayerMax = config.get(sulfur, "Sulfur Layer Max", 16, "Sulfur deposits spawn below this layer").getInt();
-        sulfurSize = config.get(sulfur, "Sulfur Size", 4, "How many blocks consist of the deposit").getInt();
+                0,
+                256,
+                "Sulfur will try spawn between min and this deposits per chunk");
+        sulfurLayerMin = config.getInt("Sulfur Layer Min", sulfur, 0, 0, 255, "Sulfur deposits spawn above this layer");
+        sulfurLayerMax = config
+                .getInt("Sulfur Layer Max", sulfur, 16, 0, 255, "Sulfur deposits spawn below this layer");
+        sulfurSize = config.getInt("Sulfur Size", sulfur, 4, 0, 512, "How many blocks consist of the deposit");
 
-        boraxRarity = (float) config.get(
-                borax,
+        boraxRarity = config.getFloat(
                 "Borax Rarity",
-                0.1D,
-                "The chance for borax to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any borax")
-                .getDouble();
-        boraxFrequencyMin = config
-                .get(borax, "Borax Frequency Min", 5, "Borax will try spawn between this and max deposits per chunk")
-                .getInt();
-        boraxFrequencyMax = config
-                .get(borax, "Borax Frequency Max", 10, "Borax will try spawn between min and this deposits per chunk")
-                .getInt();
-        boraxLayerMin = config.get(borax, "Borax Layer Min", 48, "Borax deposits spawn above this layer").getInt();
-        boraxLayerMax = config.get(borax, "Borax Layer Max", 96, "Borax deposits spawn below this layer").getInt();
-        boraxSize = config.get(borax, "Borax Size", 8, "How many blocks consist of the deposit").getInt();
+                borax,
+                0.1F,
+                0F,
+                1F,
+                "The chance for borax to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any borax");
+        boraxFrequencyMin = config.getInt(
+                "Borax Frequency Min",
+                borax,
+                5,
+                0,
+                256,
+                "Borax will try spawn between this and max deposits per chunk");
+        boraxFrequencyMax = config.getInt(
+                "Borax Frequency Max",
+                borax,
+                10,
+                0,
+                256,
+                "Borax will try spawn between min and this deposits per chunk");
+        boraxLayerMin = config.getInt("Borax Layer Min", borax, 48, 0, 255, "Borax deposits spawn above this layer");
+        boraxLayerMax = config.getInt("Borax Layer Max", borax, 96, 0, 255, "Borax deposits spawn below this layer");
+        boraxSize = config.getInt("Borax Size", borax, 8, 0, 512, "How many blocks consist of the deposit");
 
-        limestoneRarity = (float) config.get(
-                limestone,
+        limestoneRarity = config.getFloat(
                 "Limestone Rarity",
-                2.5E-2D,
-                "The chance for limestone to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any limestone")
-                .getDouble();
-        limestoneFrequencyMin = config.get(
                 limestone,
+                2.5E-2F,
+                0F,
+                1F,
+                "The chance for limestone to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any limestone");
+        limestoneFrequencyMin = config.getInt(
                 "Limestone Frequency Min",
-                1,
-                "Limestone will try spawn between this and max deposits per chunk").getInt();
-        limestoneFrequencyMax = config.get(
                 limestone,
-                "Limestone Frequency Max",
                 1,
-                "Limestone will try spawn between min and this deposits per chunk").getInt();
+                0,
+                256,
+                "Limestone will try spawn between this and max deposits per chunk");
+        limestoneFrequencyMax = config.getInt(
+                "Limestone Frequency Max",
+                limestone,
+                1,
+                0,
+                256,
+                "Limestone will try spawn between min and this deposits per chunk");
         limestoneLayerMin = config
-                .get(limestone, "Limestone Layer Min", 48, "Limestone deposits spawn above this layer").getInt();
+                .getInt("Limestone Layer Min", limestone, 48, 0, 255, "Limestone deposits spawn above this layer");
         limestoneLayerMax = config
-                .get(limestone, "Limestone Layer Max", 96, "Limestone deposits spawn below this layer").getInt();
-        limestoneSize = config.get(limestone, "Limestone Size", 128, "How many blocks consist of the deposit").getInt();
+                .getInt("Limestone Layer Max", limestone, 96, 0, 255, "Limestone deposits spawn below this layer");
+        limestoneSize = config
+                .getInt("Limestone Size", limestone, 128, 0, 512, "How many blocks consist of the deposit");
 
         // Trees and Plants use SN values to make them more compact (since their pretty
         // rare)
-        berryRarity = (float) config.get(
-                berry,
+        berryRarity = config.getFloat(
                 "Berry Bush Rarity",
-                3.0E-2D,
-                "The chance for berry bushes to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any berries")
-                .getDouble();
-        yewRarity = (float) config.get(
-                yew,
+                berry,
+                3.0E-2F,
+                0F,
+                1F,
+                "The chance for berry bushes to spawn in a chunk. (0=never, 1.0=always), this means some chunks may not have any berries");
+        yewRarity = config.getFloat(
                 "Yew Tree Rarity",
-                1.0E-3D,
-                "The chance for yew trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees")
-                .getDouble();
-        ironbarkRarity = (float) config.get(
-                ironbark,
+                yew,
+                1.0E-3F,
+                0F,
+                1F,
+                "The chance for yew trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees");
+        ironbarkRarity = config.getFloat(
                 "Ironbark Tree Rarity",
-                1.5E-3D,
-                "The chance for ironbark trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees")
-                .getDouble();
-        ebonyRarity = (float) config.get(
-                ebony,
+                ironbark,
+                1.5E-3F,
+                0F,
+                1F,
+                "The chance for ironbark trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees");
+        ebonyRarity = config.getFloat(
                 "Ebony Tree Rarity",
-                5.0E-4D,
-                "The chance for ebony trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees")
-                .getDouble();
+                ebony,
+                5.0E-4F,
+                0F,
+                1F,
+                "The chance for ebony trees to spawn in a chunk. (0=never, 1.0=always), this means many chunks may not have any trees");
 
-        berryMinTemp = (float) config
-                .get(berry, "Berry Bush Spawn Temp Min", 0.2D, "The minimal biome temperature berries can spawn")
-                .getDouble();
-        berryMaxTemp = (float) config
-                .get(berry, "Berry Bush Spawn Temp Max", 1.0D, "The maximum biome temperature berries can spawn")
-                .getDouble();
-        berryMinRain = (float) config
-                .get(berry, "Berry Bush Spawn Rain Min", 0.3D, "The minimal biome rainfall berries can spawn")
-                .getDouble();
-        berryMaxRain = (float) config
-                .get(berry, "Berry Bush Spawn Rain Max", 1.0D, "The maximum biome rainfall berries can spawn")
-                .getDouble();
+        berryMinTemp = config.getFloat(
+                "Berry Bush Spawn Temp Min",
+                berry,
+                0.2F,
+                -1F,
+                3F,
+                "The minimal biome temperature berries can spawn");
+        berryMaxTemp = config.getFloat(
+                "Berry Bush Spawn Temp Max",
+                berry,
+                1.0F,
+                -1F,
+                3F,
+                "The maximum biome temperature berries can spawn");
+        berryMinRain = config.getFloat(
+                "Berry Bush Spawn Rain Min",
+                berry,
+                0.3F,
+                0F,
+                1F,
+                "The minimal biome rainfall berries can spawn");
+        berryMaxRain = config.getFloat(
+                "Berry Bush Spawn Rain Max",
+                berry,
+                1.0F,
+                0F,
+                1F,
+                "The maximum biome rainfall berries can spawn");
 
-        yewMinTemp = (float) config
-                .get(yew, "Yew Tree Spawn Temp Min", 0.2D, "The minimal biome temperature yew can spawn").getDouble();
-        yewMaxTemp = (float) config
-                .get(yew, "Yew Tree Spawn Temp Max", 1.0D, "The maximum biome temperature yew can spawn").getDouble();
-        yewMinRain = (float) config
-                .get(yew, "Yew Tree Spawn Rain Min", 0.3D, "The minimal biome rainfall yew can spawn").getDouble();
-        yewMaxRain = (float) config
-                .get(yew, "Yew Tree Spawn Rain Max", 1.0D, "The maximum biome rainfall yew can spawn").getDouble();
+        yewMinTemp = config
+                .getFloat("Yew Tree Spawn Temp Min", yew, 0.2F, -1F, 3F, "The minimal biome temperature yew can spawn");
+        yewMaxTemp = config
+                .getFloat("Yew Tree Spawn Temp Max", yew, 1.0F, -1F, 3F, "The maximum biome temperature yew can spawn");
+        yewMinRain = config
+                .getFloat("Yew Tree Spawn Rain Min", yew, 0.3F, 0F, 1F, "The minimal biome rainfall yew can spawn");
+        yewMaxRain = config
+                .getFloat("Yew Tree Spawn Rain Max", yew, 1.0F, 0F, 1F, "The maximum biome rainfall yew can spawn");
 
-        ironbarkMinTemp = (float) config
-                .get(ironbark, "Ironbark Tree Spawn Temp Min", 0.4D, "The minimal biome temperature ironbark can spawn")
-                .getDouble();
-        ironbarkMaxTemp = (float) config
-                .get(ironbark, "Ironbark Tree Spawn Temp Max", 1.2D, "The maximum biome temperature ironbark can spawn")
-                .getDouble();
-        ironbarkMinRain = (float) config
-                .get(ironbark, "Ironbark Tree Spawn Rain Min", 0.0D, "The minimal biome rainfall ironbark can spawn")
-                .getDouble();
-        ironbarkMaxRain = (float) config
-                .get(ironbark, "Ironbark Tree Spawn Rain Max", 0.8D, "The maximum biome rainfall ironbark can spawn")
-                .getDouble();
+        ironbarkMinTemp = config.getFloat(
+                "Ironbark Tree Spawn Temp Min",
+                ironbark,
+                0.4F,
+                -1F,
+                3F,
+                "The minimal biome temperature ironbark can spawn");
+        ironbarkMaxTemp = config.getFloat(
+                "Ironbark Tree Spawn Temp Max",
+                ironbark,
+                1.2F,
+                -1F,
+                3F,
+                "The maximum biome temperature ironbark can spawn");
+        ironbarkMinRain = config.getFloat(
+                "Ironbark Tree Spawn Rain Min",
+                ironbark,
+                0.0F,
+                0F,
+                1F,
+                "The minimal biome rainfall ironbark can spawn");
+        ironbarkMaxRain = config.getFloat(
+                "Ironbark Tree Spawn Rain Max",
+                ironbark,
+                0.8F,
+                0F,
+                1F,
+                "The maximum biome rainfall ironbark can spawn");
 
-        ebonyMinTemp = (float) config
-                .get(ebony, "Ebony Tree Spawn Temp Min", 0.2D, "The minimal biome temperature ebony can spawn")
-                .getDouble();
-        ebonyMaxTemp = (float) config
-                .get(ebony, "Ebony Tree Spawn Temp Max", 1.0D, "The maximum biome temperature ebony can spawn")
-                .getDouble();
-        ebonyMinRain = (float) config
-                .get(ebony, "Ebony Tree Spawn Rain Min", 0.4D, "The minimal biome rainfall ebony can spawn")
-                .getDouble();
-        ebonyMaxRain = (float) config
-                .get(ebony, "Ebony Tree Spawn Rain Max", 1.0D, "The maximum biome rainfall ebony can spawn")
-                .getDouble();
+        ebonyMinTemp = config.getFloat(
+                "Ebony Tree Spawn Temp Min",
+                ebony,
+                0.2F,
+                -1F,
+                3F,
+                "The minimal biome temperature ebony can spawn");
+        ebonyMaxTemp = config.getFloat(
+                "Ebony Tree Spawn Temp Max",
+                ebony,
+                1.0F,
+                -1F,
+                3F,
+                "The maximum biome temperature ebony can spawn");
+        ebonyMinRain = config.getFloat(
+                "Ebony Tree Spawn Rain Min",
+                ebony,
+                0.4F,
+                0F,
+                1F,
+                "The minimal biome rainfall ebony can spawn");
+        ebonyMaxRain = config.getFloat(
+                "Ebony Tree Spawn Rain Max",
+                ebony,
+                1.0F,
+                0F,
+                1F,
+                "The maximum biome rainfall ebony can spawn");
 
-        structureTickRate = config
-                .get(structure, "Generation Tick rate", 1, "How many ticks (1/20seconds) for each section to generate")
-                .getInt();
-        MFChance = (float) config.get(
-                ancientForge,
-                "Spawn Chance",
-                1.5E-2D,
-                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)").getDouble();
-        MAChance = (float) config.get(
-                ancientAlter,
-                "Spawn Chance",
-                1.0E-2D,
-                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)").getDouble();
-        DSChance = (float) config.get(
-                dwarvenSH,
-                "Spawn Chance",
-                5.0E-2D,
-                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)").getDouble();
-
-        DSGrid = config.get(
-                dwarvenSH,
-                "Stronghold Grid size",
-                8,
-                "Strongholds generate on a grid on the map to avoid overlaps, this defines the minimum distance between two strongholds (in 16x16 block chunks)")
-                .getInt();
-        DSLength = config.get(
-                dwarvenSH,
-                "Stronghold max length",
-                8,
-                "Max amount of halls making the length of dwarf strongholds (some may be smaller or larger, but this is a guideline)")
-                .getInt();
-        DSDeviations = config.get(
-                dwarvenSH,
-                "Stronghold max deviations",
+        structureTickRate = config.getInt(
+                "Generation Tick rate",
+                structure,
                 1,
-                "Max amount of intersections in dwarf stronghold hallways (not including living hubs). This can significantly increase complexity of strongholds and in turn lag when generating")
-                .getInt();
+                1,
+                1000,
+                "How many ticks (1/20seconds) for each section to generate");
+        MFChance = config.getFloat(
+                "Spawn Chance",
+                ancientForge,
+                1.5E-2F,
+                0F,
+                1F,
+                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)");
+        MAChance = config.getFloat(
+                "Spawn Chance",
+                ancientAlter,
+                1.0E-2F,
+                0F,
+                1F,
+                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)");
+        DSChance = config.getFloat(
+                "Spawn Chance",
+                dwarvenSH,
+                5.0E-2F,
+                0F,
+                1F,
+                "The chance for this structure to generate in a chunk. (0=never, 1.0=always)");
+
+        DSGrid = config.getInt(
+                "Stronghold Grid size",
+                dwarvenSH,
+                8,
+                0,
+                512,
+                "Strongholds generate on a grid on the map to avoid overlaps, this defines the minimum distance between two strongholds (in 16x16 block chunks)");
+        DSLength = config.getInt(
+                "Stronghold max length",
+                dwarvenSH,
+                8,
+                1,
+                64,
+                "Max amount of halls making the length of dwarf strongholds (some may be smaller or larger, but this is a guideline)");
+        DSDeviations = config.getInt(
+                "Stronghold max deviations",
+                dwarvenSH,
+                1,
+                0,
+                64,
+                "Max amount of intersections in dwarf stronghold hallways (not including living hubs). This can significantly increase complexity of strongholds and in turn lag when generating");
 
     }
 

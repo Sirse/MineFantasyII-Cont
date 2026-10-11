@@ -5,24 +5,24 @@ import net.minecraft.entity.EntityList;
 
 import cpw.mods.fml.common.registry.EntityRegistry;
 import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.config.ConfigExperiment;
+import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.entity.*;
 import minefantasy.mf2.util.MFLogUtil;
 
 public class EntityListMF {
 
     public static void register() {
-        addEntity(EntityArrowMF.class, "arrowMF", 1, 16, ConfigExperiment.dynamicArrows ? 1 : 20);
-        addEntity(EntityBomb.class, "bombMF", 2, 16, ConfigExperiment.dynamicArrows ? 1 : 20);
-        addEntity(EntityShrapnel.class, "shrapnel_mf", 3, 16, ConfigExperiment.dynamicArrows ? 1 : 20);
-        addEntity(EntityFireBlast.class, "fire_blast", 4, 16, ConfigExperiment.dynamicArrows ? 2 : 20);
-        addEntity(EntitySmoke.class, "smoke_mf", 5, 16, ConfigExperiment.dynamicArrows ? 2 : 20);
-        addEntity(EntityItemUnbreakable.class, "special_eitem_mf", 6, 16, ConfigExperiment.dynamicArrows ? 2 : 20);
+        addEntity(EntityArrowMF.class, "arrowMF", 1, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
+        addEntity(EntityBomb.class, "bombMF", 2, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
+        addEntity(EntityShrapnel.class, "shrapnel_mf", 3, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
+        addEntity(EntityFireBlast.class, "fire_blast", 4, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
+        addEntity(EntitySmoke.class, "smoke_mf", 5, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
+        addEntity(EntityItemUnbreakable.class, "special_eitem_mf", 6, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
 
         addEntity(EntityMine.class, "landmineMF", 7, 16, 10);
         addEntity(EntityParachute.class, "parachute_mf", 8, 16, 20);
 
-        addEntity(EntityDragonBreath.class, "dragonbreath", 9, 16, ConfigExperiment.dynamicArrows ? 2 : 20);
+        addEntity(EntityDragonBreath.class, "dragonbreath", 9, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
 
         MobListMF.register();
     }

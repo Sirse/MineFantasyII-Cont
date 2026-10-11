@@ -197,7 +197,8 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
                         && distance < 12
                         && rand.nextInt(50) == 0
                         && this.getAttack() == (byte) 0
-                        && this.getMinotaur().throwsBombs) {
+                        && this.getMinotaur().throwsBombs
+                        && ConfigMobs.minotaurBombs) {
                     this.throwBomb(target, 1.0F);
                 }
 

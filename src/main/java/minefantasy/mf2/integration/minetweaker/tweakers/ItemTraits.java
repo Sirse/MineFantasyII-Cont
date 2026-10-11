@@ -1,21 +1,17 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 
-import minefantasy.mf2.api.armour.ArmourDesign;
 import minefantasy.mf2.api.armour.CustomArmourEntry;
 import minefantasy.mf2.api.armour.CustomDamageRatioEntry;
-import minefantasy.mf2.api.armour.IArmourMF;
 import minefantasy.mf2.api.crafting.CustomCrafterEntry;
 import minefantasy.mf2.api.farming.CustomHoeEntry;
-import minefantasy.mf2.api.helpers.ArmourCalculator;
-import minefantasy.mf2.api.tool.IToolMF;
-import minefantasy.mf2.api.weapon.IDamageType;
+import minefantasy.mf2.api.helpers.ItemTraitRules;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
@@ -51,79 +47,39 @@ public class ItemTraits {
     public static void armour(IItemStack stack, String design, @Optional float weight, @Optional String group) {
         String line = "ItemTraits.armour(" + stack + ", \"" + design + "\", ...)";
         Item item = item(line, stack);
-        if (item == null || !notOwn(line, item, item instanceof IArmourMF)) {
-            return;
+        if (item != null) {
+            build(
+                    line,
+                    CustomArmourEntry.entries,
+                    item,
+                    () -> ItemTraitRules.armour(item, design, weight == 0F ? 1F : weight, group));
         }
-        ArmourDesign template = design == null ? null : ArmourDesign.designs.get(design);
-        if (template == null) {
-            MineTweakerAPI.logError(
-                    line + ": no armour design of that name; there are "
-                            + ArmourDesign.designs.keySet()
-                            + ". "
-                            + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        float scale = weight == 0F ? 1F : weight;
-        if (!finite(scale) || scale <= 0F || scale > 100F) {
-            MineTweakerAPI.logError(
-                    line + ": the weight is a share of the design's, above 0 to 100. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        String kind = group == null ? template.getGroup() : group;
-        if (!group(line, kind)) {
-            return;
-        }
-        float share = item instanceof ItemArmor ? ArmourCalculator.sizes[((ItemArmor) item).armorType] : 0.25F;
-        // As CustomArmourEntry.registerItem(piece, template, ...) works it out
-        put(
-                line,
-                CustomArmourEntry.entries,
-                item,
-                CustomArmourEntry.of(item, template.getWeight() * scale, template.getBulk() * share, kind));
     }
 
     @ZenMethod
     public static void wornArmour(IItemStack stack, float kilograms, float suitBulk, String group) {
         String line = "ItemTraits.wornArmour(" + stack + ", ...)";
         Item item = item(line, stack);
-        if (item == null || !notOwn(line, item, item instanceof IArmourMF) || !group(line, group)) {
-            return;
+        if (item != null) {
+            build(
+                    line,
+                    CustomArmourEntry.entries,
+                    item,
+                    () -> ItemTraitRules.wornArmour(item, kilograms, suitBulk, group));
         }
-        if (!(item instanceof ItemArmor)) {
-            MineTweakerAPI.logError(
-                    line + ": only armour is worn; use armour with a design. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        if (!finite(kilograms) || kilograms < 0F
-                || kilograms > 1000F
-                || !finite(suitBulk)
-                || suitBulk < 0F
-                || suitBulk > 100F) {
-            MineTweakerAPI.logError(
-                    line + ": the weight is 0 to 1000 kg and the bulk 0 to 100. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        float share = ArmourCalculator.sizes[((ItemArmor) item).armorType];
-        put(
-                line,
-                CustomArmourEntry.entries,
-                item,
-                CustomArmourEntry.of(item, kilograms / share, suitBulk * share, group));
     }
 
     @ZenMethod
     public static void damage(IItemStack stack, float cutting, float piercing, float blunt) {
         String line = "ItemTraits.damage(" + stack + ", " + cutting + ", " + piercing + ", " + blunt + ")";
         Item item = item(line, stack);
-        if (item == null || !notOwn(line, item, item instanceof IDamageType)
-                || !ratio(line, cutting, piercing, blunt)) {
-            return;
+        if (item != null) {
+            build(
+                    line,
+                    CustomDamageRatioEntry.entries,
+                    item,
+                    () -> ItemTraitRules.damage(item, cutting, piercing, blunt));
         }
-        put(
-                line,
-                CustomDamageRatioEntry.entries,
-                item,
-                CustomDamageRatioEntry.of(new float[] { cutting, blunt, piercing }));
     }
 
     @ZenMethod
@@ -136,59 +92,32 @@ public class ItemTraits {
                 + ", "
                 + blunt
                 + ")";
-        if (entity == null || entity.isEmpty()) {
-            MineTweakerAPI.logError(line + ": no entity named. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        if (!ratio(line, cutting, piercing, blunt)) {
-            return;
-        }
-        if (!EntityList.stringToClassMapping.containsKey(entity)) {
+        if (entity != null && !EntityList.stringToClassMapping.containsKey(entity)) {
             MineTweakerAPI.logWarning(line + ": no entity of that name is registered now");
         }
-        put(
+        build(
                 line,
                 CustomDamageRatioEntry.entriesProj,
                 entity,
-                CustomDamageRatioEntry.of(new float[] { cutting, blunt, piercing }));
+                () -> ItemTraitRules.projectileDamage(entity, cutting, piercing, blunt));
     }
 
     @ZenMethod
     public static void crafter(IItemStack stack, String type, float efficiency, int tier) {
         String line = "ItemTraits.crafter(" + stack + ", \"" + type + "\", " + efficiency + ", " + tier + ")";
         Item item = item(line, stack);
-        if (item == null || !notOwn(line, item, item instanceof IToolMF)) {
-            return;
+        if (item != null) {
+            build(line, CustomCrafterEntry.entries, item, () -> ItemTraitRules.crafter(item, type, efficiency, tier));
         }
-        if (type == null || type.isEmpty()
-                || !type.equals(type.trim())
-                || "nothing".equals(type)
-                || "hands".equals(type)) {
-            MineTweakerAPI.logError(
-                    line + ": the tool type is a name such as hammer or knife. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        if (!finite(efficiency) || efficiency <= 0F || efficiency > 1000F || tier < -1 || tier > 100) {
-            MineTweakerAPI.logError(
-                    line + ": the efficiency is above 0 to 1000 and the tier -1 to 100. "
-                            + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        put(line, CustomCrafterEntry.entries, item, CustomCrafterEntry.of(item, type, efficiency, tier));
     }
 
     @ZenMethod
     public static void hoe(IItemStack stack, float efficiency) {
         String line = "ItemTraits.hoe(" + stack + ", " + efficiency + ")";
         Item item = item(line, stack);
-        if (item == null) {
-            return;
+        if (item != null) {
+            build(line, CustomHoeEntry.entries, item, () -> ItemTraitRules.hoe(item, efficiency));
         }
-        if (!finite(efficiency) || efficiency <= 0F || efficiency > 1000F) {
-            MineTweakerAPI.logError(line + ": the efficiency is above 0 to 1000. " + ScriptRecipes.NOTHING_CHANGED);
-            return;
-        }
-        put(line, CustomHoeEntry.entries, item, CustomHoeEntry.of(item, efficiency));
     }
 
     @ZenMethod
@@ -216,41 +145,16 @@ public class ItemTraits {
         return held.getItem();
     }
 
-    private static boolean notOwn(String line, Item item, boolean own) {
-        if (own) {
-            MineTweakerAPI.logError(
-                    line + ": the item sets these traits itself, so they would never be read. "
-                            + ScriptRecipes.NOTHING_CHANGED);
+    /** Applies the entry the rules build, or reports why they refuse it and changes nothing. */
+    private static <K, V> void build(String line, Map<K, V> map, K key, Supplier<V> entry) {
+        V value;
+        try {
+            value = entry.get();
+        } catch (IllegalArgumentException e) {
+            MineTweakerAPI.logError(line + ": " + e.getMessage() + ". " + ScriptRecipes.NOTHING_CHANGED);
+            return;
         }
-        return !own;
-    }
-
-    private static boolean group(String line, String group) {
-        if (ArmourDesign.light.equals(group) || "medium".equals(group) || ArmourDesign.heavy.equals(group)) {
-            return true;
-        }
-        MineTweakerAPI
-                .logError(line + ": the armour class is light, medium or heavy. " + ScriptRecipes.NOTHING_CHANGED);
-        return false;
-    }
-
-    /** The entries keep cutting, blunt, piercing. */
-    private static boolean ratio(String line, float cutting, float piercing, float blunt) {
-        if (finite(cutting) && finite(piercing)
-                && finite(blunt)
-                && cutting >= 0F
-                && piercing >= 0F
-                && blunt >= 0F
-                && cutting + piercing + blunt > 0F
-                && cutting + piercing + blunt <= 1000F) {
-            return true;
-        }
-        MineTweakerAPI.logError(line + ": the parts are 0 or more, and not all 0. " + ScriptRecipes.NOTHING_CHANGED);
-        return false;
-    }
-
-    private static boolean finite(float value) {
-        return !Float.isNaN(value) && !Float.isInfinite(value);
+        put(line, map, key, value);
     }
 
     private static <K, V> void put(String line, Map<K, V> map, K key, V value) {

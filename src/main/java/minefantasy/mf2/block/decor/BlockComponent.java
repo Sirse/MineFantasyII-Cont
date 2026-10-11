@@ -28,7 +28,6 @@ import minefantasy.mf2.block.tileentity.TileEntityComponent;
 
 public class BlockComponent extends BlockTiled<TileEntityComponent> {
 
-    public static int component_RI = 118;
     private final Random rand = new Random();
 
     public BlockComponent() {
@@ -121,7 +120,8 @@ public class BlockComponent extends BlockTiled<TileEntityComponent> {
 
     @SideOnly(Side.CLIENT)
     public int getRenderType() {
-        return component_RI;
+        // Drawn by its tile entity alone
+        return -1;
     }
 
     @Override

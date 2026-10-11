@@ -123,7 +123,7 @@ public class TongsHelper {
     /** The fluid a quench takes from a tank: a trough unit, 62.5 mB, rounded up. */
     public static final int QUENCH_FLUID = 63;
     /** How much riskier water out of a proper bath, a cauldron or open water, quenches. */
-    public static final float RAW_WATER_RISK = 1.5F;
+    public static float RAW_WATER_RISK = 1.5F;
 
     /**
      * Where a piece can be quenched here, taking what the quench uses: a quench block, any tank of a quenching fluid

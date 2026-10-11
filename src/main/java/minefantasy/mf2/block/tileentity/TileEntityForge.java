@@ -30,6 +30,8 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     public static final float maxTemperature = 5000;
     private static final float FUEL_PER_TICK = 0.2F;
+    /** Config multiplier of the fuel a lit forge burns. */
+    public static float fuelUse = 1F;
     public float fuel;
     public float maxFuel = 6000;// 5m
     public float temperature, fuelTemperature;
@@ -156,7 +158,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     private void tickFuel() {
         if (fuel > 0) {
-            fuel -= FUEL_PER_TICK;
+            fuel -= FUEL_PER_TICK * fuelUse;
             saveLater();
         }
 
@@ -165,7 +167,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
     /** Remaining burn time at the same consumption rate the server ticks. */
     public float getFuelSeconds() {
-        return Math.max(0F, fuel) / (20F * FUEL_PER_TICK);
+        return Math.max(0F, fuel) / (20F * FUEL_PER_TICK * fuelUse);
     }
 
     private boolean isBurning() {

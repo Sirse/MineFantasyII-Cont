@@ -31,7 +31,6 @@ import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.weapon.*;
 import minefantasy.mf2.config.ConfigArmour;
-import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.config.ConfigStamina;
 import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.entity.Shockwave;
@@ -190,7 +189,7 @@ public class CombatMechanics {
             damage = ISpecialArmor.ArmorProperties.ApplyArmor(event.entityLiving, armours, event.source, damage);
         }
         // Stuck arrows (experimental)
-        if (ConfigExperiment.stickArrows && event.source.getSourceOfDamage() != null
+        if (ConfigWeapon.stickArrows && event.source.getSourceOfDamage() != null
                 && event.source.getSourceOfDamage() instanceof EntityArrow) {
             if (!event.entity.worldObj.isRemote) {
                 ArrowEffectsMF.stickArrowIn(

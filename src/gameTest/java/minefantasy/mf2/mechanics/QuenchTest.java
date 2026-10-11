@@ -272,4 +272,20 @@ public class QuenchTest {
         }
         helper.succeed();
     }
+
+    /** The config multiplies every metal's gain. */
+    @GameTest
+    public static void theHardeningModifierScalesTheGain(GameTestHelper helper) {
+        float was = Quench.hardening;
+        Quench.hardening = 2F;
+        try {
+            assertEquals(
+                    ItemQuality.ORDINARY + 30,
+                    quality(Quench.cool(hotSword("Steel", 0.5F), WATER, null, NEVER_CRACKS)),
+                    0.01F);
+        } finally {
+            Quench.hardening = was;
+        }
+        helper.succeed();
+    }
 }

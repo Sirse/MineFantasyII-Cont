@@ -87,6 +87,26 @@ public class ClientProxyMF extends CommonProxyMF {
         FMLCommonHandler.instance().bus().register(new ClientTickHandler());
         FMLCommonHandler.instance().bus().register(new ItemUseSyncMF());
 
+        // Free render ids from Forge, taken before the handlers that answer to them
+        minefantasy.mf2.block.crafting.BlockAnvilMF.anvil_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockCarpenter.carpenter_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockKitchenBench.kitchen_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockBombBench.bomb_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockTanningRack.tanner_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockForge.forge_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockBellows.bellows_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockResearchStation.research_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.decor.BlockTrough.trough_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockBombPress.bpress_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockBloomery.bloomery_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockCrossbowBench.crossBench_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockQuern.quern_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockFirepit.firepit_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.crafting.BlockRoast.roast_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockBigFurnace.furn_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.decor.BlockRack.rack_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.decor.BlockAmmoBox.ammo_RI = RenderingRegistry.getNextAvailableRenderId();
+        minefantasy.mf2.block.refining.BlockChimney.pipe_RI = RenderingRegistry.getNextAvailableRenderId();
         RenderingRegistry.registerBlockHandler(new RenderAnvilMF());
         ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAnvilMF.class, new TileEntityAnvilMFRenderer());
         RenderingRegistry.registerBlockHandler(new RenderCarpenter());

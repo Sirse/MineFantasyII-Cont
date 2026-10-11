@@ -21,8 +21,8 @@ import net.minecraftforge.event.entity.player.*;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.tool.IHuntingItem;
-import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.config.ConfigHardcore;
+import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.entity.mob.EntityDragon;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -202,7 +202,7 @@ public class LootEvents {
         }
         Entity dropper = event.entity;
 
-        if (dropper != null && ConfigExperiment.stickArrows && !dropper.worldObj.isRemote) {
+        if (dropper != null && ConfigWeapon.stickArrows && !dropper.worldObj.isRemote) {
             ArrayList<ItemStack> stuckArrows = (ArrayList<ItemStack>) ArrowEffectsMF.getStuckArrows(dropper);
             if (!stuckArrows.isEmpty()) {
 

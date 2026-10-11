@@ -20,11 +20,11 @@ import minefantasy.mf2.item.list.ComponentListMF;
 public class TileEntityResearch extends TileEntityStation implements IBasicMetre {
 
     /** Bookshelves count within this far of the table: across, and up and down. */
-    public static final int SHELF_REACH = 5;
-    public static final int SHELF_HEIGHT = 3;
+    public static int SHELF_REACH = 5;
+    public static int SHELF_HEIGHT = 3;
     /** The most bookshelves can speed study up by, and how many shelves bring two thirds of it. */
-    public static final float SHELF_MOST = 1.5F;
-    public static final float SHELF_SCALE = 10F;
+    public static float SHELF_MOST = 1.5F;
+    public static float SHELF_SCALE = 10F;
 
     /** How far study has got, on which item and by whom, and its pace; saved with the table. */
     public final ResearchStudy study = new ResearchStudy();

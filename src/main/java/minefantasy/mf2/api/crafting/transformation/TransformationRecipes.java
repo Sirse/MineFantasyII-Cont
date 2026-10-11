@@ -167,7 +167,7 @@ public class TransformationRecipes {
                     false,
                     "hammer",
                     -1,
-                    3,
+                    ConfigCrafting.cobbleHammerHits,
                     null,
                     null,
                     "dig.stone",

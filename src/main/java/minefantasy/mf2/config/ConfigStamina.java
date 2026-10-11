@@ -27,66 +27,81 @@ public class ConfigStamina extends ConfigurationBaseMF {
                 "##Activate Stamina System##",
                 "Is enabled",
                 true,
-                "This is the main switch for the stamina bar and all it's features. Setting false disables the system entirely")
+                "This is the main switch for the stamina bar and all its features. Setting false disables the system entirely")
                 .getBoolean();
 
-        StaminaBar.decayModifierCfg = (float) config
-                .get(VALUES, "Decay Modifier", 1.0F, "This modifies the rate of decay").getDouble();
-        StaminaBar.configRegenModifier = (float) config
-                .get(VALUES, "Regen Modifier", 1.0F, "This modifies the rate of regen").getDouble();
-        StaminaBar.pauseModifier = (float) config
-                .get(VALUES, "Idle Modifier", 1.0F, "This modifies the time between decaying and regenning back")
-                .getDouble();
-        StaminaBar.configBulk = (float) config.get(
+        StaminaBar.decayModifierCfg = config
+                .getFloat("Decay Modifier", VALUES, 1.0F, 0F, 100F, "This modifies the rate of decay");
+        StaminaBar.configRegenModifier = config
+                .getFloat("Regen Modifier", VALUES, 1.0F, 0F, 100F, "This modifies the rate of regen");
+        StaminaBar.pauseModifier = config.getFloat(
+                "Idle Modifier",
                 VALUES,
-                "Bulk Regen Modifier",
                 1.0F,
-                "This is the rate that worn apparel slows regen: Most items bring it down by 25%, plate is more scale/leather is less")
-                .getDouble();
+                0F,
+                100F,
+                "This modifies the time between decaying and regenning back");
+        StaminaBar.configBulk = config.getFloat(
+                "Bulk Regen Modifier",
+                VALUES,
+                1.0F,
+                0F,
+                100F,
+                "This is the rate that worn apparel slows regen: Most items bring it down by 25%, plate is more scale/leather is less");
         StaminaBar.scaleDifficulty = config.get(
                 VALUES,
                 "Difficulty Scale Decay",
                 false,
                 "This makes difficulty change your decay rate across all fields: peaceful(-50%), easy(-25%), normal(base), hard(+25%)")
                 .getBoolean();
-        StaminaBar.defaultMax = (float) config.get(
-                VALUES,
+        StaminaBar.defaultMax = config.getFloat(
                 "Max stamina base",
+                VALUES,
                 100F,
-                "This is where your stamina starts on spawning, Note that when changed: it only applies on death or new worlds")
-                .getDouble();
-        // StaminaBar.restrictSystem = config.get("Restrict use to
-        // players", "Will restrict", false, "This restricts the stamina system only to
-        // players").getBoolean();
-
-        weaponModifier = (float) config
-                .get(VALUES, "Weapon Modifier", 1.0F, "This modifies the amount using weapons influences stamina")
-                .getDouble();
-        sprintModifier = (float) config.get(VALUES, "Sprint Modifier", 1.0F, "Modify how fast sprinting decays stamina")
-                .getDouble();
-        fullRegenSeconds = config.get(
+                1F,
+                10000F,
+                "This is where your stamina starts on spawning, Note that when changed: it only applies on death or new worlds");
+        weaponModifier = config.getFloat(
+                "Weapon Modifier",
                 VALUES,
+                1.0F,
+                0F,
+                100F,
+                "This modifies the amount using weapons influences stamina");
+        sprintModifier = config
+                .getFloat("Sprint Modifier", VALUES, 1.0F, 0F, 100F, "Modify how fast sprinting decays stamina");
+        fullRegenSeconds = config.getInt(
                 "Regen Time",
+                VALUES,
                 15,
-                "Base time(seconds) until the metre is refilled(this is the base, other variables will be modified)")
-                .getInt();
-        weaponDrain = (float) config.get(
-                VALUES,
+                1,
+                3600,
+                "Base time(seconds) until the metre is refilled(this is the base, other variables will be modified)");
+        weaponDrain = config.getFloat(
                 "Exhausted Damage Modifier",
-                0.85F,
-                "This is how being exhausted(empty stamina) influences your damage as a decimal. 0.85 = 85%. A value more than 1 increases the damage when out of stamina")
-                .getDouble();
-        bowModifier = (float) config.get(VALUES, "Bow Time", 1.0F, "Modifies the rate drawing bows will drain stamina")
-                .getDouble();
-        StaminaBar.configArmourWeightModifier = (float) config
-                .get(VALUES, "Weight Modifier", 1.0F, "Modifies the amount weight of armour slows decay").getDouble();
-        miningSpeed = (float) config
-                .get(VALUES, "Mining Modifier", 1.0F, "Modifies the rate block breaking drains stamina").getDouble();
-        exhaustDamage = (float) config.get(
                 VALUES,
+                0.85F,
+                0F,
+                10F,
+                "This is how being exhausted(empty stamina) influences your damage as a decimal. 0.85 = 85%. A value more than 1 increases the damage when out of stamina");
+        bowModifier = config
+                .getFloat("Bow Time", VALUES, 1.0F, 0F, 100F, "Modifies the rate drawing bows will drain stamina");
+        StaminaBar.configArmourWeightModifier = config.getFloat(
+                "Weight Modifier",
+                VALUES,
+                1.0F,
+                0F,
+                100F,
+                "Modifies the amount weight of armour slows decay");
+        miningSpeed = config
+                .getFloat("Mining Modifier", VALUES, 1.0F, 0F, 100F, "Modifies the rate block breaking drains stamina");
+        exhaustDamage = config.getFloat(
                 "Exhausted Damage Taken",
+                VALUES,
                 1.5F,
-                "How much damage you take when out of stamina (1.5 = +50% more damage)").getDouble();
+                0F,
+                10F,
+                "How much damage you take when out of stamina (1.5 = +50% more damage)");
 
         affectSpeed = config.get(OPTION, "Affect Speed", true, "Slowness effect adds when out of stamina").getBoolean();
         affectMining = config.get(OPTION, "Affect Mining", true, "Breaking blocks drains stamina, adds mining fatigue")
@@ -95,8 +110,13 @@ public class ConfigStamina extends ConfigurationBaseMF {
         StaminaBar.levelUp = config
                 .get(OTHER, "Level Max Stamina", false, "This makes your experience bar increase max stamina")
                 .getBoolean();
-        StaminaBar.levelAmount = (float) config
-                .get(OTHER, "Level Up Amount", 5F, "How much an experience level increases stamina max").getDouble();
+        StaminaBar.levelAmount = config.getFloat(
+                "Level Up Amount",
+                OTHER,
+                5F,
+                0F,
+                1000F,
+                "How much an experience level increases stamina max");
     }
 
 }

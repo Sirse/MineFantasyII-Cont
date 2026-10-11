@@ -28,7 +28,6 @@ import minefantasy.mf2.api.archery.IArrowRetrieve;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.weapon.IDamageType;
-import minefantasy.mf2.config.ConfigExperiment;
 import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.item.archery.ArrowType;
 import minefantasy.mf2.item.gadget.EnumExplosiveType;
@@ -259,7 +258,7 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     public void onUpdate() {
         super.onEntityUpdate();
 
-        if (ConfigExperiment.dynamicArrows && worldObj.isRemote) {
+        if (ConfigWeapon.dynamicArrows && worldObj.isRemote) {
             return;
         }
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {

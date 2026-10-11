@@ -40,6 +40,8 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     private static final float BASE_PROGRESS_MAX = 400F;
     private static final float ADVANCED_PROGRESS_MAX = 2000F;
     private static final float SMELT_TEMPERATURE_THRESHOLD = 600F;
+    /** Config multiplier of how long a smelt takes. */
+    public static float smeltTime = 1F;
 
     private final int[] gridSlots = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
     private final int[] outputSlots = new int[] { OUTPUT_SLOT };
@@ -85,7 +87,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
 
         boolean wasHot = getIsHot();
         this.temperature = getTemperature();
-        this.progressMax = (getTier() >= 2) ? ADVANCED_PROGRESS_MAX : BASE_PROGRESS_MAX;
+        this.progressMax = ((getTier() >= 2) ? ADVANCED_PROGRESS_MAX : BASE_PROGRESS_MAX) * smeltTime;
 
         if (wasHot && canSmelt()) {
             updateSmelting();

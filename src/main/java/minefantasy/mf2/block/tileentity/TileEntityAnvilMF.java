@@ -68,7 +68,7 @@ public class TileEntityAnvilMF extends TileEntityStation
     private int hammerTierRequired;
     private int anvilTierRequired;
     /** How wide the hit window stays on an anvil below the recipe's tier; a lower anvil still works, only harder */
-    public static final float LOW_TIER_HIT_WINDOW = 0.25F;
+    public static float LOW_TIER_HIT_WINDOW = 0.25F;
 
     public TileEntityAnvilMF() {
         this(0, "Iron");

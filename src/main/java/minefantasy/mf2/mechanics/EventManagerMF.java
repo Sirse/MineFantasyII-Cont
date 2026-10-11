@@ -23,6 +23,7 @@ import minefantasy.mf2.api.rpg.LevelupEvent;
 import minefantasy.mf2.api.rpg.SyncSkillEvent;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.tool.ISmithTongs;
+import minefantasy.mf2.config.ConfigCrafting;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.entity.EntityItemUnbreakable;
@@ -192,7 +193,7 @@ public class EventManagerMF {
             }
         }
         {
-            if (ConfigHardcore.HCChotBurn && item != null && isHotItem(item)) {
+            if (ConfigCrafting.hotBurn && item != null && isHotItem(item)) {
                 if (event.isCancelable()) {
                     event.setCanceled(true);
                 }
