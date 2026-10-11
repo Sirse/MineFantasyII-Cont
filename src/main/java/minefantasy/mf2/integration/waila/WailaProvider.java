@@ -87,7 +87,7 @@ public final class WailaProvider implements IWailaDataProvider {
     @Override
     public boolean hasWailaAdvancedBody(ItemStack stack, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         NBTTagCompound data = accessor.getNBTData().getCompoundTag(WailaData.KEY);
-        return enabled(data, config) && data.hasKey("Tool") && !data.getString("Tool").isEmpty();
+        return enabled(data, config) && WailaTooltip.hasDetails(data);
     }
 
     @Override

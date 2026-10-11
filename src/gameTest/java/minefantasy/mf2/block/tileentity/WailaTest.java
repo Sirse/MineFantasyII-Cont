@@ -112,6 +112,113 @@ public class WailaTest {
         helper.succeed();
     }
 
+    private static IWailaDataAccessor accessor(NBTTagCompound data) {
+        NBTTagCompound tag = new NBTTagCompound();
+        tag.setTag(WailaData.KEY, data);
+        return (IWailaDataAccessor) Proxy.newProxyInstance(
+                WailaTest.class.getClassLoader(),
+                new Class<?>[] { IWailaDataAccessor.class },
+                (proxy, method, args) -> method.getName().equals("getNBTData") ? tag : null);
+    }
+
+    private static IWailaConfigHandler enabledConfig() {
+        return (IWailaConfigHandler) Proxy.newProxyInstance(
+                WailaTest.class.getClassLoader(),
+                new Class<?>[] { IWailaConfigHandler.class },
+                (proxy, method, args) -> true);
+    }
+
+    private static List<String> tooltip(NBTTagCompound data, boolean advanced) {
+        WailaProvider provider = new WailaProvider();
+        IWailaDataAccessor accessor = accessor(data);
+        List<String> tip = new ArrayList<>();
+        tip.add("Other provider");
+        provider.getWailaBody(null, tip, accessor, enabledConfig());
+        if (advanced) provider.getWailaAdvancedBody(null, tip, accessor, enabledConfig());
+        return tip;
+    }
+
+    @GameTest
+    public static void rackContentsReplaceOccupancyOnlyInTheAdvancedHud(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            minefantasy.mf2.block.tileentity.decor.TileEntityRack rack = place(
+                    new minefantasy.mf2.block.tileentity.decor.TileEntityRack());
+            FakePlayer player = near(helper, rack.xCoord, rack.yCoord, rack.zCoord);
+            WailaProvider provider = new WailaProvider();
+            NBTTagCompound empty = inspect(rack, player);
+            assertFalse(provider.hasWailaAdvancedBody(null, accessor(empty), enabledConfig()));
+            for (int i = 0; i < 4; i++) rack.setInventorySlotContents(i, new ItemStack(ToolListMF.hammerStone));
+            NBTTagCompound before = new NBTTagCompound();
+            rack.writeToNBT(before);
+            NBTTagCompound data = inspect(rack, player);
+            assertTrue(provider.hasWailaAdvancedBody(null, accessor(data), enabledConfig()));
+            List<String> compact = tooltip(data, false);
+            assertEquals(2, compact.size());
+            assertFalse(
+                    compact.toString().contains(
+                            ToolListMF.hammerStone.getItemStackDisplayName(new ItemStack(ToolListMF.hammerStone))));
+            List<String> expanded = tooltip(data, true);
+            assertEquals(5, expanded.size());
+            assertEquals("Other provider", expanded.get(0));
+            assertFalse(expanded.contains(compact.get(1)));
+            assertEquals(4, data.getTagList("Contents", 10).tagCount());
+            NBTTagCompound after = new NBTTagCompound();
+            rack.writeToNBT(after);
+            assertEquals(before, after);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void advancedToolRequirementsDoNotRepeatTheRefusal(GameTestHelper helper) {
+        NBTTagCompound data = new NBTTagCompound();
+        data.setString("Kind", "craft");
+        data.setString("Tool", "knife");
+        data.setInteger("ToolTier", 2);
+        data.setString("Reason", "tool");
+        net.minecraft.nbt.NBTTagList args = new net.minecraft.nbt.NBTTagList();
+        args.appendTag(new net.minecraft.nbt.NBTTagString("knife"));
+        args.appendTag(new net.minecraft.nbt.NBTTagString("nothing"));
+        data.setTag("Args", args);
+        List<String> compact = tooltip(data, false);
+        List<String> expanded = tooltip(data, true);
+        assertEquals(2, compact.size());
+        assertEquals(2, expanded.size()); // one enriched requirement, no Tool: knife or phantom bench tier
+        assertTrue(expanded.get(1).contains("2"));
+        assertFalse(expanded.get(1).equals(compact.get(1)));
+        data.removeTag("Reason");
+        data.removeTag("Args");
+        assertEquals(1, tooltip(data, false).size());
+        assertEquals(2, tooltip(data, true).size());
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void heatDetailsKeepProgressAndProblemsWithoutDuplicatingBaseRows(GameTestHelper helper) {
+        NBTTagCompound data = new NBTTagCompound();
+        data.setString("Kind", "heat");
+        data.setBoolean("Built", false);
+        data.setString("Reason", "not_built");
+        data.setInteger("Smoke", 20);
+        data.setInteger("MaxSmoke", 100);
+        data.setFloat("FuelSeconds", 90);
+        data.setBoolean("ShowProgress", true);
+        data.setFloat("Progress", 30);
+        data.setFloat("MaxProgress", 100);
+        List<String> compact = tooltip(data, false);
+        List<String> expanded = tooltip(data, true);
+        assertEquals(3, compact.size()); // foreign row, progress, failure; no duplicate 'not built'
+        assertEquals(5, expanded.size()); // fuel and smoke added
+        assertEquals("Other provider", expanded.get(0));
+        assertTrue(expanded.contains(compact.get(1)));
+        assertTrue(expanded.contains(compact.get(2)));
+        assertEquals(expanded.size(), new java.util.HashSet<String>(expanded).size());
+        helper.succeed();
+    }
+
     @GameTest
     public static void theServerReceivedTheWailaRegistration(GameTestHelper helper) {
         TileEntityKitchenBench bench = new TileEntityKitchenBench();

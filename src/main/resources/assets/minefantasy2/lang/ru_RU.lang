@@ -2596,3 +2596,7 @@ minefantasy2.waila.locked=Заблокировано
 minefantasy2.waila.unlocked=Разблокировано
 minefantasy2.waila.reason.tool=Нужен: %s
 minefantasy2.waila.material=Материал: %s
+
+minefantasy2.waila.reason.tool_tier=Нужен: %s (уровень %s)
+
+minefantasy2.waila.storage_occupied=Занято: %s / %s

@@ -147,6 +147,7 @@ final class WailaProcesses {
 
     private static void cooking(NBTTagCompound data, TileEntityRoast roast) {
         data.setString("Kind", "heat");
+        data.setBoolean("TemperatureDetails", true);
         int heat = roast.getWorkTemperature();
         data.setFloat("Temperature", heat);
         CookRecipe.Found found = roast.getShownCooking();

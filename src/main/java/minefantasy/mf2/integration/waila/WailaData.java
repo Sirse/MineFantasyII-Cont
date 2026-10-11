@@ -65,6 +65,7 @@ public final class WailaData {
             reason(data, crucible.getWorkProblem());
         } else if (tile instanceof TileEntityForge) {
             TileEntityForge forge = (TileEntityForge) tile;
+            data.setBoolean("TemperatureDetails", true);
             data.setString("Kind", "heat");
             data.setBoolean("Burning", forge.isLit() && forge.fuel > 0);
             data.setFloat("FuelSeconds", finite(forge.getFuelSeconds()));

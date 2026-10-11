@@ -46,7 +46,7 @@ final class WailaWorld {
                     if (contents.tagCount() < 4) contents.appendTag(stack.copy().writeToNBT(new NBTTagCompound()));
                 }
             }
-            data.setTag("Results", contents);
+            data.setTag("Contents", contents);
             data.setInteger("Count", occupied);
             data.setInteger("Limit", rack.getSizeInventory());
         } else if (tile instanceof TileEntityResearch) {

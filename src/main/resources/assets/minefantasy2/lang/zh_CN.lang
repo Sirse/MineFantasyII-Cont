@@ -2479,3 +2479,6 @@ minefantasy2.waila.locked=已锁定
 minefantasy2.waila.unlocked=未锁定
 minefantasy2.waila.reason.tool=需要：%s
 minefantasy2.waila.material=材料：%s
+
+minefantasy2.waila.storage_occupied=已占用：%s / %s
+minefantasy2.waila.reason.tool_tier=需要：%s（等级 %s）

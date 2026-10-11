@@ -2481,3 +2481,7 @@ minefantasy2.waila.locked=Locked
 minefantasy2.waila.unlocked=Unlocked
 minefantasy2.waila.reason.tool=Requires: %s
 minefantasy2.waila.material=Material: %s
+
+minefantasy2.waila.reason.tool_tier=Requires: %s (tier %s)
+
+minefantasy2.waila.storage_occupied=Occupied: %s / %s

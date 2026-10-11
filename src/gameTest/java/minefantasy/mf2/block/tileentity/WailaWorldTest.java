@@ -73,7 +73,11 @@ public class WailaWorldTest {
         data = inspect(helper, rack, player);
         assertEquals(1, data.getInteger("Count"));
         assertEquals(4, data.getInteger("Limit"));
-        assertEquals(1, data.getTagList("Results", 10).tagCount());
+        assertEquals(1, data.getTagList("Contents", 10).tagCount());
+        assertFalse("rack contents must not be confused with processing results", data.hasKey("Results"));
+        assertEquals(
+                Items.iron_sword,
+                ItemStack.loadItemStackFromNBT(data.getTagList("Contents", 10).getCompoundTagAt(0)).getItem());
         helper.succeed();
     }
 
