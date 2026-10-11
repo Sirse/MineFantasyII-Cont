@@ -32,11 +32,11 @@ public class QuenchScriptTest {
     @GameTest
     public static void aScriptSetsAMetalAndAReloadPutsItBack(GameTestHelper helper) throws Exception {
         Scripts.around(helper, () -> {
-            assertEquals(0, Scripts.run("mods.minefantasy.Quench.metal(\"Bronze\", 1, 2, 3, 4, 5, 6);").size());
+            assertEquals(0, Scripts.run("mods.minefantasy.Quench.metal(\"bRoNzE\", 1, 2, 3, 4, 5, 6);").size());
             QuenchResponse bronze = QuenchResponse.of("Bronze");
             assertEquals(3F, bronze.bonus(QuenchMedium.WATER), 0F);
             assertEquals(6F, bronze.crack(QuenchMedium.BRINE), 0F);
-            assertEquals(0, Scripts.run("mods.minefantasy.Quench.justCools(\"Steel\");").size());
+            assertEquals(0, Scripts.run("mods.minefantasy.Quench.justCools(\"steel\");").size());
             assertFalse("steel still hardens", QuenchResponse.of("Steel").matters());
         });
         assertFalse("bronze kept the script's response", QuenchResponse.of("Bronze").matters());
@@ -48,6 +48,10 @@ public class QuenchScriptTest {
         Scripts.around(helper, () -> {
             assertFalse(Scripts.run("mods.minefantasy.Quench.fluid(\"water\", \"acid\");").isEmpty());
             assertSame(QuenchMedium.WATER, QuenchMedium.of(FluidRegistry.WATER));
+            assertFalse(Scripts.run("mods.minefantasy.Quench.metal(\"missing_metal\", 1, 2, 3, 4, 5, 6);").isEmpty());
+            assertFalse(Scripts.run("mods.minefantasy.Quench.justCools(\"missing_metal\");").isEmpty());
+            assertNull(QuenchResponse.registered("missing_metal"));
+            assertFalse(Scripts.run("mods.minefantasy.Quench.justCools(\"any\");").isEmpty());
             assertFalse(Scripts.run("mods.minefantasy.Quench.metal(\"Steel\", 1, 120, 3, 4, 5, 6);").isEmpty());
             assertFalse(Scripts.run("mods.minefantasy.Quench.metal(\"Steel\", 1, -1, 3, 4, 5, 6);").isEmpty());
             assertEquals("a refused line changed steel", 15F, QuenchResponse.of("Steel").bonus(QuenchMedium.WATER), 0F);

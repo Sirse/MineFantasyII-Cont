@@ -6,6 +6,7 @@ import java.util.Map;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptNames;
 import minetweaker.MineTweakerAPI;
 import minetweaker.MineTweakerImplementationAPI;
 import minetweaker.api.player.IPlayer;
@@ -16,7 +17,21 @@ public class MTCommands implements ICommandFunction {
     @Override
     public void execute(String[] arguments, IPlayer player) {
         if (arguments.length < 1) {
-            player.sendChat("Please, specify a MF command");
+            if (player != null) {
+                player.sendChat("Specify materials, skills, tools or designs");
+            }
+            return;
+        }
+
+        if (arguments[0].equals("tools") || arguments[0].equals("designs")) {
+            MineTweakerAPI.logCommand(
+                    arguments[0].equals("tools")
+                            ? "MineFantasy built-in tool types: " + ScriptNames.TOOLS
+                                    + "; grid recipes also accept hands; mods may add tool types"
+                            : ScriptNames.designs());
+            if (player != null) {
+                player.sendChat("Names generated; see minetweaker.log in your minecraft dir");
+            }
             return;
         }
 

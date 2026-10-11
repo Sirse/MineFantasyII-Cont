@@ -46,7 +46,11 @@ public final class ScriptRecipes {
     private ScriptRecipes() {}
 
     public static void hookReloads() {
-        MineTweakerImplementationAPI.onReloadEvent(event -> MFRecipes.REGISTRIES.beginReload());
+        MineTweakerImplementationAPI.onReloadEvent(event -> {
+            MFRecipes.REGISTRIES.beginReload();
+            ScriptWarnings.resetDeprecated();
+            ScriptNames.resetSpecialDesigns();
+        });
         MineTweakerImplementationAPI.onPostReload(event -> {
             if (MFRecipes.REGISTRIES.getState() == RecipeRegistries.State.RELOADING) {
                 MFRecipes.REGISTRIES.publish();
@@ -93,6 +97,25 @@ public final class ScriptRecipes {
             } else {
                 MineTweakerAPI.logInfo("Removed " + station + " recipes " + removed);
             }
+        });
+    }
+
+    /** Replaces the selected recipes atomically, keeping their ids and order; by default exactly one must match. */
+    public static <R> void replaceWhere(RecipeRegistry<R> registry, String what, Predicate<RecipeEntry<R>> filter,
+            int expected, BiConsumer<RecipeTransaction, RecipeId> replacement) {
+        apply("Replacing " + registry.getStation() + " recipes " + what, tx -> {
+            if (expected < 0) {
+                throw new IllegalArgumentException("expected count must be positive");
+            }
+            List<RecipeId> ids = tx.matchingIds(registry, filter);
+            int count = expected == 0 ? 1 : expected;
+            if (ids.size() != count) {
+                throw new IllegalArgumentException("expected " + count + " recipes, found " + ids.size() + " " + ids);
+            }
+            for (RecipeId id : ids) {
+                replacement.accept(tx, id);
+            }
+            MineTweakerAPI.logInfo("Replaced " + registry.getStation() + " recipes " + ids);
         });
     }
 

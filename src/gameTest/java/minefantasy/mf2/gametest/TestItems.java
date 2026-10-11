@@ -10,6 +10,7 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minefantasy.mf2.api.crafting.exotic.ISpecialCraftItem;
 import minefantasy.mf2.api.heating.IHotItem;
 import minefantasy.mf2.api.material.CustomMaterial;
 
@@ -35,6 +36,8 @@ public final class TestItems {
     public static Item tank;
     /** Another mod's copper ingot, listed under ingotCopper after MineFantasy's own. */
     public static Item foreignCopper;
+    /** Counts design discovery calls through the real script action path. */
+    public static DesignProbe designProbe;
 
     /** A metal whose craft time modifier is 3 and whose tiers are 3; a second metal; a wood. */
     public static CustomMaterial steel, bronze, oak;
@@ -42,6 +45,8 @@ public final class TestItems {
     private TestItems() {}
 
     static void register() {
+        designProbe = new DesignProbe();
+        item("design_probe", designProbe);
         ore = item("ore", new Item());
         bar = item("bar", new Item());
         metaBar = item("meta_bar", new Item().setHasSubtypes(true));
@@ -80,6 +85,17 @@ public final class TestItems {
         item.setUnlocalizedName(GameTestMod.MODID + "." + name);
         GameRegistry.registerItem(item, name);
         return item;
+    }
+
+    public static final class DesignProbe extends Item implements ISpecialCraftItem {
+
+        public int reads;
+
+        @Override
+        public String getDesign(ItemStack stack) {
+            reads++;
+            return "qa_design";
+        }
     }
 
     private static final class HotItem extends Item implements IHotItem {

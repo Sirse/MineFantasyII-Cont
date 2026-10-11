@@ -18,6 +18,8 @@ import minefantasy.mf2.api.weapon.IDamageType;
  */
 public final class ItemTraitRules {
 
+    public static final String CRAFTER_TYPES = "hammer, hvyHammer, knife, shears, needle, spoon, mallet, saw, spanner";
+
     private ItemTraitRules() {}
 
     /** Armour by a design: its suit weight times the modifier, and its bulk shared out to the slot. */
@@ -77,7 +79,7 @@ public final class ItemTraitRules {
                 || !type.equals(type.trim())
                 || "nothing".equals(type)
                 || "hands".equals(type)) {
-            throw new IllegalArgumentException("the tool type is a name such as hammer or knife");
+            throw new IllegalArgumentException("the tool type is a name such as " + CRAFTER_TYPES);
         }
         if (!finite(efficiency) || efficiency <= 0F || efficiency > 1000F || tier < -1 || tier > 100) {
             throw new IllegalArgumentException("the efficiency is above 0 to 1000 and the tier -1 to 100");

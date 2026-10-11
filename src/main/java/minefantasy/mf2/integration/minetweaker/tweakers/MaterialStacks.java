@@ -85,7 +85,7 @@ public class MaterialStacks {
         return new CarbonInput();
     }
 
-    private static CustomMaterial known(String name) {
+    static CustomMaterial known(String name) {
         // "any" is how MineFantasy names an item without a material; it is never one a script can ask for
         if (name == null || name.equalsIgnoreCase("any")) {
             throw new IllegalArgumentException(

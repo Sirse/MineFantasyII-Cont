@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging.SpecialCraft;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptNames;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
@@ -29,6 +30,7 @@ public class SpecialForging {
         ScriptWarnings.itemsOnly("SpecialForging", base);
         ScriptWarnings.itemsOnly("SpecialForging", output);
         ScriptRecipes.apply("Setting " + design + " craft of " + base, tx -> {
+            ScriptNames.requireNamedDesign(design);
             Item outputItem = ScriptInputs.toOutput(output).getItem();
             for (Item baseItem : items(base)) {
                 minefantasy.mf2.api.crafting.exotic.SpecialForging
@@ -51,6 +53,7 @@ public class SpecialForging {
     @ZenMethod
     public static void remove(@NotNull String design, @NotNull IIngredient base) {
         ScriptRecipes.apply("Removing " + design + " craft of " + base, tx -> {
+            ScriptNames.requireNamedDesign(design);
             for (Item baseItem : items(base)) {
                 RecipeId id = minefantasy.mf2.api.crafting.exotic.SpecialForging.idFor(design, baseItem);
                 minefantasy.mf2.api.crafting.exotic.SpecialForging.stageRemove(tx, id);

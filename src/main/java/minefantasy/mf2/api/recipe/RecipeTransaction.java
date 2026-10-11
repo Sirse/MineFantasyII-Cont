@@ -82,6 +82,15 @@ public final class RecipeTransaction implements AutoCloseable {
 
     /** Removes every recipe the filter accepts, in the state this transaction sees; returns the ids removed. */
     public <R> List<RecipeId> removeWhere(RecipeRegistry<R> registry, Predicate<? super RecipeEntry<R>> filter) {
+        List<RecipeId> removed = matchingIds(registry, filter);
+        for (RecipeId id : removed) {
+            remove(registry, id);
+        }
+        return removed;
+    }
+
+    /** Selects ids from the working layer and this transaction's pending operations without changing either. */
+    public <R> List<RecipeId> matchingIds(RecipeRegistry<R> registry, Predicate<? super RecipeEntry<R>> filter) {
         guard(registry);
         Map<RecipeId, RecipeEntry<R>> view = new LinkedHashMap<>(registry.working());
         // The filter judges the state this transaction would leave: staged adds and replaces included
@@ -99,9 +108,6 @@ public final class RecipeTransaction implements AutoCloseable {
             if (filter.test(entry)) {
                 removed.add(entry.getId());
             }
-        }
-        for (RecipeId id : removed) {
-            remove(registry, id);
         }
         return Collections.unmodifiableList(removed);
     }

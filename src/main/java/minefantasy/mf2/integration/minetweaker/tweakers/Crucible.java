@@ -35,6 +35,12 @@ public class Crucible {
     @ZenMethod
     public static void add(@NotNull String name, @NotNull IItemStack out, int level, int dupe,
             @NotNull IIngredient[] ingred, @Optional int priority) {
+        ScriptWarnings.deprecated("Crucible.add", "Crucible.recipe(name, output, ingredients).register()");
+        addRecipe(name, out, level, dupe, ingred, priority);
+    }
+
+    private static void addRecipe(String name, IItemStack out, int level, int dupe, IIngredient[] ingred,
+            int priority) {
         RecipeId id = ScriptRecipes.scriptId(STATION, name);
         for (IIngredient ingredient : ingred) {
             ScriptWarnings.inputTag(ingredient);
@@ -63,6 +69,60 @@ public class Crucible {
             }
             AlloyRecipes.stageRatio(tx, id, alloys, priority);
         });
+    }
+
+    @ZenMethod
+    public static Builder recipe(String name, IItemStack output, IIngredient[] ingredients) {
+        return new Builder(name, output, ingredients);
+    }
+
+    @ZenClass("mods.minefantasy.CrucibleRecipeBuilder")
+    public static final class Builder {
+
+        private final String name;
+        private final IItemStack output;
+        private final IIngredient[] ingredients;
+        private int tier;
+        private int ratio = 1;
+        private int priority;
+        private boolean registered;
+
+        private Builder(String name, IItemStack output, IIngredient[] ingredients) {
+            this.name = name;
+            this.output = output;
+            this.ingredients = ingredients;
+        }
+
+        @ZenMethod
+        public Builder tier(int tier) {
+            this.tier = tier;
+            return this;
+        }
+
+        @ZenMethod
+        public Builder ratio(int ratio) {
+            this.ratio = ratio;
+            return this;
+        }
+
+        @ZenMethod
+        public Builder priority(int priority) {
+            this.priority = priority;
+            return this;
+        }
+
+        @ZenMethod
+        public void register() {
+            String problem = registered ? "builder is already registered"
+                    : ratio < 1 ? "ratio must be at least 1" : ingredients == null ? "give ingredients" : null;
+            if (problem != null) {
+                minetweaker.MineTweakerAPI
+                        .logError("Crucible.recipe(" + name + "): " + problem + ". " + ScriptRecipes.NOTHING_CHANGED);
+                return;
+            }
+            registered = true;
+            addRecipe(name, output, tier, ratio, ingredients, priority);
+        }
     }
 
     /** Removes one alloy by id; ratio copies have their own ids ({@code _x2}...). */

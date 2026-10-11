@@ -6,6 +6,7 @@ import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
@@ -35,6 +36,7 @@ public class CarpentersBench {
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, double exp, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds,
             @Optional int priority) {
+        ScriptWarnings.deprecated("CarpenterBench.addShaped", "CarpenterBench.shaped(name, output)...register()");
         shaped(name, output).cells(ingreds).skill(skill).research(research).sound(sound).experience(exp)
                 .tool(tool, hammer).stationTier(anvil).time(time).priority(priority).register();
     }
@@ -43,6 +45,7 @@ public class CarpentersBench {
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, double exp, String tool, int hammer, int anvil, int time, IIngredient[] ingreds,
             @Optional int priority) {
+        ScriptWarnings.deprecated("CarpenterBench.addShapeless", "CarpenterBench.shapeless(name, output)...register()");
         shapeless(name, output).ingredients(ingreds).skill(skill).research(research).sound(sound).experience(exp)
                 .tool(tool, hammer).stationTier(anvil).time(time).priority(priority).register();
     }

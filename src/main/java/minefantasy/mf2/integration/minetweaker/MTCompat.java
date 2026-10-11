@@ -10,7 +10,9 @@ import minetweaker.api.item.IIngredient;
 public class MTCompat {
 
     private static final String[] COMMAND_DESC = { "MineFantasy commands:", "   /minetweaker mf materials",
-            "   Lists all MF materials", "   /minetweaker mf skills", "   Lists all MF skills" };
+            "   Lists all MF materials", "   /minetweaker mf skills", "   Lists all MF skills",
+            "   /minetweaker mf tools", "   Lists built-in MF tool types", "   /minetweaker mf designs",
+            "   Lists MF armour and special forging designs" };
 
     public static void loadTweakers() {
         MineTweakerAPI.registerClass(Anvil.class);
@@ -20,6 +22,11 @@ public class MTCompat {
         MineTweakerAPI.registerClass(CarpentersBench.class);
         MineTweakerAPI.registerClass(KitchenBench.class);
         MineTweakerAPI.registerClass(Cooking.class);
+        MineTweakerAPI.registerClass(Cooking.Builder.class);
+        MineTweakerAPI.registerClass(Crucible.Builder.class);
+        MineTweakerAPI.registerClass(Quern.Builder.class);
+        MineTweakerAPI.registerClass(TanningRack.Builder.class);
+        MineTweakerAPI.registerClass(PaintOil.Builder.class);
         MineTweakerAPI.registerClass(Crucible.class);
         MineTweakerAPI.registerClass(Forge.class);
         MineTweakerAPI.registerClass(Fuels.class);

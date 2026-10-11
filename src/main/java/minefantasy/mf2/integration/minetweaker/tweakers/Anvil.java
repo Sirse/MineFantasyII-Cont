@@ -4,6 +4,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import stanhebben.zenscript.annotations.NotNull;
@@ -33,6 +34,7 @@ public class Anvil {
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             boolean hot, String tool, int hammer, int anvil, int time, IIngredient[][] ingreds,
             @Optional int priority) {
+        ScriptWarnings.deprecated("Anvil.addShaped", "Anvil.shaped(name, output)...register()");
         shaped(name, output).cells(ingreds).skill(skill).research(research).hot(hot).tool(tool, hammer)
                 .stationTier(anvil).time(time).priority(priority).register();
     }
@@ -40,6 +42,7 @@ public class Anvil {
     @ZenMethod
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             boolean hot, String tool, int hammer, int anvil, int time, IIngredient[] ingreds, @Optional int priority) {
+        ScriptWarnings.deprecated("Anvil.addShapeless", "Anvil.shapeless(name, output)...register()");
         shapeless(name, output).ingredients(ingreds).skill(skill).research(research).hot(hot).tool(tool, hammer)
                 .stationTier(anvil).time(time).priority(priority).register();
     }

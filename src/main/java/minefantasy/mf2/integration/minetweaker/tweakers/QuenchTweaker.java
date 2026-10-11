@@ -92,11 +92,18 @@ public class QuenchTweaker {
     }
 
     private static void setMetal(String line, final String material, final QuenchResponse response) {
-        MineTweakerAPI.apply(new Change<QuenchResponse>(line, QuenchResponse.registered(material)) {
+        final String registered;
+        try {
+            registered = MaterialStacks.known(material).name;
+        } catch (IllegalArgumentException e) {
+            MineTweakerAPI.logError(line + ": " + e.getMessage() + ". " + ScriptRecipes.NOTHING_CHANGED);
+            return;
+        }
+        MineTweakerAPI.apply(new Change<QuenchResponse>(line, QuenchResponse.registered(registered)) {
 
             @Override
             void put(QuenchResponse value) {
-                QuenchResponse.register(material, value);
+                QuenchResponse.register(registered, value);
             }
 
             @Override

@@ -2,14 +2,10 @@ package minefantasy.mf2.integration.nei;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.opengl.GL11;
@@ -88,36 +84,36 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
         if (!NEIHelper.isValidStack(inputStack)) {
             return;
         }
-        ItemStack hiddenStack = null;
-
         if (inputStack.getItem() instanceof IHotItem) {
             inputStack = Heatable.getItem(inputStack);
             if (!NEIHelper.isValidStack(inputStack)) {
                 return;
             }
         }
-
-        if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.smeltDragonforge)) {
-            for (Map.Entry<Item, Item> entry : SpecialForging.dragonforgeCrafts().entrySet()) {
-                if (CustomToolHelper.areEqual(new ItemStack(entry.getValue()), inputStack)) {
-                    hiddenStack = CustomToolHelper.tryDeconstruct(new ItemStack(entry.getKey()), inputStack);
-                }
-            }
-        }
-
-        for (GridRecipe irecipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
-            if (irecipe == null || !NEIHelper.isValidStack(irecipe.getRecipeOutput())) {
+        for (GridRecipe recipe : (List<GridRecipe>) CraftingManagerAnvil.getInstance().getRecipeList()) {
+            ItemStack base = recipe == null ? null : recipe.getRecipeOutput();
+            if (!NEIHelper.isValidStack(base)
+                    || !NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, recipe.getResearch())) {
                 continue;
             }
-            ItemStack specialStack = getSpecialResultFor(irecipe.getRecipeOutput(), inputStack);
-            if ((hiddenStack != null && CustomToolHelper.areEqual(irecipe.getRecipeOutput(), hiddenStack))
-                    || CustomToolHelper.areEqual(irecipe.getRecipeOutput(), inputStack)
-                    || CustomToolHelper.areEqual(specialStack, inputStack)) {
-                if (NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
-                    arecipes.add(new CachedAnvilRecipe(irecipe, inputStack, getSpecialCatalyst(irecipe, inputStack)));
+            if (CustomToolHelper.areEqual(base, inputStack)) {
+                arecipes.add(new CachedAnvilRecipe(recipe, inputStack, null));
+            }
+            for (AnvilSpecialRecipes.Result result : AnvilSpecialRecipes.results(base)) {
+                if (canViewSpecial(result.design) && result.matches(inputStack)) {
+                    arecipes.add(new CachedAnvilRecipe(recipe, inputStack, specialCatalyst(result.design)));
                 }
             }
         }
+    }
+
+    private boolean canViewSpecial(String design) {
+        return !SpecialForging.DRAGONFORGE.equals(design)
+                || NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, KnowledgeListMF.smeltDragonforge);
+    }
+
+    private ItemStack specialCatalyst(String design) {
+        return "ornate".equals(design) ? new ItemStack(ComponentListMF.ornate_items) : null;
     }
 
     @SuppressWarnings("unchecked")
@@ -129,37 +125,20 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                 continue;
             }
             arecipes.add(new CachedAnvilRecipe(irecipe, null, null));
+            ItemStack ornate = createSpecialResult("ornate", irecipe.getRecipeOutput());
+            if (ornate != null) {
+                arecipes.add(new CachedAnvilRecipe(irecipe, ornate, specialCatalyst("ornate")));
+            }
         }
-    }
-
-    private ItemStack getSpecialResultFor(ItemStack baseOutput, ItemStack requestedOutput) {
-        String design = CustomToolHelper.getCustomStyle(requestedOutput);
-        if (design == null) {
-            return null;
-        }
-        ItemStack specialOutput = createSpecialResult(design, baseOutput);
-        if (specialOutput != null && !CustomToolHelper.hasAnyMaterial(specialOutput)
-                && CustomToolHelper.hasAnyMaterial(requestedOutput)) {
-            specialOutput = CustomToolHelper.tryDeconstruct(specialOutput, requestedOutput);
-        }
-        return specialOutput;
     }
 
     private ItemStack createSpecialResult(String design, ItemStack baseOutput) {
-        if (!NEIHelper.isValidStack(baseOutput)) {
-            return null;
+        for (AnvilSpecialRecipes.Result result : AnvilSpecialRecipes.results(baseOutput)) {
+            if (design.equals(result.design)) {
+                return result.getOutput();
+            }
         }
-        Item special = SpecialForging.getSpecialCraft(design, baseOutput);
-        if (special == null) {
-            return null;
-        }
-
-        ItemStack specialOutput = new ItemStack(special, baseOutput.stackSize, baseOutput.getItemDamage());
-        NBTBase nbt = !baseOutput.hasTagCompound() ? null : baseOutput.getTagCompound().copy();
-        if (nbt != null) {
-            specialOutput.setTagCompound((NBTTagCompound) nbt);
-        }
-        return specialOutput;
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -183,10 +162,10 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
                 if (!NEIHelper.canViewResearch(Minecraft.getMinecraft().thePlayer, irecipe.getResearch())) {
                     continue;
                 }
-                if (SpecialForging.getSpecialCraft("ornate", irecipe.getRecipeOutput()) == null) {
+                ItemStack ornateOutput = createSpecialResult("ornate", irecipe.getRecipeOutput());
+                if (ornateOutput == null) {
                     continue;
                 }
-                ItemStack ornateOutput = createSpecialResult("ornate", irecipe.getRecipeOutput());
                 arecipes.add(new CachedAnvilRecipe(irecipe, ornateOutput, new ItemStack(ComponentListMF.ornate_items)));
             }
             return;
@@ -209,20 +188,6 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             recipe.setIngredientPermutation(recipe.ingredients, ingredient);
             arecipes.add(recipe);
         }
-    }
-
-    private ItemStack getSpecialCatalyst(GridRecipe recipe, ItemStack requestedOutput) {
-        String design = CustomToolHelper.getCustomStyle(requestedOutput);
-        if (!"ornate".equals(design)) {
-            return null;
-        }
-        if (recipe == null || !NEIHelper.isValidStack(recipe.getRecipeOutput())) {
-            return null;
-        }
-        if (SpecialForging.getSpecialCraft(design, recipe.getRecipeOutput()) == null) {
-            return null;
-        }
-        return new ItemStack(ComponentListMF.ornate_items);
     }
 
     // TODO: Implement wood permutations, add additional helper method for custom material support in crafting and usage
@@ -248,7 +213,7 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             toolType = recipe.getToolType();
             toolTier = recipe.getRecipeHammer();
             anvilTier = recipe.getAnvil();
-            if (inputStack != null && recipe.isShaped()) {
+            if (inputStack != null) {
                 this.inputStack = inputStack.copy();
                 this.inputStack.stackSize = recipe.getRecipeOutput().stackSize;
             } else {

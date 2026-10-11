@@ -191,4 +191,27 @@ public class GridBuilderScriptTest {
             }
         });
     }
+
+    /** The old positional calls still work and warn once per load; the builder does not warn. */
+    @GameTest
+    public static void oldCallsWarnOnce(GameTestHelper helper) throws Exception {
+        Scripts.around(helper, () -> {
+            java.util.List<String> warned = Scripts.warnings(
+                    "mods.minefantasy.Anvil.addShapeless(\"old_a\", <minecraft:diamond>, \"artisanry\", \"\", false,"
+                            + " \"hammer\", 0, 0, 10, [<minecraft:stick>]);",
+                    "mods.minefantasy.Anvil.addShapeless(\"old_b\", <minecraft:emerald>, \"artisanry\", \"\", false,"
+                            + " \"hammer\", 0, 0, 10, [<minecraft:bone>]);");
+            int deprecated = 0;
+            for (String line : warned) {
+                if (line.contains("Anvil.addShapeless is deprecated")) deprecated++;
+            }
+            assertEquals(1, deprecated);
+            assertNotNull(added(MFRecipes.ANVIL, "crafttweaker:anvil/old_b"));
+            for (String line : Scripts.warnings(
+                    "mods.minefantasy.Anvil.shapeless(\"new_a\", <minecraft:diamond>).ingredients([<minecraft:stick>])"
+                            + ".tool(\"hammer\", 0).time(10).register();")) {
+                assertFalse(line, line.contains("deprecated"));
+            }
+        });
+    }
 }

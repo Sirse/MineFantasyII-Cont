@@ -5,6 +5,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.integration.minetweaker.helpers.GridBuilder;
+import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
 import minetweaker.api.item.IIngredient;
 import minetweaker.api.item.IItemStack;
 import stanhebben.zenscript.annotations.NotNull;
@@ -35,6 +36,7 @@ public class KitchenBench {
     @ZenMethod
     public static void addShaped(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, String tool, int time, float dirtyAmount, IIngredient[][] ingreds, @Optional int priority) {
+        ScriptWarnings.deprecated("KitchenBench.addShaped", "KitchenBench.shaped(name, output)...register()");
         dirt(shaped(name, output).cells(ingreds), dirtyAmount).skill(skill).research(research).sound(sound)
                 .tool(tool, -1).time(time).priority(priority).register();
     }
@@ -42,6 +44,7 @@ public class KitchenBench {
     @ZenMethod
     public static void addShapeless(@NotNull String name, @NotNull IItemStack output, String skill, String research,
             String sound, String tool, int time, float dirtyAmount, IIngredient[] ingreds, @Optional int priority) {
+        ScriptWarnings.deprecated("KitchenBench.addShapeless", "KitchenBench.shapeless(name, output)...register()");
         dirt(shapeless(name, output).ingredients(ingreds), dirtyAmount).skill(skill).research(research).sound(sound)
                 .tool(tool, -1).time(time).priority(priority).register();
     }

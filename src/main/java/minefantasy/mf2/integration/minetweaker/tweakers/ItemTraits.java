@@ -44,15 +44,16 @@ public class ItemTraits {
     private ItemTraits() {}
 
     @ZenMethod
-    public static void armour(IItemStack stack, String design, @Optional float weight, @Optional String group) {
+    public static void armour(IItemStack stack, String design) {
+        armour(stack, design, 1F, null);
+    }
+
+    @ZenMethod
+    public static void armour(IItemStack stack, String design, float weight, @Optional String group) {
         String line = "ItemTraits.armour(" + stack + ", \"" + design + "\", ...)";
         Item item = item(line, stack);
         if (item != null) {
-            build(
-                    line,
-                    CustomArmourEntry.entries,
-                    item,
-                    () -> ItemTraitRules.armour(item, design, weight == 0F ? 1F : weight, group));
+            build(line, CustomArmourEntry.entries, item, () -> ItemTraitRules.armour(item, design, weight, group));
         }
     }
 

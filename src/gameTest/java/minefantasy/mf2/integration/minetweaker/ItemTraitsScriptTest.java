@@ -55,6 +55,33 @@ public class ItemTraitsScriptTest {
     }
 
     @GameTest
+    public static void armourOverloadsDistinguishOmittedWeightFromZero(GameTestHelper helper) throws Exception {
+        float before = ArmourCalculator.getPieceWeight(HELMET, 0);
+        Scripts.around(helper, () -> {
+            assertEquals(
+                    0,
+                    Scripts.run(
+                            "mods.minefantasy.ItemTraits.armour(<minecraft:leather_helmet>, \"plate\", 0.5, \"light\");")
+                            .size());
+            assertEquals(
+                    ArmourDesign.PLATE.getWeight() * ArmourCalculator.sizes[0] * 0.5F,
+                    ArmourCalculator.getPieceWeight(HELMET, 0),
+                    0.001F);
+            assertEquals("light", ArmourCalculator.getArmourClass(HELMET));
+            assertEquals(
+                    0,
+                    Scripts.run("mods.minefantasy.ItemTraits.armour(<minecraft:leather_helmet>, \"plate\", 0.5);")
+                            .size());
+            assertEquals(ArmourDesign.PLATE.getGroup(), ArmourCalculator.getArmourClass(HELMET));
+            assertFalse(
+                    Scripts.run(
+                            "mods.minefantasy.ItemTraits.armour(<minecraft:leather_helmet>, \"plate\", 0, \"light\");")
+                            .isEmpty());
+            assertEquals(before, ArmourCalculator.getPieceWeight(HELMET, 0), 0.001F);
+        });
+    }
+
+    @GameTest
     public static void aScriptMakesAToolAWeaponAndAHoe(GameTestHelper helper) throws Exception {
         Scripts.around(helper, () -> {
             assertEquals(

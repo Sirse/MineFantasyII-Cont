@@ -1,5 +1,8 @@
 package minefantasy.mf2.integration.minetweaker.helpers;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -12,7 +15,22 @@ import minetweaker.api.minecraft.MineTweakerMC;
 /** Warnings for script ingredients that do not mean what they look like, logged while the script loads. */
 public final class ScriptWarnings {
 
+    /** The old calls already warned about since the last reload: one warning each, not one per recipe. */
+    private static final Set<String> DEPRECATED = new HashSet<String>();
+
     private ScriptWarnings() {}
+
+    /** An old positional call still kept for existing scripts, once per load. */
+    public static void deprecated(String api, String instead) {
+        if (DEPRECATED.add(api)) {
+            MineTweakerAPI.logWarning(api + " is deprecated and will be removed: use " + instead + " instead");
+        }
+    }
+
+    /** Warns about the old calls again after a reload. */
+    public static void resetDeprecated() {
+        DEPRECATED.clear();
+    }
 
     /**
      * An input given with {@code withTag}: CraftTweaker matches it by item alone, so the tag does not restrict the

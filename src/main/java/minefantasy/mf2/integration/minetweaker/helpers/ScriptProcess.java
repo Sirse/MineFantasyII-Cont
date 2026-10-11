@@ -34,6 +34,22 @@ public final class ScriptProcess {
                 tx -> tx.replace(registry, recipeId, recipe.get(), priority));
     }
 
+    public static void replaceAccepting(RecipeRegistry<ProcessRecipe> registry, IItemStack input,
+            Supplier<ProcessRecipe> recipe, int priority, int expected) {
+        ProcessRecipe[] built = new ProcessRecipe[1];
+        ScriptRecipes.replaceWhere(
+                registry,
+                "taking " + input,
+                entry -> TweakedIngredients.takes(entry.getRecipe().getInput(), input),
+                expected,
+                (tx, id) -> {
+                    if (built[0] == null) {
+                        built[0] = recipe.get();
+                    }
+                    tx.replace(registry, id, built[0], priority);
+                });
+    }
+
     public static void remove(RecipeRegistry<ProcessRecipe> registry, String id) {
         RecipeId recipeId = ScriptRecipes.parseId(registry.getStation(), id);
         ScriptRecipes.apply(
