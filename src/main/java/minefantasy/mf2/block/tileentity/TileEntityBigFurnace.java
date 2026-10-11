@@ -192,12 +192,16 @@ public class TileEntityBigFurnace extends TileEntityStation
         }
         TileEntityBigFurnace heater = getHeater();
 
+        float ambient = getAmbientTemperature();
         if (heater != null) {
-            heat = heater.heat;
+            // The heater's heat above its own air: the air up here is a little cooler, and a cold heater must not
+            // smelt by that difference alone
+            heat = ambient + heater.heat - heater.getAmbientTemperature();
         } else {
-            heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 4F);
+            heat = AmbientTemperature.approach(heat, ambient, 4F);
         }
-        if (heat <= getAmbientTemperature()) {
+        int warmth = (int) (heat - ambient);
+        if (warmth <= 0) {
             progress = 0;
             return;
         }
@@ -232,9 +236,8 @@ public class TileEntityBigFurnace extends TileEntityStation
         }
 
         if (canSmelt) {
-            // Whole degrees only: heat is clamped to zero or above, so this drops the same fraction the compound
-            // assignment used to drop silently, and says so.
-            progress += (int) heat;
+            // Whole degrees above the air, as heat counted from zero before ambient temperature
+            progress += warmth;
         }
         if (!canSmelt || smelted) {
             progress = 0;

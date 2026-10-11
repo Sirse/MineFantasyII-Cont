@@ -51,7 +51,12 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         if (fuel > 0) {
             --fuel;
         }
-        if (isBuilt && smokeStorage < getMaxSmokeStorage()) {
+        // Fuel is lit and progress made only while a chamber has something to smelt; without either it starts over
+        boolean work = isBuilt && !worldObj.isRemote && hasWork();
+        if (!worldObj.isRemote && (!work || fuel <= 0 && !isFuel(items[0]))) {
+            progress = 0;
+        }
+        if (work && smokeStorage < getMaxSmokeStorage()) {
             if (fuel > 0) {
                 ++progress;
                 float maxProgress = getMaxProgress();
@@ -79,6 +84,24 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
         if (!worldObj.isRemote && wasBurning != isBurning()) {
             BlockBFH.updateFurnaceBlockState(isBurning(), this.worldObj, this.xCoord, this.yCoord, this.zCoord);
         }
+    }
+
+    /** Whether some chamber above has an input it would smelt, with carbon for it. */
+    private boolean hasWork() {
+        for (int y = 0; y < maxFurnaceHeight; y++) {
+            TileEntity tileEntity = worldObj.getTileEntity(xCoord, yCoord + y + 1, zCoord);
+            if (!(tileEntity instanceof TileEntityBlastFC) || tileEntity instanceof TileEntityBlastFH) {
+                return false;
+            }
+            TileEntityBlastFC shaft = (TileEntityBlastFC) tileEntity;
+            ItemStack input = shaft.getStackInSlot(1);
+            if (shaft.getIsBuilt() && input != null
+                    && (shaft.tempUses > 0 || isCarbon(shaft.getStackInSlot(0)))
+                    && MFRecipes.find(MFRecipes.BLAST_FURNACE, input) != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private float getMaxProgress() {
