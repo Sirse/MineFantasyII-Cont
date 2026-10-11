@@ -44,6 +44,7 @@ public class NEIConfig implements IConfigureNEI {
 
     @Override
     public void loadConfig() {
+        hideInternalItems();
         if (ConfigIntegration.neiIntegration) {
             RecipeHandlerCarpenter handlerCarpenter = new RecipeHandlerCarpenter();
             API.registerRecipeHandler(handlerCarpenter);
@@ -135,6 +136,18 @@ public class NEIConfig implements IConfigureNEI {
 
             registerHandlerInfos(new NEIRegisterHandlerInfosEvent());
         }
+    }
+
+    /** NEI may enumerate registered items even when their creative sub-item list is empty. */
+    private static void hideInternalItems() {
+        hideBlock(BlockListMF.WG_Mark);
+        hideBlock(BlockListMF.components);
+        hideBlock(BlockListMF.forge_active);
+        hideBlock(BlockListMF.forge_metal_active);
+    }
+
+    private static void hideBlock(Block block) {
+        API.hideItem(new ItemStack(block, 1, net.minecraftforge.oredict.OreDictionary.WILDCARD_VALUE));
     }
 
     /**
