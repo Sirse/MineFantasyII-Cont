@@ -4,6 +4,7 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeMetadata;
+import minefantasy.mf2.integration.minetweaker.helpers.RecipeBuilderState;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
@@ -57,16 +58,14 @@ public class Quern {
     @ZenClass("mods.minefantasy.QuernRecipeBuilder")
     public static final class Builder {
 
-        private final String name;
         private final IItemStack output;
         private final IIngredient input;
-        private int priority;
-        private boolean registered;
+        private final RecipeBuilderState state;
         private int tier;
         private boolean consumePot;
 
         private Builder(String name, IItemStack output, IIngredient input) {
-            this.name = name;
+            this.state = new RecipeBuilderState(name);
             this.output = output;
             this.input = input;
         }
@@ -85,31 +84,28 @@ public class Quern {
 
         @ZenMethod
         public Builder priority(int priority) {
-            this.priority = priority;
+            state.priority(priority);
             return this;
         }
 
         private ProcessRecipe build() {
-            if (registered) {
-                throw new IllegalArgumentException("builder is already registered");
-            }
-            registered = true;
+            state.claim();
             return Quern.recipe(output, input, tier, consumePot);
         }
 
         @ZenMethod
         public void register() {
-            ScriptProcess.add(MFRecipes.QUERN, name, this::build, priority);
+            state.register(MFRecipes.QUERN, this::build);
         }
 
         @ZenMethod
         public void replace(String id) {
-            ScriptProcess.replace(MFRecipes.QUERN, id, this::build, priority);
+            state.replace(MFRecipes.QUERN, id, this::build);
         }
 
         @ZenMethod
         public void replaceAccepting(IItemStack stack, @Optional int expected) {
-            ScriptProcess.replaceAccepting(MFRecipes.QUERN, stack, this::build, priority, expected);
+            state.replaceAccepting(MFRecipes.QUERN, stack, this::build, expected);
         }
     }
 

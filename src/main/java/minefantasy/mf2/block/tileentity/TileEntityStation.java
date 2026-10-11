@@ -1,8 +1,14 @@
 package minefantasy.mf2.block.tileentity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
+
+import minefantasy.mf2.api.recipe.CraftPlan;
 
 /**
  * A station with an inventory. The station keeps its slots in an array of its own and names it through
@@ -11,6 +17,22 @@ import net.minecraft.item.ItemStack;
  * its {@link Role}.
  */
 public abstract class TileEntityStation extends TileEntityShown implements ISidedInventory {
+
+    /** Pays a grid project while suppressing recipe resets caused by the payment itself. */
+    protected final boolean payGrid(CraftPlan project, Consumer<Boolean> suppressReset) {
+        if (project == null) return false;
+        List<ItemStack> spill = new ArrayList<>();
+        boolean paid;
+        suppressReset.accept(true);
+        try {
+            paid = GridProject.pay(project, this, spill);
+        } finally {
+            suppressReset.accept(false);
+        }
+        for (ItemStack stack : spill) InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
+        onInventoryChanged();
+        return paid;
+    }
 
     /** What a slot is for, as far as hoppers and other automation are concerned. */
     public enum Role {

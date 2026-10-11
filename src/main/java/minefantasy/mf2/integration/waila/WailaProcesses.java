@@ -167,10 +167,11 @@ final class WailaProcesses {
         progress(data, roast.progress, roast.maxProgress);
         data.setBoolean("Ready", burnStage);
         data.setBoolean("BurnProgress", burnStage);
+        CookRecipe.HeatState heatState = recipe.heatState(heat, TileEntityRoast.enableOverheat);
         if (burnStage) reason(data, CheckResult.Reason.of("burning_food"));
-        else if (heat <= recipe.getMinTemperature())
+        else if (heatState == CookRecipe.HeatState.TOO_COLD)
             reason(data, CheckResult.Reason.temperature(heat, recipe.getMinTemperature() + 1));
-        else if (TileEntityRoast.enableOverheat && recipe.canBurn() && heat > recipe.getMaxTemperature()) {
+        else if (heatState == CookRecipe.HeatState.OVERHEATED) {
             reason(data, CheckResult.Reason.of("overheat"));
         }
     }

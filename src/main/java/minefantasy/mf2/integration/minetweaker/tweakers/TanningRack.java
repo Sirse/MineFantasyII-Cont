@@ -4,6 +4,7 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeMetadata;
+import minefantasy.mf2.integration.minetweaker.helpers.RecipeBuilderState;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
@@ -57,17 +58,15 @@ public class TanningRack {
     @ZenClass("mods.minefantasy.TanningRackRecipeBuilder")
     public static final class Builder {
 
-        private final String name;
         private final IItemStack output;
         private final IIngredient input;
-        private int priority;
-        private boolean registered;
+        private final RecipeBuilderState state;
         private Float time;
         private int tier;
         private String tool = "knife";
 
         private Builder(String name, IItemStack output, IIngredient input) {
-            this.name = name;
+            this.state = new RecipeBuilderState(name);
             this.output = output;
             this.input = input;
         }
@@ -87,15 +86,12 @@ public class TanningRack {
 
         @ZenMethod
         public Builder priority(int priority) {
-            this.priority = priority;
+            state.priority(priority);
             return this;
         }
 
         private ProcessRecipe build() {
-            if (registered) {
-                throw new IllegalArgumentException("builder is already registered");
-            }
-            registered = true;
+            state.claim();
             if (time == null) {
                 throw new IllegalArgumentException("give time(work)");
             }
@@ -104,17 +100,17 @@ public class TanningRack {
 
         @ZenMethod
         public void register() {
-            ScriptProcess.add(MFRecipes.TANNING, name, this::build, priority);
+            state.register(MFRecipes.TANNING, this::build);
         }
 
         @ZenMethod
         public void replace(String id) {
-            ScriptProcess.replace(MFRecipes.TANNING, id, this::build, priority);
+            state.replace(MFRecipes.TANNING, id, this::build);
         }
 
         @ZenMethod
         public void replaceAccepting(IItemStack stack, @Optional int expected) {
-            ScriptProcess.replaceAccepting(MFRecipes.TANNING, stack, this::build, priority, expected);
+            state.replaceAccepting(MFRecipes.TANNING, stack, this::build, expected);
         }
     }
 

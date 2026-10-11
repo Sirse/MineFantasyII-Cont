@@ -302,6 +302,14 @@ public class WailaProcessingTest {
             NBTTagCompound data = inspect(spit, player);
             assertSame(flour, ItemStack.loadItemStackFromNBT(data.getCompoundTag("Item")).getItem());
             assertEquals("overheat", data.getString("Reason"));
+            boolean overheat = TileEntityRoast.enableOverheat;
+            try {
+                TileEntityRoast.enableOverheat = false;
+                assertFalse(inspect(spit, player).hasKey("Reason"));
+            } finally {
+                TileEntityRoast.enableOverheat = overheat;
+            }
+
             fire.setLit(false);
             assertEquals("temperature", inspect(spit, player).getString("Reason"));
             spit.setInventorySlotContents(0, new ItemStack(flour));

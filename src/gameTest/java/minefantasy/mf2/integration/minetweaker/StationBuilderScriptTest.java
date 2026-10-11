@@ -30,11 +30,34 @@ public class StationBuilderScriptTest {
         Scripts.around(helper, () -> {
             List<String> errors = Scripts.run(
                     "mods.minefantasy.Cooking.recipe(\"built_bread\", <minecraft:bread>, <minecraft:wheat> * 3).heat(150, 250).time(60).burnsAfter(20).oven().priority(7).register();",
-                    "mods.minefantasy.Quern.recipe(\"built_dust\", <minecraft:redstone>, <minecraft:stick>).tier(2).consumePot().register();",
-                    "mods.minefantasy.TanningRack.recipe(\"built_leather\", <minecraft:leather>, <minecraft:rotten_flesh> * 4).time(2.0).tool(\"shears\", 1).register();",
-                    "mods.minefantasy.Crucible.recipe(\"built_alloy\", <minecraft:diamond>, [<minecraft:iron_ingot>]).tier(1).ratio(2).register();",
-                    "mods.minefantasy.PaintOil.recipe(\"built_paint\", <minecraft:stone>, <minecraft:cobblestone>).register();");
+                    "mods.minefantasy.Quern.recipe(\"built_dust\", <minecraft:redstone>, <minecraft:stick>).tier(2).consumePot().priority(7).register();",
+                    "mods.minefantasy.TanningRack.recipe(\"built_leather\", <minecraft:leather>, <minecraft:rotten_flesh> * 4).time(2.0).tool(\"shears\", 1).priority(7).register();",
+                    "mods.minefantasy.Crucible.recipe(\"built_alloy\", <minecraft:diamond>, [<minecraft:iron_ingot>]).tier(1).ratio(2).priority(7).register();",
+                    "mods.minefantasy.PaintOil.recipe(\"built_paint\", <minecraft:stone>, <minecraft:cobblestone>).priority(7).register();");
             assertTrue("builder scripts failed: " + errors, errors.isEmpty());
+            assertEquals(
+                    7,
+                    MFRecipes.COOKING.published().get(RecipeId.parse("crafttweaker:cooking/built_bread"))
+                            .getPriority());
+            assertEquals(
+                    7,
+                    MFRecipes.COOKING.published().get(RecipeId.parse("crafttweaker:cooking/built_bread_burnt"))
+                            .getPriority());
+            assertEquals(
+                    7,
+                    MFRecipes.QUERN.published().get(RecipeId.parse("crafttweaker:quern/built_dust")).getPriority());
+            assertEquals(
+                    7,
+                    MFRecipes.TANNING.published().get(RecipeId.parse("crafttweaker:tanning/built_leather"))
+                            .getPriority());
+            assertEquals(
+                    7,
+                    MFRecipes.ALLOY.published().get(RecipeId.parse("crafttweaker:alloy/built_alloy_x2")).getPriority());
+            assertEquals(
+                    7,
+                    MFRecipes.PAINT_OIL.published().get(RecipeId.parse("crafttweaker:paint_oil/built_paint"))
+                            .getPriority());
+
             CookRecipe cooking = MFRecipes.COOKING.published().get(RecipeId.parse("crafttweaker:cooking/built_bread"))
                     .getRecipe();
             assertEquals(150, cooking.getMinTemperature());

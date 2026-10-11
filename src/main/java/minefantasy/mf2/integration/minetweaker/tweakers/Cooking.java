@@ -4,6 +4,7 @@ import minefantasy.mf2.api.cooking.CookRecipe;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeTransaction;
+import minefantasy.mf2.integration.minetweaker.helpers.RecipeBuilderState;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
@@ -114,11 +115,11 @@ public class Cooking {
         private Integer burnTime;
         private boolean oven;
         private boolean canBurn = true;
-        private int priority;
-        private boolean registered;
+        private final RecipeBuilderState state;
 
         private Builder(String name, IItemStack output, IIngredient input) {
             this.name = name;
+            this.state = new RecipeBuilderState(name);
             this.output = output;
             this.input = input;
         }
@@ -157,15 +158,12 @@ public class Cooking {
 
         @ZenMethod
         public Builder priority(int priority) {
-            this.priority = priority;
+            state.priority(priority);
             return this;
         }
 
         private CookRecipe build() {
-            if (registered) {
-                throw new IllegalArgumentException("builder is already registered");
-            }
-            registered = true;
+            state.claim();
             if (min == null || time == null) {
                 throw new IllegalArgumentException("give heat(min, max) and time(ticks)");
             }
@@ -175,14 +173,15 @@ public class Cooking {
         @ZenMethod
         public void register() {
             RecipeId id = ScriptRecipes.scriptId(STATION, name);
-            ScriptRecipes.apply("Adding cooking recipe " + id, tx -> build().addTo(tx, id, priority));
+            ScriptRecipes.apply("Adding cooking recipe " + id, tx -> build().addTo(tx, id, state.priority()));
         }
 
         @ZenMethod
         public void replace(String id) {
             RecipeId recipeId = ScriptRecipes.parseId(STATION, id);
-            ScriptRecipes
-                    .apply("Replacing cooking recipe " + recipeId, tx -> replaceIn(tx, recipeId, build(), priority));
+            ScriptRecipes.apply(
+                    "Replacing cooking recipe " + recipeId,
+                    tx -> replaceIn(tx, recipeId, build(), state.priority()));
         }
 
         @ZenMethod
@@ -198,7 +197,7 @@ public class Cooking {
                         if (built[0] == null) {
                             built[0] = build();
                         }
-                        replaceIn(tx, id, built[0], priority);
+                        replaceIn(tx, id, built[0], state.priority());
                     });
         }
     }

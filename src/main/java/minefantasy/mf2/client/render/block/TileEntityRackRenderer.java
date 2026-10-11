@@ -216,33 +216,7 @@ public class TileEntityRackRenderer extends TileEntitySpecialRenderer {
         ItemRenderer.renderItemIn2D(tessellator, f1, f2, f, f3, icon.getIconWidth(), icon.getIconHeight(), 0.0625F);
 
         if (itemstack.hasEffect(layer)) {
-            GL11.glDepthFunc(GL11.GL_EQUAL);
-            GL11.glDisable(GL11.GL_LIGHTING);
-            texturemanager.bindTexture(TextureHelperMF.ITEM_GLINT);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_COLOR, GL11.GL_ONE);
-            float f7 = 0.76F;
-            GL11.glColor4f(0.5F * f7, 0.25F * f7, 0.8F * f7, 1.0F);
-            GL11.glMatrixMode(GL11.GL_TEXTURE);
-            GL11.glPushMatrix();
-            float f8 = 0.125F;
-            GL11.glScalef(f8, f8, f8);
-            float f9 = Minecraft.getSystemTime() % 3000L / 3000.0F * 8.0F;
-            GL11.glTranslatef(f9, 0.0F, 0.0F);
-            GL11.glRotatef(-50.0F, 0.0F, 0.0F, 1.0F);
-            ItemRenderer.renderItemIn2D(tessellator, 0.0F, 0.0F, 1.0F, 1.0F, 256, 256, 0.0625F);
-            GL11.glPopMatrix();
-            GL11.glPushMatrix();
-            GL11.glScalef(f8, f8, f8);
-            f9 = Minecraft.getSystemTime() % 4873L / 4873.0F * 8.0F;
-            GL11.glTranslatef(-f9, 0.0F, 0.0F);
-            GL11.glRotatef(10.0F, 0.0F, 0.0F, 1.0F);
-            ItemRenderer.renderItemIn2D(tessellator, 0.0F, 0.0F, 1.0F, 1.0F, 256, 256, 0.0625F);
-            GL11.glPopMatrix();
-            GL11.glMatrixMode(GL11.GL_MODELVIEW);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glEnable(GL11.GL_LIGHTING);
-            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            TextureHelperMF.renderEnchantmentEffects(tessellator);
         }
 
         GL11.glDisable(GL12.GL_RESCALE_NORMAL);

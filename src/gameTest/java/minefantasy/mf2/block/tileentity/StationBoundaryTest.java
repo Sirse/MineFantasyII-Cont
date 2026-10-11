@@ -551,6 +551,35 @@ public class StationBoundaryTest {
     }
 
     @GameTest
+    public static void cookingHeatBoundariesAndDisabledOverheatPreserveFood(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        boolean overheat = TileEntityRoast.enableOverheat;
+        try {
+            TileEntityRoast.enableOverheat = true;
+            cookingRecipe(new ItemStack(flour), 100);
+            TileEntityRoast roast = spit();
+            cook(roast, 100);
+            assertEquals(0F, roast.progress, 0F);
+            cook(roast, 101);
+            assertEquals(1.01F, roast.progress, 0.001F);
+            cook(roast, 500);
+            assertSame(seed, roast.getStackInSlot(0).getItem());
+            assertEquals(6.01F, roast.progress, 0.001F);
+            TileEntityRoast.enableOverheat = false;
+            cook(roast, 501);
+            assertSame(seed, roast.getStackInSlot(0).getItem());
+            assertEquals(11.02F, roast.progress, 0.001F);
+            TileEntityRoast.enableOverheat = true;
+            cook(roast, 501);
+            assertSame(junk, roast.getStackInSlot(0).getItem());
+        } finally {
+            TileEntityRoast.enableOverheat = overheat;
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    @GameTest
     public static void hotSpitWithNothingToCookStaysIdle(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {

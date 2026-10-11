@@ -10,6 +10,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.api.refine.AlloyRecipes;
+import minefantasy.mf2.integration.minetweaker.helpers.RecipeBuilderState;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
@@ -84,11 +85,11 @@ public class Crucible {
         private final IIngredient[] ingredients;
         private int tier;
         private int ratio = 1;
-        private int priority;
-        private boolean registered;
+        private final RecipeBuilderState state;
 
         private Builder(String name, IItemStack output, IIngredient[] ingredients) {
             this.name = name;
+            this.state = new RecipeBuilderState(name);
             this.output = output;
             this.ingredients = ingredients;
         }
@@ -107,21 +108,21 @@ public class Crucible {
 
         @ZenMethod
         public Builder priority(int priority) {
-            this.priority = priority;
+            state.priority(priority);
             return this;
         }
 
         @ZenMethod
         public void register() {
-            String problem = registered ? "builder is already registered"
+            String problem = state.registrationProblem() != null ? state.registrationProblem()
                     : ratio < 1 ? "ratio must be at least 1" : ingredients == null ? "give ingredients" : null;
             if (problem != null) {
                 minetweaker.MineTweakerAPI
                         .logError("Crucible.recipe(" + name + "): " + problem + ". " + ScriptRecipes.NOTHING_CHANGED);
                 return;
             }
-            registered = true;
-            addRecipe(name, output, tier, ratio, ingredients, priority);
+            state.claim();
+            addRecipe(name, output, tier, ratio, ingredients, state.priority());
         }
     }
 

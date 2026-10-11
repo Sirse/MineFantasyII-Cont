@@ -69,8 +69,11 @@ public abstract class GuiCraftBench extends GuiStation {
             GuiHelper.renderGhostResult(this, bench.getShownResult());
         }
         String name = bench.getResultName();
-        String title = MineFantasyII.isDebug() ? benchTool
-                : knows ? name.startsWith("gui.") ? StatCollector.translateToLocal(name) : name : "????";
+        String title = knows ? name.startsWith("gui.") ? StatCollector.translateToLocal(name) : name : "????";
+        if (MineFantasyII.isDebug()) {
+            // Debug adds the bench's tool id; it never hides the name
+            title += " [" + benchTool + "]";
+        }
         fontRendererObj.drawString(title, 10 + inset, 8, 0);
         if (!showsProject()) {
             return;

@@ -145,10 +145,11 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
             return;
         }
         CookRecipe current = found.recipe;
-        if (temp <= current.getMinTemperature()) {
+        CookRecipe.HeatState heatState = current.heatState(temp, enableOverheat);
+        if (heatState == CookRecipe.HeatState.TOO_COLD) {
             return;
         }
-        if (enableOverheat && current.canBurn() && temp > current.getMaxTemperature()) {
+        if (heatState == CookRecipe.HeatState.OVERHEATED) {
             finish(plan(found, true));
             return;
         }

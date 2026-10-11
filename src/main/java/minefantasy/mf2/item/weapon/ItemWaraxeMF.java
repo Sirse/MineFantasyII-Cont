@@ -3,15 +3,11 @@ package minefantasy.mf2.item.weapon;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 
 import minefantasy.mf2.api.helpers.Cooldowns;
-import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.weapon.WeaponClass;
 import minefantasy.mf2.mechanics.EventManagerMF;
 
@@ -33,78 +29,18 @@ public class ItemWaraxeMF extends ItemWeaponMF {
     }
 
     public static void brutalise(EntityLivingBase entityHitting, EntityLivingBase entityHit, float power) {
-        if (!entityHit.worldObj.isRemote) {
-            if (entityHitting instanceof EntityPlayer) {
-                ((EntityPlayer) entityHitting).onCriticalHit(entityHit);
-            }
-        }
+        AxeCombat.brutalise(entityHitting, entityHit, power);
     }
 
     @Override
     public float modifyDamage(ItemStack item, EntityLivingBase wielder, Entity hit, float initialDam,
             boolean properHit) {
-        float damage = super.modifyDamage(item, wielder, hit, initialDam, properHit);
-        if (!(hit instanceof EntityLivingBase)) {
-            return damage;
-        }
-        EntityLivingBase target = (EntityLivingBase) hit;
-
-        if (wielder.isSprinting()) {
-            if (wielder.fallDistance > 0 && canLunge(wielder)
-                    && tryPerformAbility(wielder, lunge_cost, !properHit, true, true, true))// LUNGE: 20 Points
-            {
-                return chargeAt(wielder, target, true, damage, properHit);
-            } else if (wielder.onGround && getHeightGap(target, wielder) <= 0.5F
-                    && tryPerformAbility(wielder, charge_cost))// CHARGE: 10 points
-            {
-                return chargeAt(wielder, target, false, damage, properHit);
-            }
-        } else if (wielder.fallDistance > 0 && !wielder.isOnLadder() && tryPerformAbility(wielder, jump_cost))// JUMP: 2
-        // points
-        {
-            if (properHit) brutalise(wielder, target, 1.0F);
-            return damage * 1.25F;
-        }
-        return damage;
-    }
-
-    private float chargeAt(EntityLivingBase entityHitting, EntityLivingBase entityHit, boolean lunge, float dam,
-            boolean properHit) {
-        if (properHit) brutalise(entityHitting, entityHit, 1.0F);
-
-        if (lunge) {
-            float fallBonus = (Math.min(entityHitting.fallDistance, getMeleeDamage(entityHitting.getHeldItem()))) / 2F;
-            if (entityHit.onGround && !properHit) {
-                entityHitting.hurtResistantTime = 20;
-                TacticalManager.knockbackEntity(entityHit, entityHitting, 4F, 0.5F);
-                TacticalManager.lungeEntity(entityHitting, entityHit, 2F, 0.1F);
-            }
-            if (properHit) {
-                if (!entityHit.isPotionActive(Potion.moveSlowdown.id)) {
-                    entityHit.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 400, 3));
-                    entityHit.addPotionEffect(new PotionEffect(Potion.confusion.id, 200, 1));
-                }
-
-                entityHitting.fallDistance -= fallBonus;
-            }
-            if (fallBonus > 0) {
-                dam += fallBonus;
-            }
-        } else {
-            if (properHit) {
-                if (entityHitting.onGround && entityHit.onGround && !properHit) {
-                    entityHitting.hurtResistantTime = 20;
-                    TacticalManager.lungeEntity(entityHitting, entityHit, 1F, 0.0F);
-                }
-                if (properHit) {
-                    if (!entityHit.isPotionActive(Potion.moveSlowdown.id)) {
-                        entityHit.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 200, 3));
-                        entityHit.addPotionEffect(new PotionEffect(Potion.confusion.id, 100, 0));
-                    }
-                }
-            }
-        }
-        return dam * 1.25F;
+        return AxeCombat.modifyDamage(
+                this,
+                wielder,
+                hit,
+                super.modifyDamage(item, wielder, hit, initialDam, properHit),
+                properHit);
     }
 
     @Override
@@ -113,18 +49,6 @@ public class ItemWaraxeMF extends ItemWeaponMF {
             Cooldowns.set(hit, EventManagerMF.injuredNBT, 200 + rand.nextInt(600));
         }
         super.onProperHit(user, weapon, hit, dam);
-    }
-
-    /**
-     * Determines if sprint-jump lunges work
-     */
-    private boolean canLunge(EntityLivingBase entityHitting) {
-        return true;
-    }
-
-    private double getHeightGap(EntityLivingBase entityHit, EntityLivingBase entityHitting) {
-        double a = entityHitting.posY - entityHit.posY;
-        return Math.max(a, -a);
     }
 
     @Override

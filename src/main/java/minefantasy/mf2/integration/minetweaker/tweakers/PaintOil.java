@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
+import minefantasy.mf2.integration.minetweaker.helpers.RecipeBuilderState;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptProcess;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptWarnings;
@@ -62,45 +63,40 @@ public class PaintOil {
     @ZenClass("mods.minefantasy.PaintOilRecipeBuilder")
     public static final class Builder {
 
-        private final String name;
         private final IItemStack output;
         private final IItemStack input;
-        private int priority;
-        private boolean registered;
+        private final RecipeBuilderState state;
 
         private Builder(String name, IItemStack output, IItemStack input) {
-            this.name = name;
+            this.state = new RecipeBuilderState(name);
             this.output = output;
             this.input = input;
         }
 
         @ZenMethod
         public Builder priority(int priority) {
-            this.priority = priority;
+            state.priority(priority);
             return this;
         }
 
         private ProcessRecipe build() {
-            if (registered) {
-                throw new IllegalArgumentException("builder is already registered");
-            }
-            registered = true;
+            state.claim();
             return PaintOil.recipe(input, output);
         }
 
         @ZenMethod
         public void register() {
-            ScriptProcess.add(MFRecipes.PAINT_OIL, name, this::build, priority);
+            state.register(MFRecipes.PAINT_OIL, this::build);
         }
 
         @ZenMethod
         public void replace(String id) {
-            ScriptProcess.replace(MFRecipes.PAINT_OIL, id, this::build, priority);
+            state.replace(MFRecipes.PAINT_OIL, id, this::build);
         }
 
         @ZenMethod
         public void replaceAccepting(IItemStack stack, @Optional int expected) {
-            ScriptProcess.replaceAccepting(MFRecipes.PAINT_OIL, stack, this::build, priority, expected);
+            state.replaceAccepting(MFRecipes.PAINT_OIL, stack, this::build, expected);
         }
     }
 

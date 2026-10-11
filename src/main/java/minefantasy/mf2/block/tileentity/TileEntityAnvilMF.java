@@ -344,18 +344,7 @@ public class TileEntityAnvilMF extends TileEntityStation
 
     /** Takes what the project owes from the grid; containers without room are dropped. False on a mismatch. */
     private boolean payGrid() {
-        if (project == null) {
-            return false;
-        }
-        List<ItemStack> spill = new ArrayList<>();
-        resetRecipe = true;
-        boolean paid = GridProject.pay(project, this, spill);
-        resetRecipe = false;
-        for (ItemStack stack : spill) {
-            InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, stack);
-        }
-        this.onInventoryChanged();
-        return paid;
+        return payGrid(project, value -> resetRecipe = value);
     }
 
     private boolean canFitResult(ItemStack result) {

@@ -37,6 +37,19 @@ public final class CookRecipe implements RecipeChecks.Validated {
         RecipeChecks.notNegative("burn time", burnTime);
     }
 
+    public enum HeatState {
+        TOO_COLD,
+        COOKING,
+        OVERHEATED
+    }
+
+    /** Read-only temperature decision shared by cooking and its HUD; minimum is exclusive. */
+    public HeatState heatState(int temperature, boolean overheatEnabled) {
+        if (temperature <= minTemperature) return HeatState.TOO_COLD;
+        if (overheatEnabled && canBurn && temperature > maxTemperature) return HeatState.OVERHEATED;
+        return HeatState.COOKING;
+    }
+
     /** Suffix of the companion recipe that burns the cooked output. */
     public static final String BURNT_SUFFIX = "_burnt";
 
