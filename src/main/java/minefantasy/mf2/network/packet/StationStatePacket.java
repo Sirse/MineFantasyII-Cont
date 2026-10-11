@@ -40,9 +40,9 @@ public class StationStatePacket extends PacketMF {
             return;
         }
         // Locals, not fields: this handler instance is shared by every player through packetList
-        int[] at = NetworkUtils.readCoords(packet);
+        int x = packet.readInt(), y = packet.readInt(), z = packet.readInt();
         NBTTagCompound read = ByteBufUtils.readTag(packet);
-        Shown shown = Tiles.get(player.worldObj, at[0], at[1], at[2], Shown.class);
+        Shown shown = Tiles.get(player.worldObj, x, y, z, Shown.class);
         if (shown != null && read != null) {
             shown.show(read);
         }
@@ -55,7 +55,9 @@ public class StationStatePacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        NetworkUtils.writeCoords(packet, coords[0], coords[1], coords[2]);
+        packet.writeInt(coords[0]);
+        packet.writeInt(coords[1]);
+        packet.writeInt(coords[2]);
         ByteBufUtils.writeTag(packet, state);
     }
 }

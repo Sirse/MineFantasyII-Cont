@@ -1,76 +1,35 @@
 package minefantasy.mf2.network;
 
-import java.lang.reflect.Method;
-
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.api.helpers.Tiles;
-
-/**
- * Here I used code in Railcraft.
- * <p>
- * https://github.com/Railcraft/Railcraft/blob/mc-1.7.10/src/main/java/mods/railcraft/common/util/network/PacketDispatcher.java
- */
 
 public class NetworkUtils {
 
-    private static final Class playerInstanceClass;
-    private static final Method getOrCreateChunkWatcher;
-    private static final Method sendToAllPlayersWatchingChunk;
-
-    static {
-        try {
-            playerInstanceClass = PlayerManager.class.getDeclaredClasses()[0];
-            getOrCreateChunkWatcher = ReflectionHelper.findMethod(
-                    PlayerManager.class,
-                    null,
-                    new String[] { "func_72690_a", "getOrCreateChunkWatcher" },
-                    int.class,
-                    int.class,
-                    boolean.class);
-            sendToAllPlayersWatchingChunk = ReflectionHelper.findMethod(
-                    playerInstanceClass,
-                    null,
-                    new String[] { "func_151251_a", "sendToAllPlayersWatchingChunk" },
-                    Packet.class);
-            getOrCreateChunkWatcher.setAccessible(true);
-            sendToAllPlayersWatchingChunk.setAccessible(true);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     /** Sends to the players watching the chunk; a world that is not a server's (a client, a test) has none. */
-    public static void sendToWatchers(Packet packet, net.minecraft.world.World world, int worldX, int worldZ) {
+    public static void sendToWatchers(Packet packet, World world, int worldX, int worldZ) {
         if (world instanceof WorldServer) {
             sendToWatchers(packet, (WorldServer) world, worldX, worldZ);
         }
     }
 
+    /**
+     * Sends to the players watching the chunk, leaving out those still waiting for the chunk itself: a tile packet
+     * ahead of its chunk would be lost under it. The same players vanilla's own chunk watcher sends to.
+     */
     public static void sendToWatchers(Packet packet, WorldServer world, int worldX, int worldZ) {
-        try {
-            Object playerInstance = getOrCreateChunkWatcher
-                    .invoke(world.getPlayerManager(), worldX >> 4, worldZ >> 4, false);
-            if (playerInstance != null) sendToAllPlayersWatchingChunk.invoke(playerInstance, packet);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        PlayerManager watchers = world.getPlayerManager();
+        for (Object player : world.playerEntities) {
+            if (player instanceof EntityPlayerMP
+                    && watchers.isPlayerWatchingChunk((EntityPlayerMP) player, worldX >> 4, worldZ >> 4)) {
+                ((EntityPlayerMP) player).playerNetServerHandler.sendPacket(packet);
+            }
         }
-    }
-
-    public static void writeCoords(ByteBuf buf, int x, int y, int z) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
-    }
-
-    public static int[] readCoords(ByteBuf buf) {
-        return new int[] { buf.readInt(), buf.readInt(), buf.readInt() };
     }
 
     public static boolean isServer(EntityPlayer player) {
@@ -83,19 +42,5 @@ public class NetworkUtils {
      */
     public static boolean hasPayload(ByteBuf buf, int bytes) {
         return buf != null && buf.readableBytes() >= bytes;
-    }
-
-    public static <T> T getTile(World world, int[] coords, Class<T> clazz) {
-        if (world == null || coords == null || coords.length < 3) return null;
-        if (!world.blockExists(coords[0], coords[1], coords[2])) return null;
-        return Tiles.get(world, coords[0], coords[1], coords[2], clazz);
-    }
-
-    public static boolean isWithinDistanceSq(EntityPlayer player, int[] coords, double maxDistanceSq) {
-        if (player == null || coords == null || coords.length < 3) return false;
-        double dx = player.posX - (coords[0] + 0.5);
-        double dy = player.posY - (coords[1] + 0.5);
-        double dz = player.posZ - (coords[2] + 0.5);
-        return (dx * dx + dy * dy + dz * dz) <= maxDistanceSq;
     }
 }

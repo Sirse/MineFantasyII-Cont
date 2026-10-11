@@ -8,8 +8,6 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
-import minefantasy.mf2.network.NetworkUtils;
-
 public class TileEntityRoad extends TileEntity {
 
     public int[] surface = new int[] { 0, 0 };
@@ -50,7 +48,8 @@ public class TileEntityRoad extends TileEntity {
     public void sendPacketToClients() {
         if (worldObj.isRemote) return;
 
-        NetworkUtils.sendToWatchers(getDescriptionPacket(), worldObj, this.xCoord, this.zCoord);
+        // Vanilla sends the description packet to the chunk's watchers
+        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
     }
 
     public void writeToNBT(NBTTagCompound nbt) {

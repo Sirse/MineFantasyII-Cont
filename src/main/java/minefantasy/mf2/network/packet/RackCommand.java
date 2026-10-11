@@ -52,7 +52,7 @@ public class RackCommand extends PacketMF {
 
         // Distance first, then a loaded-chunk test: World.getTileEntity would otherwise load or even generate the
         // chunk for arbitrary coordinates sent by a modified client
-        if (!NetworkUtils.isWithinDistanceSq(player, new int[] { x, y, z }, 64)) {
+        if (player.getDistanceSq(x + 0.5D, y + 0.5D, z + 0.5D) > 64D) {
             return;
         }
         if (!player.worldObj.blockExists(x, y, z)) {
