@@ -254,6 +254,7 @@ public class ClientProxyMF extends CommonProxyMF {
 
     private void registerRenders() {
         registerEntityRenderer();
+        RenderWoodDecorItem.register();
 
         MinecraftForgeClient.registerItemRenderer(ToolListMF.swordStone, new RenderSword());
         MinecraftForgeClient.registerItemRenderer(ToolListMF.maceStone, new RenderSword());

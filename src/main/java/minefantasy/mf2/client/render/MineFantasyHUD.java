@@ -150,28 +150,38 @@ public class MineFantasyHUD extends Gui {
         TileEntity tile = player.worldObj.getTileEntity(x, y, z);
         if (tile == null) return;
 
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        // HUD textures contain nearly transparent edge pixels. Do not inherit another overlay's alpha state.
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT | GL11.GL_CURRENT_BIT | GL11.GL_TEXTURE_BIT);
+        try {
+            GL11.glEnable(GL11.GL_BLEND);
+            OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
-        if (tile instanceof TileEntityAnvilMF) {
-            renderAnvilMetre(player, (TileEntityAnvilMF) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof TileEntityCarpenterMF) {
-            renderCarpenterMetre(player, (TileEntityCarpenterMF) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof TileEntityKitchenBench) {
-            renderKitchenMetre(player, (TileEntityKitchenBench) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof TileEntityTanningRack) {
-            renderTanningRackMetre(player, (TileEntityTanningRack) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof IBasicMetre) {
-            renderGenericMetre((IBasicMetre) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof IQualityBalance) {
-            renderQualityBalance((IQualityBalance) tile, screenWidth, screenHeight);
-        }
-        if (tile instanceof TileEntityRoad) {
-            renderRoad(player, (TileEntityRoad) tile, screenWidth, screenHeight);
+            if (tile instanceof TileEntityAnvilMF) {
+                renderAnvilMetre(player, (TileEntityAnvilMF) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof TileEntityCarpenterMF) {
+                renderCarpenterMetre(player, (TileEntityCarpenterMF) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof TileEntityKitchenBench) {
+                renderKitchenMetre(player, (TileEntityKitchenBench) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof TileEntityTanningRack) {
+                renderTanningRackMetre(player, (TileEntityTanningRack) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof IBasicMetre) {
+                renderGenericMetre((IBasicMetre) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof IQualityBalance) {
+                renderQualityBalance((IQualityBalance) tile, screenWidth, screenHeight);
+            }
+            if (tile instanceof TileEntityRoad) {
+                renderRoad(player, (TileEntityRoad) tile, screenWidth, screenHeight);
+            }
+        } finally {
+            GL11.glPopAttrib();
         }
     }
 
