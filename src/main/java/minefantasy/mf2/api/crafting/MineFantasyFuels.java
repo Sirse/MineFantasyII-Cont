@@ -36,8 +36,8 @@ public class MineFantasyFuels {
     }
 
     /**
-     * Adds a carbon item for smelting. A stack names its own metadata only; its wildcard ({@code <item:*>}, an Item or
-     * a Block) names every one.
+     * Adds a carbon item for smelting. A stack names its own metadata only, every one with
+     * {@link OreDictionary#WILDCARD_VALUE} ({@code <item:*>}); an Item or a Block names metadata 0.
      *
      * @param input Item Block or ItemStack
      * @param uses
