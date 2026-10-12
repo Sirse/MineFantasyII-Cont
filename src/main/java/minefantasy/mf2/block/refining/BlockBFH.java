@@ -30,7 +30,6 @@ import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 public class BlockBFH extends BlockStation<TileEntityBlastFH> {
 
-    private static boolean keepInventory;
     public IIcon bottomTex;
     public IIcon sideTex;
     public boolean isActive;
@@ -48,23 +47,7 @@ public class BlockBFH extends BlockStation<TileEntityBlastFH> {
     }
 
     public static void updateFurnaceBlockState(boolean state, World world, int x, int y, int z) {
-        int l = world.getBlockMetadata(x, y, z);
-        TileEntity tileentity = world.getTileEntity(x, y, z);
-        keepInventory = true;
-
-        if (state) {
-            world.setBlock(x, y, z, BlockListMF.blast_heater_active);
-        } else {
-            world.setBlock(x, y, z, BlockListMF.blast_heater);
-        }
-
-        keepInventory = false;
-        world.setBlockMetadataWithNotify(x, y, z, l, 2);
-
-        if (tileentity != null) {
-            tileentity.validate();
-            world.setTileEntity(x, y, z, tileentity);
-        }
+        swapBlock(world, x, y, z, state ? BlockListMF.blast_heater_active : BlockListMF.blast_heater);
     }
 
     @Override
@@ -152,8 +135,4 @@ public class BlockBFH extends BlockStation<TileEntityBlastFH> {
         return Item.getItemFromBlock(BlockListMF.blast_heater);
     }
 
-    @Override
-    protected boolean keepsContents() {
-        return keepInventory;
-    }
 }

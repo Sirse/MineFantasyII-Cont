@@ -32,7 +32,6 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 
 public class BlockCrucible extends BlockStation<TileEntityCrucible> {
 
-    private static boolean keepInventory;
     public final boolean isActive;
     public int tier;
     public String type;
@@ -58,28 +57,16 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
     }
 
     public static void updateFurnaceBlockState(boolean state, World world, int x, int y, int z) {
-        int l = world.getBlockMetadata(x, y, z);
-        TileEntityCrucible tileentity = stationAt(world, x, y, z);
-        keepInventory = true;
         Block block = world.getBlock(x, y, z);
-
-        if (block instanceof BlockCrucible) {
-            int blocktier = ((BlockCrucible) block).tier;
-            boolean auto = ((BlockCrucible) block).isAuto;
-            if (state) {
-                world.setBlock(x, y, z, getActiveBlock(blocktier, auto));
-            } else {
-                world.setBlock(x, y, z, getInactiveBlock(blocktier, auto));
-            }
-        }
-
-        keepInventory = false;
-        world.setBlockMetadataWithNotify(x, y, z, l, 2);
-
-        if (tileentity != null) {
-            tileentity.validate();
-            world.setTileEntity(x, y, z, tileentity);
-        }
+        if (!(block instanceof BlockCrucible)) return;
+        BlockCrucible crucible = (BlockCrucible) block;
+        swapBlock(
+                world,
+                x,
+                y,
+                z,
+                state ? getActiveBlock(crucible.tier, crucible.isAuto)
+                        : getInactiveBlock(crucible.tier, crucible.isAuto));
     }
 
     private static Block getActiveBlock(int tier, boolean auto) {
@@ -196,11 +183,6 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
     @Override
     public Item getItemDropped(int meta, Random rand, int fort) {
         return Item.getItemFromBlock(getInactiveBlock(tier, isAuto));
-    }
-
-    @Override
-    protected boolean keepsContents() {
-        return keepInventory;
     }
 
     /** With Hardcore Ingots a broken crucible loses what it has already melted. */

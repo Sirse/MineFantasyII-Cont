@@ -2,6 +2,7 @@ package minefantasy.mf2.block.basic;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 import minefantasy.mf2.block.tileentity.InventorySlots;
@@ -16,12 +17,27 @@ public abstract class BlockStation<T extends TileEntityStation> extends BlockTil
         super(material, type);
     }
 
+    /** Set while a station's block is swapped, when breaking it must leave the station be. */
+    private static boolean swapping;
+
     /**
-     * Whether the block is only being swapped for its lit or unlit twin: the station stays, contents and tile alike,
-     * and breaking does nothing.
+     * Swaps a station's block for its lit or unlit twin, keeping its metadata and the station, contents and tile alike.
+     * Does nothing when that block is already there.
      */
-    protected boolean keepsContents() {
-        return false;
+    protected static void swapBlock(World world, int x, int y, int z, Block twin) {
+        if (twin == null || world.getBlock(x, y, z) == twin) return;
+        int meta = world.getBlockMetadata(x, y, z);
+        TileEntity station = world.getTileEntity(x, y, z);
+        swapping = true;
+        try {
+            world.setBlock(x, y, z, twin, meta, 3);
+        } finally {
+            swapping = false;
+        }
+        if (station != null) {
+            station.validate();
+            world.setTileEntity(x, y, z, station);
+        }
     }
 
     /** How many of the station's slots, from the first, are thrown out when it is broken; all by default. */
@@ -31,7 +47,7 @@ public abstract class BlockStation<T extends TileEntityStation> extends BlockTil
 
     @Override
     public void breakBlock(World world, int x, int y, int z, Block block, int meta) {
-        if (keepsContents()) {
+        if (swapping) {
             return;
         }
         T station = getTile(world, x, y, z);

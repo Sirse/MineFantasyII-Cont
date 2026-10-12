@@ -39,7 +39,6 @@ import minefantasy.mf2.knowledge.KnowledgeListMF;
 public class BlockForge extends BlockStation<TileEntityForge> {
 
     public static int forge_RI = 104;
-    private static boolean keepInventory;
     public final boolean isActive;
     public int tier;
     public String type;
@@ -65,27 +64,10 @@ public class BlockForge extends BlockStation<TileEntityForge> {
     }
 
     public static void updateFurnaceBlockState(boolean state, World world, int x, int y, int z) {
-        int l = world.getBlockMetadata(x, y, z);
-        TileEntityForge tileentity = stationAt(world, x, y, z);
-        keepInventory = true;
         Block block = world.getBlock(x, y, z);
-
-        if (block instanceof BlockForge) {
-            int blocktier = ((BlockForge) block).tier;
-            if (state) {
-                world.setBlock(x, y, z, getActiveBlock(blocktier));
-            } else {
-                world.setBlock(x, y, z, getInactiveBlock(blocktier));
-            }
-        }
-
-        keepInventory = false;
-        world.setBlockMetadataWithNotify(x, y, z, l, 2);
-
-        if (tileentity != null) {
-            tileentity.validate();
-            world.setTileEntity(x, y, z, tileentity);
-        }
+        if (!(block instanceof BlockForge)) return;
+        int tier = ((BlockForge) block).tier;
+        swapBlock(world, x, y, z, state ? getActiveBlock(tier) : getInactiveBlock(tier));
     }
 
     private static Block getActiveBlock(int tier) {
@@ -279,8 +261,4 @@ public class BlockForge extends BlockStation<TileEntityForge> {
         }
     }
 
-    @Override
-    protected boolean keepsContents() {
-        return keepInventory;
-    }
 }
