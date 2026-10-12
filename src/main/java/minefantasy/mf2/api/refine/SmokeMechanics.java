@@ -128,6 +128,16 @@ public class SmokeMechanics {
     /**
      * Emits smoke from a source, or goes through a chimney
      */
+    /** Whether a block is under open sky, with all eight around above it open too: smoke there needs no chimney. */
+    public static boolean isOutside(World world, int x, int y, int z) {
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (!world.canBlockSeeTheSky(x + dx, y + 1, z + dz)) return false;
+            }
+        }
+        return true;
+    }
+
     public static void emitSmokeIndirect(World world, int xCoord, int yCoord, int zCoord, int value) {
         if (tryUseChimney(world, xCoord, yCoord, zCoord, value)) {
             return;

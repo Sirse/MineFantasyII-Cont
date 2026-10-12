@@ -97,7 +97,9 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             progress = 0;
         }
 
-        if (progress > 0 && rand.nextInt(4) == 0 && !isOutside() && this.getTier() < 2) {
+        if (progress > 0 && rand.nextInt(4) == 0
+                && !SmokeMechanics.isOutside(worldObj, xCoord, yCoord, zCoord)
+                && this.getTier() < 2) {
             SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, 1);
         }
 
@@ -129,17 +131,6 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     private void onAutoSmelt() {
         Sounds.at(this, "random.fizz", 1.0F, 1.0F);
         Sounds.at(this, "random.piston.out", 1.0F, 1.0F);
-    }
-
-    private boolean isOutside() {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                if (!worldObj.canBlockSeeTheSky(xCoord + x, yCoord + 1, zCoord + y)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     public void smeltItem() {

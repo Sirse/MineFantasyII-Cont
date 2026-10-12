@@ -111,7 +111,9 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
             else if (work > maxTemp && rand.nextInt(20) == 0) heatState.approachFuelHeat(maxTemp, 10F);
             temperature = heatState.temperature();
 
-            if (isBurning && temperature > 250 && rand.nextInt(20) == 0 && !isOutside()) {
+            if (isBurning && temperature > 250
+                    && rand.nextInt(20) == 0
+                    && !SmokeMechanics.isOutside(worldObj, xCoord, yCoord, zCoord)) {
                 int val = this.getTier() == 1 ? 3 : 1;
                 if (this.hasBlockAbove()) {
                     SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord + 1, zCoord, val);
@@ -123,17 +125,6 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         } finally {
             if (heatState.consumeChanged()) saveLater();
         }
-    }
-
-    private boolean isOutside() {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                if (!worldObj.canBlockSeeTheSky(xCoord + x, yCoord + 1, zCoord + y)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     private void shareTemp() {
