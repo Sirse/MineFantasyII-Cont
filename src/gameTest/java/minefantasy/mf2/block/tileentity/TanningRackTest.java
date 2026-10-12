@@ -46,13 +46,13 @@ public class TanningRackTest {
                         0));
         helper.setBlock(1, 1, 1, block);
         TileEntityTanningRack rack = helper.assertTileEntityPresent(TileEntityTanningRack.class, 1, 1, 1);
-        setField(rack, "rand", new Random() {
+        rack.rand = new Random() {
 
             @Override
             public int nextInt(int bound) {
                 return 0;
             }
-        });
+        };
         rack.setInventorySlotContents(0, new ItemStack(seed));
         rack.updateRecipe();
         return rack;

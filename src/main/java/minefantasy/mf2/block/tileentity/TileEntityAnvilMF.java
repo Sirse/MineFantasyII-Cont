@@ -56,12 +56,12 @@ public class TileEntityAnvilMF extends TileEntityStation
     /** Saved progress outlives the derived recipe cache, so rebuild it before the first canCraft check. */
     private boolean needsRecipeRestore;
     private boolean isFakeAnvil = false;
-    private ItemStack recipe;
+    ItemStack recipe;
     private GridRecipe activeRecipe;
     /** The id of the recipe the grid holds, as the lookup found it. */
     private RecipeId activeId;
     /** The craft the grid holds, worked out in full; the HUD, the save and finishing all read it. */
-    private CraftPlan project;
+    CraftPlan project;
     /** The project the progress belongs to, kept across saves, and what watchers last got. */
     private final CraftState craft = new CraftState();
     private static final RecipeId REPAIR = RecipeId.of("minefantasy2", "anvil/repair");
@@ -230,7 +230,7 @@ public class TileEntityAnvilMF extends TileEntityStation
         return getResearchNeeded().isEmpty() || ResearchLogic.hasInfoUnlocked(user, getResearchNeeded());
     }
 
-    private void craftItem(EntityPlayer lastHit) {
+    void craftItem(EntityPlayer lastHit) {
         if (!GridProject.stillMakes(this)) {
             progress = 0;
             return;
@@ -305,7 +305,7 @@ public class TileEntityAnvilMF extends TileEntityStation
     }
 
     /** Result as the server last sent it; clients never run the recipe lookup themselves */
-    private ItemStack clientResult;
+    ItemStack clientResult;
 
     /** The recipe result, or on the client the copy the server synced for display */
     public ItemStack getShownResult() {

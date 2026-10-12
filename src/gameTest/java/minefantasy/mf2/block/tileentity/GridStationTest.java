@@ -37,12 +37,16 @@ public class GridStationTest {
         return stack == null ? 0 : stack.stackSize;
     }
 
-    private static ItemStack product(Object station) throws Exception {
-        return (ItemStack) get(station, "recipe");
+    private static ItemStack product(Object station) {
+        if (station instanceof TileEntityAnvilMF) return ((TileEntityAnvilMF) station).recipe;
+        if (station instanceof TileEntityCarpenterMF) return ((TileEntityCarpenterMF) station).recipe;
+        return ((TileEntityKitchenBench) station).recipe;
     }
 
-    private static boolean hasProject(Object station) throws Exception {
-        return get(station, "project") != null;
+    private static boolean hasProject(Object station) {
+        if (station instanceof TileEntityAnvilMF) return ((TileEntityAnvilMF) station).project != null;
+        if (station instanceof TileEntityCarpenterMF) return ((TileEntityCarpenterMF) station).project != null;
+        return ((TileEntityKitchenBench) station).project != null;
     }
 
     // region anvil
@@ -286,7 +290,7 @@ public class GridStationTest {
     }
 
     private static void craft(TileEntityKitchenBench bench) throws Exception {
-        call(bench, "craftItem", new Class<?>[] { net.minecraft.entity.player.EntityPlayer.class }, (Object) null);
+        bench.craftItem(null);
     }
 
     private static int kitchenOutput(TileEntityKitchenBench bench) {
@@ -413,7 +417,7 @@ public class GridStationTest {
             TileEntityCarpenterMF bench = bench(recipe, 0, 1, 5);
             assertTrue(hasProject(bench));
             bench.progress = bench.progressMax;
-            call(bench, "craftItem", new Class<?>[] { net.minecraft.entity.player.EntityPlayer.class }, (Object) null);
+            bench.craftItem(null);
             assertEquals(2, size(bench.getStackInSlot(0)));
             assertEquals(bar, bench.getStackInSlot(bench.getSizeInventory() - 5).getItem());
         } finally {

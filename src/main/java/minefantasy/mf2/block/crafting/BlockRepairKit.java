@@ -25,7 +25,7 @@ public class BlockRepairKit extends Block {
     protected boolean isOrnate = false;
     protected float repairLevelEnchant = 0.0F;
     private String type;
-    private Random rand = new Random();
+    Random rand = new Random();
 
     public BlockRepairKit(String name, float repairLevel, float rate, float breakChance) {
         super(Material.cloth);

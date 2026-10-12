@@ -345,7 +345,7 @@ public class TileEntityBigFurnace extends TileEntityStation
      * The smelt of one input slot into its output slot: a furnace recipe with its own amount and usage, or else vanilla
      * smelting one item. Null when nothing smelts or the output has no room.
      */
-    private CraftPlan planFor(int input, int output) {
+    CraftPlan planFor(int input, int output) {
         CraftPlan plan = buildPlanFor(input, output);
         return plan != null && plan.canApplySpilling(CraftInventory.of(this)) ? plan : null;
     }

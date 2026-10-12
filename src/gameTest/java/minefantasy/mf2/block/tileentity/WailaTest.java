@@ -315,7 +315,9 @@ public class WailaTest {
                 world().setTileEntity(station.xCoord, station.yCoord, station.zCoord, station);
                 station.setInventorySlotContents(0, new ItemStack(seed));
                 ((GridProject.Bench) station).updateCraftingData();
-                setField(station, "progress", 40F);
+                if (station instanceof TileEntityAnvilMF) ((TileEntityAnvilMF) station).progress = 40F;
+                if (station instanceof TileEntityCarpenterMF) ((TileEntityCarpenterMF) station).progress = 40F;
+                if (station instanceof TileEntityKitchenBench) ((TileEntityKitchenBench) station).progress = 40F;
                 FakePlayer player = near(helper, station.xCoord, station.yCoord, station.zCoord);
                 NBTTagCompound before = saved(station);
                 world().getChunkFromBlockCoords(station.xCoord, station.zCoord).isModified = false;

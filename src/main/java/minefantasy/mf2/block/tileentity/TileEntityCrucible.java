@@ -228,7 +228,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         return hasOutputRoom() ? null : CheckResult.Reason.OUTPUT_FULL;
     }
 
-    private void updateCachedRecipe() {
+    void updateCachedRecipe() {
         ItemStack[] inputs = new ItemStack[GRID_SLOT_COUNT];
         for (int i = 0; i < GRID_SLOT_COUNT; i++) {
             inputs[i] = inventory[i];

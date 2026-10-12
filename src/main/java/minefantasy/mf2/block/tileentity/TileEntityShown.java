@@ -17,7 +17,7 @@ import minefantasy.mf2.network.packet.StationStatePacket;
 public abstract class TileEntityShown extends TileEntity implements StationStatePacket.Shown {
 
     /** What the watchers last got; null until the first send. */
-    private NBTTagCompound sent;
+    NBTTagCompound sent;
 
     /** The state players see; null for none. Built on the server, so it must not read client-only fields. */
     protected NBTTagCompound describe() {

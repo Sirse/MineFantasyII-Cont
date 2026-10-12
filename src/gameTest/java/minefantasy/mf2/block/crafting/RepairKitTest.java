@@ -1,8 +1,7 @@
-package minefantasy.mf2.block;
+package minefantasy.mf2.block.crafting;
 
 import static minefantasy.mf2.gametest.Assert.*;
 
-import java.lang.reflect.Field;
 import java.util.Random;
 
 import net.minecraft.enchantment.Enchantment;
@@ -16,7 +15,6 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.block.crafting.BlockRepairKit;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.list.CustomToolListMF;
@@ -49,14 +47,12 @@ public class RepairKitTest {
 
     /** Runs the use with the kit's rolls fixed: 0 succeeds and breaks the kit, 0.99 fails and keeps it. */
     private static void rolled(BlockRepairKit kit, float roll, Use use) throws Exception {
-        Field field = BlockRepairKit.class.getDeclaredField("rand");
-        field.setAccessible(true);
-        Object kept = field.get(kit);
-        field.set(kit, rolling(roll));
+        Random kept = kit.rand;
+        kit.rand = rolling(roll);
         try {
             use.run();
         } finally {
-            field.set(kit, kept);
+            kit.rand = kept;
         }
     }
 

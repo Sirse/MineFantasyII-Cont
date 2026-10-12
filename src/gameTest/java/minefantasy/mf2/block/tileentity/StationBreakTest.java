@@ -167,9 +167,9 @@ public class StationBreakTest {
                 if (finished) {
                     FakePlayer cook = holding(helper, null);
                     carpenter.progress = carpenter.progressMax;
-                    call(carpenter, "craftItem", new Class<?>[] { EntityPlayer.class }, cook);
+                    carpenter.craftItem(cook);
                     kitchen.progress = kitchen.progressMax;
-                    call(kitchen, "craftItem", new Class<?>[] { EntityPlayer.class }, cook);
+                    kitchen.craftItem(cook);
                 }
                 Map<String, Integer> spilled = pickUp(helper);
                 breakAt(helper, 1, 1, 1);
@@ -249,9 +249,9 @@ public class StationBreakTest {
                 assertNotNull("the rack shows no result", rack.getStackInSlot(1));
                 rack.progress = 5;
                 if (finished) {
-                    Object plan = call(rack, "currentPlan", new Class<?>[0]);
+                    Object plan = rack.currentPlan();
                     assertNotNull("the rack found no work", plan);
-                    call(rack, "finish", new Class<?>[] { CraftPlan.class }, plan);
+                    rack.finish((CraftPlan) plan);
                 }
                 Map<String, Integer> spilled = pickUp(helper);
                 breakAt(helper, 1, 1, 1);
@@ -283,7 +283,7 @@ public class StationBreakTest {
                 spit.setInventorySlotContents(0, new ItemStack(seed));
                 spit.updateRecipe();
                 spit.progress = finished ? 10 : 5;
-                call(spit, "cook", new Class<?>[] { int.class }, 200);
+                spit.cook(200);
                 breakAt(helper, 1, 1, 1);
                 Map<String, Integer> expected = items(new ItemStack(finished ? flour : seed));
                 assertEquals(finished ? "after the work" : "during the work", expected, pickUp(helper));
@@ -317,7 +317,7 @@ public class StationBreakTest {
                         helper.setBlock(1, 1, 1, BlockListMF.crucible);
                         TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
                         crucible.setInventorySlotContents(0, new ItemStack(jar));
-                        call(crucible, "updateCachedRecipe", new Class<?>[0]);
+                        crucible.updateCachedRecipe();
                         helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
                         crucible.temperature = 500;
                         crucible.progress = 1;
@@ -405,8 +405,8 @@ public class StationBreakTest {
 
     /** One smelt of the furnace, the way its update does it once the heat is up. */
     private static void smeltOnce(TileEntityBigFurnace furnace) throws Exception {
-        setField(furnace, "built", true);
-        CraftPlan plan = (CraftPlan) call(furnace, "planFor", new Class<?>[] { int.class, int.class }, 0, 4);
+        furnace.built = true;
+        CraftPlan plan = furnace.planFor(0, 4);
         assertNotNull("the furnace found nothing to smelt", plan);
         assertTrue(plan.apply(CraftInventory.of(furnace), new ArrayList<>()));
     }

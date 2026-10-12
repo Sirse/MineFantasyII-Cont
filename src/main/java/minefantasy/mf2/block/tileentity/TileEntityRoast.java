@@ -133,7 +133,7 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
      * reload may have removed or changed it since the food went on, and then the cooking starts over on what the food
      * cooks by now instead of going on by the old recipe.
      */
-    private void cook(int temp) {
+    void cook(int temp) {
         CookRecipe.Found found = CookRecipe.find(items[0], isOven());
         CraftPlan plan = plan(found, false);
         if (plan == null && !craft.isRunning()) {
@@ -189,7 +189,7 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
     }
 
     /** Pays for the cooking and leaves the result; returned containers without room drop off. */
-    private void finish(CraftPlan plan) {
+    void finish(CraftPlan plan) {
         if (plan != null) {
             List<ItemStack> spill = new ArrayList<>();
             plan.apply(CraftInventory.of(this, 64), spill);

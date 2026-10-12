@@ -4,7 +4,6 @@ import static minefantasy.mf2.block.tileentity.Stations.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,9 +104,7 @@ public class CraftStateTest {
 
     /** Whether the block's shown state differs from what its watchers last got. */
     private static boolean unsent(TileEntityShown shown) throws Exception {
-        Field sent = TileEntityShown.class.getDeclaredField("sent");
-        sent.setAccessible(true);
-        return !shown.describe().equals(sent.get(shown));
+        return !shown.describe().equals(shown.sent);
     }
 
     @GameTest

@@ -21,7 +21,6 @@ import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
 import minefantasy.mf2.api.knowledge.InformationList;
-import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeId;
@@ -148,10 +147,7 @@ public class HudSyncTest {
             TileEntityAnvilMF anvil = place(new TileEntityAnvilMF());
             anvil.setInventorySlotContents(0, new ItemStack(junk));
             anvil.updateCraftingData();
-            assertEquals(
-                    "the project lost the id the lookup found",
-                    id,
-                    ((CraftPlan) get(anvil, "project")).getRecipeId());
+            assertEquals("the project lost the id the lookup found", id, anvil.project.getRecipeId());
             anvil.progress = 3;
             anvil.qualityBalance = 0.25F;
             TileEntityAnvilMF client = shown(new TileEntityAnvilMF(), anvil);
@@ -162,7 +158,7 @@ public class HudSyncTest {
             assertEquals(knownResearch(), client.getResearchNeeded());
             assertEquals(2, client.getToolTierNeeded());
             assertEquals(1, client.getAnvilTierNeeded());
-            ItemStack shownResult = (ItemStack) get(client, "clientResult");
+            ItemStack shownResult = client.clientResult;
             assertEquals(bar, shownResult.getItem());
             assertEquals(3, shownResult.stackSize);
         } finally {
@@ -187,7 +183,7 @@ public class HudSyncTest {
             assertEquals(2F, carpenter.progress, 0F);
             assertEquals(2, carpenter.getToolTierNeeded());
             assertEquals(1, carpenter.getCarpenterTierNeeded());
-            assertEquals(bar, ((ItemStack) get(carpenter, "clientResult")).getItem());
+            assertEquals(bar, (carpenter.clientResult).getItem());
 
             TileEntityKitchenBench kitchen = place(new TileEntityKitchenBench());
             kitchen.setInventorySlotContents(0, new ItemStack(junk));
@@ -197,7 +193,7 @@ public class HudSyncTest {
             assertEquals(5F, cook.dirtyProgress, 0F);
             assertEquals(kitchen.getDirtyMax(), cook.getDirtyMax(), 0F);
             assertEquals("hammer", cook.getToolNeeded());
-            assertEquals(bar, ((ItemStack) get(cook, "clientResult")).getItem());
+            assertEquals(bar, (cook.clientResult).getItem());
         } finally {
             Stations.end();
         }

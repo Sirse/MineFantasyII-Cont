@@ -43,7 +43,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
     public float prevAcTime;
     public float acTime;
     private int tempTicksExisted = 0;
-    private Random rand = new Random();
+    Random rand = new Random();
 
     public TileEntityTanningRack() {
         this(0, "Basic");
@@ -241,7 +241,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
      * replaced or removed the recipe since the item went on the rack; then the work restarts instead of paying out the
      * old result.
      */
-    private CraftPlan currentPlan() {
+    CraftPlan currentPlan() {
         CraftPlan plan = plan(MFRecipes.find(MFRecipes.TANNING, items[0]));
         if (craft.holds(plan)) {
             return plan;
@@ -261,7 +261,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
     }
 
     /** Pays for the work and leaves the product on the rack; returned containers without room drop off it. */
-    private boolean finish(CraftPlan plan) {
+    boolean finish(CraftPlan plan) {
         List<ItemStack> spill = new ArrayList<>();
         boolean paid = plan.apply(CraftInventory.of(this, 64), spill);
         GridProject.drop(this, spill);

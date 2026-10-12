@@ -221,13 +221,13 @@ public class StationBoundaryTest {
                         0));
         TileEntityBigFurnace furnace = new TileEntityBigFurnace();
         place(furnace);
-        setField(furnace, "built", true);
+        furnace.built = true;
         furnace.setInventorySlotContents(0, input);
         return furnace;
     }
 
     private static void smelt(TileEntityBigFurnace furnace) throws Exception {
-        Object plan = call(furnace, "planFor", new Class<?>[] { int.class, int.class }, 0, 4);
+        Object plan = furnace.planFor(0, 4);
         assertTrue("the furnace found nothing to smelt", plan != null);
         // The same path updateEntity takes once the heat is up
         java.util.List<ItemStack> spill = new java.util.ArrayList<>();
@@ -297,7 +297,7 @@ public class StationBoundaryTest {
     /** The end of the last hit: the bench re-reads its grid and pays out, as tryCraft does at full progress. */
     private static void finish(TileEntityCarpenterMF bench) throws Exception {
         bench.progress = bench.progressMax;
-        call(bench, "craftItem", new Class<?>[] { net.minecraft.entity.player.EntityPlayer.class }, (Object) null);
+        bench.craftItem(null);
     }
 
     private static int output(TileEntityCarpenterMF bench) {
@@ -412,7 +412,7 @@ public class StationBoundaryTest {
     }
 
     private static Object currentPlan(TileEntityTanningRack rack) throws Exception {
-        return call(rack, "currentPlan", new Class<?>[0]);
+        return rack.currentPlan();
     }
 
     @GameTest
@@ -423,7 +423,7 @@ public class StationBoundaryTest {
             TileEntityTanningRack rack = rack();
             Object plan = currentPlan(rack);
             assertTrue(plan != null);
-            call(rack, "finish", new Class<?>[] { minefantasy.mf2.api.recipe.CraftPlan.class }, plan);
+            rack.finish((minefantasy.mf2.api.recipe.CraftPlan) plan);
             assertEquals(bar, rack.getStackInSlot(0).getItem());
             assertEquals(1, size(rack.getStackInSlot(0)));
             assertEquals(2, dropped(emptyJar));
@@ -488,7 +488,7 @@ public class StationBoundaryTest {
             TileEntityCrucible crucible = new TileEntityCrucible();
             place(crucible);
             crucible.setInventorySlotContents(0, new ItemStack(jar, 1));
-            call(crucible, "updateCachedRecipe", new Class<?>[0]);
+            crucible.updateCachedRecipe();
             helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
             crucible.temperature = 500;
             crucible.smeltItem();
@@ -520,7 +520,7 @@ public class StationBoundaryTest {
             rack.updateRecipe();
             Object plan = currentPlan(rack);
             assertNotNull("the rack found no work", plan);
-            call(rack, "finish", new Class<?>[] { minefantasy.mf2.api.recipe.CraftPlan.class }, plan);
+            rack.finish((minefantasy.mf2.api.recipe.CraftPlan) plan);
             assertEquals(flour, rack.getStackInSlot(0).getItem());
             assertEquals(3, size(rack.getStackInSlot(0)));
         } finally {
@@ -548,7 +548,7 @@ public class StationBoundaryTest {
     }
 
     private static void cook(TileEntityRoast spit, int temperature) throws Exception {
-        call(spit, "cook", new Class<?>[] { int.class }, temperature);
+        spit.cook(temperature);
     }
 
     @GameTest

@@ -6,7 +6,6 @@ import static minefantasy.mf2.gametest.TestItems.*;
 
 import java.util.function.Consumer;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
@@ -58,7 +57,7 @@ public class LastHitTest {
         bench.progress = bench.progressMax - 0.01F;
         change.accept(bench);
         bench.progress = bench.progressMax;
-        call(bench, "craftItem", new Class<?>[] { EntityPlayer.class }, (Object) null);
+        bench.craftItem(null);
         return bench;
     }
 

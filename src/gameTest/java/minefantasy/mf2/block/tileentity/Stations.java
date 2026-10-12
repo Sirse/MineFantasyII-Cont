@@ -1,6 +1,5 @@
 package minefantasy.mf2.block.tileentity;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -181,18 +180,7 @@ public final class Stations {
         return stack;
     }
 
-    static Object get(Object target, String name) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        return field.get(target);
-    }
-
-    static void setField(Object target, String name, Object value) throws Exception {
-        Field field = target.getClass().getDeclaredField(name);
-        field.setAccessible(true);
-        field.set(target, value);
-    }
-
+    /** Calls a private method of a class outside this package, where the test cannot reach it otherwise. */
     static Object call(Object target, String name, Class<?>[] types, Object... args) throws Exception {
         Method method = target.getClass().getDeclaredMethod(name, types);
         method.setAccessible(true);
