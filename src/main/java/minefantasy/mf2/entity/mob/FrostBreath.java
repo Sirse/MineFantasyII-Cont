@@ -16,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.config.ConfigMobs;
 import minefantasy.mf2.entity.EntityDragonBreath;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class FrostBreath extends DragonBreath {
 
@@ -52,24 +53,17 @@ public class FrostBreath extends DragonBreath {
 
     @Override
     public void hitBlock(World world, EntityDragonBreath instance, int x, int y, int z, boolean impact) {
+        if (world.isRemote || !impact && instance.rand.nextInt(20) != 0 || !ConfigMobs.dragonGriefGeneral) return;
+        if (!world.isAirBlock(x, y + 1, z)) return;
+        // The dragon behind the breath changes blocks as a creature may: mobGriefing decides
+        Entity dragon = instance.shootingEntity;
         Block hit = world.getBlock(x, y, z);
-        if (!world.isRemote && (impact || instance.rand.nextInt(20) == 0)) {
-            if (!world.getGameRules().getGameRuleBooleanValue("mobGriefing")) return;
-            if (ConfigMobs.dragonGriefGeneral && world.isAirBlock(x, y + 1, z)) {
-                if (hit.isSideSolid(world, x, y, z, ForgeDirection.UP)) {
-                    world.setBlock(x, y + 1, z, Blocks.snow_layer);
-                }
-
-                if (hit == Blocks.water || hit == Blocks.flowing_water) {
-                    world.setBlock(x, y, z, Blocks.ice);
-                }
-                if (hit == Blocks.water || hit == Blocks.lava) {
-                    world.setBlock(x, y, z, Blocks.obsidian);
-                }
-                if (hit == Blocks.water || hit == Blocks.flowing_lava) {
-                    world.setBlock(x, y, z, Blocks.cobblestone);
-                }
-            }
+        if (hit.isSideSolid(world, x, y, z, ForgeDirection.UP)) {
+            ProtectionHelper.placeBlock(dragon, world, x, y + 1, z, Blocks.snow_layer, 0);
         }
+        // Water freezes; still lava sets into obsidian and flowing lava into cobblestone
+        Block frozen = hit == Blocks.water || hit == Blocks.flowing_water ? Blocks.ice
+                : hit == Blocks.lava ? Blocks.obsidian : hit == Blocks.flowing_lava ? Blocks.cobblestone : null;
+        if (frozen != null) ProtectionHelper.replaceBlock(dragon, world, x, y, z, frozen, 0);
     }
 }

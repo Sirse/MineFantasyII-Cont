@@ -31,6 +31,7 @@ import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.list.styles.OrnateStyle;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob, ISpecialCombatMob {
 
@@ -223,7 +224,7 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
         }
     }
 
-    private void forage() {
+    void forage() {
         if (rand.nextInt(100) == 0) {
             int radius = 8;
             for (int x = -radius; x <= radius; x++) {
@@ -249,20 +250,22 @@ public class EntityMinotaur extends EntityMobMF implements IArmourPenetrationMob
             }
             return;
         }
-        if (worldObj.getBlock((int) posX, (int) posY, (int) posZ) == BlockListMF.berryBush
-                && worldObj.getBlockMetadata((int) posX, (int) posY, (int) posZ) == 0) {
+        int x = MathHelper.floor_double(posX), y = MathHelper.floor_double(posY), z = MathHelper.floor_double(posZ);
+        Block food = worldObj.getBlock(x, y, z);
+        int meta = worldObj.getBlockMetadata(x, y, z);
+        // Grazing changes blocks as a creature may: mobGriefing decides, as for a sheep eating grass
+        if (food == BlockListMF.berryBush && meta == 0) {
+            if (ProtectionHelper.replaceBlock(this, worldObj, x, y, z, food, 1)) {
+                worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "random.eat", 1.0F, 0.75F);
+                swingItem();
+                heal(10);
+            }
+        } else if (food instanceof BlockCrops && meta > 0 && ProtectionHelper.breakBlock(this, worldObj, x, y, z)) {
             worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "random.eat", 1.0F, 0.75F);
+            worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "dig.grass", 1.0F, 1.00F);
             swingItem();
-            heal(10);
-            worldObj.setBlockMetadataWithNotify((int) posX, (int) posY, (int) posZ, 1, 2);
-        } else if (worldObj.getBlock((int) posX, (int) posY, (int) posZ) instanceof BlockCrops
-                && worldObj.getBlockMetadata((int) posX, (int) posY, (int) posZ) > 0) {
-                    worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "random.eat", 1.0F, 0.75F);
-                    worldObj.playSoundEffect(posX, posY + getEyeHeight(), posZ, "dig.grass", 1.0F, 1.00F);
-                    swingItem();
-                    heal(5);
-                    worldObj.setBlockToAir((int) posX, (int) posY, (int) posZ);
-                }
+            heal(5);
+        }
     }
 
     @Override

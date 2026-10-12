@@ -213,6 +213,12 @@ public class ProtectionHelper {
         return canBreak(actor, world, x, y, z) && world.setBlock(x, y, z, block, meta, 3);
     }
 
+    /** {@link #replaceBlock(EntityPlayer, World, int, int, int, Block, int)} for whoever is behind an action. */
+    public static boolean replaceBlock(Entity actor, World world, int x, int y, int z, Block block, int meta) {
+        if (actor instanceof EntityPlayer) return replaceBlock((EntityPlayer) actor, world, x, y, z, block, meta);
+        return canBreak(actor, world, x, y, z) && world.setBlock(x, y, z, block, meta, 3);
+    }
+
     /** The last check of a placement, after protection allowed it; false puts the block back. */
     public interface CommitCheck {
 
