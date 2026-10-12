@@ -86,12 +86,13 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             return;
         }
 
-        boolean wasHot = getIsHot();
-        this.temperature = getTemperature();
+        float workingHeat = getWorkingHeat();
+        boolean wasHot = getIsHot(workingHeat);
+        this.temperature = getTemperature(workingHeat);
         this.progressMax = ((getTier() >= 2) ? ADVANCED_PROGRESS_MAX : BASE_PROGRESS_MAX) * smeltTime;
 
-        if (wasHot && canSmelt()) {
-            updateSmelting();
+        if (wasHot && canSmelt(workingHeat)) {
+            updateSmelting(workingHeat);
         } else {
             progress = 0;
         }
@@ -100,32 +101,27 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, 1);
         }
 
-        if (wasHot != getIsHot()) {
-            BlockCrucible.updateFurnaceBlockState(
-                    this.temperature > getAmbientTemperature(),
-                    worldObj,
-                    xCoord,
-                    yCoord,
-                    zCoord);
+        if (wasHot != getIsHot(workingHeat)) {
+            BlockCrucible.updateFurnaceBlockState(workingHeat > 0, worldObj, xCoord, yCoord, zCoord);
         }
     }
 
-    private void updateSmelting() {
-        progress += (temperature / SMELT_TEMPERATURE_THRESHOLD);
+    private void updateSmelting(float workingHeat) {
+        progress += (workingHeat / SMELT_TEMPERATURE_THRESHOLD);
         if (progress >= progressMax) {
             progress = 0;
-            smeltItem();
+            smeltItem(workingHeat);
             if (isAuto()) {
                 onAutoSmelt();
             }
         }
     }
 
-    private boolean getIsHot() {
+    private boolean getIsHot(float workingHeat) {
         if (this.getTier() >= 2) {
             return this.isCoated();
         }
-        return this.temperature > getAmbientTemperature();
+        return workingHeat > 0;
     }
 
     private void onAutoSmelt() {
@@ -145,7 +141,11 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     }
 
     public void smeltItem() {
-        if (!canSmelt()) {
+        smeltItem(getWorkingHeat());
+    }
+
+    private void smeltItem(float workingHeat) {
+        if (!canSmelt(workingHeat)) {
             return;
         }
 
@@ -172,9 +172,9 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
                 .spawnParticle("portal", xCoord + x + 0.5D, yCoord + y + 0.5D, zCoord + z + 0.5D, 0.0D, -0.5D, 0.0D);
     }
 
-    private boolean canSmelt() {
+    private boolean canSmelt(float workingHeat) {
         ensureRecipeIsCurrent();
-        if (this.temperature <= getAmbientTemperature() || this.cachedRecipeOutput == null) {
+        if (workingHeat <= 0 || this.cachedRecipeOutput == null) {
             return false;
         }
         for (int i = 0; i < GRID_SLOT_COUNT; i++) {
@@ -217,7 +217,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (cachedRecipeOutput == null) {
             return CheckResult.Reason.NO_RECIPE;
         }
-        if (temperature <= getAmbientTemperature()) {
+        if (getWorkingHeat() <= 0) {
             return CheckResult.Reason.of("no_heat");
         }
         for (int slot = 0; slot < GRID_SLOT_COUNT; slot++) {
@@ -300,6 +300,10 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     }
 
     public float getTemperature() {
+        return getTemperature(getWorkingHeat());
+    }
+
+    private float getTemperature(float workingHeat) {
         if (this.getTier() >= 1 && !isCoated()) {
             return getAmbientTemperature();
         }
@@ -317,9 +321,18 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             return 750F;
         }
 
+        return workingHeat > 0 ? Math.max(getAmbientTemperature(), workingHeat) : getAmbientTemperature();
+    }
+
+    /** Processing speed uses source heat, never a difference from the current weather. */
+    public float getWorkingHeat() {
+        if (getTier() >= 1 && !isCoated()) return 0F;
+        if (getTier() >= 2) return 5000F;
+        Material material = worldObj.getBlock(xCoord, yCoord - 1, zCoord).getMaterial();
+        if (material == Material.fire) return 250F;
+        if (material == Material.lava) return 750F;
         TileEntityForge forge = Tiles.get(worldObj, xCoord, yCoord - 1, zCoord, TileEntityForge.class);
-        float heat = forge == null ? 0F : forge.getBlockTemperature();
-        return heat > 0F ? Math.max(getAmbientTemperature(), Math.min(heat, 2500F)) : getAmbientTemperature();
+        return forge == null ? 0F : Math.min(forge.getWorkingHeat(), 2500F);
     }
 
     private float getAmbientTemperature() {

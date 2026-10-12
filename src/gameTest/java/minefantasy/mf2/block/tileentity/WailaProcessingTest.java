@@ -98,6 +98,10 @@ public class WailaProcessingTest {
                             1000));
             helper.setBlock(2, 2, 2, BlockListMF.furnace_stone);
             TileEntityBigFurnace furnace = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
+            helper.setBlock(2, 1, 2, BlockListMF.furnace_heater);
+            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            heater.fuel = 200;
+            heater.heat = 200;
             furnace.built = true;
             furnace.heat = 200;
             furnace.progress = 40000;
@@ -111,12 +115,10 @@ public class WailaProcessingTest {
             assertEquals("output_full", inspect(furnace, player).getString("Reason"));
             furnace.setInventorySlotContents(7, null);
             assertFalse("one valid smelt was treated as blocked", inspect(furnace, player).hasKey("Reason"));
-            furnace.heat = 0;
+            furnace.heat = heater.heat = 0;
             assertEquals("no_heat", inspect(furnace, player).getString("Reason"));
             furnace.built = false;
             assertEquals("not_built", inspect(furnace, player).getString("Reason"));
-            helper.setBlock(2, 1, 2, BlockListMF.furnace_heater);
-            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
             heater.built = true;
             heater.fuel = 200;
             assertEquals(10F, inspect(heater, player).getFloat("FuelSeconds"), 0F);
@@ -311,7 +313,7 @@ public class WailaProcessingTest {
             }
 
             fire.setLit(false);
-            assertEquals("temperature", inspect(spit, player).getString("Reason"));
+            assertEquals("no_heat", inspect(spit, player).getString("Reason"));
             spit.setInventorySlotContents(0, new ItemStack(flour));
             spit.updateRecipe();
             assertTrue(inspect(spit, player).getBoolean("Ready"));
@@ -329,4 +331,36 @@ public class WailaProcessingTest {
         }
         helper.succeed();
     }
+
+    @GameTest
+    public static void warmAirDoesNotMakeCookingAvailableWithoutASource(GameTestHelper helper) {
+        Stations.begin(helper);
+        minefantasy.mf2.api.heating.AmbientTemperature.setProvider((world, x, y, z) -> 40F);
+        try {
+            reload(
+                    tx -> CookRecipe.builder(Input.of(seed), new ItemStack(flour)).temperature(5, 1000).time(100)
+                            .canBurn(false).build().addTo(tx, id("cooking", "warm_air"), 1000));
+            helper.setBlock(1, 2, 1, BlockListMF.roast);
+            TileEntityRoast spit = helper.assertTileEntityPresent(TileEntityRoast.class, 1, 2, 1);
+            spit.setInventorySlotContents(0, new ItemStack(seed));
+            spit.updateRecipe();
+            FakePlayer player = near(helper, spit);
+            assertEquals("no_heat", inspect(spit, player).getString("Reason"));
+            for (int tick = 0; tick < 40; tick++) spit.updateEntity();
+            assertEquals(0F, spit.progress, 0F);
+            assertSame(seed, spit.getStackInSlot(0).getItem());
+            helper.setBlock(1, 1, 1, BlockListMF.firepit);
+            TileEntityFirepit fire = helper.assertTileEntityPresent(TileEntityFirepit.class, 1, 1, 1);
+            fire.fuel = 600;
+            fire.setLit(true);
+            assertFalse(inspect(spit, player).hasKey("Reason"));
+            for (int tick = 0; tick < 20; tick++) spit.updateEntity();
+            assertTrue(spit.progress > 0);
+        } finally {
+            minefantasy.mf2.api.heating.AmbientTemperature.setProvider(null);
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
 }

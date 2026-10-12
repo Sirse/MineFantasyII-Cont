@@ -61,8 +61,7 @@ final class WailaProcesses {
         } else if (furnace.isHeater()) {
             data.setBoolean("Burning", furnace.fuel > 0);
             data.setFloat("FuelSeconds", Math.max(0, furnace.fuel) / 20F);
-            if (furnace.fuel <= 0 && furnace.heat <= furnace.getAmbientTemperature())
-                reason(data, CheckResult.Reason.of("no_heat"));
+            if (furnace.fuel <= 0 && furnace.getWorkingHeat() <= 0) reason(data, CheckResult.Reason.of("no_heat"));
         } else {
             List<CraftPlan> plans = furnace.getShownPlans();
             NBTTagList results = new NBTTagList();
@@ -77,7 +76,7 @@ final class WailaProcesses {
             data.setBoolean("ShowProgress", !plans.isEmpty());
             if (plans.isEmpty()) reason(data, CheckResult.Reason.NO_RECIPE);
             else if (!canWork) reason(data, CheckResult.Reason.OUTPUT_FULL);
-            else if (furnace.heat <= furnace.getAmbientTemperature()) reason(data, CheckResult.Reason.of("no_heat"));
+            else if (furnace.getWorkingHeat() <= 0) reason(data, CheckResult.Reason.of("no_heat"));
         }
     }
 
@@ -169,6 +168,7 @@ final class WailaProcesses {
         data.setBoolean("BurnProgress", burnStage);
         CookRecipe.HeatState heatState = recipe.heatState(heat, TileEntityRoast.enableOverheat);
         if (burnStage) reason(data, CheckResult.Reason.of("burning_food"));
+        else if (roast.getSourceHeat() <= 0) reason(data, CheckResult.Reason.of("no_heat"));
         else if (heatState == CookRecipe.HeatState.TOO_COLD)
             reason(data, CheckResult.Reason.temperature(heat, recipe.getMinTemperature() + 1));
         else if (heatState == CookRecipe.HeatState.OVERHEATED) {

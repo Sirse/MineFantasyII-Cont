@@ -240,8 +240,13 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
         return craft.isRunning();
     }
 
+    /** Actual source heat used by cooking; air temperature alone does not advance a recipe. */
+    public int getSourceHeat() {
+        return worldObj != null && worldObj.blockExists(xCoord, yCoord - 1, zCoord) ? getTemp() : 0;
+    }
+
     public int getWorkTemperature() {
-        int heat = worldObj != null && worldObj.blockExists(xCoord, yCoord - 1, zCoord) ? getTemp() : 0;
+        int heat = getSourceHeat();
         return heat > 0 ? heat
                 : Math.round(minefantasy.mf2.api.heating.AmbientTemperature.get(worldObj, xCoord, yCoord, zCoord));
     }

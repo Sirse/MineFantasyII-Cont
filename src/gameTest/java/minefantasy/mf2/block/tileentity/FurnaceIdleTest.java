@@ -26,7 +26,7 @@ public class FurnaceIdleTest {
     private FurnaceIdleTest() {}
 
     /** A heater and a furnace above it, walled in firebrick, facing north. */
-    private static TileEntityBigFurnace builtFurnace(GameTestHelper helper) {
+    static TileEntityBigFurnace builtFurnace(GameTestHelper helper) {
         for (int y = 1; y <= 2; y++) {
             helper.setBlock(1, y, 2, BlockListMF.firebricks);
             helper.setBlock(3, y, 2, BlockListMF.firebricks);
@@ -122,4 +122,188 @@ public class FurnaceIdleTest {
             return true;
         });
     }
+
+    @GameTest
+    public static void advancedForgeCoolsAfterFuelEnds(GameTestHelper helper) {
+        AmbientTemperature.setProvider((world, x, y, z) -> 20F);
+        try {
+            helper.setBlock(2, 1, 2, BlockListMF.forge_metal_active);
+            TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
+            forge.temperature = 120F;
+            forge.fuel = 0;
+            for (int tick = 0; tick < 60; tick++) forge.updateEntity();
+            assertEquals("an empty advanced forge kept its heat", 20F, forge.temperature, 0F);
+            assertEquals(0, forge.getHeat());
+            forge.fuel = 10;
+            forge.fuelTemperature = 600F;
+            for (int tick = 0; tick < 15; tick++) forge.updateEntity();
+            assertTrue("a fueled forge must still heat up", forge.temperature > 20F);
+        } finally {
+            AmbientTemperature.setProvider(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void crucibleUsesHeatAboveTheSourcesAir(GameTestHelper helper) {
+        Stations.begin(helper);
+        int forgeY = helper.absolute(2, 1, 2).y();
+        AmbientTemperature.setProvider((world, x, y, z) -> y == forgeY ? 25F : 20F);
+        try {
+            reload(
+                    tx -> tx.add(
+                            MFRecipes.ALLOY,
+                            id("alloy", "air"),
+                            new minefantasy.mf2.api.refine.Alloy(
+                                    new ItemStack(flour),
+                                    0,
+                                    java.util.Arrays.asList(new ItemStack(seed))),
+                            0));
+            helper.setBlock(2, 1, 2, BlockListMF.forge_metal_active);
+            helper.setBlock(2, 2, 2, BlockListMF.crucible);
+            TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
+            TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 2, 2, 2);
+            forge.temperature = 25F;
+            forge.fuel = 0;
+            crucible.setInventorySlotContents(0, new ItemStack(seed));
+            for (int tick = 0; tick < 60; tick++) {
+                forge.updateEntity();
+                crucible.updateEntity();
+            }
+            assertEquals(20F, crucible.temperature, 0F);
+            assertEquals("air made smelting progress", 0F, crucible.progress, 0F);
+            assertTrue(crucible.getStackInSlot(9) == null);
+            assertEquals(1, crucible.getStackInSlot(0).stackSize);
+            forge.temperature = 600F;
+            forge.fuelTemperature = 600F;
+            forge.fuel = 1000;
+            for (int tick = 0; tick < 2000 && crucible.getStackInSlot(9) == null; tick++) {
+                forge.updateEntity();
+                crucible.updateEntity();
+            }
+            assertTrue("a hot forge must still smelt", crucible.getStackInSlot(9) != null);
+            assertSame(flour, crucible.getStackInSlot(9).getItem());
+            assertTrue(crucible.getStackInSlot(0) == null);
+            AmbientTemperature.setProvider((world, x, y, z) -> -15F);
+            helper.setBlock(2, 1, 2, BlockListMF.forge_metal);
+            forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
+            forge.temperature = -15F;
+            crucible.setInventorySlotContents(9, null);
+            crucible.setInventorySlotContents(0, new ItemStack(seed));
+            for (int tick = 0; tick < 20; tick++) {
+                forge.updateEntity();
+                crucible.updateEntity();
+            }
+            assertEquals("an unlit forge warmed a freezing crucible", -15F, crucible.temperature, 0F);
+            assertEquals(0F, crucible.progress, 0F);
+            assertTrue(crucible.getStackInSlot(9) == null);
+        } finally {
+            AmbientTemperature.setProvider(null);
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void bigHeaterLightsOnlyForWorkThatFits(GameTestHelper helper) {
+        Stations.begin(helper);
+        try {
+            reload(
+                    tx -> tx.add(
+                            MFRecipes.BIG_FURNACE,
+                            id("big_furnace", "idle"),
+                            ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
+                            0));
+            TileEntityBigFurnace furnace = builtFurnace(helper);
+            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            heater.setInventorySlotContents(0, new ItemStack(Items.coal, 4));
+            for (int tick = 0; tick < 30; tick++) {
+                furnace.updateEntity();
+                heater.updateEntity();
+            }
+            assertTrue(furnace.built && heater.built);
+            assertEquals("empty furnace burned fuel", 4, heater.getStackInSlot(0).stackSize);
+            furnace.setInventorySlotContents(0, new ItemStack(Items.stick));
+            heater.updateEntity();
+            assertEquals("unusable input burned fuel", 4, heater.getStackInSlot(0).stackSize);
+            furnace.setInventorySlotContents(0, new ItemStack(seed));
+            furnace.setInventorySlotContents(4, new ItemStack(flour, 64));
+            heater.updateEntity();
+            assertEquals("blocked output burned fuel", 4, heater.getStackInSlot(0).stackSize);
+            furnace.setInventorySlotContents(4, null);
+            heater.updateEntity();
+            assertEquals(3, heater.getStackInSlot(0).stackSize);
+            assertTrue(heater.fuel > 0);
+            heater.fuel = 0;
+            furnace.setInventorySlotContents(0, null);
+            heater.updateEntity();
+            assertEquals("changed input lit more fuel", 3, heater.getStackInSlot(0).stackSize);
+            furnace.setInventorySlotContents(0, new ItemStack(seed));
+            heater.updateEntity();
+            assertEquals(2, heater.getStackInSlot(0).stackSize);
+            heater.heat = heater.maxHeat = 5000;
+            for (int tick = 0; tick < 100 && furnace.getStackInSlot(4) == null; tick++) {
+                heater.updateEntity();
+                furnace.updateEntity();
+            }
+            assertTrue("valid work must still pay out", furnace.getStackInSlot(4) != null);
+            assertSame(flour, furnace.getStackInSlot(4).getItem());
+            assertTrue(furnace.getStackInSlot(0) == null);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void neighbouringForgesExchangeOnlyExcessHeat(GameTestHelper helper) {
+        int sourceX = helper.absolute(1, 1, 1).x();
+        AmbientTemperature.setProvider((world, x, y, z) -> x == sourceX ? 20F : 40F);
+        try {
+            helper.setBlock(1, 1, 1, BlockListMF.forge_metal_active);
+            helper.setBlock(2, 1, 1, BlockListMF.forge_metal);
+            TileEntityForge source = helper.assertTileEntityPresent(TileEntityForge.class, 1, 1, 1);
+            TileEntityForge other = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 1);
+            source.temperature = source.fuelTemperature = 60F;
+            source.fuel = 100;
+            other.temperature = 40F;
+            for (int tick = 0; tick < 10; tick++) source.updateEntity();
+            assertEquals("sharing reset a warm neighbour", 40F, other.temperature, 0F);
+            assertEquals(2F, other.getWorkingHeat(), 0F);
+            AmbientTemperature.setProvider((world, x, y, z) -> x == sourceX ? 20F : -15F);
+            source.temperature = 20F;
+            source.fuelTemperature = 0F;
+            other.temperature = -15F;
+            for (int tick = 0; tick < 10; tick++) source.updateEntity();
+            assertEquals("air generated heat in a freezing neighbour", -15F, other.temperature, 0F);
+        } finally {
+            AmbientTemperature.setProvider(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void bellowsWorkOnALitForgeBelowZeroButNotAnUnlitOne(GameTestHelper helper) {
+        AmbientTemperature.setProvider((world, x, y, z) -> -15F);
+        try {
+            helper.setBlock(2, 1, 2, BlockListMF.forge_metal_active);
+            TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
+            forge.temperature = -15F;
+            forge.fuelTemperature = 600F;
+            forge.fuel = 100;
+            forge.onUsedWithBellows(1F);
+            assertTrue("a lit freezing forge rejected bellows", forge.temperature > -15F);
+            helper.setBlock(2, 1, 2, BlockListMF.forge_metal);
+            forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
+            forge.temperature = -15F;
+            forge.fuelTemperature = 600F;
+            forge.fuel = 100;
+            forge.onUsedWithBellows(1F);
+            assertEquals("unlit stored fuel became heat", -15F, forge.temperature, 0F);
+        } finally {
+            AmbientTemperature.setProvider(null);
+        }
+        helper.succeed();
+    }
+
 }

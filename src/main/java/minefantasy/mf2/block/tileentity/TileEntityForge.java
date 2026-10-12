@@ -41,11 +41,13 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     public int workableState = 0;
     public boolean isLit;
     public int exactTemperature;
+    private float exactWorkingHeat;
     int justShared;
     private ItemStack[] inv = new ItemStack[1];
     private Random rand = new Random();
     private int ticksExisted;
     private boolean thermalInitialized;
+    private final minefantasy.mf2.api.heating.StationHeat heatState = new minefantasy.mf2.api.heating.StationHeat();
     private boolean isBurning = false;
 
     public TileEntityForge(Block block, String type) {
@@ -67,57 +69,60 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
 
         if (worldObj.isRemote) return;
 
-        if (justShared > 0) --justShared;
-        super.updateEntity();
-
-        if (ticksExisted % 20 == 0) {
-            ItemStack item = getStackInSlot(0);
-            if (item != null && !worldObj.isRemote) {
-                modifyItem(item, 0);
-            }
-            syncData();
-        }
-        if (ticksExisted % 10 == 0) {
-            shareTemp();
-        }
-
-        if (!isLit() && !worldObj.isRemote) {
+        try {
+            heatState.importLegacyTemperature(temperature, getAmbientTemperature(), isBurning());
             if (ticksExisted % 5 == 0) {
-                float next = AmbientTemperature.approach(temperature, getAmbientTemperature(), 10F);
-                if (next != temperature) {
+                heatState.approachAir(getAmbientTemperature(), 10F);
+                temperature = heatState.temperature();
+            }
+
+            if (justShared > 0) --justShared;
+            super.updateEntity();
+
+            if (ticksExisted % 20 == 0) {
+                ItemStack item = getStackInSlot(0);
+                if (item != null && !worldObj.isRemote) {
+                    modifyItem(item, 0);
+                }
+                syncData();
+            }
+            if (ticksExisted % 10 == 0) {
+                shareTemp();
+            }
+
+            if (!isLit() || fuel <= 0) {
+                if (fuel <= 0 && isLit()) extinguish();
+                if (ticksExisted % 5 == 0) {
+                    heatState.cool(10F);
+                    float next = heatState.temperature();
                     temperature = next;
-                    saveLater();
+                }
+                return;
+            }
+            tickFuel();
+            if (fuel <= 0) {
+                this.extinguish();
+                return;
+            }
+            isBurning = isBurning();// Check if it's burning
+            float maxTemp = fuelTemperature + getUnderTemperature();
+            float work = heatState.work();
+            if (work < maxTemp) heatState.approachFuelHeat(maxTemp, 2F);
+            else if (work > maxTemp && rand.nextInt(20) == 0) heatState.approachFuelHeat(maxTemp, 10F);
+            temperature = heatState.temperature();
+
+            if (isBurning && temperature > 250 && rand.nextInt(20) == 0 && !isOutside()) {
+                int val = this.getTier() == 1 ? 3 : 1;
+                if (this.hasBlockAbove()) {
+                    SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord + 1, zCoord, val);
+                } else {
+                    SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, val);
                 }
             }
-            return;
+            maxFuel = getTier() == 1 ? 12000 : 6000;
+        } finally {
+            if (heatState.consumeChanged()) saveLater();
         }
-        tickFuel();
-        if (fuel <= 0) {
-            this.extinguish();
-            return;
-        }
-        isBurning = isBurning();// Check if it's burning
-        float maxTemp = isLit() ? (fuelTemperature + getUnderTemperature()) : 0;
-
-        if (temperature < maxTemp) {
-            float amount = 2.0F;
-            temperature += amount;
-            if (temperature > maxTemp) {
-                temperature = maxTemp;
-            }
-        } else if (temperature > maxTemp && rand.nextInt(20) == 0) {
-            temperature -= 10;
-        }
-
-        if (isBurning && temperature > 250 && rand.nextInt(20) == 0 && !isOutside()) {
-            int val = this.getTier() == 1 ? 3 : 1;
-            if (this.hasBlockAbove()) {
-                SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord + 1, zCoord, val);
-            } else {
-                SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, val);
-            }
-        }
-        maxFuel = getTier() == 1 ? 12000 : 6000;
     }
 
     private boolean isOutside() {
@@ -145,15 +150,17 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         int share = 2;
         TileEntityForge forge = Tiles.get(worldObj, xCoord + x, yCoord, zCoord + z, TileEntityForge.class);
         if (forge != null) {
-            if (isLit && !forge.isLit && forge.fuel > 0) {
+            if (isBurning() && !forge.isLit() && forge.fuel > 0) {
                 forge.fireUpForge();
             }
-            if (!forge.isBurning() && temperature > 1) {
-                forge.temperature = 1;
-            }
-            if (forge.temperature < (temperature - share)) {
-                forge.temperature += share;
-                temperature -= share;
+            forge.heatState
+                    .importLegacyTemperature(forge.temperature, forge.getAmbientTemperature(), forge.isBurning());
+            float warmth = heatState.work();
+            float otherWarmth = forge.heatState.work();
+            if (isBurning() && warmth > otherWarmth) {
+                heatState.transferTo(forge.heatState, share);
+                forge.temperature = forge.heatState.temperature();
+                temperature = heatState.temperature();
                 saveLater();
                 forge.saveLater();
             }
@@ -182,12 +189,12 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     }
 
     private boolean isBurning() {
-        return fuel > 0 && temperature > 0;
+        return isLit() && fuel > 0;
     }
 
     @SideOnly(Side.CLIENT)
     private boolean shouldRenderFlame() {
-        return fuel > 0 && temperature > 1;
+        return isBurning();
     }
 
     private void modifyItem(ItemStack item, int slot) {
@@ -212,7 +219,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
                 ItemHeated.setTemp(item, temp);
                 saveLater();
             }
-        } else if (temperature > Math.max(100F, getAmbientTemperature())) {
+        } else if (getWorkingHeat() > 0 && temperature > Math.max(100F, getAmbientTemperature())) {
             this.setInventorySlotContents(slot, ItemHeated.createHotItem(item));
 
         }
@@ -248,6 +255,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
+        heatState.write(nbt);
         nbt.setFloat("temperature", temperature);
         nbt.setBoolean("AmbientHeat", thermalInitialized);
         nbt.setFloat("fuelTemperature", fuelTemperature);
@@ -263,6 +271,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         super.readFromNBT(nbt);
 
         temperature = nbt.getFloat("temperature");
+        heatState.read(nbt, temperature);
         thermalInitialized = nbt.getBoolean("AmbientHeat");
         fuelTemperature = nbt.getFloat("fuelTemperature");
         dragonHeartPower = nbt.getFloat("dragonHeartPower");
@@ -425,11 +434,12 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (fuel <= 0) {
             return;
         }
+        heatState.importLegacyTemperature(temperature, getAmbientTemperature(), true);
         float max = getBellowsMax();
         justShared = 5;
-        if (temperature < max) {
-            temperature = Math.min(max, temperature + (500F * powerLevel));
-        }
+        heatState.boost(500F * powerLevel, max);
+        temperature = heatState.temperature();
+        saveLater();
 
         for (int a = 0; a < 10; a++) {
             worldObj.spawnParticle(
@@ -458,11 +468,14 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         }
     }
 
+    public float getWorkingHeat() {
+        if (worldObj != null && worldObj.isRemote) return exactWorkingHeat;
+        return heatState.previewLegacyWork(temperature, getAmbientTemperature(), isBurning());
+    }
+
+    /** Physical temperature of a proven source, including its remaining heat after the fire ends. */
     public float getBlockTemperature() {
-        if (this.isLit) {
-            return temperature;
-        }
-        return 0;
+        return getWorkingHeat() > 0 ? temperature : 0F;
     }
 
     public float getAmbientTemperature() {
@@ -526,9 +539,10 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         if (worldObj.isRemote) {
             return exactTemperature;
         }
-        if (temperature <= getAmbientTemperature()) return 0;
-        int mx = (int) (temperature * 1.2F);
-        int mn = (int) (temperature * 0.8F);
+        float work = getWorkingHeat();
+        if (work <= 0) return 0;
+        int mx = (int) (work * 1.2F);
+        int mn = (int) (work * 0.8F);
         return Functions.getIntervalWave1_i(ticksExisted, 400, mx, mn);
     }
 
@@ -545,6 +559,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         state.setFloat("Temperature", temperature);
         state.setFloat("FuelTemperature", fuelTemperature);
         state.setInteger("Heat", getHeat());
+        state.setFloat("WorkingHeat", getWorkingHeat());
         state.setInteger("Workable", getWorkableState());
         return state;
     }
@@ -556,6 +571,7 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
         temperature = state.getFloat("Temperature");
         fuelTemperature = state.getFloat("FuelTemperature");
         exactTemperature = state.getInteger("Heat");
+        exactWorkingHeat = state.getFloat("WorkingHeat");
         workableState = state.getInteger("Workable");
     }
 

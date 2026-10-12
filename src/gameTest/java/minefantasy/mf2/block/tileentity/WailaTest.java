@@ -410,11 +410,14 @@ public class WailaTest {
             TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
             crucible.setInventorySlotContents(0, new ItemStack(seed));
             crucible.progress = 40;
+            helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
             crucible.temperature = 100;
             FakePlayer player = near(helper, crucible.xCoord, crucible.yCoord, crucible.zCoord);
             assertFalse(inspect(crucible, player).hasKey("Reason"));
+            helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.air);
             crucible.temperature = 0;
             assertEquals("no_heat", inspect(crucible, player).getString("Reason"));
+            helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
             crucible.temperature = 100;
             reload(tx -> {});
             NBTTagCompound before = saved(crucible);

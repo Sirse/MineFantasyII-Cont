@@ -316,6 +316,7 @@ public class StationBreakTest {
                     TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
                     crucible.setInventorySlotContents(0, new ItemStack(jar));
                     call(crucible, "updateCachedRecipe", new Class<?>[0]);
+                    helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
                     crucible.temperature = 500;
                     crucible.progress = 1;
                     if (finished) {

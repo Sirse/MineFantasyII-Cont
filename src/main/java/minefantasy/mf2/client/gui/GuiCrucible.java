@@ -35,7 +35,7 @@ public class GuiCrucible extends GuiStation {
                 && !tile.isAuto()) {
             drawTexturedModalRect(left + 128, top + 31, 225, 2, 18, 18);
         }
-        if (tile.temperature > 0) {
+        if (tile.getWorkingHeat() > 0) {
             drawTexturedModalRect(left + 81, top + 75, 243, 0, 14, 12);
         }
         if (tile.progress > 0 && tile.progressMax > 0) {

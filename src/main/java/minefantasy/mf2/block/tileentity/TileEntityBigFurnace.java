@@ -60,6 +60,7 @@ public class TileEntityBigFurnace extends TileEntityStation
     // HEATER
     public float heat;
     private boolean thermalInitialized;
+    private final minefantasy.mf2.api.heating.StationHeat heatState = new minefantasy.mf2.api.heating.StationHeat();
     public float maxHeat;
     public int justShared;
     // FURNACE
@@ -99,9 +100,12 @@ public class TileEntityBigFurnace extends TileEntityStation
             justShared = 5;
 
             if (fuel > 0) {
+                heatState.importLegacyTemperature(heat, getAmbientTemperature(), true);
                 int max = (int) (maxHeat * 1.5F);
-                if (heat < max) {
-                    heat += 50 * powerLevel;
+                if (heatState.work() < max) {
+                    heatState.boost(50 * powerLevel, max);
+                    heat = heatState.temperature();
+                    saveLater();
                 }
 
                 for (int a = 0; a < 10; a++) {
@@ -130,12 +134,13 @@ public class TileEntityBigFurnace extends TileEntityStation
 
     @Override
     public void updateEntity() {
-        float previousHeat = heat;
         if (!worldObj.isRemote && !thermalInitialized) {
             if (heat == 0F) heat = getAmbientTemperature();
             thermalInitialized = true;
             saveLater();
         }
+        if (!worldObj.isRemote)
+            heatState.importLegacyTemperature(heat, getAmbientTemperature(), isHeater() && fuel > 0);
         super.updateEntity();
 
         if (!worldObj.isRemote) {
@@ -168,7 +173,7 @@ public class TileEntityBigFurnace extends TileEntityStation
             sendPacketToClients();
         }
         wasBurning = isBurning();
-        if (!worldObj.isRemote && previousHeat != heat) saveLater();
+        if (!worldObj.isRemote && heatState.consumeChanged()) saveLater();
     }
 
     private void updateFurnace() {
@@ -193,14 +198,11 @@ public class TileEntityBigFurnace extends TileEntityStation
         TileEntityBigFurnace heater = getHeater();
 
         float ambient = getAmbientTemperature();
-        if (heater != null) {
-            // The heater's heat above its own air: the air up here is a little cooler, and a cold heater must not
-            // smelt by that difference alone
-            heat = ambient + heater.heat - heater.getAmbientTemperature();
-        } else {
-            heat = AmbientTemperature.approach(heat, ambient, 4F);
-        }
-        int warmth = (int) (heat - ambient);
+        heatState.approachAir(ambient, 4F);
+        if (heater != null) heatState.followSource(heater.getWorkingHeat());
+        else heatState.cool(4F);
+        heat = heatState.temperature();
+        int warmth = (int) heatState.work();
         if (warmth <= 0) {
             progress = 0;
             return;
@@ -394,6 +396,16 @@ public class TileEntityBigFurnace extends TileEntityStation
         return tile != null && !tile.isHeater() ? tile : null;
     }
 
+    /** Reuse the same current recipe and output checks as the smelting path before lighting fresh fuel. */
+    private boolean hasSmeltingWork() {
+        if (!built) return false;
+        if (getSpecialResult() != null) return canFitSpecialResult();
+        for (int slot = 0; slot < 4; slot++) {
+            if (planFor(slot, slot + 4) != null) return true;
+        }
+        return false;
+    }
+
     private void updateHeater() {
         if (worldObj.isRemote) return;
 
@@ -402,21 +414,20 @@ public class TileEntityBigFurnace extends TileEntityStation
             aboveType = furn.getType();
         }
         if (!built) {
-            heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 4F);
+            heatState.approachAir(getAmbientTemperature(), 4F);
+            heatState.cool(4F);
+            heat = heatState.temperature();
             maxHeat = fuel = maxFuel = 0;
             return;
         }
-        float target = Math.max(getAmbientTemperature(), maxHeat);
-        if (heat < target) {
-            heat++;
-        }
-        if (heat > target) {
-            heat--;
-        }
+        heatState.approachAir(getAmbientTemperature(), 1F);
+        float target = fuel > 0 ? maxHeat : 0F;
+        heatState.approachFuelHeat(target, 1F);
+        heat = heatState.temperature();
         if (fuel > 0) {
             fuel--;
         } else {
-            if (inv[0] != null && isItemFuel(inv[0])) {
+            if (furn != null && furn.hasSmeltingWork() && inv[0] != null && isItemFuel(inv[0])) {
                 fuel = maxFuel = getItemBurnTime(inv[0]);
                 maxHeat = getItemHeat(inv[0]);
                 // One unit is burned, so only one container comes back. Replacing the whole stack with a single
@@ -433,7 +444,6 @@ public class TileEntityBigFurnace extends TileEntityStation
                 }
             }
             if (fuel <= 0) {
-                heat = AmbientTemperature.approach(heat, getAmbientTemperature(), 1F);
                 maxHeat = 0;
             }
         }
@@ -537,6 +547,7 @@ public class TileEntityBigFurnace extends TileEntityStation
         maxFuel = nbt.hasKey("maxFuel") ? nbt.getInteger("maxFuel") : nbt.getInteger("MaxFuel");
 
         heat = nbt.getFloat("heat");
+        heatState.read(nbt, heat);
         thermalInitialized = nbt.getBoolean("AmbientHeat");
         maxHeat = nbt.getFloat("maxHeat");
 
@@ -558,6 +569,7 @@ public class TileEntityBigFurnace extends TileEntityStation
         nbt.setInteger("fuel", fuel);
         nbt.setInteger("maxFuel", maxFuel);
 
+        heatState.write(nbt);
         nbt.setFloat("heat", heat);
         nbt.setBoolean("AmbientHeat", thermalInitialized);
         nbt.setFloat("maxHeat", maxHeat);
@@ -575,9 +587,17 @@ public class TileEntityBigFurnace extends TileEntityStation
             return isBurningClient;
         }
         if (isHeater()) {
-            return heat > getAmbientTemperature();
+            return getWorkingHeat() > 0;
         }
-        return progress > 0 && heat > getAmbientTemperature();
+        return progress > 0 && getWorkingHeat() > 0;
+    }
+
+    public float getWorkingHeat() {
+        if (!isHeater()) {
+            TileEntityBigFurnace heater = getHeater();
+            if (heater != null) return heater.getWorkingHeat();
+        }
+        return heatState.previewLegacyWork(heat, getAmbientTemperature(), isHeater() && fuel > 0);
     }
 
     public float getAmbientTemperature() {

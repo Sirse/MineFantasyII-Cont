@@ -489,6 +489,7 @@ public class StationBoundaryTest {
             place(crucible);
             crucible.setInventorySlotContents(0, new ItemStack(jar, 1));
             call(crucible, "updateCachedRecipe", new Class<?>[0]);
+            helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
             crucible.temperature = 500;
             crucible.smeltItem();
             assertEquals(bar, crucible.getStackInSlot(9).getItem());
