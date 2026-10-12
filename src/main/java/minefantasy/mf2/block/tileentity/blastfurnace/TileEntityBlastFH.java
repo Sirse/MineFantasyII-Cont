@@ -45,6 +45,9 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     @Override
     public void updateEntity() {
+        int previousFuel = fuel;
+        float previousProgress = progress;
+        int previousSmoke = smokeStorage;
         super.updateEntity();
 
         boolean wasBurning = isBurning();
@@ -81,6 +84,10 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             if (ticksExisted % 10 == 0) shootFire();
 
         }
+        if (!worldObj.isRemote
+                && (fuel != previousFuel || progress != previousProgress || smokeStorage != previousSmoke)) {
+            saveLater();
+        }
         if (!worldObj.isRemote && wasBurning != isBurning()) {
             BlockBFH.updateFurnaceBlockState(isBurning(), this.worldObj, this.xCoord, this.yCoord, this.zCoord);
         }
@@ -95,9 +102,9 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             }
             TileEntityBlastFC shaft = (TileEntityBlastFC) tileEntity;
             ItemStack input = shaft.getStackInSlot(1);
-            if (shaft.getIsBuilt() && input != null
-                    && (shaft.tempUses > 0 || isCarbon(shaft.getStackInSlot(0)))
-                    && MFRecipes.find(MFRecipes.BLAST_FURNACE, input) != null) {
+            if (input != null && (shaft.tempUses > 0 || isCarbon(shaft.getStackInSlot(0)))
+                    && MFRecipes.find(MFRecipes.BLAST_FURNACE, input) != null
+                    && shaft.getIsBuilt()) {
                 return true;
             }
         }
