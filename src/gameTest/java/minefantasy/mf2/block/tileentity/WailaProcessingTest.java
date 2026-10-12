@@ -1,8 +1,10 @@
 package minefantasy.mf2.block.tileentity;
 
 import static minefantasy.mf2.block.tileentity.Stations.*;
+import static minefantasy.mf2.block.tileentity.WailaFixtures.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
+import static minefantasy.mf2.gametest.Ticks.tick;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,8 +27,7 @@ import minefantasy.mf2.api.recipe.RecipeMetadata;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
-import minefantasy.mf2.gametest.Modders;
-import minefantasy.mf2.integration.waila.WailaData;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.waila.WailaProvider;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -36,39 +37,6 @@ import minefantasy.mf2.item.list.ToolListMF;
 public class WailaProcessingTest {
 
     private WailaProcessingTest() {}
-
-    private static FakePlayer near(GameTestHelper helper, TileEntity tile) {
-        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
-        player.setPosition(tile.xCoord + 0.5, tile.yCoord + 1, tile.zCoord + 0.5);
-        return player;
-    }
-
-    private static NBTTagCompound saved(TileEntity tile) {
-        NBTTagCompound tag = new NBTTagCompound();
-        tile.writeToNBT(tag);
-        return tag;
-    }
-
-    private static NBTTagCompound inspect(TileEntity tile, FakePlayer player) {
-        NBTTagCompound before = saved(tile);
-        tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord).isModified = false;
-        NBTTagCompound data = null;
-        for (int repeat = 0; repeat < 3; repeat++) {
-            data = new WailaProvider().getNBTData(
-                    player,
-                    tile,
-                    new NBTTagCompound(),
-                    tile.getWorldObj(),
-                    tile.xCoord,
-                    tile.yCoord,
-                    tile.zCoord).getCompoundTag(WailaData.KEY);
-        }
-        assertEquals("tooltip changed saved state", before, saved(tile));
-        assertFalse(
-                "tooltip dirtied a clean chunk",
-                tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord).isModified);
-        return data;
-    }
 
     @GameTest
     public static void processingProvidersAreRegisteredOnTheServer(GameTestHelper helper) {
@@ -335,8 +303,7 @@ public class WailaProcessingTest {
     @GameTest
     public static void warmAirDoesNotMakeCookingAvailableWithoutASource(GameTestHelper helper) {
         Stations.begin(helper);
-        minefantasy.mf2.api.heating.AmbientTemperature.setProvider((world, x, y, z) -> 40F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> 40F)) {
             reload(
                     tx -> CookRecipe.builder(Input.of(seed), new ItemStack(flour)).temperature(5, 1000).time(100)
                             .canBurn(false).build().addTo(tx, id("cooking", "warm_air"), 1000));
@@ -346,7 +313,7 @@ public class WailaProcessingTest {
             spit.updateRecipe();
             FakePlayer player = near(helper, spit);
             assertEquals("no_heat", inspect(spit, player).getString("Reason"));
-            for (int tick = 0; tick < 40; tick++) spit.updateEntity();
+            tick(spit, 40);
             assertEquals(0F, spit.progress, 0F);
             assertSame(seed, spit.getStackInSlot(0).getItem());
             helper.setBlock(1, 1, 1, BlockListMF.firepit);
@@ -354,13 +321,41 @@ public class WailaProcessingTest {
             fire.fuel = 600;
             fire.setLit(true);
             assertFalse(inspect(spit, player).hasKey("Reason"));
-            for (int tick = 0; tick < 20; tick++) spit.updateEntity();
+            tick(spit, 20);
             assertTrue(spit.progress > 0);
         } finally {
-            minefantasy.mf2.api.heating.AmbientTemperature.setProvider(null);
             Stations.end();
         }
         helper.succeed();
     }
 
+    @GameTest
+    public static void warmAirIsNoHeatForACrucibleOrAnUnfuelledHeater(GameTestHelper helper) {
+        Stations.begin(helper);
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> 40F)) {
+            reload(
+                    tx -> tx.add(
+                            MFRecipes.ALLOY,
+                            id("alloy", "warm_air"),
+                            new minefantasy.mf2.api.refine.Alloy(
+                                    new ItemStack(flour),
+                                    0,
+                                    java.util.Arrays.asList(new ItemStack(seed))),
+                            0));
+            TileEntityBigFurnace furnace = FurnaceIdleTest.builtFurnace(helper);
+            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            helper.setBlock(5, 1, 2, BlockListMF.forge);
+            helper.setBlock(5, 2, 2, BlockListMF.crucible);
+            TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 5, 1, 2);
+            TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 5, 2, 2);
+            crucible.setInventorySlotContents(0, new ItemStack(seed));
+            tick(20, forge, heater, furnace);
+            assertTrue("the air warmed the forge", forge.temperature > 30F);
+            assertEquals("no_heat", inspect(crucible, near(helper, crucible)).getString("Reason"));
+            assertEquals("no_heat", inspect(heater, near(helper, heater)).getString("Reason"));
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
 }
