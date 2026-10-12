@@ -3,11 +3,14 @@ package minefantasy.mf2.mechanics;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.mechanics.ProtectionFixtures.*;
 
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 
@@ -18,6 +21,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.refining.BlockBFH;
+import minefantasy.mf2.block.tileentity.TileEntityChimney;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.gametest.DenyAll;
 import minefantasy.mf2.gametest.DenyPlacing;
@@ -180,6 +184,84 @@ public class BlastFurnaceOwnerTest {
         heater.setOwner(unconnected(helper));
         heater.explodeFromSmoke();
         assertTrue("with an owner allowed, the blast breaks the floor", count(helper, Blocks.stone) < 25);
+        helper.succeed();
+    }
+
+    /** A chimney choked with smoke. Its blast is weak, and mostly spent on the chimney itself. */
+    private static TileEntityChimney chokedChimney(GameTestHelper helper) {
+        floor(helper);
+        helper.setBlock(2, 2, 2, BlockListMF.chimney_stone);
+        TestPos at = helper.absolute(2, 2, 2);
+        return (TileEntityChimney) helper.getWorld().getTileEntity(at.x(), at.y(), at.z());
+    }
+
+    @GameTest
+    public static void aChokedChimneyWithNoOwnerBreaksNothing(GameTestHelper helper) {
+        TileEntityChimney chimney = chokedChimney(helper);
+        for (int i = 0; i < 3; i++) {
+            chimney.explodeFromSmoke();
+        }
+        assertEquals("the chimney stands", 1, count(helper, BlockListMF.chimney_stone));
+        assertEquals("the floor stands", 25, count(helper, Blocks.stone));
+        helper.succeed();
+    }
+
+    /** An owner playing in another world acts as themselves: no stand-in shares their identity meanwhile. */
+    @GameTest
+    public static void anOwnerOnlineElsewhereActsAsThemselves(GameTestHelper helper) {
+        EntityPlayerMP player = unconnected(helper);
+        ActionOwner owner = new ActionOwner();
+        owner.set(player);
+        List<Object> online = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+        try (Overrides overrides = new Overrides().run(() -> online.add(player), () -> online.remove(player))) {
+            TestPos at = helper.absolute(2, 2, 2);
+            assertSame(player, owner.resolve(helper.getWorld(), at.x(), at.y(), at.z()));
+        }
+        assertTrue("offline, a stand-in acts", owner.resolve(helper.getWorld()) instanceof FakePlayer);
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aChokedChimneyBlastsAsItsOwnerMayWhenTheyAreAway(GameTestHelper helper) {
+        TileEntityChimney chimney = chokedChimney(helper);
+        chimney.setOwner(unconnected(helper));
+        chimney.explodeFromSmoke();
+        assertEquals("the absent owner's stand-in blasts", 0, count(helper, BlockListMF.chimney_stone));
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aStandInStandsWhereItActsAndAnOwnerStaysPut(GameTestHelper helper) {
+        World world = helper.getWorld();
+        EntityPlayerMP player = unconnected(helper);
+        player.setPosition(100.5D, 70D, 100.5D);
+        ActionOwner owner = new ActionOwner();
+        owner.set(player);
+        TestPos at = helper.absolute(2, 2, 2);
+        EntityPlayer standIn = owner.resolve(world, at.x(), at.y(), at.z());
+        assertTrue(standIn instanceof FakePlayer);
+        assertTrue(
+                "the stand-in is not at the block",
+                standIn.getDistanceSq(at.x() + 0.5D, at.y(), at.z() + 0.5D) < 0.01D);
+        try (Overrides overrides = new Overrides()
+                .run(() -> world.playerEntities.add(player), () -> world.playerEntities.remove(player))) {
+            assertSame(player, owner.resolve(world, at.x(), at.y(), at.z()));
+            assertTrue("the owner was moved", player.getDistanceSq(100.5D, 70D, 100.5D) < 0.01D);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aChokedChimneyBlastsAsItsOwnerMay(GameTestHelper helper) {
+        TileEntityChimney chimney = chokedChimney(helper);
+        EntityPlayerMP owner = unconnected(helper);
+        chimney.setOwner(owner);
+        try (Overrides overrides = new Overrides().run(
+                () -> helper.getWorld().playerEntities.add(owner),
+                () -> helper.getWorld().playerEntities.remove(owner))) {
+            chimney.explodeFromSmoke();
+        }
+        assertEquals("with its owner about, the blast breaks the chimney", 0, count(helper, BlockListMF.chimney_stone));
         helper.succeed();
     }
 }

@@ -2,11 +2,13 @@ package minefantasy.mf2.mechanics;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
@@ -26,15 +28,28 @@ public final class ActionOwner {
         playerId = player == null ? null : player.getUniqueID();
     }
 
+    /**
+     * The player acting at this block: the owner when online, otherwise a stand-in with the owner's profile, standing
+     * at the block so that protection weighing where the actor stands sees the owner's own place. Null when no owner is
+     * known.
+     */
+    public EntityPlayer resolve(World world, int x, int y, int z) {
+        EntityPlayer player = resolve(world);
+        if (player instanceof FakePlayer) player.setPosition(x + 0.5D, y, z + 0.5D);
+        return player;
+    }
+
+    /**
+     * The owner when online, in this world or another, otherwise a stand-in with the owner's profile; null when none is
+     * known. An online owner always acts as themselves, so no stand-in shares their identity while they play.
+     */
     public EntityPlayer resolve(World world) {
         if (world == null || world.isRemote) return null;
         if (playerId == null) {
-            return legacyName.isEmpty() ? null : world.getPlayerEntityByName(legacyName);
+            return legacyName.isEmpty() ? null : online(world, null, legacyName);
         }
-        for (Object value : world.playerEntities) {
-            EntityPlayer player = (EntityPlayer) value;
-            if (playerId.equals(player.getUniqueID())) return player;
-        }
+        EntityPlayer online = online(world, playerId, null);
+        if (online != null) return online;
         if (!(world instanceof WorldServer)) return null;
         return proxy((WorldServer) world, playerId, legacyName);
     }
@@ -58,6 +73,24 @@ public final class ActionOwner {
             }
             if (playerId == null) legacyName = "";
         }
+    }
+
+    /** The player with this id, or else this name, in this world first and then anywhere on the server. */
+    private static EntityPlayer online(World world, UUID id, String name) {
+        EntityPlayer found = find(world.playerEntities, id, name);
+        if (found != null) return found;
+        MinecraftServer server = MinecraftServer.getServer();
+        return server == null ? null : find(server.getConfigurationManager().playerEntityList, id, name);
+    }
+
+    private static EntityPlayer find(List<?> players, UUID id, String name) {
+        for (Object value : players) {
+            EntityPlayer player = (EntityPlayer) value;
+            if (player instanceof FakePlayer) continue;
+            if (id != null ? id.equals(player.getUniqueID()) : name.equals(player.getCommandSenderName()))
+                return player;
+        }
+        return null;
     }
 
     public static FakePlayer proxy(WorldServer world, UUID playerId, String name) {

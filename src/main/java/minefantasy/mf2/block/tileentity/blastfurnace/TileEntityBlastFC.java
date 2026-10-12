@@ -117,7 +117,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
      * known, and then the furnace changes nothing around it that needs rights.
      */
     public EntityPlayer owner() {
-        return owner.resolve(worldObj);
+        return owner.resolve(worldObj, xCoord, yCoord, zCoord);
     }
 
     protected void interact(TileEntityBlastFC tile) {

@@ -12,16 +12,15 @@ import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.refine.ISmokeCarrier;
 import minefantasy.mf2.api.refine.SmokeMechanics;
 import minefantasy.mf2.block.refining.BlockChimney;
+import minefantasy.mf2.mechanics.ActionOwner;
 
 public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
 
     public int lastSharedInt = 0;
     protected int smokeStorage;
     private int isIndirect = -1;
-    /**
-     * Name of the player who placed this block; empty when unknown (pre-existing blocks)
-     */
-    private String ownerName = "";
+    /** Who placed this block; unknown for blocks from before owners were kept. */
+    private final ActionOwner owner = new ActionOwner();
     private Random rand = new Random();
 
     @Override
@@ -37,9 +36,17 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
             }
         }
         if (!worldObj.isRemote && smokeStorage > getMaxSmokeStorage() && rand.nextInt(500) == 0) {
-            // Attribute the blast to the block's owner, so protection plugins evaluate the right permissions
-            worldObj.newExplosion(getExplosionCause(), xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 2F, false, true);
+            explodeFromSmoke();
         }
+    }
+
+    /**
+     * The blast of a chimney choked with smoke, attributed to its owner so protection weighs the owner's rights, online
+     * or not. With no owner known no one's rights can be asked, so it breaks nothing.
+     */
+    public void explodeFromSmoke() {
+        EntityPlayer cause = owner.resolve(worldObj, xCoord, yCoord, zCoord);
+        worldObj.newExplosion(cause, xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, 2F, false, cause != null);
     }
 
     /**
@@ -47,14 +54,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
      * stand nearby and protection plugins evaluate the right permissions. Called from the block on placement.
      */
     public void setOwner(EntityPlayer player) {
-        ownerName = player == null ? "" : player.getCommandSenderName();
-    }
-
-    private EntityPlayer getExplosionCause() {
-        if (ownerName == null || ownerName.isEmpty()) {
-            return null;
-        }
-        return worldObj.getPlayerEntityByName(ownerName);
+        owner.set(player);
     }
 
     public boolean isPipeChimney() {
@@ -114,7 +114,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        nbt.setString("Owner", ownerName == null ? "" : ownerName);
+        owner.writeToNBT(nbt);
         nbt.setInteger("StoredSmoke", smokeStorage);
     }
 
@@ -122,7 +122,7 @@ public class TileEntityChimney extends TileEntity implements ISmokeCarrier {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        ownerName = nbt.getString("Owner");
+        owner.readFromNBT(nbt);
         smokeStorage = nbt.getInteger("StoredSmoke");
     }
 
