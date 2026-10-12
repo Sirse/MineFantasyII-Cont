@@ -12,6 +12,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
@@ -36,6 +37,7 @@ import minefantasy.mf2.api.mining.RandomDigs;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.IMiningDrops;
 import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.mechanics.HarvestTool;
 
 /**
  * @author Anonymous Productions
@@ -81,7 +83,11 @@ public class ItemTrowMF extends ItemSpade implements IToolMaterial, IMiningDrops
     /** Gravel dug with a trowel always gives flint in place of its usual drops; silk touch keeps the gravel. */
     public static void digGravel(BlockEvent.HarvestDropsEvent event) {
         if (event.block != Blocks.gravel || event.harvester == null || event.isSilkTouching) return;
-        ItemStack held = event.harvester.getHeldItem();
+        // A trowel worn out by this very dig is already gone from the hand: read the tool the harvest began with
+        ItemStack held = event.harvester instanceof EntityPlayerMP
+                ? ((HarvestTool) ((EntityPlayerMP) event.harvester).theItemInWorldManager).mf2$harvestTool()
+                : null;
+        if (held == null) held = event.harvester.getHeldItem();
         if (held == null || !(held.getItem() instanceof ItemTrowMF)) return;
         event.drops.clear();
         event.drops.add(

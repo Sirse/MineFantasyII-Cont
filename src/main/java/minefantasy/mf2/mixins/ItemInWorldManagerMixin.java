@@ -14,13 +14,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import minefantasy.mf2.mechanics.BlockEvents;
+import minefantasy.mf2.mechanics.HarvestTool;
 
 /**
  * Settles what mining gives once vanilla's harvest really removed the block: Forge 1.7.10 has no event after a break,
  * and a break that drops nothing (stone by hand) raises none at all.
  */
 @Mixin(ItemInWorldManager.class)
-public abstract class ItemInWorldManagerMixin {
+public abstract class ItemInWorldManagerMixin implements HarvestTool {
 
     /** What each harvest in progress takes, or null until it gets that far; nested harvests stack. */
     @Unique
@@ -47,6 +48,12 @@ public abstract class ItemInWorldManagerMixin {
         mf2$harvests.push(
                 new Object[] { self.theWorld.getBlock(x, y, z), self.theWorld.getBlockMetadata(x, y, z),
                         held == null ? null : held.copy() });
+    }
+
+    @Override
+    public ItemStack mf2$harvestTool() {
+        Object[] noted = mf2$harvests.peek();
+        return noted == null || noted.length != 3 || noted[2] == null ? null : ((ItemStack) noted[2]).copy();
     }
 
     @Inject(method = "tryHarvestBlock", at = @At("RETURN"))

@@ -48,6 +48,21 @@ public class MiningDropsTest {
     }
 
     @GameTest
+    public static void aTrowelBreakingOnItsLastDigStillGivesFlint(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, Blocks.gravel);
+        TestPos at = helper.absolute(1, 1, 1);
+        EntityPlayerMP player = digger(helper, at);
+        ItemStack trowel = player.getHeldItem();
+        trowel.setItemDamage(trowel.getMaxDamage());
+        assertTrue("the dig succeeds", player.theItemInWorldManager.tryHarvestBlock(at.x(), at.y(), at.z()));
+        endOfTick(helper);
+        assertTrue("the trowel did not break", player.getHeldItem() == null);
+        assertEquals("flint", 1, countItems(helper, at, Items.flint));
+        assertEquals("no gravel", 0, countItems(helper, at, Item.getItemFromBlock(Blocks.gravel)));
+        helper.succeed();
+    }
+
+    @GameTest
     public static void randomDigsArePaidOnlyForARealDig(GameTestHelper helper) {
         ItemStack loot = new ItemStack(Items.diamond);
         RandomDigs dig = new RandomDigs(loot, 1000F, Blocks.dirt, OreDictionary.WILDCARD_VALUE, -1, -1, -1, false);
