@@ -101,8 +101,10 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, 1);
         }
 
-        if (wasHot != getIsHot(workingHeat)) {
-            BlockCrucible.updateFurnaceBlockState(workingHeat > 0, worldObj, xCoord, yCoord, zCoord);
+        // The master crucible is lit by lightning, not by heat
+        Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
+        if (getTier() < 2 && block instanceof BlockCrucible && ((BlockCrucible) block).isActive != wasHot) {
+            BlockCrucible.updateFurnaceBlockState(wasHot, worldObj, xCoord, yCoord, zCoord);
         }
     }
 

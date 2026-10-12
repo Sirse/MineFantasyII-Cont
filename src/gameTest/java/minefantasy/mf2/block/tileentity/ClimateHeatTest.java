@@ -15,6 +15,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
+import com.gtnewhorizons.horizonqa.api.TestPos;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
@@ -115,6 +116,25 @@ public class ClimateHeatTest {
         } finally {
             Stations.end();
         }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aCrucibleLightsOverFireAndGoesOutWithout(GameTestHelper helper) {
+        helper.setBlock(2, 1, 2, Blocks.netherrack);
+        helper.setBlock(2, 2, 2, Blocks.fire);
+        helper.setBlock(2, 3, 2, BlockListMF.crucible);
+        TestPos at = helper.absolute(2, 3, 2);
+        TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 2, 3, 2);
+        crucible.updateEntity();
+        assertSame(
+                "stayed cold over fire",
+                BlockListMF.crucible_active,
+                helper.getWorld().getBlock(at.x(), at.y(), at.z()));
+        helper.setBlock(2, 2, 2, Blocks.air);
+        crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 2, 3, 2);
+        crucible.updateEntity();
+        assertSame("stayed lit without fire", BlockListMF.crucible, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
         helper.succeed();
     }
 
