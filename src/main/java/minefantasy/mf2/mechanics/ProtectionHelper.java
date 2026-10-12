@@ -70,6 +70,21 @@ public class ProtectionHelper {
         return world.setBlockToAir(x, y, z);
     }
 
+    /**
+     * Runs an item use's world changes outside Forge's item-use capture, which drops them unannounced and unasked when
+     * the use returns false. Each change must then be asked about here, as {@link #breakBlock} and
+     * {@link #replaceBlock} do.
+     */
+    public static void outsideItemUse(World world, Runnable action) {
+        boolean capturing = world.captureBlockSnapshots;
+        world.captureBlockSnapshots = false;
+        try {
+            action.run();
+        } finally {
+            world.captureBlockSnapshots = capturing;
+        }
+    }
+
     /** Places a block, such as fire, where the player may place it. See {@link #replaceBlock}. */
     public static boolean placeBlock(EntityPlayer player, World world, int x, int y, int z, Block block, int meta) {
         return place(player, world, x, y, z, block, meta, null);
@@ -90,9 +105,13 @@ public class ProtectionHelper {
         if (world == null || player == null || world.isRemote || !world.blockExists(x, y, z)) return false;
         Block original = world.getBlock(x, y, z);
         int originalMeta = world.getBlockMetadata(x, y, z);
+        if (world.captureBlockSnapshots || deciding || original.hasTileEntity(originalMeta)) return false;
         if (!canBreak(player, world, x, y, z)) return false;
-        if (!stands(world, x, y, z, original, originalMeta)) return false;
-        return place(player, world, x, y, z, block, meta, check);
+        if (stands(world, x, y, z, original, originalMeta) && place(player, world, x, y, z, block, meta, check))
+            return true;
+        // The break event already told the player the block was gone
+        world.markBlockForUpdate(x, y, z);
+        return false;
     }
 
     /**

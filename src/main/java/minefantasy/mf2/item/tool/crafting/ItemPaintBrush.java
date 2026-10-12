@@ -16,6 +16,7 @@ import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 /**
  * @author Anonymous Productions
@@ -62,22 +63,22 @@ public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
                 meta = output.getItemDamage();
             }
         }
-        if (newBlock != null) {
-            world.playAuxSFXAtEntity(user, 2001, x, y, z, Block.getIdFromBlock(newBlock) + (meta << 12));
-
-            user.inventory.consumeInventoryItem(ComponentListMF.plant_oil);
-            ItemStack jug = new ItemStack(FoodListMF.jug_empty);
-
-            if (!user.inventory.addItemStackToInventory(jug) && !world.isRemote) {
-                user.entityDropItem(jug, 0F);
-            }
-            if (world.isRemote) return true;
-
-            SkillList.construction.addXP(user, 1);
-            item.damageItem(1, user);
-            world.setBlock(x, y, z, newBlock);
-            world.setBlockMetadataWithNotify(x, y, z, meta, 2);
-        }
+        if (newBlock == null) return false;
+        if (world.isRemote) return true;
+        final Block paint = newBlock;
+        final int paintMeta = meta;
+        // Oil is paid only once the painted block stands
+        ProtectionHelper.outsideItemUse(
+                world,
+                () -> ProtectionHelper.replaceBlock(user, world, x, y, z, paint, paintMeta, () -> {
+                    if (!user.inventory.consumeInventoryItem(ComponentListMF.plant_oil)) return false;
+                    ItemStack jug = new ItemStack(FoodListMF.jug_empty);
+                    if (!user.inventory.addItemStackToInventory(jug)) user.entityDropItem(jug, 0F);
+                    world.playAuxSFXAtEntity(user, 2001, x, y, z, Block.getIdFromBlock(paint) + (paintMeta << 12));
+                    SkillList.construction.addXP(user, 1);
+                    item.damageItem(1, user);
+                    return true;
+                }));
         return false;
     }
 

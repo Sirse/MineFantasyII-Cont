@@ -162,22 +162,25 @@ public class ItemScythe extends Item implements IToolMaterial, IDamageType, IRac
             return false;
         } else {
             Block block = world.getBlock(x, y, z);
+            ProtectionHelper.outsideItemUse(world, () -> cut(world, x, y, z, player, block));
+        }
+        return false;
+    }
 
-            if (block != null) {
-                Material m = block.getMaterial();
-                float hard = block.getBlockHardness(world, x, y, z);
-                if (this.canCutMaterial(m, hard, false)) {
-                    if (cutGrass(world, x, y, z, 5, player, false)) {
-                        player.swingItem();
-                    }
-                } else if (this.canCutMaterial(m, hard, true)) {
-                    if (cutGrass(world, x, y, z, 3, player, true)) {
-                        player.swingItem();
-                    }
+    private void cut(World world, int x, int y, int z, EntityPlayer player, Block block) {
+        if (block != null) {
+            Material m = block.getMaterial();
+            float hard = block.getBlockHardness(world, x, y, z);
+            if (this.canCutMaterial(m, hard, false)) {
+                if (cutGrass(world, x, y, z, 5, player, false)) {
+                    player.swingItem();
+                }
+            } else if (this.canCutMaterial(m, hard, true)) {
+                if (cutGrass(world, x, y, z, 3, player, true)) {
+                    player.swingItem();
                 }
             }
         }
-        return false;
     }
 
     @Override
