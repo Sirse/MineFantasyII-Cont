@@ -12,9 +12,6 @@ import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.OreDictionary;
 
-import com.google.common.collect.Lists;
-
-import cpw.mods.fml.common.IFuelHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.cooking.CookRecipe;
@@ -45,10 +42,6 @@ public class MineFantasyAPI {
      * This variable saves if MineFantasy is in debug mode
      */
     public static boolean isInDebugMode;
-    /**
-     * This fuel handler is for MineFantasy equipment, it uses real fuel(like coal) not wood
-     */
-    private static List<IFuelHandler> fuelHandlers = Lists.newArrayList();
 
     @SideOnly(Side.CLIENT)
     public static void init() {}
@@ -103,18 +96,6 @@ public class MineFantasyAPI {
     public static RecipeEntry<ProcessRecipe> addBlastFurnaceRecipe(Object input, ItemStack output) {
         return NativeRecipes
                 .addNative(MFRecipes.BLAST_FURNACE, input, ProcessRecipe.of(NativeRecipes.input(input), output));
-    }
-
-    public static void registerFuelHandler(IFuelHandler handler) {
-        fuelHandlers.add(handler);
-    }
-
-    public static int getFuelValue(ItemStack itemStack) {
-        int fuelValue = 0;
-        for (IFuelHandler handler : fuelHandlers) {
-            fuelValue = Math.max(fuelValue, handler.getBurnTime(itemStack));
-        }
-        return fuelValue;
     }
 
     /**

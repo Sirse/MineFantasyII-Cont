@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.mining.RandomDigs;
 import minefantasy.mf2.api.mining.RandomOre;
@@ -192,7 +191,6 @@ public class ComponentListMF {
         WoodMaterial.init();
         Items.potionitem.setContainerItem(Items.glass_bottle);
         GameRegistry.registerFuelHandler(new FuelHandlerMF());
-        MineFantasyAPI.registerFuelHandler(new AdvancedFuelHandlerMF());
         Items.iron_ingot.setTextureName("minefantasy2:component/ingotWroughtIron");
         Blocks.iron_block.setBlockTextureName("minefantasy2:metal/iron_block");
         Blocks.iron_bars.setBlockTextureName("minefantasy2:metal/iron_bars");
@@ -214,11 +212,18 @@ public class ComponentListMF {
         OreDictionary.registerOre("ingotCompositeAlloy", ingotCompositeAlloy);
         OreDictionary.registerOre("ingotIron", Items.iron_ingot);
         OreDictionary.registerOre("ingotGold", Items.gold_ingot);
-
-        AdvancedFuelHandlerMF.registerItems();
     }
 
     private static void initFuels() {
+        MineFantasyFuels.addCarbon(new ItemStack(Items.coal, 1, OreDictionary.WILDCARD_VALUE), 1);
+        MineFantasyFuels.addCarbon(coke, 1);
+        MineFantasyFuels.addCarbon(coal_flux, 1);
+        MineFantasyFuels.addCarbon(Blocks.coal_block, 9);
+        // Blast furnace heater: coal and charcoal burn 15s, coke twice that, a block of coal nine coal
+        MineFantasyFuels.addBlastFuel(coalDust, 100);
+        MineFantasyFuels.addBlastFuel(new ItemStack(Items.coal, 1, OreDictionary.WILDCARD_VALUE), 300);
+        MineFantasyFuels.addBlastFuel(coke, 600);
+        MineFantasyFuels.addBlastFuel(Blocks.coal_block, 2700);
         MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 0), 900, 1500);// 1500C , 45s
         MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 1), 1200, 1800);// 1800C , 1m
         MineFantasyFuels.addForgeFuel(Items.blaze_powder, 200, 3000, true);// 3000C , 10s

@@ -10,8 +10,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
-import minefantasy.mf2.api.MineFantasyAPI;
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.Sounds;
@@ -40,7 +40,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
     }
 
     public static int getItemBurnTime(ItemStack fuel) {
-        return MineFantasyAPI.getFuelValue(fuel) / 4;
+        return MineFantasyFuels.getBlastFuel(fuel);
     }
 
     @Override

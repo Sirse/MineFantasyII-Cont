@@ -12,8 +12,8 @@ import minefantasy.mf2.api.heating.ForgeFuel;
 import minefantasy.mf2.api.heating.ForgeItemHandler;
 
 /**
- * Forge fuels, with how long and how hot they burn, and carbon for the bloomery and the blast furnace, kept as the ore
- * name {@code Carbon-<uses>}.
+ * Forge fuels, with how long and how hot they burn; fuel for the blast furnace heater; and carbon for the bloomery and
+ * the blast furnace, kept as the ore name {@code Carbon-<uses>}.
  */
 public class MineFantasyFuels {
 
@@ -123,6 +123,58 @@ public class MineFantasyFuels {
      */
     public static boolean isCarbon(ItemStack item) {
         return getCarbon(item) > 0;
+    }
+
+    /** Fuel for the blast furnace heater: an item, every metadata for a wildcard, and how many ticks it burns. */
+    public static final class BlastFuel {
+
+        private final ItemStack item;
+        private final int ticks;
+
+        private BlastFuel(ItemStack item, int ticks) {
+            this.item = item;
+            this.ticks = ticks;
+        }
+    }
+
+    private static final List<BlastFuel> blastFuel = new ArrayList<BlastFuel>();
+    /** Fuel scripts add or take out, ahead of the mods' own, the latest first: a reload takes it back out. */
+    private static final List<BlastFuel> scriptBlastFuel = new ArrayList<BlastFuel>();
+
+    /**
+     * Adds fuel for the blast furnace heater. A stack names its own metadata only, every one with
+     * {@link OreDictionary#WILDCARD_VALUE}; an Item or a Block names metadata 0.
+     *
+     * @param input Item Block or ItemStack
+     * @param ticks how long one item burns
+     */
+    public static void addBlastFuel(Object input, int ticks) {
+        ItemStack item = convert(input);
+        if (item != null && ticks > 0) blastFuel.add(new BlastFuel(item.copy(), ticks));
+    }
+
+    /** As {@link #addBlastFuel}, for a script; no ticks takes the item out as fuel. */
+    public static BlastFuel addScriptBlastFuel(ItemStack item, int ticks) {
+        BlastFuel fuel = new BlastFuel(item.copy(), Math.max(0, ticks));
+        scriptBlastFuel.add(fuel);
+        return fuel;
+    }
+
+    public static void removeScriptBlastFuel(BlastFuel fuel) {
+        scriptBlastFuel.remove(fuel);
+    }
+
+    /** How many ticks this burns in the blast furnace heater; 0 when it is no fuel there. */
+    public static int getBlastFuel(ItemStack item) {
+        if (item == null || item.getItem() == null) return 0;
+        for (int i = scriptBlastFuel.size() - 1; i >= 0; i--) {
+            BlastFuel fuel = scriptBlastFuel.get(i);
+            if (OreDictionary.itemMatches(fuel.item, item, false)) return fuel.ticks;
+        }
+        for (BlastFuel fuel : blastFuel) {
+            if (OreDictionary.itemMatches(fuel.item, item, false)) return fuel.ticks;
+        }
+        return 0;
     }
 
     public static ItemStack convert(Object input) {
