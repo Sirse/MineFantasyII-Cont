@@ -8,6 +8,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.enviromine.EnviroMineCompat;
 import minefantasy.mf2.integration.sereneseasons.SereneSeasonsCompat;
 
@@ -27,16 +28,14 @@ public class SereneSeasonsInstalledTest {
                 forge.yCoord,
                 forge.zCoord);
         assertTrue("real seasonal API failed", Float.isFinite(climate));
-        SereneSeasonsCompat.load();
-        AmbientTemperature.setProvider(null);
-        try {
+        try (Overrides overrides = new Overrides().run(() -> SereneSeasonsCompat.load(), () -> EnviroMineCompat.load())
+                .air(null)) {
+            // No integration provider: the forge reads the biome climate Serene Seasons adjusts
             float expected = Math.max(
                     -100F,
                     Math.min(100F, AmbientTemperature.temperate + (climate - .8F) * AmbientTemperature.biomeScale));
             forge.updateEntity();
             assertEquals(expected, forge.temperature, .001F);
-        } finally {
-            EnviroMineCompat.load();
         }
         helper.succeed();
     }

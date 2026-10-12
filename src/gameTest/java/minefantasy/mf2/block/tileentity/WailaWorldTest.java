@@ -1,12 +1,12 @@
 package minefantasy.mf2.block.tileentity;
 
+import static minefantasy.mf2.block.tileentity.WailaFixtures.*;
 import static minefantasy.mf2.gametest.Assert.*;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.FakePlayer;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
@@ -21,34 +21,10 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.gametest.Modders;
-import minefantasy.mf2.integration.waila.WailaData;
 import minefantasy.mf2.integration.waila.WailaProvider;
 
 @GameTestHolder("minefantasy2")
 public class WailaWorldTest {
-
-    private static NBTTagCompound inspect(GameTestHelper helper, TileEntity tile, FakePlayer player) {
-        player.setPosition(tile.xCoord + .5, tile.yCoord + 1, tile.zCoord + .5);
-        NBTTagCompound before = new NBTTagCompound();
-        tile.writeToNBT(before);
-        tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord).isModified = false;
-        NBTTagCompound result = null;
-        for (int i = 0; i < 3; i++) result = new WailaProvider().getNBTData(
-                player,
-                tile,
-                new NBTTagCompound(),
-                tile.getWorldObj(),
-                tile.xCoord,
-                tile.yCoord,
-                tile.zCoord).getCompoundTag(WailaData.KEY);
-        NBTTagCompound after = new NBTTagCompound();
-        tile.writeToNBT(after);
-        assertEquals("view changed state", before, after);
-        assertFalse(
-                "view dirtied chunk",
-                tile.getWorldObj().getChunkFromBlockCoords(tile.xCoord, tile.zCoord).isModified);
-        return result;
-    }
 
     @GameTest
     public static void storageUsesActualCountAndRackSlots(GameTestHelper helper) {
@@ -56,7 +32,7 @@ public class WailaWorldTest {
         helper.setBlock(2, 2, 2, BlockListMF.components);
         TileEntityComponent pile = helper.assertTileEntityPresent(TileEntityComponent.class, 2, 2, 2);
         pile.setItem(new ItemStack(Items.iron_ingot), "bar", "bar", 64, 40);
-        NBTTagCompound data = inspect(helper, pile, player);
+        NBTTagCompound data = inspectNear(pile, player);
         assertEquals(40, data.getInteger("Count"));
         assertEquals(64, data.getInteger("Limit"));
         assertEquals(1, pile.item.stackSize);
@@ -64,13 +40,13 @@ public class WailaWorldTest {
         TileEntityAmmoBox box = helper.assertTileEntityPresent(TileEntityAmmoBox.class, 3, 2, 2);
         box.ammo = new ItemStack(Items.arrow);
         box.stock = 100;
-        data = inspect(helper, box, player);
+        data = inspectNear(box, player);
         assertEquals(100, data.getInteger("Count"));
         assertEquals(box.getMaxAmmo(box.ammo), data.getInteger("Limit"));
         helper.setBlock(4, 2, 2, BlockListMF.rack_wood);
         TileEntityRack rack = helper.assertTileEntityPresent(TileEntityRack.class, 4, 2, 2);
         rack.setInventorySlotContents(0, new ItemStack(Items.iron_sword));
-        data = inspect(helper, rack, player);
+        data = inspectNear(rack, player);
         assertEquals(1, data.getInteger("Count"));
         assertEquals(4, data.getInteger("Limit"));
         assertEquals(1, data.getTagList("Contents", 10).tagCount());
@@ -92,7 +68,7 @@ public class WailaWorldTest {
         TileEntityRoad road = helper.assertTileEntityPresent(TileEntityRoad.class, 3, 2, 2);
         road.setSurface(Blocks.cobblestone, 0);
         road.isLocked = true;
-        NBTTagCompound data = inspect(helper, road, player);
+        NBTTagCompound data = inspectNear(road, player);
         assertTrue(data.getBoolean("Locked"));
         assertEquals(
                 new ItemStack(Blocks.cobblestone).getItem(),
@@ -110,11 +86,11 @@ public class WailaWorldTest {
         table.study.startOverIfChanged(artifact, player.getUniqueID().toString());
         table.study.progress = 4;
         table.maxProgress = 10;
-        assertTrue(inspect(helper, table, player).getBoolean("ShowProgress"));
+        assertTrue(inspectNear(table, player).getBoolean("ShowProgress"));
         FakePlayer other = Modders.fresh(helper, Modders.NOVICE);
-        assertFalse(inspect(helper, table, other).hasKey("Progress"));
+        assertFalse(inspectNear(table, other).hasKey("Progress"));
         table.setInventorySlotContents(0, new ItemStack(Items.paper));
-        assertFalse(inspect(helper, table, player).hasKey("Progress"));
+        assertFalse(inspectNear(table, player).hasKey("Progress"));
         helper.succeed();
     }
 
@@ -135,18 +111,18 @@ public class WailaWorldTest {
         helper.setBlock(2, 2, 2, BlockListMF.research);
         TileEntityResearch table = helper.assertTileEntityPresent(TileEntityResearch.class, 2, 2, 2);
         table.setInventorySlotContents(0, artifact);
-        NBTTagCompound data = inspect(helper, table, player);
+        NBTTagCompound data = inspectNear(table, player);
         assertTrue(data.getBoolean("ResearchHidden"));
         assertEquals(0, data.getTagList("Research", 10).tagCount());
         for (InformationBase parent = hidden.parentInfo; parent != null; parent = parent.parentInfo) {
             ResearchLogic.forceUnlock(player, parent);
         }
-        data = inspect(helper, table, player);
+        data = inspectNear(table, player);
         assertFalse(data.getBoolean("ResearchHidden"));
         assertEquals(1, data.getTagList("Research", 10).tagCount());
         assertFalse(data.getTagList("Research", 10).getCompoundTagAt(0).getBoolean("Learned"));
         ResearchLogic.forceUnlock(player, hidden);
-        data = inspect(helper, table, player);
+        data = inspectNear(table, player);
         assertTrue(data.getTagList("Research", 10).getCompoundTagAt(0).getBoolean("Learned"));
         helper.succeed();
     }

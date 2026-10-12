@@ -11,6 +11,7 @@ import enviromine.core.EM_Settings;
 import enviromine.trackers.properties.BiomeProperties;
 import enviromine.trackers.properties.DimensionProperties;
 import minefantasy.mf2.api.heating.AmbientTemperature;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.enviromine.EnviroMineCompat;
 
 @GameTestHolder(value = "minefantasy2", requiredMods = "enviromine")
@@ -48,13 +49,15 @@ public class EnviroMineClimateTest {
 
     @GameTest
     public static void blockProfilesRespectMetadataDisabledAndInvalidValues(GameTestHelper helper) {
-        boolean enabled = EnviroMineCompat.enabled;
-        EnviroMineCompat.enabled = true;
         String name = String
                 .valueOf(net.minecraft.block.Block.blockRegistry.getNameForObject(net.minecraft.init.Blocks.stone));
         java.util.Map<String, enviromine.trackers.properties.BlockProperties> before = new java.util.HashMap<>(
                 EM_Settings.blockProperties);
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> EnviroMineCompat.enabled, v -> EnviroMineCompat.enabled = v, true).run(() -> {}, () -> {
+                    EM_Settings.blockProperties.clear();
+                    EM_Settings.blockProperties.putAll(before);
+                })) {
             float[] values = { 12, -5, 500, Float.NaN };
             for (int i = 0; i < 4; i++) {
                 enviromine.trackers.properties.BlockProperties profile = new enviromine.trackers.properties.BlockProperties(
@@ -68,13 +71,9 @@ public class EnviroMineClimateTest {
             assertEquals(-5F, profile.temperature(net.minecraft.init.Blocks.stone, 1), 0F);
             assertEquals(0F, profile.temperature(net.minecraft.init.Blocks.stone, 2), 0F);
             assertTrue(Float.isNaN(profile.temperature(net.minecraft.init.Blocks.stone, 3)));
-            EnviroMineCompat.enabled = false;
+            overrides.set(() -> EnviroMineCompat.enabled, v -> EnviroMineCompat.enabled = v, false);
             assertFalse(profile.isActive());
             assertTrue(Float.isNaN(profile.temperature(net.minecraft.init.Blocks.stone, 0)));
-        } finally {
-            EM_Settings.blockProperties.clear();
-            EM_Settings.blockProperties.putAll(before);
-            EnviroMineCompat.enabled = enabled;
         }
         helper.succeed();
     }
@@ -84,10 +83,15 @@ public class EnviroMineClimateTest {
         TestPos at = helper.absolute(1, 1, 1);
         int id = helper.getWorld().getBiomeGenForCoords(at.x(), at.z()).biomeID;
         BiomeProperties biome = properties();
-        BiomeProperties before = EM_Settings.biomeProperties.put(id, biome);
+        BiomeProperties before = EM_Settings.biomeProperties.get(id);
         int dimension = helper.getWorld().provider.dimensionId;
-        DimensionProperties dimensionBefore = EM_Settings.dimensionProperties.remove(dimension);
-        try {
+        DimensionProperties dimensionBefore = EM_Settings.dimensionProperties.get(dimension);
+        try (Overrides overrides = new Overrides()
+                .run(() -> EM_Settings.biomeProperties.put(id, biome), () -> restore(id, before))
+                .run(() -> EM_Settings.dimensionProperties.remove(dimension), () -> {
+                    if (dimensionBefore == null) EM_Settings.dimensionProperties.remove(dimension);
+                    else EM_Settings.dimensionProperties.put(dimension, dimensionBefore);
+                })) {
             float baseline = new EnviroMineCompat.Climate(world -> null).get(helper.getWorld(), at.x(), at.y(), at.z());
             String[] seasons = { "EARLY_SPRING", "MID_SPRING", "LATE_SPRING", "EARLY_SUMMER", "MID_SUMMER",
                     "LATE_SUMMER", "EARLY_AUTUMN", "MID_AUTUMN", "LATE_AUTUMN", "EARLY_WINTER", "MID_WINTER",
@@ -106,10 +110,6 @@ public class EnviroMineClimateTest {
                     .get(helper.getWorld(), at.x(), at.y(), at.z());
             float noSeason = new EnviroMineCompat.Climate(world -> null).get(helper.getWorld(), at.x(), at.y(), at.z());
             assertEquals(noSeason, disabled, 0F);
-        } finally {
-            restore(id, before);
-            if (dimensionBefore == null) EM_Settings.dimensionProperties.remove(dimension);
-            else EM_Settings.dimensionProperties.put(dimension, dimensionBefore);
         }
         helper.succeed();
     }
@@ -120,15 +120,12 @@ public class EnviroMineClimateTest {
         int id = helper.getWorld().getBiomeGenForCoords(at.x(), at.z()).biomeID;
         BiomeProperties biome = properties();
         biome.ambientTemp = Float.NaN;
-        BiomeProperties before = EM_Settings.biomeProperties.put(id, biome);
+        BiomeProperties before = EM_Settings.biomeProperties.get(id);
         EnviroMineCompat.Climate climate = new EnviroMineCompat.Climate(world -> null);
-        AmbientTemperature.setProvider(climate);
-        try {
+        try (Overrides overrides = new Overrides()
+                .run(() -> EM_Settings.biomeProperties.put(id, biome), () -> restore(id, before)).air(climate)) {
             assertTrue(Float.isNaN(climate.get(helper.getWorld(), at.x(), at.y(), at.z())));
             assertTrue(Float.isFinite(AmbientTemperature.get(helper.getWorld(), at.x(), at.y(), at.z())));
-        } finally {
-            restore(id, before);
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
@@ -138,8 +135,9 @@ public class EnviroMineClimateTest {
         TestPos at = helper.absolute(1, 1, 1);
         int id = helper.getWorld().getBiomeGenForCoords(at.x(), at.z()).biomeID;
         BiomeProperties biome = properties();
-        BiomeProperties before = EM_Settings.biomeProperties.put(id, biome);
-        try {
+        BiomeProperties before = EM_Settings.biomeProperties.get(id);
+        try (Overrides overrides = new Overrides()
+                .run(() -> EM_Settings.biomeProperties.put(id, biome), () -> restore(id, before))) {
             assertTrue(
                     Float.isFinite(
                             new EnviroMineCompat.Climate(world -> null)
@@ -151,8 +149,6 @@ public class EnviroMineClimateTest {
                     Float.isNaN(
                             new EnviroMineCompat.Climate(world -> null)
                                     .get(helper.getWorld(), at.x(), at.y(), at.z())));
-        } finally {
-            restore(id, before);
         }
         helper.succeed();
     }
@@ -161,17 +157,14 @@ public class EnviroMineClimateTest {
     public static void continuationGetsColderAtNight(GameTestHelper helper) {
         TestPos at = helper.absolute(1, 1, 1);
         int id = helper.getWorld().getBiomeGenForCoords(at.x(), at.z()).biomeID;
-        BiomeProperties before = EM_Settings.biomeProperties.put(id, properties());
-        long time = helper.getWorld().getWorldTime();
-        try {
-            helper.getWorld().setWorldTime(6000);
+        BiomeProperties before = EM_Settings.biomeProperties.get(id);
+        try (Overrides overrides = new Overrides()
+                .run(() -> EM_Settings.biomeProperties.put(id, properties()), () -> restore(id, before))
+                .set(() -> helper.getWorld().getWorldTime(), v -> helper.getWorld().setWorldTime(v), 6000L)) {
             float day = new EnviroMineCompat.Climate(world -> null).get(helper.getWorld(), at.x(), at.y(), at.z());
             helper.getWorld().setWorldTime(18000);
             float night = new EnviroMineCompat.Climate(world -> null).get(helper.getWorld(), at.x(), at.y(), at.z());
             assertEquals(8F, day - night, .001F);
-        } finally {
-            helper.getWorld().setWorldTime(time);
-            restore(id, before);
         }
         helper.succeed();
     }

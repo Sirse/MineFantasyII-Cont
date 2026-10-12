@@ -17,6 +17,7 @@ import ganymedes01.etfuturum.spectator.SpectatorMode;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigIntegration;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.etfuturum.EtFuturumCompat;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
@@ -33,11 +34,13 @@ public class EtFuturumInstalledTest {
 
     @GameTest
     public static void theBridgeRegistersContent(GameTestHelper helper) {
-        boolean integration = ConfigIntegration.etfuturumIntegration;
-        boolean blacklist = ConfigIntegration.etfuturumBlastBlacklist;
-        try {
-            ConfigIntegration.etfuturumIntegration = true;
-            ConfigIntegration.etfuturumBlastBlacklist = true;
+        try (Overrides overrides = new Overrides().set(
+                () -> ConfigIntegration.etfuturumIntegration,
+                v -> ConfigIntegration.etfuturumIntegration = v,
+                true).set(
+                        () -> ConfigIntegration.etfuturumBlastBlacklist,
+                        v -> ConfigIntegration.etfuturumBlastBlacklist = v,
+                        true)) {
             EtFuturumCompat.load();
 
             assertTrue("berries do not compost", CompostingRegistry.isCompostable(new ItemStack(FoodListMF.berries)));
@@ -64,9 +67,6 @@ public class EtFuturumInstalledTest {
             assertTrue(
                     "raw iron does not refine in the big furnace",
                     refinesToBar(ModItems.RAW_ORE.newItemStack(1, 1), "Iron"));
-        } finally {
-            ConfigIntegration.etfuturumIntegration = integration;
-            ConfigIntegration.etfuturumBlastBlacklist = blacklist;
         }
         helper.succeed();
     }

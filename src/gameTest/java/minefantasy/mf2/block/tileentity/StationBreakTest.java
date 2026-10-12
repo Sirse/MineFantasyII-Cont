@@ -40,6 +40,7 @@ import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.list.ToolListMF;
 
 /**
@@ -299,43 +300,44 @@ public class StationBreakTest {
 
     @GameTest
     public static void crucible(GameTestHelper helper) throws Exception {
-        boolean reduce = ConfigHardcore.HCCreduceIngots;
         Stations.begin(helper);
-        try {
-            reload(
-                    tx -> tx.add(
-                            MFRecipes.ALLOY,
-                            id("alloy", "jar"),
-                            new Alloy(new ItemStack(bar), 0, Arrays.asList(new ItemStack(jar))),
-                            0));
-            // Hardcore Ingots: breaking a crucible loses its output, as the book warns
-            for (boolean hardcore : new boolean[] { false, true }) {
-                ConfigHardcore.HCCreduceIngots = hardcore;
-                for (boolean finished : new boolean[] { false, true }) {
-                    helper.setBlock(1, 1, 1, BlockListMF.crucible);
-                    TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
-                    crucible.setInventorySlotContents(0, new ItemStack(jar));
-                    call(crucible, "updateCachedRecipe", new Class<?>[0]);
-                    helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
-                    crucible.temperature = 500;
-                    crucible.progress = 1;
-                    if (finished) {
-                        crucible.smeltItem();
-                        assertEquals(bar, crucible.getStackInSlot(crucible.getSizeInventory() - 1).getItem());
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, false)) {
+            try {
+                reload(
+                        tx -> tx.add(
+                                MFRecipes.ALLOY,
+                                id("alloy", "jar"),
+                                new Alloy(new ItemStack(bar), 0, Arrays.asList(new ItemStack(jar))),
+                                0));
+                // Hardcore Ingots: breaking a crucible loses its output, as the book warns
+                for (boolean hardcore : new boolean[] { false, true }) {
+                    ConfigHardcore.HCCreduceIngots = hardcore;
+                    for (boolean finished : new boolean[] { false, true }) {
+                        helper.setBlock(1, 1, 1, BlockListMF.crucible);
+                        TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
+                        crucible.setInventorySlotContents(0, new ItemStack(jar));
+                        call(crucible, "updateCachedRecipe", new Class<?>[0]);
+                        helper.setBlock(1, 0, 1, net.minecraft.init.Blocks.lava);
+                        crucible.temperature = 500;
+                        crucible.progress = 1;
+                        if (finished) {
+                            crucible.smeltItem();
+                            assertEquals(bar, crucible.getStackInSlot(crucible.getSizeInventory() - 1).getItem());
+                        }
+                        breakAt(helper, 1, 1, 1);
+                        Map<String, Integer> expected = !finished ? items(new ItemStack(jar))
+                                : hardcore ? items(new ItemStack(emptyJar))
+                                        : items(new ItemStack(emptyJar), new ItemStack(bar));
+                        assertEquals(
+                                (hardcore ? "hardcore, " : "") + (finished ? "after the work" : "during the work"),
+                                expected,
+                                pickUp(helper));
                     }
-                    breakAt(helper, 1, 1, 1);
-                    Map<String, Integer> expected = !finished ? items(new ItemStack(jar))
-                            : hardcore ? items(new ItemStack(emptyJar))
-                                    : items(new ItemStack(emptyJar), new ItemStack(bar));
-                    assertEquals(
-                            (hardcore ? "hardcore, " : "") + (finished ? "after the work" : "during the work"),
-                            expected,
-                            pickUp(helper));
                 }
+            } finally {
+                Stations.end();
             }
-        } finally {
-            ConfigHardcore.HCCreduceIngots = reduce;
-            Stations.end();
         }
         helper.succeed();
     }
@@ -470,41 +472,41 @@ public class StationBreakTest {
 
     @GameTest
     public static void blastFurnaceLosesAPartAtATime(GameTestHelper helper) throws Exception {
-        boolean reduce = ConfigHardcore.HCCreduceIngots;
         Stations.begin(helper);
-        try {
-            ConfigHardcore.HCCreduceIngots = false;
-            reload(
-                    tx -> tx.add(
-                            MFRecipes.BLAST_FURNACE,
-                            id("blast_furnace", "ore"),
-                            ProcessRecipe.of(Input.of(ore), new ItemStack(bar)),
-                            0));
-            // During the work: the chamber goes, then the heater smelts what is left above it, which is nothing
-            TileEntityBlastFH heater = blastFurnace(helper);
-            breakAt(helper, 2, 3, 2);
-            assertEquals(
-                    "the chamber drops its load",
-                    items(new ItemStack(carbon), new ItemStack(ore)),
-                    pickUp(helper));
-            call(heater, "smeltItem", new Class<?>[0]);
-            assertNull("a smelt without a chamber made something", catcher(helper).getStackInSlot(9));
-            assertEquals(items(), pickUp(helper));
-            breakAt(helper, 2, 2, 2);
-            assertEquals("the heater drops its fuel", items(new ItemStack(Items.coal, 2)), pickUp(helper));
-            breakAt(helper, 2, 1, 2);
-            assertEquals(items(), pickUp(helper));
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, false)) {
+            try {
+                reload(
+                        tx -> tx.add(
+                                MFRecipes.BLAST_FURNACE,
+                                id("blast_furnace", "ore"),
+                                ProcessRecipe.of(Input.of(ore), new ItemStack(bar)),
+                                0));
+                // During the work: the chamber goes, then the heater smelts what is left above it, which is nothing
+                TileEntityBlastFH heater = blastFurnace(helper);
+                breakAt(helper, 2, 3, 2);
+                assertEquals(
+                        "the chamber drops its load",
+                        items(new ItemStack(carbon), new ItemStack(ore)),
+                        pickUp(helper));
+                call(heater, "smeltItem", new Class<?>[0]);
+                assertNull("a smelt without a chamber made something", catcher(helper).getStackInSlot(9));
+                assertEquals(items(), pickUp(helper));
+                breakAt(helper, 2, 2, 2);
+                assertEquals("the heater drops its fuel", items(new ItemStack(Items.coal, 2)), pickUp(helper));
+                breakAt(helper, 2, 1, 2);
+                assertEquals(items(), pickUp(helper));
 
-            // After the work: the ore and a use of the carbon are spent, the bar sits in the crucible
-            heater = blastFurnace(helper);
-            call(heater, "smeltItem", new Class<?>[0]);
-            breakAt(helper, 2, 3, 2);
-            breakAt(helper, 2, 2, 2);
-            breakAt(helper, 2, 1, 2);
-            assertEquals("after the work", items(new ItemStack(Items.coal, 2), new ItemStack(bar)), pickUp(helper));
-        } finally {
-            ConfigHardcore.HCCreduceIngots = reduce;
-            Stations.end();
+                // After the work: the ore and a use of the carbon are spent, the bar sits in the crucible
+                heater = blastFurnace(helper);
+                call(heater, "smeltItem", new Class<?>[0]);
+                breakAt(helper, 2, 3, 2);
+                breakAt(helper, 2, 2, 2);
+                breakAt(helper, 2, 1, 2);
+                assertEquals("after the work", items(new ItemStack(Items.coal, 2), new ItemStack(bar)), pickUp(helper));
+            } finally {
+                Stations.end();
+            }
         }
         helper.succeed();
     }

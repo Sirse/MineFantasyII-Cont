@@ -19,6 +19,7 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.gadget.ItemClimbingPick;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -53,12 +54,9 @@ public class OffhandUseTest {
     }
 
     private static void withoutStamina(Check check) {
-        boolean stamina = StaminaBar.isSystemActive;
-        StaminaBar.isSystemActive = false;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)) {
             check.run();
-        } finally {
-            StaminaBar.isSystemActive = stamina;
         }
     }
 

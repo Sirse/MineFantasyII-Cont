@@ -24,6 +24,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.config.ConfigCrafting;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.item.list.ArmourListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -133,9 +134,8 @@ public class HeatHazardTest {
 
     @GameTest
     public static void hotItemsBurnAPlayerWithoutBlacksmithAttire(GameTestHelper helper) {
-        boolean hardcore = ConfigCrafting.hotBurn;
-        try {
-            ConfigCrafting.hotBurn = false;
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigCrafting.hotBurn, v -> ConfigCrafting.hotBurn = v, false)) {
             FakePlayer bare = carrying(helper, hotSword(), false);
             assertTrue("a hot item did not burn", PlayerTickHandlerMF.burnWithHotItems(bare));
             assertTrue("the player is not on fire", bare.isBurning());
@@ -147,12 +147,10 @@ public class HeatHazardTest {
                     "a cold item burned",
                     PlayerTickHandlerMF.burnWithHotItems(carrying(helper, new ItemStack(Items.iron_sword), false)));
 
-            ConfigCrafting.hotBurn = true;
+            overrides.set(() -> ConfigCrafting.hotBurn, v -> ConfigCrafting.hotBurn = v, true);
             assertTrue(
                     "hardcore hot burns spared the attire",
                     PlayerTickHandlerMF.burnWithHotItems(carrying(helper, hotSword(), true)));
-        } finally {
-            ConfigCrafting.hotBurn = hardcore;
         }
         helper.succeed();
     }

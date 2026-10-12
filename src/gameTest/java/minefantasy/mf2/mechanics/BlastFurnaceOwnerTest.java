@@ -9,7 +9,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
@@ -20,6 +19,9 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.refining.BlockBFH;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
+import minefantasy.mf2.gametest.DenyAll;
+import minefantasy.mf2.gametest.DenyPlacing;
+import minefantasy.mf2.gametest.Overrides;
 
 /**
  * The blast furnace acts for the player who built it, known by UUID, online or through a stand-in; with no owner known
@@ -74,8 +76,7 @@ public class BlastFurnaceOwnerTest {
                 helper.getWorld().getBlock(at.x() + 1, at.y(), at.z()));
 
         DenyPlacing deny = new DenyPlacing();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(deny)) {
             helper.getWorld().setBlock(at.x(), at.y() - 1, at.z() + 1, Blocks.stone);
             assertFalse("not where the owner may not place", heater.setFire(at.x(), at.y(), at.z() + 1));
             assertEquals("the place event was asked", Blocks.fire, deny.placed);
@@ -83,8 +84,6 @@ public class BlastFurnaceOwnerTest {
                     "cancelled furnace fire restores air",
                     Blocks.air,
                     helper.getWorld().getBlock(at.x(), at.y(), at.z() + 1));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         endOfTick(helper);
         helper.succeed();
@@ -113,14 +112,10 @@ public class BlastFurnaceOwnerTest {
         }
 
         // A stand-in gets no rights of its own: protection still says no
-        DenyAll deny = new DenyAll();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(new DenyAll())) {
             helper.setBlock(1, 1, 1, Blocks.stone);
             TestPos at = helper.absolute(1, 1, 1);
             assertFalse(ProtectionHelper.canBreak(firstOwner.resolve(world), world, at.x(), at.y(), at.z()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertFalse("a stand-in is no operator", firstOwner.resolve(world).canCommandSenderUseCommand(2, "gamemode"));
         helper.succeed();

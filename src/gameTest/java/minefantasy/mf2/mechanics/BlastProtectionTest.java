@@ -11,7 +11,6 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.GameRules;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.world.ExplosionEvent;
 
@@ -24,6 +23,9 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.entity.EntityFireBlast;
 import minefantasy.mf2.entity.EntityMine;
 import minefantasy.mf2.entity.Shockwave;
+import minefantasy.mf2.gametest.DenyAll;
+import minefantasy.mf2.gametest.DenyPlacing;
+import minefantasy.mf2.gametest.Overrides;
 
 /**
  * Fire blasts, explosions, shockwaves and mines change blocks and hurt as whoever is behind them may: a player as
@@ -99,12 +101,8 @@ public class BlastProtectionTest {
         helper.setBlock(2, 2, 2, Blocks.stone);
         TestPos at = helper.absolute(2, 2, 2);
         EntityFireBlast blast = new EntityFireBlast(helper.getWorld(), unconnected(helper), 0, 0, 0);
-        DenyAll deny = new DenyAll();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(new DenyAll())) {
             helper.getWorld().newExplosion(blast, at.x() + 0.5D, at.y() + 0.5D, at.z() + 0.5D, 2.0F, false, true);
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertEquals(
                 "a denied explosion block remains",
@@ -126,12 +124,8 @@ public class BlastProtectionTest {
     public static void aCancelledExplosionBreaksAndBurnsNothing(GameTestHelper helper) {
         floor(helper);
         TestPos at = helper.absolute(2, 2, 2);
-        CancelExplosions cancel = new CancelExplosions();
-        MinecraftForge.EVENT_BUS.register(cancel);
-        try {
+        try (Overrides overrides = new Overrides().listen(new CancelExplosions())) {
             helper.getWorld().newExplosion(unconnected(helper), at.x() + 0.5D, at.y(), at.z() + 0.5D, 3F, true, true);
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(cancel);
         }
         assertEquals("the floor stands", 25, count(helper, Blocks.stone));
         assertEquals("nothing burns", 0, count(helper, Blocks.fire));
@@ -143,14 +137,10 @@ public class BlastProtectionTest {
         floor(helper);
         TestPos at = helper.absolute(2, 2, 2);
         EntityFireBlast blast = new EntityFireBlast(helper.getWorld(), unconnected(helper), 0, 0, 0);
-        DenyAll deny = new DenyAll();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(new DenyAll())) {
             for (int i = 0; i < 5; i++) {
                 helper.getWorld().newExplosion(blast, at.x() + 0.5D, at.y(), at.z() + 0.5D, 3F, true, true);
             }
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertEquals("the floor stands", 25, count(helper, Blocks.stone));
         assertEquals("nothing burns", 0, count(helper, Blocks.fire));
@@ -161,13 +151,9 @@ public class BlastProtectionTest {
     public static void anotherExplosionIsLeftToItsOwnEvents(GameTestHelper helper) {
         floor(helper);
         TestPos at = helper.absolute(2, 2, 2);
-        DenyAll deny = new DenyAll();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(new DenyAll())) {
             // A player's own explosion raises no break event; its Start and Detonate events are for others to settle
             helper.getWorld().newExplosion(unconnected(helper), at.x() + 0.5D, at.y(), at.z() + 0.5D, 3F, false, true);
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertTrue("MF took nothing out of it", count(helper, Blocks.stone) < 25);
         helper.succeed();
@@ -207,12 +193,9 @@ public class BlastProtectionTest {
         TestPos at = helper.absolute(1, 2, 1);
         EntityFireBlast blast = new EntityFireBlast(helper.getWorld(), unconnected(helper), 0, 0, 0);
         DenyPlacing deny = new DenyPlacing();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(deny)) {
             assertFalse(blast.placeFire(at.x(), at.y(), at.z()));
             assertEquals("the place event was asked about the fire", Blocks.fire, deny.placed);
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertEquals(Blocks.air, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
         assertTrue("allowed, it burns", blast.placeFire(at.x(), at.y(), at.z()));
@@ -240,12 +223,12 @@ public class BlastProtectionTest {
         pig.setPosition(at.x() + 1.5D, at.y(), at.z() + 0.5D);
         helper.getWorld().spawnEntityInWorld(pig);
         NoteAttack note = new NoteAttack();
-        MinecraftForge.EVENT_BUS.register(note);
-        try {
-            mine.explode();
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(note);
-            pig.setDead();
+        try (Overrides overrides = new Overrides().listen(note)) {
+            try {
+                mine.explode();
+            } finally {
+                pig.setDead();
+            }
         }
         assertNotNull("the mine hurt the pig", note.source);
         assertEquals("mine", note.source.getDamageType());
@@ -293,14 +276,13 @@ public class BlastProtectionTest {
         helper.getWorld().spawnEntityInWorld(player);
         float health = pig.getHealth();
         Shockwave wave = wave(helper, at);
-        CancelAttacks cancel = new CancelAttacks();
-        MinecraftForge.EVENT_BUS.register(cancel);
-        try {
-            wave.initiate();
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(cancel);
-            helper.getWorld().removePlayerEntityDangerously(player);
-            pig.setDead();
+        try (Overrides overrides = new Overrides().listen(new CancelAttacks())) {
+            try {
+                wave.initiate();
+            } finally {
+                helper.getWorld().removePlayerEntityDangerously(player);
+                pig.setDead();
+            }
         }
         assertEquals("the pig is not hurt", health, pig.getHealth());
         assertEquals("nor pushed", 0D, pig.motionX);

@@ -9,6 +9,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.api.armour.CustomDamageRatioEntry;
+import minefantasy.mf2.gametest.Overrides;
 
 /** Custom item entries read from the config. */
 @GameTestHolder("minefantasy2")
@@ -59,18 +60,19 @@ public class ConfigItemRegistryTest {
     /** The handpick's fortune switch is read from the file, not from a Java system property. */
     @GameTest
     public static void theHandpickFortuneSwitchIsRead(GameTestHelper helper) throws Exception {
-        boolean was = ConfigTools.handpickFortune;
-        java.io.File file = java.io.File.createTempFile("mf-tools", ".cfg");
-        try {
-            net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
-                    file);
-            config.get(ConfigTools.CATEGORY_BONUS, "Fortune enchantment for handpick", false).set(true);
-            config.save();
-            new ConfigTools().setConfig(new net.minecraftforge.common.config.Configuration(file));
-            assertTrue(ConfigTools.handpickFortune);
-        } finally {
-            ConfigTools.handpickFortune = was;
-            file.delete();
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigTools.handpickFortune, v -> ConfigTools.handpickFortune = v, false)) {
+            java.io.File file = java.io.File.createTempFile("mf-tools", ".cfg");
+            try {
+                net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
+                        file);
+                config.get(ConfigTools.CATEGORY_BONUS, "Fortune enchantment for handpick", false).set(true);
+                config.save();
+                new ConfigTools().setConfig(new net.minecraftforge.common.config.Configuration(file));
+                assertTrue(ConfigTools.handpickFortune);
+            } finally {
+                file.delete();
+            }
         }
         helper.succeed();
     }
@@ -78,18 +80,21 @@ public class ConfigItemRegistryTest {
     /** A value out of its range is brought into it, not used as written. */
     @GameTest
     public static void anOutOfRangeValueIsClamped(GameTestHelper helper) throws Exception {
-        float was = minefantasy.mf2.api.heating.Quench.cracking;
-        java.io.File file = java.io.File.createTempFile("mf-crafting", ".cfg");
-        try {
-            net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
-                    file);
-            config.get(ConfigCrafting.CATEGORY_SMITHING, "Quench Crack Modifier", 1D).set(50D);
-            config.save();
-            new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(file));
-            assertEquals(10F, minefantasy.mf2.api.heating.Quench.cracking, 0F);
-        } finally {
-            minefantasy.mf2.api.heating.Quench.cracking = was;
-            file.delete();
+        try (Overrides overrides = new Overrides().set(
+                () -> minefantasy.mf2.api.heating.Quench.cracking,
+                v -> minefantasy.mf2.api.heating.Quench.cracking = v,
+                1F)) {
+            java.io.File file = java.io.File.createTempFile("mf-crafting", ".cfg");
+            try {
+                net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
+                        file);
+                config.get(ConfigCrafting.CATEGORY_SMITHING, "Quench Crack Modifier", 1D).set(50D);
+                config.save();
+                new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(file));
+                assertEquals(10F, minefantasy.mf2.api.heating.Quench.cracking, 0F);
+            } finally {
+                file.delete();
+            }
         }
         helper.succeed();
     }
@@ -97,37 +102,43 @@ public class ConfigItemRegistryTest {
     /** The new balance options reach the code that uses them. */
     @GameTest
     public static void balanceOptionsAreRead(GameTestHelper helper) throws Exception {
-        float rise = minefantasy.mf2.api.rpg.RPGElements.levelUpModifier;
-        float gain = minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier;
-        float fuel = minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse;
-        float wear = minefantasy.mf2.api.heating.Quench.CRACK_WEAR;
-        java.io.File hardcore = java.io.File.createTempFile("mf-hardcore", ".cfg");
-        java.io.File crafting = java.io.File.createTempFile("mf-crafting", ".cfg");
-        try {
-            net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
-                    hardcore);
-            config.get(ConfigHardcore.CATEGORY_SKILLS, "Level Cost Rise", 1.5D).set(0D);
-            config.get(ConfigHardcore.CATEGORY_SKILLS, "XP Gain Modifier", 1D).set(3D);
-            config.save();
-            config = new net.minecraftforge.common.config.Configuration(crafting);
-            config.get(ConfigCrafting.CATEGORY_REFINING, "Forge Fuel Use Modifier", 1D).set(2D);
-            config.get(ConfigCrafting.CATEGORY_SMITHING, "Quench Crack Wear", 0.25D).set(0.5D);
-            config.save();
-            new ConfigHardcore().setConfig(new net.minecraftforge.common.config.Configuration(hardcore));
-            new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(crafting));
-            // With no rise every level costs the same
-            minefantasy.mf2.api.rpg.Skill skill = minefantasy.mf2.api.rpg.SkillList.artisanry;
-            assertEquals(skill.getLvlXP(1, null), skill.getLvlXP(30, null));
-            assertEquals(3F, minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier, 0F);
-            assertEquals(2F, minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse, 0F);
-            assertEquals(0.5F, minefantasy.mf2.api.heating.Quench.CRACK_WEAR, 0F);
-        } finally {
-            minefantasy.mf2.api.rpg.RPGElements.levelUpModifier = rise;
-            minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier = gain;
-            minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse = fuel;
-            minefantasy.mf2.api.heating.Quench.CRACK_WEAR = wear;
-            hardcore.delete();
-            crafting.delete();
+        try (Overrides overrides = new Overrides()
+                .keep(
+                        () -> minefantasy.mf2.api.rpg.RPGElements.levelUpModifier,
+                        v -> minefantasy.mf2.api.rpg.RPGElements.levelUpModifier = v)
+                .keep(
+                        () -> minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier,
+                        v -> minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier = v)
+                .keep(
+                        () -> minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse,
+                        v -> minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse = v)
+                .keep(
+                        () -> minefantasy.mf2.api.heating.Quench.CRACK_WEAR,
+                        v -> minefantasy.mf2.api.heating.Quench.CRACK_WEAR = v)) {
+            java.io.File hardcore = java.io.File.createTempFile("mf-hardcore", ".cfg");
+            java.io.File crafting = java.io.File.createTempFile("mf-crafting", ".cfg");
+            try {
+                net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
+                        hardcore);
+                config.get(ConfigHardcore.CATEGORY_SKILLS, "Level Cost Rise", 1.5D).set(0D);
+                config.get(ConfigHardcore.CATEGORY_SKILLS, "XP Gain Modifier", 1D).set(3D);
+                config.save();
+                config = new net.minecraftforge.common.config.Configuration(crafting);
+                config.get(ConfigCrafting.CATEGORY_REFINING, "Forge Fuel Use Modifier", 1D).set(2D);
+                config.get(ConfigCrafting.CATEGORY_SMITHING, "Quench Crack Wear", 0.25D).set(0.5D);
+                config.save();
+                new ConfigHardcore().setConfig(new net.minecraftforge.common.config.Configuration(hardcore));
+                new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(crafting));
+                // With no rise every level costs the same
+                minefantasy.mf2.api.rpg.Skill skill = minefantasy.mf2.api.rpg.SkillList.artisanry;
+                assertEquals(skill.getLvlXP(1, null), skill.getLvlXP(30, null));
+                assertEquals(3F, minefantasy.mf2.api.rpg.RPGElements.levelSpeedModifier, 0F);
+                assertEquals(2F, minefantasy.mf2.block.tileentity.TileEntityForge.fuelUse, 0F);
+                assertEquals(0.5F, minefantasy.mf2.api.heating.Quench.CRACK_WEAR, 0F);
+            } finally {
+                hardcore.delete();
+                crafting.delete();
+            }
         }
         helper.succeed();
     }
@@ -138,25 +149,27 @@ public class ConfigItemRegistryTest {
      */
     @GameTest
     public static void roadSpeedAndTransformationsFollowTheConfig(GameTestHelper helper) throws Exception {
-        int level = minefantasy.mf2.block.decor.BlockRoad.speedLevel;
-        java.io.File file = java.io.File.createTempFile("mf-crafting", ".cfg");
-        try {
-            net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
-                    file);
-            config.get(ConfigCrafting.CATEGORY_BLOCKS, "Road Speed Level", 1).set(0);
-            config.save();
-            new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(file));
-            assertFalse("transformations are on by default", ConfigCrafting.enableTransformations);
-            net.minecraft.entity.monster.EntityZombie walker = new net.minecraft.entity.monster.EntityZombie(
-                    helper.getWorld());
-            minefantasy.mf2.block.list.BlockListMF.road.onEntityWalking(helper.getWorld(), 0, 0, 0, walker);
-            assertNull(walker.getActivePotionEffect(net.minecraft.potion.Potion.moveSpeed));
-            minefantasy.mf2.block.decor.BlockRoad.speedLevel = 2;
-            minefantasy.mf2.block.list.BlockListMF.road.onEntityWalking(helper.getWorld(), 0, 0, 0, walker);
-            assertEquals(1, walker.getActivePotionEffect(net.minecraft.potion.Potion.moveSpeed).getAmplifier());
-        } finally {
-            minefantasy.mf2.block.decor.BlockRoad.speedLevel = level;
-            file.delete();
+        try (Overrides overrides = new Overrides().keep(
+                () -> minefantasy.mf2.block.decor.BlockRoad.speedLevel,
+                v -> minefantasy.mf2.block.decor.BlockRoad.speedLevel = v)) {
+            java.io.File file = java.io.File.createTempFile("mf-crafting", ".cfg");
+            try {
+                net.minecraftforge.common.config.Configuration config = new net.minecraftforge.common.config.Configuration(
+                        file);
+                config.get(ConfigCrafting.CATEGORY_BLOCKS, "Road Speed Level", 1).set(0);
+                config.save();
+                new ConfigCrafting().setConfig(new net.minecraftforge.common.config.Configuration(file));
+                assertFalse("transformations are on by default", ConfigCrafting.enableTransformations);
+                net.minecraft.entity.monster.EntityZombie walker = new net.minecraft.entity.monster.EntityZombie(
+                        helper.getWorld());
+                minefantasy.mf2.block.list.BlockListMF.road.onEntityWalking(helper.getWorld(), 0, 0, 0, walker);
+                assertNull(walker.getActivePotionEffect(net.minecraft.potion.Potion.moveSpeed));
+                minefantasy.mf2.block.decor.BlockRoad.speedLevel = 2;
+                minefantasy.mf2.block.list.BlockListMF.road.onEntityWalking(helper.getWorld(), 0, 0, 0, walker);
+                assertEquals(1, walker.getActivePotionEffect(net.minecraft.potion.Potion.moveSpeed).getAmplifier());
+            } finally {
+                file.delete();
+            }
         }
         helper.succeed();
     }

@@ -19,6 +19,7 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.list.CustomToolListMF;
 
 /**
@@ -69,15 +70,10 @@ public class HeavyHarvestTest {
     }
 
     private static <T> T withoutStaminaOrCrumbling(java.util.concurrent.Callable<T> body) throws Exception {
-        boolean stamina = StaminaBar.isSystemActive;
-        float crumble = ConfigTools.hvyDropChance;
-        StaminaBar.isSystemActive = false;
-        ConfigTools.hvyDropChance = 0F;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)
+                .set(() -> ConfigTools.hvyDropChance, v -> ConfigTools.hvyDropChance = v, 0F)) {
             return body.call();
-        } finally {
-            StaminaBar.isSystemActive = stamina;
-            ConfigTools.hvyDropChance = crumble;
         }
     }
 

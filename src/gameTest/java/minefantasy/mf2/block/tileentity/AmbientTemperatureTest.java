@@ -1,6 +1,7 @@
 package minefantasy.mf2.block.tileentity;
 
 import static minefantasy.mf2.gametest.Assert.*;
+import static minefantasy.mf2.gametest.Ticks.tick;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,6 +15,7 @@ import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.ComponentListMF;
 
@@ -38,8 +40,7 @@ public class AmbientTemperatureTest {
         net.minecraft.tileentity.TileEntity original = helper.getWorld().getTileEntity(at.x(), at.y(), at.z());
         SavingFurnace furnace = new SavingFurnace();
         helper.getWorld().setTileEntity(at.x(), at.y(), at.z(), furnace);
-        AmbientTemperature.setProvider((world, x, y, z) -> 20F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> 20F)) {
             furnace.updateEntity();
             furnace.dirtyCalls = 0;
             furnace.heat = 80F;
@@ -50,7 +51,6 @@ public class AmbientTemperatureTest {
             assertTrue("heat change was not saved", chunk.isModified);
             assertEquals("heat change issued comparator updates", 0, furnace.dirtyCalls);
         } finally {
-            AmbientTemperature.setProvider(null);
             helper.getWorld().setTileEntity(at.x(), at.y(), at.z(), original);
         }
         helper.succeed();
@@ -58,15 +58,14 @@ public class AmbientTemperatureTest {
 
     @GameTest
     public static void coldStationsSettleAtAirAndKeepItAcrossSave(GameTestHelper helper) {
-        AmbientTemperature.setProvider((world, x, y, z) -> -15F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> -15F)) {
             helper.setBlock(1, 1, 1, BlockListMF.forge);
             TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 1, 1, 1);
             forge.updateEntity();
             assertEquals(-15F, forge.temperature, 0F);
             assertEquals("cold forge supplies heat", 0, forge.getHeat());
             forge.temperature = 85F;
-            for (int i = 0; i < 60; i++) forge.updateEntity();
+            tick(forge, 60);
             assertEquals("forge did not cool to air", -15F, forge.temperature, 0F);
             NBTTagCompound saved = new NBTTagCompound();
             forge.writeToNBT(saved);
@@ -78,25 +77,20 @@ public class AmbientTemperatureTest {
             crucible.updateEntity();
             assertEquals(-15F, crucible.temperature, 0F);
             assertEquals(0F, crucible.progress, 0F);
-        } finally {
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
 
     @GameTest
     public static void ambientAirDoesNotMakeAColdPieceHot(GameTestHelper helper) {
-        AmbientTemperature.setProvider((world, x, y, z) -> 40F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> 40F)) {
             helper.setBlock(1, 1, 1, BlockListMF.forge);
             TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 1, 1, 1);
             ItemStack cold = new ItemStack(net.minecraft.init.Items.iron_ingot);
             forge.setInventorySlotContents(0, cold);
-            for (int i = 0; i < 40; i++) forge.updateEntity();
+            tick(forge, 40);
             assertEquals(40F, forge.temperature, 0F);
             assertEquals(cold.getItem(), forge.getStackInSlot(0).getItem());
-        } finally {
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }

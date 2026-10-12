@@ -4,7 +4,6 @@ import static minefantasy.mf2.gametest.Assert.*;
 
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -12,25 +11,17 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ItemInWorldManager;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
-import net.minecraftforge.event.world.BlockEvent;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.TestPos;
-import com.mojang.authlib.GameProfile;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import minefantasy.mf2.entity.EntityFireBlast;
+import minefantasy.mf2.gametest.Players;
 import minefantasy.mf2.item.list.ComponentListMF;
 
 /** Players, places, counts and protection stand-ins shared by the protection tests. */
@@ -40,14 +31,7 @@ final class ProtectionFixtures {
 
     /** A real server player, not a fake one, with no connection, as automation and tests have. */
     static EntityPlayerMP unconnected(GameTestHelper helper) {
-        WorldServer world = (WorldServer) helper.getWorld();
-        EntityPlayerMP player = new EntityPlayerMP(
-                MinecraftServer.getServer(),
-                world,
-                new GameProfile(UUID.randomUUID(), "mf2_unconnected"),
-                new ItemInWorldManager(world));
-        player.inventory.clearInventory(null, -1);
-        return player;
+        return Players.unconnected(helper, "mf2_unconnected");
     }
 
     static int rocksAround(GameTestHelper helper, TestPos at) {
@@ -78,29 +62,6 @@ final class ProtectionFixtures {
         }
     }
 
-    /** Denies every break, as a region protection mod would inside its region. */
-    public static final class DenyAll {
-
-        @SubscribeEvent
-        public void deny(BlockEvent.BreakEvent event) {
-            event.setCanceled(true);
-        }
-    }
-
-    /** Denies placing but not breaking, as some protection mods do. */
-    public static final class DenyPlacing {
-
-        public Block placed;
-        public Block worldBlockDuringEvent;
-
-        @SubscribeEvent
-        public void deny(BlockEvent.PlaceEvent event) {
-            placed = event.block;
-            worldBlockDuringEvent = event.world.getBlock(event.x, event.y, event.z);
-            event.setCanceled(true);
-        }
-    }
-
     static int countItems(GameTestHelper helper, TestPos at, Item item) {
         List<?> entities = helper.getWorld().getEntitiesWithinAABB(
                 EntityItem.class,
@@ -114,12 +75,7 @@ final class ProtectionFixtures {
     }
 
     static EntityPlayerMP named(GameTestHelper helper, String name) {
-        WorldServer world = (WorldServer) helper.getWorld();
-        return new EntityPlayerMP(
-                MinecraftServer.getServer(),
-                world,
-                new GameProfile(UUID.randomUUID(), name),
-                new ItemInWorldManager(world));
+        return Players.unconnected(helper, name);
     }
 
     /** A floor of stone with air above, for an explosion to break and set alight. */
@@ -141,10 +97,8 @@ final class ProtectionFixtures {
 
     /** A connected survival player beside the spot, to break blocks through vanilla's own path. */
     static EntityPlayerMP miner(GameTestHelper helper, TestPos at) {
-        EntityPlayerMP player = unconnected(helper);
+        EntityPlayerMP player = Players.connected(helper, "mf2_miner", null);
         player.setPosition(at.x() + 0.5D, at.y() + 0.5D, at.z() + 3.5D);
-        new NetHandlerPlayServer(MinecraftServer.getServer(), new NetworkManager(false), player);
-        player.theItemInWorldManager.setGameType(WorldSettings.GameType.SURVIVAL);
         return player;
     }
 }

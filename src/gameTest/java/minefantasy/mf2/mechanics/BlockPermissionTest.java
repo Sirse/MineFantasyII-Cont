@@ -14,7 +14,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.IChatComponent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.world.BlockEvent;
@@ -28,7 +27,10 @@ import com.mojang.authlib.GameProfile;
 import cpw.mods.fml.common.eventhandler.Event;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.crafting.transformation.TransformationRecipes;
+import minefantasy.mf2.gametest.DenyAll;
+import minefantasy.mf2.gametest.DenyPlacing;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 
 /**
  * Protection is asked for each block change a player makes: breaking, placing, replacing and interacting, through Forge
@@ -47,14 +49,10 @@ public class BlockPermissionTest {
         assertTrue(
                 "allowed where nothing forbids it",
                 ProtectionHelper.canBreak(player, helper.getWorld(), at.x(), at.y(), at.z()));
-        DenyAll deny = new DenyAll();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(new DenyAll())) {
             assertFalse(
                     "no connection is no permission",
                     ProtectionHelper.canBreak(player, helper.getWorld(), at.x(), at.y(), at.z()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         endOfTick(helper);
         helper.succeed();
@@ -87,8 +85,7 @@ public class BlockPermissionTest {
         TestPos at = helper.absolute(1, 1, 1);
         EntityPlayerMP player = unconnected(helper);
         CountEvents count = new CountEvents();
-        MinecraftForge.EVENT_BUS.register(count);
-        try {
+        try (Overrides overrides = new Overrides().listen(count)) {
             assertTrue(ProtectionHelper.canBreak(player, helper.getWorld(), at.x(), at.y(), at.z()));
             assertEquals("one break event per question", 1, count.breaks);
             assertTrue(ProtectionHelper.canInteract(player, helper.getWorld(), at.x(), at.y(), at.z()));
@@ -102,8 +99,6 @@ public class BlockPermissionTest {
             assertFalse(
                     "useBlock denied",
                     ProtectionHelper.canInteract(player, helper.getWorld(), at.x(), at.y(), at.z()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(count);
         }
         endOfTick(helper);
         helper.succeed();
@@ -166,8 +161,7 @@ public class BlockPermissionTest {
                 new ItemStack(Items.diamond));
         assertTrue("an item lies beside it", helper.getWorld().spawnEntityInWorld(nearbyDrop));
         DenyPlacing deny = new DenyPlacing();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(deny)) {
             assertTrue(
                     "breaking is still allowed",
                     ProtectionHelper.canBreak(player, helper.getWorld(), ground.x(), ground.y(), ground.z()));
@@ -190,8 +184,6 @@ public class BlockPermissionTest {
                     "the stone stays",
                     Blocks.stone,
                     helper.getWorld().getBlock(ground.x(), ground.y(), ground.z()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         endOfTick(helper);
         helper.succeed();
@@ -219,13 +211,10 @@ public class BlockPermissionTest {
         TestPos at = helper.absolute(1, 2, 1);
         EntityPlayerMP player = unconnected(helper);
         ReenterPlacement reenter = new ReenterPlacement();
-        MinecraftForge.EVENT_BUS.register(reenter);
-        try {
+        try (Overrides overrides = new Overrides().listen(reenter)) {
             assertTrue(
                     "outer placement commits",
                     ProtectionHelper.placeBlock(player, helper.getWorld(), at.x(), at.y(), at.z(), Blocks.fire, 0));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(reenter);
         }
         assertTrue("placement listener ran", reenter.attempted);
         assertFalse("a placement inside the event is refused", reenter.nestedResult);
@@ -262,8 +251,7 @@ public class BlockPermissionTest {
         player.inventory.setInventorySlotContents(1, new ItemStack(Items.redstone, 1));
         TransformationHandler handler = new TransformationHandler();
         DenyPlacing deny = new DenyPlacing();
-        MinecraftForge.EVENT_BUS.register(deny);
-        try {
+        try (Overrides overrides = new Overrides().listen(deny)) {
             handler.onPlayerInteract(
                     new PlayerInteractEvent(
                             player,
@@ -273,8 +261,6 @@ public class BlockPermissionTest {
                             at.z(),
                             1,
                             helper.getWorld()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(deny);
         }
         assertEquals("denied result leaves source", Blocks.sponge, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
         assertEquals("denied result does not consume payment", 1, player.inventory.getStackInSlot(1).stackSize);
@@ -334,9 +320,7 @@ public class BlockPermissionTest {
         ItemStack pick = new ItemStack(Items.iron_pickaxe);
         player.inventory.setInventorySlotContents(player.inventory.currentItem, pick);
         player.inventory.setInventorySlotContents(1, new ItemStack(Items.redstone, 1));
-        SwapHeld swap = new SwapHeld();
-        MinecraftForge.EVENT_BUS.register(swap);
-        try {
+        try (Overrides overrides = new Overrides().listen(new SwapHeld())) {
             new TransformationHandler().onPlayerInteract(
                     new PlayerInteractEvent(
                             player,
@@ -346,8 +330,6 @@ public class BlockPermissionTest {
                             at.z(),
                             1,
                             helper.getWorld()));
-        } finally {
-            MinecraftForge.EVENT_BUS.unregister(swap);
         }
         assertEquals("the melon stays", Blocks.melon_block, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
         assertEquals("no payment taken", 1, player.inventory.getStackInSlot(1).stackSize);

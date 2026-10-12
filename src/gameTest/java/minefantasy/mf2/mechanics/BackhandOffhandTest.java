@@ -19,6 +19,7 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
@@ -44,12 +45,9 @@ public class BackhandOffhandTest {
     /** Runs the check only with Backhand, with the stamina system off so a fresh player's empty bar does not decide. */
     private static void withBackhand(GameTestHelper helper, Check check) {
         if (Loader.isModLoaded("backhand")) {
-            boolean stamina = StaminaBar.isSystemActive;
-            StaminaBar.isSystemActive = false;
-            try {
+            try (Overrides overrides = new Overrides()
+                    .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)) {
                 check.run();
-            } finally {
-                StaminaBar.isSystemActive = stamina;
             }
         }
         helper.succeed();
@@ -123,14 +121,12 @@ public class BackhandOffhandTest {
 
     /** Strikes a zombie with the held weapon, the stamina system on, and returns the stamina it cost. */
     private static float swing(FakePlayer player) {
-        StaminaBar.isSystemActive = true;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, true)) {
             float before = StaminaBar.getStaminaValue(player);
             ItemStack held = player.getHeldItem();
             held.getItem().onLeftClickEntity(held, player, new EntityZombie(player.worldObj));
             return before - StaminaBar.getStaminaValue(player);
-        } finally {
-            StaminaBar.isSystemActive = false;
         }
     }
 
@@ -165,9 +161,8 @@ public class BackhandOffhandTest {
     @GameTest
     public static void withoutWeaponBalanceAFullOffhandOnlyTires(GameTestHelper helper) {
         withBackhand(helper, () -> {
-            boolean balance = ConfigWeapon.useBalance;
-            ConfigWeapon.useBalance = false;
-            try {
+            try (Overrides overrides = new Overrides()
+                    .set(() -> ConfigWeapon.useBalance, v -> ConfigWeapon.useBalance = v, false)) {
                 ItemStack greatsword = CustomToolHelper
                         .construct(CustomToolListMF.standard_greatsword, "iron", "oakwood");
                 FakePlayer player = wielding(helper, greatsword, new ItemStack(Items.stick), 0.5);
@@ -175,8 +170,6 @@ public class BackhandOffhandTest {
                 assertTrue("a full offhand cost no stamina", swing(player) > 0F);
                 assertEquals("the view was thrown off with balance turned off", pitch, player.rotationPitch, 0.001F);
                 assertEquals(0F, player.getEntityData().getFloat("MF_Balance_Pitch"), 0.001F);
-            } finally {
-                ConfigWeapon.useBalance = balance;
             }
         });
     }

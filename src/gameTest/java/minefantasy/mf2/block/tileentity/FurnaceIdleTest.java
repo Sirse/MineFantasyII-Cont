@@ -3,6 +3,8 @@ package minefantasy.mf2.block.tileentity;
 import static minefantasy.mf2.block.tileentity.Stations.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
+import static minefantasy.mf2.gametest.Ticks.tick;
+import static minefantasy.mf2.gametest.Ticks.tickUntil;
 
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -18,6 +20,7 @@ import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
+import minefantasy.mf2.gametest.Overrides;
 
 /** Issue #79: furnaces smelt only from fuel they burn, and only what they hold. */
 @GameTestHolder("minefantasy2")
@@ -45,7 +48,9 @@ public class FurnaceIdleTest {
     public static void aColdHeaterDoesNotSmelt(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         int heaterY = helper.absolute(2, 1, 2).y();
-        AmbientTemperature.setProvider((world, x, y, z) -> y == heaterY ? 25F : 20F);
+        // The air stays overridden while the furnace ticks between polls; the close runs when the test ends.
+        Overrides overrides = new Overrides().air((world, x, y, z) -> y == heaterY ? 25F : 20F);
+        helper.afterTest(overrides::close);
         reload(
                 tx -> tx.add(
                         MFRecipes.BIG_FURNACE,
@@ -58,15 +63,11 @@ public class FurnaceIdleTest {
         int[] ticks = { 0 };
         helper.succeedWhen(() -> {
             if (++ticks[0] < 60) return false;
-            try {
-                TileEntityBigFurnace now = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
-                TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
-                assertTrue("the furnace was never built: heater " + heater.built, now.built);
-                assertEquals("a cold heater made progress", 0, now.progress);
-                return true;
-            } finally {
-                AmbientTemperature.setProvider(null);
-            }
+            TileEntityBigFurnace now = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
+            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            assertTrue("the furnace was never built: heater " + heater.built, now.built);
+            assertEquals("a cold heater made progress", 0, now.progress);
+            return true;
         });
     }
 
@@ -125,21 +126,18 @@ public class FurnaceIdleTest {
 
     @GameTest
     public static void advancedForgeCoolsAfterFuelEnds(GameTestHelper helper) {
-        AmbientTemperature.setProvider((world, x, y, z) -> 20F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> 20F)) {
             helper.setBlock(2, 1, 2, BlockListMF.forge_metal_active);
             TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
             forge.temperature = 120F;
             forge.fuel = 0;
-            for (int tick = 0; tick < 60; tick++) forge.updateEntity();
+            tick(forge, 60);
             assertEquals("an empty advanced forge kept its heat", 20F, forge.temperature, 0F);
             assertEquals(0, forge.getHeat());
             forge.fuel = 10;
             forge.fuelTemperature = 600F;
-            for (int tick = 0; tick < 15; tick++) forge.updateEntity();
+            tick(forge, 15);
             assertTrue("a fueled forge must still heat up", forge.temperature > 20F);
-        } finally {
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
@@ -148,8 +146,7 @@ public class FurnaceIdleTest {
     public static void crucibleUsesHeatAboveTheSourcesAir(GameTestHelper helper) {
         Stations.begin(helper);
         int forgeY = helper.absolute(2, 1, 2).y();
-        AmbientTemperature.setProvider((world, x, y, z) -> y == forgeY ? 25F : 20F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> y == forgeY ? 25F : 20F)) {
             reload(
                     tx -> tx.add(
                             MFRecipes.ALLOY,
@@ -166,10 +163,7 @@ public class FurnaceIdleTest {
             forge.temperature = 25F;
             forge.fuel = 0;
             crucible.setInventorySlotContents(0, new ItemStack(seed));
-            for (int tick = 0; tick < 60; tick++) {
-                forge.updateEntity();
-                crucible.updateEntity();
-            }
+            tick(60, forge, crucible);
             assertEquals(20F, crucible.temperature, 0F);
             assertEquals("air made smelting progress", 0F, crucible.progress, 0F);
             assertTrue(crucible.getStackInSlot(9) == null);
@@ -177,10 +171,7 @@ public class FurnaceIdleTest {
             forge.temperature = 600F;
             forge.fuelTemperature = 600F;
             forge.fuel = 1000;
-            for (int tick = 0; tick < 2000 && crucible.getStackInSlot(9) == null; tick++) {
-                forge.updateEntity();
-                crucible.updateEntity();
-            }
+            tickUntil(() -> crucible.getStackInSlot(9) != null, 2000, forge, crucible);
             assertTrue("a hot forge must still smelt", crucible.getStackInSlot(9) != null);
             assertSame(flour, crucible.getStackInSlot(9).getItem());
             assertTrue(crucible.getStackInSlot(0) == null);
@@ -190,15 +181,11 @@ public class FurnaceIdleTest {
             forge.temperature = -15F;
             crucible.setInventorySlotContents(9, null);
             crucible.setInventorySlotContents(0, new ItemStack(seed));
-            for (int tick = 0; tick < 20; tick++) {
-                forge.updateEntity();
-                crucible.updateEntity();
-            }
+            tick(20, forge, crucible);
             assertEquals("an unlit forge warmed a freezing crucible", -15F, crucible.temperature, 0F);
             assertEquals(0F, crucible.progress, 0F);
             assertTrue(crucible.getStackInSlot(9) == null);
         } finally {
-            AmbientTemperature.setProvider(null);
             Stations.end();
         }
         helper.succeed();
@@ -217,10 +204,7 @@ public class FurnaceIdleTest {
             TileEntityBigFurnace furnace = builtFurnace(helper);
             TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
             heater.setInventorySlotContents(0, new ItemStack(Items.coal, 4));
-            for (int tick = 0; tick < 30; tick++) {
-                furnace.updateEntity();
-                heater.updateEntity();
-            }
+            tick(30, furnace, heater);
             assertTrue(furnace.built && heater.built);
             assertEquals("empty furnace burned fuel", 4, heater.getStackInSlot(0).stackSize);
             furnace.setInventorySlotContents(0, new ItemStack(Items.stick));
@@ -242,10 +226,7 @@ public class FurnaceIdleTest {
             heater.updateEntity();
             assertEquals(2, heater.getStackInSlot(0).stackSize);
             heater.heat = heater.maxHeat = 5000;
-            for (int tick = 0; tick < 100 && furnace.getStackInSlot(4) == null; tick++) {
-                heater.updateEntity();
-                furnace.updateEntity();
-            }
+            tickUntil(() -> furnace.getStackInSlot(4) != null, 100, heater, furnace);
             assertTrue("valid work must still pay out", furnace.getStackInSlot(4) != null);
             assertSame(flour, furnace.getStackInSlot(4).getItem());
             assertTrue(furnace.getStackInSlot(0) == null);
@@ -258,8 +239,7 @@ public class FurnaceIdleTest {
     @GameTest
     public static void neighbouringForgesExchangeOnlyExcessHeat(GameTestHelper helper) {
         int sourceX = helper.absolute(1, 1, 1).x();
-        AmbientTemperature.setProvider((world, x, y, z) -> x == sourceX ? 20F : 40F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> x == sourceX ? 20F : 40F)) {
             helper.setBlock(1, 1, 1, BlockListMF.forge_metal_active);
             helper.setBlock(2, 1, 1, BlockListMF.forge_metal);
             TileEntityForge source = helper.assertTileEntityPresent(TileEntityForge.class, 1, 1, 1);
@@ -267,25 +247,22 @@ public class FurnaceIdleTest {
             source.temperature = source.fuelTemperature = 60F;
             source.fuel = 100;
             other.temperature = 40F;
-            for (int tick = 0; tick < 10; tick++) source.updateEntity();
+            tick(source, 10);
             assertEquals("sharing reset a warm neighbour", 40F, other.temperature, 0F);
             assertEquals(2F, other.getWorkingHeat(), 0F);
             AmbientTemperature.setProvider((world, x, y, z) -> x == sourceX ? 20F : -15F);
             source.temperature = 20F;
             source.fuelTemperature = 0F;
             other.temperature = -15F;
-            for (int tick = 0; tick < 10; tick++) source.updateEntity();
+            tick(source, 10);
             assertEquals("air generated heat in a freezing neighbour", -15F, other.temperature, 0F);
-        } finally {
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
 
     @GameTest
     public static void bellowsWorkOnALitForgeBelowZeroButNotAnUnlitOne(GameTestHelper helper) {
-        AmbientTemperature.setProvider((world, x, y, z) -> -15F);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> -15F)) {
             helper.setBlock(2, 1, 2, BlockListMF.forge_metal_active);
             TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 2, 1, 2);
             forge.temperature = -15F;
@@ -300,8 +277,6 @@ public class FurnaceIdleTest {
             forge.fuel = 100;
             forge.onUsedWithBellows(1F);
             assertEquals("unlit stored fuel became heat", -15F, forge.temperature, 0F);
-        } finally {
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }

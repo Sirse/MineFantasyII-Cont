@@ -26,6 +26,7 @@ import minefantasy.mf2.block.refining.BlockCrucible;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
@@ -130,25 +131,21 @@ public class SmeltingRulesTest {
 
     @GameTest
     public static void hardcoreIngotsKeepAThirdWithoutACrucible(GameTestHelper helper) {
-        boolean reduce = ConfigHardcore.HCCreduceIngots;
-        try {
-            ConfigHardcore.HCCreduceIngots = true;
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, true)) {
             assertTrue("the kept third was lost", TileEntityBlastFH.keepsLeftover(drawing(0)));
             assertFalse("a lost ingot was kept", TileEntityBlastFH.keepsLeftover(drawing(1)));
             assertFalse("a lost ingot was kept", TileEntityBlastFH.keepsLeftover(drawing(2)));
-            ConfigHardcore.HCCreduceIngots = false;
+            overrides.set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, false);
             assertTrue("an ingot was lost with the rule off", TileEntityBlastFH.keepsLeftover(drawing(1)));
-        } finally {
-            ConfigHardcore.HCCreduceIngots = reduce;
         }
         helper.succeed();
     }
 
     @GameTest
     public static void theBlastFurnaceDropsIntoTheCrucibleBelowOrTheWorld(GameTestHelper helper) {
-        boolean reduce = ConfigHardcore.HCCreduceIngots;
-        try {
-            ConfigHardcore.HCCreduceIngots = true;
+        try (Overrides overrides = new Overrides()
+                .set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, true)) {
             helper.setBlock(1, 1, 1, BlockListMF.crucible);
             helper.setBlock(1, 2, 1, BlockListMF.blast_heater);
             TileEntityCrucible crucible = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
@@ -157,7 +154,7 @@ public class SmeltingRulesTest {
             assertNotNull("the crucible caught nothing", caught);
             assertEquals("the crucible lost ingots", 3, caught.stackSize);
 
-            ConfigHardcore.HCCreduceIngots = false;
+            overrides.set(() -> ConfigHardcore.HCCreduceIngots, v -> ConfigHardcore.HCCreduceIngots = v, false);
             helper.setBlock(5, 2, 1, BlockListMF.blast_heater);
             helper.assertTileEntityPresent(TileEntityBlastFH.class, 5, 2, 1).dropItem(new ItemStack(bar, 2));
             TestPos at = helper.absolute(5, 2, 1);
@@ -167,8 +164,6 @@ public class SmeltingRulesTest {
                             .getBoundingBox(at.x() - 1, at.y() - 1, at.z() - 1, at.x() + 2, at.y() + 2, at.z() + 2));
             assertEquals("the ingots did not come out", 1, dropped.size());
             assertEquals(2, ((EntityItem) dropped.get(0)).getEntityItem().stackSize);
-        } finally {
-            ConfigHardcore.HCCreduceIngots = reduce;
         }
         helper.succeed();
     }

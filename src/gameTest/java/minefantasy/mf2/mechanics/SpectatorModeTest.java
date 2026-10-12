@@ -30,6 +30,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.hunger.HungerSystemMF;
 import minefantasy.mf2.network.packet.PacketHandlerMF;
@@ -69,15 +70,14 @@ public class SpectatorModeTest {
                 "a spectator was recognised without Et Futurum or forcing",
                 PlayerModeHelper.isSpectator(adventurer));
 
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             assertTrue("the spectator was not recognised", PlayerModeHelper.isSpectator(spectator(helper)));
             assertFalse("a survival player read as spectator", PlayerModeHelper.isSpectator(survival(helper)));
             FakePlayer fake = Modders.fresh(helper, "Spectator");
             fake.theItemInWorldManager.setGameType(FAKE_SPECTATOR);
             assertFalse("a fake player read as spectator", PlayerModeHelper.isSpectator(fake));
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }
@@ -88,14 +88,13 @@ public class SpectatorModeTest {
         PacketHandlerMF handler = new PacketHandlerMF();
         RecordingPacket packet = new RecordingPacket();
 
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             handler.dispatchServerbound(packet, Unpooled.EMPTY_BUFFER, spectator(helper));
             assertTrue("a spectator's request was processed", packet.processed == 0);
             handler.dispatchServerbound(packet, Unpooled.EMPTY_BUFFER, survival(helper));
             assertTrue("a survival player's request was dropped", packet.processed == 1);
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }
@@ -108,8 +107,9 @@ public class SpectatorModeTest {
         rack.setInventorySlotContents(0, new ItemStack(Items.iron_sword));
         TestPos at = helper.absolute(1, 1, 1);
 
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             EntityPlayerMP watcher = spectator(helper);
             watcher.setPosition(at.x() + 0.5D, at.y() + 1.0D, at.z() + 0.5D);
             sendRackCommand(rack, 0, watcher);
@@ -117,8 +117,6 @@ public class SpectatorModeTest {
                     "the rack gave its item to a spectator",
                     rack.getStackInSlot(0) != null && rack.getStackInSlot(0).getItem() == Items.iron_sword);
             assertNull("a spectator picked up the item", watcher.getHeldItem());
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
 
         EntityPlayerMP worker = survival(helper);
@@ -144,8 +142,9 @@ public class SpectatorModeTest {
     /** Hot items in the inventory burn a smith, but neither a spectator nor a creative player. */
     @GameTest
     public static void hotItemsBurnASmithButNotASpectator(GameTestHelper helper) {
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             EntityPlayerMP watcher = spectator(helper);
             watcher.inventory.mainInventory[0] = hotStack();
             assertFalse("a spectator burned on hot items", PlayerTickHandlerMF.burnWithHotItems(watcher));
@@ -161,16 +160,15 @@ public class SpectatorModeTest {
             worker.inventory.mainInventory[0] = hotStack();
             assertTrue("a survival smith did not burn", PlayerTickHandlerMF.burnWithHotItems(worker));
             assertTrue("no burning was left on the smith", fire(worker) > 0);
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }
 
     @GameTest
     public static void aSpectatorKeepsTheirStaminaAndHunger(GameTestHelper helper) {
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             assertTrue("stamina did not affect a survival player", StaminaBar.doesAffectEntity(survival(helper)));
             assertFalse("stamina affected a spectator", StaminaBar.doesAffectEntity(spectator(helper)));
 
@@ -195,8 +193,6 @@ public class SpectatorModeTest {
             tickHunger(helper, watcher, TickEvent.Phase.END);
             assertTrue("hunger changed for a spectator", watcher.getFoodStats().getFoodLevel() == 15);
             assertEquals("saturation was spent for a spectator", 3F, HungerSystemMF.getSaturation(watcher), 0F);
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }
@@ -213,14 +209,13 @@ public class SpectatorModeTest {
 
     @GameTest
     public static void aSpectatorIsNotScaldedByAFlare(GameTestHelper helper) {
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             EntityPlayerMP watcher = spectator(helper);
             QuenchFlare.flare(helper.getWorld(), 0, 0, 0, watcher);
             assertFalse("a spectator caught fire from a flare", watcher.isBurning());
             assertEquals("a spectator was scalded", watcher.getMaxHealth(), watcher.getHealth(), 0F);
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }
@@ -232,16 +227,15 @@ public class SpectatorModeTest {
         TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
         trough.fill(ForgeDirection.UNKNOWN, new FluidStack(FluidRegistry.WATER, 1000), true);
 
-        PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(FAKE_SPECTATOR),
+                () -> PlayerModeHelper.setSpectatorGameTypeForTest(null))) {
             EntityPlayerMP watcher = spectator(helper);
             ItemStack bucket = new ItemStack(Items.bucket);
             assertFalse("the trough answered a spectator", trough.interact(watcher, bucket));
             assertTrue(
                     "the bucket was taken from the spectator",
                     bucket.getItem() == Items.bucket && bucket.stackSize == 1);
-        } finally {
-            PlayerModeHelper.setSpectatorGameTypeForTest(null);
         }
         helper.succeed();
     }

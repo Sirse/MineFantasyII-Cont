@@ -13,9 +13,9 @@ import com.gtnewhorizons.horizonqa.api.TestPos;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
-import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.ToolListMF;
 
@@ -62,8 +62,7 @@ public class PassiveCoolingTest {
     public static void coolingRestoresInventoryDropsAndTongsWithoutQuenching(GameTestHelper helper) {
         helper.succeedWhen(() -> {
             if (helper.getWorld().getTotalWorldTime() % 20 != 0) return false;
-            AmbientTemperature.setProvider((world, x, y, z) -> 20F);
-            try {
+            try (Overrides overrides = new Overrides().air((world, x, y, z) -> 20F)) {
                 TestPos at = helper.absolute(1, 1, 1);
                 helper.setBlock(1, 1, 1, Blocks.cauldron);
                 helper.getWorld().setBlockMetadataWithNotify(at.x(), at.y(), at.z(), 3, 2);
@@ -104,8 +103,6 @@ public class PassiveCoolingTest {
                 legacy.getItem().onItemRightClick(legacy, helper.getWorld(), player);
                 assertSword(legacy);
                 assertEquals(3, helper.getWorld().getBlockMetadata(at.x(), at.y(), at.z()));
-            } finally {
-                AmbientTemperature.setProvider(null);
             }
             return true;
         });

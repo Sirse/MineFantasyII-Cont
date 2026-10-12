@@ -8,6 +8,7 @@ import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.sereneseasons.SereneSeasonsCompat;
 import sereneseasons.api.season.ISeasonState;
 import sereneseasons.api.season.Season;
@@ -19,11 +20,10 @@ public class SereneSeasonsClimateTest {
 
     @GameTest
     public static void seasonalApiReadsWorldAndRecoversFromFailure(GameTestHelper helper) {
-        SeasonHelper.ISeasonDataProvider before = SeasonHelper.dataProvider;
         ISeasonState[] current = { SeasonTime.ZERO };
         boolean[] broken = { false };
         int[] calls = { 0 };
-        SeasonHelper.dataProvider = new SeasonHelper.ISeasonDataProvider() {
+        SeasonHelper.ISeasonDataProvider provider = new SeasonHelper.ISeasonDataProvider() {
 
             public ISeasonState getServerSeasonState(World world) {
                 calls[0]++;
@@ -36,7 +36,8 @@ public class SereneSeasonsClimateTest {
             }
         };
         SereneSeasonsCompat.Bridge bridge = new SereneSeasonsCompat.Bridge();
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> SeasonHelper.dataProvider, v -> SeasonHelper.dataProvider = v, provider)) {
             int duration = SeasonTime.ZERO.getSubSeasonDuration();
             current[0] = new SeasonTime(Season.SubSeason.MID_SUMMER.ordinal() * duration);
             assertEquals("MID_SUMMER", bridge.subSeason(helper.getWorld()));
@@ -49,8 +50,6 @@ public class SereneSeasonsClimateTest {
             int checked = calls[0];
             assertNull(bridge.subSeason(helper.getWorld()));
             assertEquals(checked, calls[0]);
-        } finally {
-            SeasonHelper.dataProvider = before;
         }
         helper.succeed();
     }

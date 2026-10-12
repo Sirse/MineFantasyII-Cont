@@ -1,8 +1,10 @@
 package minefantasy.mf2.block.tileentity;
 
 import static minefantasy.mf2.block.tileentity.Stations.*;
+import static minefantasy.mf2.block.tileentity.WailaFixtures.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
+import static minefantasy.mf2.gametest.Ticks.tick;
 
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -11,7 +13,6 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidRegistry;
@@ -61,7 +62,7 @@ public class WailaTest {
             assertEquals(25F, data.getFloat("FuelSeconds"), 0.01F);
             assertEquals(100F, data.getFloat("Temperature"), 0F);
             assertEquals(before, saved(forge));
-            for (int tick = 0; tick < 10; tick++) forge.updateEntity();
+            tick(forge, 10);
             assertEquals(
                     "the HUD disagrees with ten real fuel ticks",
                     24.5F,
@@ -273,29 +274,6 @@ public class WailaTest {
             Stations.end();
         }
         helper.succeed();
-    }
-
-    private static NBTTagCompound saved(TileEntityStation station) {
-        NBTTagCompound saved = new NBTTagCompound();
-        station.writeToNBT(saved);
-        return saved;
-    }
-
-    private static NBTTagCompound inspect(TileEntity station, FakePlayer player) {
-        return new WailaProvider().getNBTData(
-                player,
-                station,
-                new NBTTagCompound(),
-                station.getWorldObj(),
-                station.xCoord,
-                station.yCoord,
-                station.zCoord).getCompoundTag(WailaData.KEY);
-    }
-
-    private static FakePlayer near(GameTestHelper helper, int x, int y, int z) {
-        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
-        player.setPosition(x + 0.5D, y + 1D, z + 0.5D);
-        return player;
     }
 
     @GameTest

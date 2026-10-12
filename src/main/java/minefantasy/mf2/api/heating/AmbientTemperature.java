@@ -22,6 +22,11 @@ public final class AmbientTemperature {
         }
     }
 
+    /** The integration that supplies air temperature now, or null for the biome default. */
+    public static Provider getProvider() {
+        return provider;
+    }
+
     public static void setProvider(Provider value) {
         provider = value;
         NearbyBlockTemperature.clearCache();

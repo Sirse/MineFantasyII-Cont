@@ -7,6 +7,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.config.ConfigIntegration;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.integration.etfuturum.EtFuturumCompat;
 
 /**
@@ -20,17 +21,19 @@ public class EtFuturumBridgeTest {
 
     @GameTest
     public static void theBridgeStaysIdleWhenEtFuturumIsAbsent(GameTestHelper helper) {
-        boolean integration = ConfigIntegration.etfuturumIntegration;
-        boolean blacklist = ConfigIntegration.etfuturumBlastBlacklist;
-        try {
-            ConfigIntegration.etfuturumIntegration = true;
-            ConfigIntegration.etfuturumBlastBlacklist = true;
+        try (Overrides overrides = new Overrides().set(
+                () -> ConfigIntegration.etfuturumIntegration,
+                v -> ConfigIntegration.etfuturumIntegration = v,
+                true).set(
+                        () -> ConfigIntegration.etfuturumBlastBlacklist,
+                        v -> ConfigIntegration.etfuturumBlastBlacklist = v,
+                        true)) {
             EtFuturumCompat.load();
-            ConfigIntegration.etfuturumIntegration = false;
+            overrides.set(
+                    () -> ConfigIntegration.etfuturumIntegration,
+                    v -> ConfigIntegration.etfuturumIntegration = v,
+                    false);
             EtFuturumCompat.load();
-        } finally {
-            ConfigIntegration.etfuturumIntegration = integration;
-            ConfigIntegration.etfuturumBlastBlacklist = blacklist;
         }
         helper.succeed();
     }

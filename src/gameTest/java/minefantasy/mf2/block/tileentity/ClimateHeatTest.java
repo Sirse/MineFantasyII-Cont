@@ -3,6 +3,7 @@ package minefantasy.mf2.block.tileentity;
 import static minefantasy.mf2.block.tileentity.Stations.*;
 import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
+import static minefantasy.mf2.gametest.Ticks.tick;
 
 import java.util.Arrays;
 
@@ -18,11 +19,11 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
-import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.gametest.Overrides;
 
 @GameTestHolder("minefantasy2")
 public class ClimateHeatTest {
@@ -31,8 +32,7 @@ public class ClimateHeatTest {
     public static void repeatedWeatherChangesNeverPowerIdleStations(GameTestHelper helper) {
         Stations.begin(helper);
         float[] air = { 40F };
-        AmbientTemperature.setProvider((world, x, y, z) -> air[0]);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> air[0])) {
             reload(tx -> {
                 tx.add(
                         MFRecipes.ALLOY,
@@ -81,7 +81,6 @@ public class ClimateHeatTest {
             helper.getWorld().setTileEntity(forge.xCoord, forge.yCoord, forge.zCoord, loaded);
             assertEquals("legacy air warmth gained work credit", 0, loaded.getHeat());
         } finally {
-            AmbientTemperature.setProvider(null);
             Stations.end();
         }
         helper.succeed();
@@ -91,8 +90,7 @@ public class ClimateHeatTest {
     public static void fixedFireHasTheSameSmeltingSpeedInEveryClimate(GameTestHelper helper) {
         Stations.begin(helper);
         float[] air = { -100F };
-        AmbientTemperature.setProvider((world, x, y, z) -> air[0]);
-        try {
+        try (Overrides overrides = new Overrides().air((world, x, y, z) -> air[0])) {
             reload(
                     tx -> tx.add(
                             MFRecipes.ALLOY,
@@ -108,14 +106,13 @@ public class ClimateHeatTest {
             for (float climate : new float[] { -100, 20, 100, -100 }) {
                 air[0] = climate;
                 crucible.progress = 0;
-                for (int tick = 0; tick < 20; tick++) crucible.updateEntity();
+                tick(crucible, 20);
                 if (expected < 0) expected = crucible.progress;
                 assertTrue(crucible.progress > 0);
                 assertEquals("climate changed the fire's processing speed", expected, crucible.progress, .001F);
                 assertEquals(250F, crucible.getWorkingHeat(), 0F);
             }
         } finally {
-            AmbientTemperature.setProvider(null);
             Stations.end();
         }
         helper.succeed();
@@ -127,8 +124,7 @@ public class ClimateHeatTest {
         ChunkProviderServer provider = (ChunkProviderServer) world.getChunkProvider();
         int x = 304040, y = 100, z = 304040;
         float[] air = { 40F };
-        AmbientTemperature.setProvider((w, bx, by, bz) -> air[0]);
-        try {
+        try (Overrides overrides = new Overrides().air((w, bx, by, bz) -> air[0])) {
             provider.loadChunk(x >> 4, z >> 4);
             world.setBlock(x, y, z, BlockListMF.forge_metal_active, 0, 3);
             TileEntityForge forge = (TileEntityForge) world.getTileEntity(x, y, z);
@@ -140,23 +136,22 @@ public class ClimateHeatTest {
             // Drain the bellows change before isolating the following cooling update.
             forge.updateEntity();
             world.getChunkFromBlockCoords(x, z).isModified = false;
-            for (int tick = 0; tick < 3; tick++) forge.updateEntity();
+            tick(forge, 3);
             assertEquals(40F, forge.temperature, 0F);
             assertEquals(10F, forge.getWorkingHeat(), .001F);
             assertTrue("hidden cooling was not saved", world.getChunkFromBlockCoords(x, z).isModified);
             forge = reloadForge(world, provider, x, y, z);
             assertEquals(10F, forge.getWorkingHeat(), .001F);
-            for (int tick = 0; tick < 20; tick++) forge.updateEntity();
+            tick(forge, 20);
             assertEquals(0F, forge.getWorkingHeat(), 0F);
             world.getChunkFromBlockCoords(x, z).isModified = false;
-            for (int tick = 0; tick < 40; tick++) forge.updateEntity();
+            tick(forge, 40);
             assertTrue("idle forge dirtied an unchanged chunk", !world.getChunkFromBlockCoords(x, z).isModified);
             air[0] = 60F;
-            for (int tick = 0; tick < 10; tick++) forge.updateEntity();
+            tick(forge, 10);
             assertTrue("air temperature change was not saved", world.getChunkFromBlockCoords(x, z).isModified);
         } finally {
             world.setBlockToAir(x, y, z);
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
@@ -168,8 +163,7 @@ public class ClimateHeatTest {
         // An isolated chunk: unloading a shared GameTest structure chunk would disturb other running tests.
         int x = 304008, y = 100, z = 304008;
         float[] air = { 40F };
-        AmbientTemperature.setProvider((w, bx, by, bz) -> air[0]);
-        try {
+        try (Overrides overrides = new Overrides().air((w, bx, by, bz) -> air[0])) {
             provider.loadChunk(x >> 4, z >> 4);
             world.setBlock(x, y, z, BlockListMF.forge_metal_active, 0, 3);
             TileEntityForge forge = (TileEntityForge) world.getTileEntity(x, y, z);
@@ -181,25 +175,24 @@ public class ClimateHeatTest {
             float residue = forge.getWorkingHeat();
             assertTrue(residue > 0);
             world.getChunkFromBlockCoords(x, z).isModified = false;
-            for (int tick = 0; tick < 10; tick++) forge.updateEntity();
+            tick(forge, 10);
             assertTrue("cooling was not marked for saving", world.getChunkFromBlockCoords(x, z).isModified);
             residue = forge.getWorkingHeat();
             air[0] = 20;
             forge = reloadForge(world, provider, x, y, z);
             assertEquals("residual source heat changed on load", residue, forge.getWorkingHeat(), 0F);
             assertTrue(forge.getHeat() > 0);
-            for (int tick = 0; tick < 300; tick++) forge.updateEntity();
+            tick(forge, 300);
             assertEquals(0F, forge.getWorkingHeat(), 0F);
             air[0] = 40;
-            for (int tick = 0; tick < 20; tick++) forge.updateEntity();
+            tick(forge, 20);
             air[0] = 20;
             forge = reloadForge(world, provider, x, y, z);
             assertEquals("saved air warmth became useful heat", 0, forge.getHeat());
-            for (int tick = 0; tick < 20; tick++) forge.updateEntity();
+            tick(forge, 20);
             assertEquals(0, forge.getHeat());
         } finally {
             world.setBlockToAir(x, y, z);
-            AmbientTemperature.setProvider(null);
         }
         helper.succeed();
     }
@@ -210,8 +203,7 @@ public class ClimateHeatTest {
         WorldServer world = helper.getWorld();
         ChunkProviderServer provider = (ChunkProviderServer) world.getChunkProvider();
         int x = 304024, y = 100, z = 304024;
-        float originalTime = minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH.maxProgress;
-        try {
+        try (Overrides overrides = new Overrides()) {
             reload(
                     tx -> tx.add(
                             MFRecipes.BLAST_FURNACE,
@@ -238,7 +230,10 @@ public class ClimateHeatTest {
                     .getItemBurnTime(new ItemStack(Items.coal));
             assertTrue(burnTime > 0);
             // Each smelt necessarily crosses a fuel boundary; the normal burner and smoke paths still run.
-            minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH.maxProgress = burnTime + 20;
+            overrides.<Float>set(
+                    () -> minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH.maxProgress,
+                    v -> minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH.maxProgress = v,
+                    burnTime + 20F);
             heater.setInventorySlotContents(0, new ItemStack(Items.coal, 3));
             chamber.setInventorySlotContents(0, new ItemStack(carbon));
             chamber.setInventorySlotContents(1, new ItemStack(ore, 2));
@@ -261,10 +256,7 @@ public class ClimateHeatTest {
             assertTrue(chamber.getStackInSlot(0) == null);
             assertEquals(2, chamber.tempUses);
             world.getChunkFromBlockCoords(x, z).isModified = false;
-            for (int tick = 0; tick < burnTime + 5; tick++) {
-                heater.updateEntity();
-                chamber.updateEntity();
-            }
+            tick(burnTime + 5, heater, chamber);
             assertEquals(0, heater.fuel);
             assertEquals(0F, heater.progress, 0F);
             assertTrue("stopped furnace was not marked for saving", world.getChunkFromBlockCoords(x, z).isModified);
@@ -281,7 +273,6 @@ public class ClimateHeatTest {
             assertEquals(2, chamber.tempUses);
             assertEquals(2, crucible.getStackInSlot(9).stackSize);
         } finally {
-            minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH.maxProgress = originalTime;
             for (int dx = -1; dx <= 1; dx++) for (int dy = -1; dy <= 1; dy++)
                 for (int dz = -1; dz <= 1; dz++) world.setBlockToAir(x + dx, y + dy, z + dz);
             Stations.end();

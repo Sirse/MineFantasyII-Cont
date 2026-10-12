@@ -21,6 +21,7 @@ import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.fluid.FluidsMF;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.item.list.CustomToolListMF;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
@@ -66,12 +67,9 @@ public class QuenchTest {
     }
 
     private static <T> T withRuin(boolean ruin, java.util.function.Supplier<T> body) {
-        boolean was = Heatable.HCCquenchRuin;
-        Heatable.HCCquenchRuin = ruin;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> Heatable.HCCquenchRuin, v -> Heatable.HCCquenchRuin = v, ruin)) {
             return body.get();
-        } finally {
-            Heatable.HCCquenchRuin = was;
         }
     }
 
@@ -242,11 +240,10 @@ public class QuenchTest {
         trough.fill(ForgeDirection.UNKNOWN, new FluidStack(FluidsMF.seedOil, 250), true);
         com.gtnewhorizons.horizonqa.api.TestPos at = helper.absolute(1, 1, 1);
         QuenchMedium was = QuenchMedium.registered(FluidsMF.seedOil.getName());
-        QuenchMedium.register(FluidsMF.seedOil.getName(), null);
-        try {
+        try (Overrides overrides = new Overrides().run(
+                () -> QuenchMedium.register(FluidsMF.seedOil.getName(), null),
+                () -> QuenchMedium.register(FluidsMF.seedOil.getName(), was))) {
             assertNull(TongsHelper.findQuench(helper.getWorld(), at.x(), at.y(), at.z()));
-        } finally {
-            QuenchMedium.register(FluidsMF.seedOil.getName(), was);
         }
         assertEquals(4, trough.fill);
         helper.succeed();
@@ -256,9 +253,10 @@ public class QuenchTest {
     @GameTest
     public static void aNegativeBonusLowersTheQuality(GameTestHelper helper) {
         minefantasy.mf2.api.heating.QuenchResponse was = minefantasy.mf2.api.heating.QuenchResponse.registered("Steel");
-        try {
-            minefantasy.mf2.api.heating.QuenchResponse
-                    .register("Steel", minefantasy.mf2.api.heating.QuenchResponse.of(-20, 0, -20, 0, -500, 0));
+        try (Overrides overrides = new Overrides().run(
+                () -> minefantasy.mf2.api.heating.QuenchResponse
+                        .register("Steel", minefantasy.mf2.api.heating.QuenchResponse.of(-20, 0, -20, 0, -500, 0)),
+                () -> minefantasy.mf2.api.heating.QuenchResponse.register("Steel", was))) {
             assertEquals(
                     ItemQuality.ORDINARY - 20,
                     quality(Quench.cool(hotSword("Steel", 0.5F), WATER, null, NEVER_CRACKS)),
@@ -267,8 +265,6 @@ public class QuenchTest {
                     ItemQuality.MIN,
                     quality(Quench.cool(hotSword("Steel", 0.5F), BRINE, null, NEVER_CRACKS)),
                     0.01F);
-        } finally {
-            minefantasy.mf2.api.heating.QuenchResponse.register("Steel", was);
         }
         helper.succeed();
     }
@@ -276,15 +272,11 @@ public class QuenchTest {
     /** The config multiplies every metal's gain. */
     @GameTest
     public static void theHardeningModifierScalesTheGain(GameTestHelper helper) {
-        float was = Quench.hardening;
-        Quench.hardening = 2F;
-        try {
+        try (Overrides overrides = new Overrides().set(() -> Quench.hardening, v -> Quench.hardening = v, 2F)) {
             assertEquals(
                     ItemQuality.ORDINARY + 30,
                     quality(Quench.cool(hotSword("Steel", 0.5F), WATER, null, NEVER_CRACKS)),
                     0.01F);
-        } finally {
-            Quench.hardening = was;
         }
         helper.succeed();
     }

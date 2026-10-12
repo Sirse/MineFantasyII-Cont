@@ -27,6 +27,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.mechanics.Dodging;
 
@@ -249,9 +250,8 @@ public class PacketAbuseTest {
 
     @GameTest
     public static void aDodgeComesOnlyWithABlockAndAJumpOncePerJump(GameTestHelper helper) {
-        boolean stamina = StaminaBar.isSystemActive;
-        StaminaBar.isSystemActive = false;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)) {
             // A fresh test world has not ticked yet, and a stamp of tick 0 counts as none
             if (helper.getWorld().getTotalWorldTime() < 100) {
                 helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
@@ -284,17 +284,14 @@ public class PacketAbuseTest {
             handler.process(ints(0), player);
             later(player);
             assertFalse("a dodge came without blocking", moved(player));
-        } finally {
-            StaminaBar.isSystemActive = stamina;
         }
         helper.succeed();
     }
 
     @GameTest
     public static void flippingOnGroundInPlaceOnTheFloorOpensNoDodge(GameTestHelper helper) {
-        boolean stamina = StaminaBar.isSystemActive;
-        StaminaBar.isSystemActive = false;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)) {
             if (helper.getWorld().getTotalWorldTime() < 100) {
                 helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
             }
@@ -314,17 +311,14 @@ public class PacketAbuseTest {
             jump(player);
             handler.process(ints(1), player);
             assertTrue("a real jump still dodges", moved(player));
-        } finally {
-            StaminaBar.isSystemActive = stamina;
         }
         helper.succeed();
     }
 
     @GameTest
     public static void flippingOnGroundInMidAirOpensNoDodge(GameTestHelper helper) {
-        boolean stamina = StaminaBar.isSystemActive;
-        StaminaBar.isSystemActive = false;
-        try {
+        try (Overrides overrides = new Overrides()
+                .set(() -> StaminaBar.isSystemActive, v -> StaminaBar.isSystemActive = v, false)) {
             if (helper.getWorld().getTotalWorldTime() < 100) {
                 helper.getWorld().getWorldInfo().incrementTotalWorldTime(100);
             }
@@ -338,8 +332,6 @@ public class PacketAbuseTest {
                 later(player);
                 assertFalse("a dodge came from a landing that never happened", moved(player));
             }
-        } finally {
-            StaminaBar.isSystemActive = stamina;
         }
         helper.succeed();
     }
