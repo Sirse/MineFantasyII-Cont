@@ -25,6 +25,7 @@ import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityComponent;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class BlockComponent extends BlockTiled<TileEntityComponent> {
 
@@ -41,8 +42,9 @@ public class BlockComponent extends BlockTiled<TileEntityComponent> {
 
     public static int placeComponent(EntityPlayer user, ItemStack item, World world, int x, int y, int z, String type,
             String tex, int dir) {
-        if (world.isAirBlock(x, y, z) && canBuildOn(world, x, y - 1, z)) {
-            world.setBlock(x, y, z, BlockListMF.components, dir, 2);
+        // Set down from a right click in the air, outside Forge's placement capture: the place event is asked here
+        if (world.isAirBlock(x, y, z) && canBuildOn(world, x, y - 1, z)
+                && ProtectionHelper.placeBlock(user, world, x, y, z, BlockListMF.components, dir)) {
 
             int max = getStorageSize(type);
             int size = user.isSneaking() ? Math.min(item.stackSize, max) : 1;
