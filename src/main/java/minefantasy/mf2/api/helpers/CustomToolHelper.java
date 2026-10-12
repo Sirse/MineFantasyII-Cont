@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.helpers;
 
 import java.util.List;
+import java.util.function.Function;
 
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -14,12 +15,22 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import io.netty.buffer.ByteBuf;
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.crafting.ITieredComponent;
 import minefantasy.mf2.api.crafting.exotic.ISpecialDesign;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.item.heatable.ItemHeated;
 
 public class CustomToolHelper {
+
+    /** Preserve registry order and let each tool construct its own material variant. */
+    public static void addCreativeMetalVariants(List<ItemStack> items, Function<String, ItemStack> construct) {
+        for (CustomMaterial material : CustomMaterial.getList("metal")) {
+            if (MineFantasyII.isDebug() || material.getItem() != null) {
+                items.add(construct.apply(material.name));
+            }
+        }
+    }
 
     public static final String slot_main = "main_metal";
     public static final String slot_haft = "haft_wood";

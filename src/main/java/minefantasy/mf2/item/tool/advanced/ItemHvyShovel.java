@@ -1,7 +1,5 @@
 package minefantasy.mf2.item.tool.advanced;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -28,7 +26,6 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
-import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.mechanics.HeavyHarvest;
@@ -208,14 +205,7 @@ public class ItemHvyShovel extends ItemSpade implements IToolMaterial {
     @Override
     public void getSubItems(Item item, CreativeTabs tab, List list) {
         if (isCustom) {
-            ArrayList<CustomMaterial> metal = CustomMaterial.getList("metal");
-            Iterator iteratorMetal = metal.iterator();
-            while (iteratorMetal.hasNext()) {
-                CustomMaterial customMat = (CustomMaterial) iteratorMetal.next();
-                if (MineFantasyII.isDebug() || customMat.getItem() != null) {
-                    list.add(this.construct(customMat.name, "OakWood"));
-                }
-            }
+            CustomToolHelper.addCreativeMetalVariants(list, metal -> this.construct(metal, "OakWood"));
         } else {
             super.getSubItems(item, tab, list);
         }
