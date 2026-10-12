@@ -1,6 +1,5 @@
 package minefantasy.mf2.entity;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -9,7 +8,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -155,10 +153,6 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
                 * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI);
         this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
         this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, power * 1.5F, spread);
-    }
-
-    public static DamageSource causeBombDamage(Entity bomb, Entity user) {
-        return (new EntityDamageSourceBomb(bomb, user)).setProjectile();
     }
 
     public EntityArrowMF setDeisgn(ArrowType type) {
@@ -897,68 +891,12 @@ public class EntityArrowMF extends EntityArrow implements IProjectile, IDamageTy
     }
 
     public void explode() {
-        worldObj.playSoundAtEntity(this, "random.explode", 0.3F, 10F - 5F);
-        worldObj.createExplosion(this, posX, posY, posZ, 0, false);
-        if (!this.worldObj.isRemote) {
-            Vec3 blastPos = Vec3.createVectorHelper(posX, posY + 0.5D, posZ);
-            double area = getRangeOfBlast() * 2D;
-            AxisAlignedBB var3 = this.boundingBox.expand(area, area / 2, area);
-            List var4 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, var3);
-
-            if (var4 != null && !var4.isEmpty()) {
-                Iterator splashDamage = var4.iterator();
-
-                while (splashDamage.hasNext()) {
-                    Entity entityHit = (Entity) splashDamage.next();
-                    double distanceToEntity = this.getDistanceToEntity(entityHit);
-
-                    double radius = getRangeOfBlast();
-                    if (distanceToEntity < radius) {
-                        float dam = getExplosionDamage();
-
-                        if (distanceToEntity > radius / 2) {
-                            double sc = distanceToEntity - (radius / 2);
-                            if (sc < 0) sc = 0;
-                            if (sc > (radius / 2)) sc = (radius / 2);
-                            dam *= 1F - (float) (sc / (radius / 2));
-                        }
-                        dam *= worldObj.getBlockDensity(blastPos, entityHit.boundingBox);
-                        if (dam <= 0F) {
-                            continue;
-                        }
-                        if (!(entityHit instanceof EntityItem)) {
-                            DamageSource source = causeBombDamage(this, shootingEntity != null ? shootingEntity : this);
-                            source.setExplosion();
-                            if (getFilling() == 2) {
-                                source.setFireDamage();
-                            }
-                            entityHit.attackEntityFrom(source, dam);
-                        }
-                    }
-                }
-            }
-
-            int filling = getFilling();
-            if (filling > 0) {
-                for (int a = 0; a < 16; a++) {
-                    float range = 0.6F;
-                    EntityShrapnel shrapnel = new EntityShrapnel(
-                            worldObj,
-                            posX,
-                            posY + 0.5D,
-                            posZ,
-                            (rand.nextDouble() - 0.5) * range,
-                            (rand.nextDouble() - 0.5) * range,
-                            (rand.nextDouble() - 0.5) * range);
-
-                    if (filling == 2) {
-                        shrapnel.setFire(10);
-                    }
-                    worldObj.spawnEntityInWorld(shrapnel);
-                }
-            }
-            this.setDead();
-        }
+        new Blast(
+                this,
+                getRangeOfBlast(),
+                getExplosionDamage(),
+                EntityBomb.causeBombDamage(this, shootingEntity != null ? shootingEntity : this))
+                .filling(getFilling(), 0).explode();
     }
 
     private int getFilling() {

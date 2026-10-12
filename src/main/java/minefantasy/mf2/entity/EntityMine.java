@@ -5,15 +5,11 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import cpw.mods.fml.relauncher.Side;
@@ -244,79 +240,14 @@ public class EntityMine extends Entity {
     }
 
     public void explode() {
-        worldObj.playSoundAtEntity(this, "random.explode", 0.3F, 10F - 5F);
-        worldObj.createExplosion(this, posX, posY, posZ, 0, false);
-        if (!this.worldObj.isRemote) {
-            Vec3 blastPos = Vec3.createVectorHelper(posX, posY + 0.5D, posZ);
-            double area = getRangeOfBlast() * 2D * getPowderType().rangeModifier;
-            AxisAlignedBB var3 = this.boundingBox.expand(area, area / 2, area);
-            List var4 = this.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, var3);
-
-            if (var4 != null && !var4.isEmpty()) {
-                Iterator splashDamage = var4.iterator();
-
-                while (splashDamage.hasNext()) {
-                    Entity entityHit = (Entity) splashDamage.next();
-
-                    double distanceToEntity = this.getDistanceToEntity(entityHit);
-
-                    double radius = getRangeOfBlast() * getPowderType().rangeModifier;
-                    if (distanceToEntity < radius) {
-                        float dam = getDamage();
-
-                        if (getCasing() != 2 && distanceToEntity > radius / 2) {
-                            double sc = distanceToEntity - (radius / 2);
-                            if (sc < 0) sc = 0;
-                            if (sc > (radius / 2)) sc = (radius / 2);
-                            dam *= 1F - (float) (sc / (radius / 2));
-                        }
-                        dam *= worldObj.getBlockDensity(blastPos, entityHit.boundingBox);
-                        if (dam <= 0F) {
-                            continue;
-                        }
-                        if (!(entityHit instanceof EntityItem)) {
-                            // Dealt by whoever placed the mine, so protection (and a hybrid server's damage event)
-                            // weighs that player
-                            DamageSource source = new EntityDamageSourceIndirect("mine", this, getPlacer())
-                                    .setExplosion();
-                            if (getFilling() == 2) {
-                                source.setFireDamage();
-                            }
-                            if (entityHit.attackEntityFrom(source, dam)) {
-                                applyEffects(entityHit);
-                            }
-                        }
-                    }
-                }
-            }
-            this.setDead();
-        }
-
-        int t = getFilling();
-        if (t > 0) {
-            for (int a = 0; a < 16; a++) {
-                float range = 0.6F;
-                EntityShrapnel shrapnel = new EntityShrapnel(
-                        worldObj,
-                        posX,
-                        posY + 0.5D,
-                        posZ,
-                        (rand.nextDouble() - 0.5) * (range / 2),
-                        (rand.nextDouble()) * range,
-                        (rand.nextDouble() - 0.5) * (range / 2));
-
-                if (t == 2) {
-                    shrapnel.setFire(10);
-                }
-                worldObj.spawnEntityInWorld(shrapnel);
-            }
-        }
-    }
-
-    private void applyEffects(Entity hit) {
-        if (getFilling() == 2) {
-            hit.setFire(8);
-        }
+        // Dealt by whoever placed the mine, so protection (and a hybrid server's damage event) weighs that player
+        Blast blast = new Blast(
+                this,
+                getRangeOfBlast() * getPowderType().rangeModifier,
+                getDamage(),
+                new EntityDamageSourceIndirect("mine", this, getPlacer())).filling(getFilling(), 8).upward();
+        if (getCasing() == 2) blast.noFalloff();
+        blast.explode();
     }
 
     private double getRangeOfBlast() {
