@@ -17,18 +17,24 @@ import minefantasy.mf2.api.heating.ForgeItemHandler;
  */
 public class MineFantasyFuels {
 
-    public static void addForgeFuel(Object input, float time, int temperature) {
-        addForgeFuel(input, time, temperature, false, false);
+    /**
+     * Adds forge fuel: this many fuel units, burning at this temperature. A forge burns 0.2 units a tick at the default
+     * fuel use, so a fourth of the units is seconds of burning; the big furnace heater burns an eighth of them as
+     * ticks.
+     */
+
+    public static void addForgeFuel(Object input, float units, int temperature) {
+        addForgeFuel(input, units, temperature, false, false);
     }
 
-    public static void addForgeFuel(Object input, float time, int temperature, boolean willLight) {
-        addForgeFuel(input, time, temperature, willLight, false);
+    public static void addForgeFuel(Object input, float units, int temperature, boolean willLight) {
+        addForgeFuel(input, units, temperature, willLight, false);
     }
 
-    public static void addForgeFuel(Object input, float time, int temperature, boolean willLight, boolean refined) {
+    public static void addForgeFuel(Object input, float units, int temperature, boolean willLight, boolean refined) {
         ItemStack item = convert(input);
         if (item != null) {
-            ForgeItemHandler.add(new ForgeFuel(item.copy(), time, temperature, willLight, refined));
+            ForgeItemHandler.add(new ForgeFuel(item.copy(), units, temperature, willLight, refined));
         }
     }
 

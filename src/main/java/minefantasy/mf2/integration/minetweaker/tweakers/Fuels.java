@@ -34,13 +34,14 @@ public class Fuels {
     }
 
     /**
-     * Fuel for the forge, burning this many ticks at this temperature; the big furnace heater burns it too, and the
-     * cogwork suit when refined. It counts ahead of MineFantasy's own.
+     * Fuel for the forge: this many fuel units, burning at this temperature. A forge burns 0.2 units a tick at the
+     * default fuel use (coal is 900 units, nearly four minutes); the big furnace heater burns an eighth of the units as
+     * units, and the cogwork suit takes refined fuel by its units. It counts ahead of MineFantasy's own.
      */
     @ZenMethod
-    public static void addForgeFuel(IItemStack stack, int ticks, int temperature, @Optional boolean lights,
+    public static void addForgeFuel(IItemStack stack, int units, int temperature, @Optional boolean lights,
             @Optional boolean refined) {
-        MineTweakerAPI.apply(new ForgeFuelAction(stack, ticks, temperature, lights, refined));
+        MineTweakerAPI.apply(new ForgeFuelAction(stack, units, temperature, lights, refined));
     }
 
     /** Takes an item out as forge fuel, MineFantasy's own included. */
@@ -52,15 +53,15 @@ public class Fuels {
     private static class ForgeFuelAction implements IUndoableAction {
 
         private final IItemStack stack;
-        private final int ticks;
+        private final int units;
         private final int temperature;
         private final boolean lights;
         private final boolean refined;
         private ForgeFuel added;
 
-        ForgeFuelAction(IItemStack stack, int ticks, int temperature, boolean lights, boolean refined) {
+        ForgeFuelAction(IItemStack stack, int units, int temperature, boolean lights, boolean refined) {
             this.stack = stack;
-            this.ticks = Math.max(0, ticks);
+            this.units = Math.max(0, units);
             this.temperature = temperature;
             this.lights = lights;
             this.refined = refined;
@@ -73,7 +74,7 @@ public class Fuels {
                 MineTweakerAPI.logWarning("Skipping forge fuel with invalid item " + stack);
                 return;
             }
-            added = new ForgeFuel(mcStack.copy(), ticks, temperature, lights, refined);
+            added = new ForgeFuel(mcStack.copy(), units, temperature, lights, refined);
             ForgeItemHandler.addScript(added);
         }
 
@@ -92,8 +93,8 @@ public class Fuels {
 
         @Override
         public String describe() {
-            return ticks > 0
-                    ? "Adding forge fuel: " + stack.getDisplayName() + " (" + ticks + " ticks, " + temperature + "C)"
+            return units > 0
+                    ? "Adding forge fuel: " + stack.getDisplayName() + " (" + units + " units, " + temperature + "C)"
                     : "Removing forge fuel: " + stack.getDisplayName();
         }
 

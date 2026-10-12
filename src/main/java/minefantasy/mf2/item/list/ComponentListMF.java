@@ -229,18 +229,19 @@ public class ComponentListMF {
         MineFantasyFuels.FIREPIT.add(new ItemStack(plank, 1, OreDictionary.WILDCARD_VALUE), 200);
         MineFantasyFuels.FIREPIT.add(new ItemStack(plank_cut, 1, OreDictionary.WILDCARD_VALUE), 200);
         MineFantasyFuels.FIREPIT.add(new ItemStack(plank_pane, 1, OreDictionary.WILDCARD_VALUE), 600);
-        MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 0), 900, 1500);// 1500C , 45s
-        MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 1), 1200, 1800);// 1800C , 1m
-        MineFantasyFuels.addForgeFuel(Items.blaze_powder, 200, 3000, true);// 3000C , 10s
-        MineFantasyFuels.addForgeFuel(Items.blaze_rod, 300, 3000, true);// 3000C , 15s
-        MineFantasyFuels.addForgeFuel(Items.fire_charge, 1200, 3500, true);// 3500C , 1m
-        MineFantasyFuels.addForgeFuel(Items.lava_bucket, 2400, 5000, true);// 5000C , 2m
-        MineFantasyFuels.addForgeFuel(Items.magma_cream, 2400, 4000, true, true);// 4000C , 2m
+        // Forge fuel in units, a forge burning 0.2 a tick: a fourth of the units is seconds of burning
+        MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 0), 900, 1500); // 1500C
+        MineFantasyFuels.addForgeFuel(new ItemStack(Items.coal, 1, 1), 1200, 1800); // 1800C
+        MineFantasyFuels.addForgeFuel(Items.blaze_powder, 200, 3000, true); // 3000C
+        MineFantasyFuels.addForgeFuel(Items.blaze_rod, 300, 3000, true); // 3000C
+        MineFantasyFuels.addForgeFuel(Items.fire_charge, 1200, 3500, true); // 3500C
+        MineFantasyFuels.addForgeFuel(Items.lava_bucket, 2400, 5000, true); // 5000C
+        MineFantasyFuels.addForgeFuel(Items.magma_cream, 2400, 4000, true, true); // 4000C
 
-        MineFantasyFuels.addForgeFuel(ComponentListMF.coke, 1200, 2500, false, true);// 2500C , 1m
-        MineFantasyFuels.addForgeFuel(ComponentListMF.magma_cream_refined, 2400, 5000, true, true);// 5000C , 2m
+        MineFantasyFuels.addForgeFuel(ComponentListMF.coke, 1200, 2500, false, true); // 2500C
+        MineFantasyFuels.addForgeFuel(ComponentListMF.magma_cream_refined, 2400, 5000, true, true); // 5000C
 
-        MineFantasyFuels.addForgeFuel(ComponentListMF.coalDust, 1200, 180);// 180C , 60s
+        MineFantasyFuels.addForgeFuel(ComponentListMF.coalDust, 1200, 180); // 180C
     }
 
     private static void addRandomDrops() {
