@@ -3,10 +3,13 @@ package minefantasy.mf2.integration.minetweaker.tweakers;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
+import minefantasy.mf2.api.heating.ForgeFuel;
+import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minetweaker.IUndoableAction;
 import minetweaker.MineTweakerAPI;
 import minetweaker.api.item.IItemStack;
 import minetweaker.api.minecraft.MineTweakerMC;
+import stanhebben.zenscript.annotations.Optional;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -28,6 +31,81 @@ public class Fuels {
     @ZenMethod
     public static void removeBlastFuel(IItemStack stack) {
         MineTweakerAPI.apply(new FuelAction(MineFantasyFuels.BLAST, "blast furnace", stack, 0));
+    }
+
+    /**
+     * Fuel for the forge, burning this many ticks at this temperature; the big furnace heater burns it too, and the
+     * cogwork suit when refined. It counts ahead of MineFantasy's own.
+     */
+    @ZenMethod
+    public static void addForgeFuel(IItemStack stack, int ticks, int temperature, @Optional boolean lights,
+            @Optional boolean refined) {
+        MineTweakerAPI.apply(new ForgeFuelAction(stack, ticks, temperature, lights, refined));
+    }
+
+    /** Takes an item out as forge fuel, MineFantasy's own included. */
+    @ZenMethod
+    public static void removeForgeFuel(IItemStack stack) {
+        MineTweakerAPI.apply(new ForgeFuelAction(stack, 0, 0, false, false));
+    }
+
+    private static class ForgeFuelAction implements IUndoableAction {
+
+        private final IItemStack stack;
+        private final int ticks;
+        private final int temperature;
+        private final boolean lights;
+        private final boolean refined;
+        private ForgeFuel added;
+
+        ForgeFuelAction(IItemStack stack, int ticks, int temperature, boolean lights, boolean refined) {
+            this.stack = stack;
+            this.ticks = Math.max(0, ticks);
+            this.temperature = temperature;
+            this.lights = lights;
+            this.refined = refined;
+        }
+
+        @Override
+        public void apply() {
+            ItemStack mcStack = MineTweakerMC.getItemStack(stack);
+            if (mcStack == null) {
+                MineTweakerAPI.logWarning("Skipping forge fuel with invalid item " + stack);
+                return;
+            }
+            added = new ForgeFuel(mcStack.copy(), ticks, temperature, lights, refined);
+            ForgeItemHandler.addScript(added);
+        }
+
+        @Override
+        public boolean canUndo() {
+            return true;
+        }
+
+        @Override
+        public void undo() {
+            if (added != null) {
+                ForgeItemHandler.removeScript(added);
+                added = null;
+            }
+        }
+
+        @Override
+        public String describe() {
+            return ticks > 0
+                    ? "Adding forge fuel: " + stack.getDisplayName() + " (" + ticks + " ticks, " + temperature + "C)"
+                    : "Removing forge fuel: " + stack.getDisplayName();
+        }
+
+        @Override
+        public String describeUndo() {
+            return "Restoring forge fuel: " + stack.getDisplayName();
+        }
+
+        @Override
+        public Object getOverrideKey() {
+            return null;
+        }
     }
 
     /** Fuel for the firepit, burning this many ticks before wood scaling; it counts ahead of MineFantasy's own. */

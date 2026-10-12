@@ -30,7 +30,7 @@ public class RecipeHandlerBloom extends MFNEIRecipeHandler {
 
     private static void findFuels() {
         afuels = new ArrayList<FuelPair>();
-        for (ForgeFuel fuel : ForgeItemHandler.forgeFuel) {
+        for (ForgeFuel fuel : ForgeItemHandler.fuels()) {
             if (fuel == null || !NEIHelper.isValidStack(fuel.fuel)) {
                 continue;
             }

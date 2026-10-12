@@ -28,10 +28,7 @@ public class MineFantasyFuels {
     public static void addForgeFuel(Object input, float time, int temperature, boolean willLight, boolean refined) {
         ItemStack item = convert(input);
         if (item != null) {
-            ForgeItemHandler.forgeFuel.add(new ForgeFuel(item, time, temperature, willLight, refined));
-            if ((int) (temperature * 1.25) > ForgeItemHandler.forgeMaxTemp) {
-                ForgeItemHandler.forgeMaxTemp = (int) (temperature * 1.25);
-            }
+            ForgeItemHandler.add(new ForgeFuel(item.copy(), time, temperature, willLight, refined));
         }
     }
 

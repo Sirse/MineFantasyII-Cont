@@ -29,8 +29,11 @@ import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.crafting.Salvage;
 import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.api.crafting.refine.BloomRecipe;
+import minefantasy.mf2.api.heating.ForgeFuel;
+import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
@@ -500,6 +503,31 @@ public class TweakerTest {
         around(helper, () -> {
             noErrors(run("mods.minefantasy.Fuel.addCarbon(" + item("fuel") + ", 3);"));
             assertEquals(3, MineFantasyFuels.getCarbon(new ItemStack(fuel)));
+        });
+    }
+
+    @GameTest
+    public static void forgeFuel(GameTestHelper helper) throws Exception {
+        ItemStack coal = new ItemStack(Items.coal);
+        assertEquals(900F, ForgeItemHandler.getForgeFuel(coal), 0F);
+        assertEquals(1500, ForgeItemHandler.getForgeHeat(coal));
+        assertNull(ForgeItemHandler.getStats(new ItemStack(fuel)));
+        around(helper, () -> {
+            noErrors(
+                    run(
+                            "mods.minefantasy.Fuel.addForgeFuel(" + item("fuel") + ", 40, 2000, false, true);",
+                            "mods.minefantasy.Fuel.removeForgeFuel(<minecraft:coal>);"));
+            ForgeFuel added = ForgeItemHandler.getStats(new ItemStack(fuel));
+            assertNotNull("script fuel does not burn", added);
+            assertEquals(40F, added.duration, 0F);
+            assertEquals(2000, added.baseHeat);
+            assertEquals("refined fuel does not run a cogwork", 40F, PowerArmour.getFuelValue(new ItemStack(fuel)), 0F);
+            assertNull("coal still burns", ForgeItemHandler.getStats(coal));
+            assertNotNull("charcoal went out with coal", ForgeItemHandler.getStats(new ItemStack(Items.coal, 1, 1)));
+            assertTrue(ForgeItemHandler.fuels().contains(added));
+            noErrors(run());
+            assertNull("script fuel outlived its script", ForgeItemHandler.getStats(new ItemStack(fuel)));
+            assertEquals("coal stayed out after a reload", 900F, ForgeItemHandler.getForgeFuel(coal), 0F);
         });
     }
 
