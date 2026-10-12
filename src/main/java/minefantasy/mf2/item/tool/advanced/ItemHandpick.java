@@ -1,15 +1,14 @@
 package minefantasy.mf2.item.tool.advanced;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,13 +29,14 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.mining.RandomOre;
 import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.tool.IMiningDrops;
 import minefantasy.mf2.config.ConfigTools;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
-public class ItemHandpick extends ItemPickaxe implements IToolMaterial {
+public class ItemHandpick extends ItemPickaxe implements IToolMaterial, IMiningDrops {
 
     protected int itemRarity;
     private String name;
@@ -60,49 +60,33 @@ public class ItemHandpick extends ItemPickaxe implements IToolMaterial {
     }
 
     @Override
-    public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-            EntityLivingBase user) {
-        if (!world.isRemote) {
-            int meta = world.getBlockMetadata(x, y, z);
-            int harvestlvl = this.getMaterial().getHarvestLevel();
-            int fortune = EnchantmentHelper.getFortuneModifier(user);
-            boolean silk = EnchantmentHelper.getSilkTouchModifier(user);
+    public void giveMiningDrops(World world, int x, int y, int z, Block block, int meta, EntityPlayer player,
+            ItemStack held) {
+        int harvestlvl = this.getMaterial().getHarvestLevel();
+        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, held);
+        boolean silk = EnchantmentHelper.getEnchantmentLevel(Enchantment.silkTouch.effectId, held) > 0;
 
-            // double drop logic
-            ArrayList<ItemStack> drops = block
-                    .getDrops(world, x, y, z, meta, ConfigTools.handpickFortune ? fortune : 0);
-
-            if (!silk && drops != null && !drops.isEmpty()) {
-                Iterator<ItemStack> list = drops.iterator();
-                while (list.hasNext()) {
-                    ItemStack drop = list.next();
-                    if (isOre(block, meta) && !drop.isItemEqual(new ItemStack(block, 1, meta))
-                            && !(drop.getItem() instanceof ItemBlock)
-                            && world.rand.nextFloat() < getDoubleDropChance()) {
-                        Drops.fromBlock(world, x, y, z, drop.copy());
-                    }
-                }
-            }
-
-            // special drop logic
-            ArrayList<ItemStack> specialdrops = RandomOre
-                    .getDroppedItems(user, block, meta, harvestlvl, fortune, silk, y);
-
-            if (specialdrops != null && !specialdrops.isEmpty()) {
-                Iterator list = specialdrops.iterator();
-
-                while (list.hasNext()) {
-                    ItemStack newdrop = (ItemStack) list.next();
-
-                    if (newdrop != null) {
-                        if (newdrop.stackSize < 1) newdrop.stackSize = 1;
-
-                        Drops.fromBlock(world, x, y, z, newdrop);
-                    }
+        // double drop logic
+        ArrayList<ItemStack> drops = block.getDrops(world, x, y, z, meta, ConfigTools.handpickFortune ? fortune : 0);
+        if (!silk && drops != null) {
+            for (ItemStack drop : drops) {
+                if (isOre(block, meta) && !drop.isItemEqual(new ItemStack(block, 1, meta))
+                        && !(drop.getItem() instanceof ItemBlock)
+                        && world.rand.nextFloat() < getDoubleDropChance()) {
+                    Drops.fromBlock(world, x, y, z, drop.copy());
                 }
             }
         }
-        return super.onBlockDestroyed(item, world, block, x, y, z, user);
+
+        // special drop logic
+        ArrayList<ItemStack> specialdrops = RandomOre
+                .getDroppedItems(player, block, meta, harvestlvl, fortune, silk, y);
+        if (specialdrops != null) {
+            // The registered loot is shared: each drop is a copy
+            for (ItemStack loot : specialdrops) {
+                if (loot != null) Drops.fromBlock(world, x, y, z, loot.copy());
+            }
+        }
     }
 
     private boolean isOre(Block block, int meta) {

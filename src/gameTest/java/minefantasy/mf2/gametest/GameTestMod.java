@@ -22,6 +22,7 @@ public class GameTestMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         TestItems.register();
+        StubbornBlock.register();
     }
 
     @Mod.EventHandler

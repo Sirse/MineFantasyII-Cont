@@ -13,16 +13,19 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.*;
+import net.minecraftforge.event.world.BlockEvent;
 
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.stamina.StaminaBar;
+import minefantasy.mf2.api.tool.IMiningDrops;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.config.ConfigStamina;
 import minefantasy.mf2.farming.FarmingHelper;
 import minefantasy.mf2.integration.CustomStone;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.tool.advanced.ItemTrowMF;
 import minefantasy.mf2.item.weapon.ItemWeaponMF;
 import minefantasy.mf2.util.XSTRandom;
 
@@ -30,6 +33,11 @@ import minefantasy.mf2.util.XSTRandom;
 public class BlockEvents {
 
     private static final XSTRandom random = new XSTRandom();
+
+    @SubscribeEvent
+    public void harvestDrops(BlockEvent.HarvestDropsEvent event) {
+        ItemTrowMF.digGravel(event);
+    }
 
     @SubscribeEvent
     public void useHoe(UseHoeEvent event) {
@@ -80,6 +88,10 @@ public class BlockEvents {
                 && world.getBlock(x, y - 1, z) == Blocks.farmland
                 && FarmingHelper.didHarvestRuinBlock(world, false)) {
             ProtectionHelper.replaceBlock(player, world, x, y - 1, z, Blocks.dirt, 0);
+        }
+        if (player != null && mined.held != null && mined.held.getItem() instanceof IMiningDrops) {
+            ((IMiningDrops) mined.held.getItem())
+                    .giveMiningDrops(world, x, y, z, mined.block, mined.meta, player, mined.held);
         }
         if (player != null && !player.capabilities.isCreativeMode && !(player instanceof FakePlayer)) {
             playerMineBlock(world, x, y, z, mined);

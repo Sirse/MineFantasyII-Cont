@@ -1,16 +1,14 @@
 package minefantasy.mf2.item.tool.advanced;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
@@ -23,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.event.world.BlockEvent;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -35,17 +34,17 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.mining.RandomDigs;
 import minefantasy.mf2.api.tier.IToolMaterial;
+import minefantasy.mf2.api.tool.IMiningDrops;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
-public class ItemTrowMF extends ItemSpade implements IToolMaterial {
+public class ItemTrowMF extends ItemSpade implements IToolMaterial, IMiningDrops {
 
     protected int itemRarity;
     private String name;
     private float baseDamage = 1F;
-    private Random rand = new Random();
     // ===================================================== CUSTOM START
     // =============================================================\\
     private boolean isCustom = false;
@@ -65,46 +64,31 @@ public class ItemTrowMF extends ItemSpade implements IToolMaterial {
     }
 
     @Override
-    public boolean onBlockDestroyed(ItemStack item, World world, Block block, int x, int y, int z,
-            EntityLivingBase user) {
-        int m = world.getBlockMetadata(x, y, z);
-        alwaysDropFlint(block, item, world, user, x, y, z);
-
-        if (!world.isRemote) {
-            int meta = world.getBlockMetadata(x, y, z);
-            int harvestlvl = this.getMaterial().getHarvestLevel();
-            int fortune = EnchantmentHelper.getFortuneModifier(user);
-            boolean silk = EnchantmentHelper.getSilkTouchModifier(user);
-
-            ArrayList<ItemStack> specialdrops = RandomDigs.getDroppedItems(block, meta, harvestlvl, fortune, silk, y);
-
-            if (specialdrops != null && !specialdrops.isEmpty()) {
-                Iterator list = specialdrops.iterator();
-
-                while (list.hasNext()) {
-                    ItemStack newdrop = (ItemStack) list.next();
-
-                    if (newdrop != null) {
-                        if (newdrop.stackSize < 1) newdrop.stackSize = 1;
-
-                        Drops.fromBlock(world, x, y, z, newdrop);
-                    }
-                }
+    public void giveMiningDrops(World world, int x, int y, int z, Block block, int meta, EntityPlayer player,
+            ItemStack held) {
+        int harvestlvl = this.getMaterial().getHarvestLevel();
+        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantment.fortune.effectId, held);
+        boolean silk = EnchantmentHelper.getEnchantmentLevel(Enchantment.silkTouch.effectId, held) > 0;
+        ArrayList<ItemStack> specialdrops = RandomDigs.getDroppedItems(block, meta, harvestlvl, fortune, silk, y);
+        if (specialdrops != null) {
+            // The registered loot is shared: each drop is a copy
+            for (ItemStack loot : specialdrops) {
+                if (loot != null) Drops.fromBlock(world, x, y, z, loot.copy());
             }
         }
-        return super.onBlockDestroyed(item, world, block, x, y, z, user);
     }
 
-    private void alwaysDropFlint(Block block, ItemStack item, World world, EntityLivingBase user, int x, int y, int z) {
-        if (block == Blocks.gravel) {
-            world.setBlockToAir(x, y, z);
-            int loot = 0;
-            int enc = EnchantmentHelper.getFortuneModifier(user);
-            if (enc > 0) {
-                loot = rand.nextInt(enc);
-            }
-            Drops.fromBlock(world, x, y, z, new ItemStack(Items.flint, 1 + loot));
-        }
+    /** Gravel dug with a trowel always gives flint in place of its usual drops; silk touch keeps the gravel. */
+    public static void digGravel(BlockEvent.HarvestDropsEvent event) {
+        if (event.block != Blocks.gravel || event.harvester == null || event.isSilkTouching) return;
+        ItemStack held = event.harvester.getHeldItem();
+        if (held == null || !(held.getItem() instanceof ItemTrowMF)) return;
+        event.drops.clear();
+        event.drops.add(
+                new ItemStack(
+                        Items.flint,
+                        1 + (event.fortuneLevel > 0 ? event.world.rand.nextInt(event.fortuneLevel) : 0)));
+        event.dropChance = 1F;
     }
 
     @Override
