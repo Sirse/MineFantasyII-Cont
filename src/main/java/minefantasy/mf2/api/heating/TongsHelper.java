@@ -2,6 +2,7 @@ package minefantasy.mf2.api.heating;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 
 import minefantasy.mf2.api.helpers.Tiles;
+import minefantasy.mf2.mechanics.ProtectionHelper;
 
 public class TongsHelper {
 
@@ -128,9 +130,13 @@ public class TongsHelper {
     /**
      * Where a piece can be quenched here, taking what the quench uses: a quench block, any tank of a quenching fluid
      * (which loses {@link #QUENCH_FLUID}), a water block (which boils away) or a cauldron (which loses a level). Null
-     * when there is nothing to quench in. Only the server takes from a tank or cauldron.
+     * when there is nothing to quench in, or the smith may not use what is here. Only the server takes from a tank or
+     * cauldron; boiling a water block away is breaking it.
      */
-    public static Quench.Source findQuench(World world, int i, int j, int k) {
+    public static Quench.Source findQuench(World world, int i, int j, int k, EntityPlayer smith) {
+        if (!ProtectionHelper.canInteract(smith, world, i, j, k)) {
+            return null;
+        }
         IQuenchBlock block = Tiles.get(world, i, j, k, IQuenchBlock.class);
         if (block != null) {
             // Asked before quenching: the last of it may go. A fluid that no longer quenches is not taken
@@ -147,7 +153,9 @@ public class TongsHelper {
             return new Quench.Source(tank, 1F);
         }
         if (world.getBlock(i, j, k).getMaterial() == Material.water) {
-            world.setBlockToAir(i, j, k);
+            if (!world.isRemote && !ProtectionHelper.breakBlock(smith, world, i, j, k)) {
+                return null;
+            }
             return new Quench.Source(QuenchMedium.WATER, RAW_WATER_RISK);
         }
         if (isCauldron(world, i, j, k)) {
@@ -177,9 +185,12 @@ public class TongsHelper {
     /**
      * Draws {@code amount} millibuckets of water here for a container: from any tank (troughs included), a cauldron
      * (which loses a level) or a water block, which is left in place, as a bottle leaves it. Returns whether there was
-     * water; only the server takes it.
+     * water the player may draw; only the server takes it.
      */
-    public static boolean drawWater(World world, int x, int y, int z, int amount) {
+    public static boolean drawWater(World world, int x, int y, int z, int amount, EntityPlayer player) {
+        if (!ProtectionHelper.canInteract(player, world, x, y, z)) {
+            return false;
+        }
         if (takeTankWater(world, x, y, z, amount)) {
             return true;
         }

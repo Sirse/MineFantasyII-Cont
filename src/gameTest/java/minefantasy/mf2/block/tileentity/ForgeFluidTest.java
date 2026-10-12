@@ -227,9 +227,11 @@ public class ForgeFluidTest {
             TileEntityTrough trough = placedTrough(helper);
             trough.fill = 6;
             int x = trough.xCoord, y = trough.yCoord, z = trough.zCoord;
-            assertTrue(TongsHelper.drawWater(world(), x, y, z, FluidsMF.JUG));
+            assertTrue(TongsHelper.drawWater(world(), x, y, z, FluidsMF.JUG, Modders.fresh(helper, Modders.SMITH)));
             assertEquals("a jug did not take four units", 2, trough.fill);
-            assertFalse("a jug was filled from too little", TongsHelper.drawWater(world(), x, y, z, 250));
+            assertFalse(
+                    "a jug was filled from too little",
+                    TongsHelper.drawWater(world(), x, y, z, 250, Modders.fresh(helper, Modders.SMITH)));
             assertEquals(2, trough.fill);
         } finally {
             Stations.end();
@@ -243,12 +245,17 @@ public class ForgeFluidTest {
         try {
             TestPos at = helper.absolute(2, 1, 3);
             world().setBlock(at.x(), at.y(), at.z(), Blocks.cauldron, 3, 2);
-            assertTrue(TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
+            assertTrue(
+                    TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250, Modders.fresh(helper, Modders.SMITH)));
             assertEquals("drawing left the cauldron full", 2, world().getBlockMetadata(at.x(), at.y(), at.z()));
-            assertTrue(TongsHelper.findQuench(world(), at.x(), at.y(), at.z()) != null);
+            assertTrue(
+                    TongsHelper.findQuench(world(), at.x(), at.y(), at.z(), Modders.fresh(helper, Modders.SMITH))
+                            != null);
             assertEquals("quenching left the cauldron as it was", 1, world().getBlockMetadata(at.x(), at.y(), at.z()));
-            TongsHelper.findQuench(world(), at.x(), at.y(), at.z());
-            assertFalse("an empty cauldron gave water", TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
+            TongsHelper.findQuench(world(), at.x(), at.y(), at.z(), Modders.fresh(helper, Modders.SMITH));
+            assertFalse(
+                    "an empty cauldron gave water",
+                    TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250, Modders.fresh(helper, Modders.SMITH)));
         } finally {
             Stations.end();
         }
@@ -262,9 +269,12 @@ public class ForgeFluidTest {
         try {
             TestPos at = helper.absolute(3, 1, 3);
             world().setBlock(at.x(), at.y(), at.z(), Blocks.water, 0, 2);
-            assertTrue(TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250));
+            assertTrue(
+                    TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), 250, Modders.fresh(helper, Modders.SMITH)));
             assertSame("the jug took the water block", Blocks.water, world().getBlock(at.x(), at.y(), at.z()));
-            assertTrue(TongsHelper.findQuench(world(), at.x(), at.y(), at.z()) != null);
+            assertTrue(
+                    TongsHelper.findQuench(world(), at.x(), at.y(), at.z(), Modders.fresh(helper, Modders.SMITH))
+                            != null);
             assertSame(Blocks.air, world().getBlock(at.x(), at.y(), at.z()));
         } finally {
             Stations.end();

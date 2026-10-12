@@ -111,7 +111,13 @@ public class TroughFluidTest {
             trough.fill(ANY, new FluidStack(FluidsMF.seedOil, 1000), true);
             assertFalse(
                     "a jug drew water from oil",
-                    TongsHelper.drawWater(world(), at.x(), at.y(), at.z(), FluidsMF.JUG));
+                    TongsHelper.drawWater(
+                            world(),
+                            at.x(),
+                            at.y(),
+                            at.z(),
+                            FluidsMF.JUG,
+                            Modders.fresh(helper, Modders.SMITH)));
             assertEquals(16, trough.fill);
             TileEntityKitchenBench bench = place(new TileEntityKitchenBench());
             bench.setDirtyMax(50F);

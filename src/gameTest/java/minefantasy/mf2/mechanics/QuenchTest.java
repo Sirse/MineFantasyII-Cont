@@ -21,6 +21,7 @@ import minefantasy.mf2.api.helpers.ItemQuality;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.fluid.FluidsMF;
+import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.item.list.CustomToolListMF;
@@ -224,7 +225,8 @@ public class QuenchTest {
         TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
         trough.fill(ForgeDirection.UNKNOWN, new FluidStack(FluidsMF.seedOil, 250), true);
         com.gtnewhorizons.horizonqa.api.TestPos at = helper.absolute(1, 1, 1);
-        Quench.Source source = TongsHelper.findQuench(helper.getWorld(), at.x(), at.y(), at.z());
+        Quench.Source source = TongsHelper
+                .findQuench(helper.getWorld(), at.x(), at.y(), at.z(), Modders.fresh(helper, Modders.SMITH));
         assertNotNull(source);
         assertSame(QuenchMedium.OIL, source.medium);
         assertEquals(3, trough.fill);
@@ -243,7 +245,13 @@ public class QuenchTest {
         try (Overrides overrides = new Overrides().run(
                 () -> QuenchMedium.register(FluidsMF.seedOil.getName(), null),
                 () -> QuenchMedium.register(FluidsMF.seedOil.getName(), was))) {
-            assertNull(TongsHelper.findQuench(helper.getWorld(), at.x(), at.y(), at.z()));
+            assertNull(
+                    TongsHelper.findQuench(
+                            helper.getWorld(),
+                            at.x(),
+                            at.y(),
+                            at.z(),
+                            Modders.fresh(helper, Modders.SMITH)));
         }
         assertEquals(4, trough.fill);
         helper.succeed();

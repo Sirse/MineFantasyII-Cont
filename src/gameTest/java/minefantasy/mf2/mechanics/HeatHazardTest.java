@@ -23,9 +23,12 @@ import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
 import minefantasy.mf2.config.ConfigCrafting;
+import minefantasy.mf2.gametest.DenyAll;
+import minefantasy.mf2.gametest.DenyInteract;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.Overrides;
 import minefantasy.mf2.gametest.TestItems;
+import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ArmourListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 
@@ -52,7 +55,8 @@ public class HeatHazardTest {
 
     private static Quench.Source quenchAt(GameTestHelper helper, int x, int y, int z) {
         TestPos pos = helper.absolute(x, y, z);
-        return TongsHelper.findQuench(helper.getWorld(), pos.x(), pos.y(), pos.z());
+        return TongsHelper
+                .findQuench(helper.getWorld(), pos.x(), pos.y(), pos.z(), Modders.fresh(helper, Modders.SMITH));
     }
 
     @GameTest
@@ -152,6 +156,57 @@ public class HeatHazardTest {
                     "hardcore hot burns spared the attire",
                     PlayerTickHandlerMF.burnWithHotItems(carrying(helper, hotSword(), true)));
         }
+        helper.succeed();
+    }
+
+    private static FakePlayer smithAbove(GameTestHelper helper, TestPos at, ItemStack held) {
+        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+        player.setPositionAndRotation(at.x() + 0.5, at.y() + 2, at.z() + 0.5, 0F, 90F);
+        player.setCurrentItemOrArmor(0, held);
+        return player;
+    }
+
+    /** Boiling water away is breaking it: where that is refused, loaded tongs neither quench nor take the water. */
+    @GameTest
+    public static void tongsDoNotBoilAwayWaterTheyMayNotBreak(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, Blocks.water);
+        TestPos at = helper.absolute(1, 1, 1);
+        ItemStack tongs = new ItemStack(ToolListMF.tongsStone);
+        FakePlayer player = smithAbove(helper, at, tongs);
+        assertTrue(TongsHelper.trySetHeldItem(tongs, hotSword()));
+        try (Overrides deny = new Overrides().listen(new DenyAll())) {
+            tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        }
+        assertSame("the water was taken", Blocks.water, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
+        assertNotNull("the piece was quenched", TongsHelper.getHeldItem(tongs));
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), player);
+        assertSame("allowed, the water boils away", Blocks.air, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
+        assertNull(TongsHelper.getHeldItem(tongs));
+        helper.succeed();
+    }
+
+    /** Where using the block is refused, neither tongs nor a jug take from a trough or cauldron. */
+    @GameTest
+    public static void nothingIsTakenFromAContainerThatMayNotBeUsed(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.trough_wood);
+        TileEntityTrough trough = helper.assertTileEntityPresent(TileEntityTrough.class, 1, 1, 1);
+        trough.fill = 8;
+        TestPos at = helper.absolute(1, 1, 1);
+        ItemStack tongs = new ItemStack(ToolListMF.tongsStone);
+        FakePlayer smith = smithAbove(helper, at, tongs);
+        assertTrue(TongsHelper.trySetHeldItem(tongs, hotSword()));
+        ItemStack jug = new ItemStack(FoodListMF.jug_empty);
+        try (Overrides deny = new Overrides().listen(new DenyInteract())) {
+            tongs.getItem().onItemRightClick(tongs, helper.getWorld(), smith);
+            assertNotNull("the piece was quenched", TongsHelper.getHeldItem(tongs));
+            FakePlayer cook = smithAbove(helper, at, jug);
+            jug.getItem().onItemRightClick(jug, helper.getWorld(), cook);
+            assertEquals("the jug was filled", 1, jug.stackSize);
+            assertEquals("the trough lost water", 8, trough.fill);
+        }
+        tongs.getItem().onItemRightClick(tongs, helper.getWorld(), smith);
+        assertNull("allowed, the piece is quenched", TongsHelper.getHeldItem(tongs));
+        assertEquals(7, trough.fill);
         helper.succeed();
     }
 }

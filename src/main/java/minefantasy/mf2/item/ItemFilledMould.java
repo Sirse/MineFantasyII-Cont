@@ -79,7 +79,7 @@ public class ItemFilledMould extends ItemComponentMF {
 
                 ItemStack drop = getHeldItem(item);
 
-                if (drop != null && TongsHelper.findQuench(world, i, j, k) != null) {
+                if (drop != null && TongsHelper.findQuench(world, i, j, k, player) != null) {
                     Sounds.quench(player);
 
                     for (int a = 0; a < 5; a++) {

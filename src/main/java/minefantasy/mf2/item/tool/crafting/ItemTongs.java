@@ -126,7 +126,7 @@ public class ItemTongs extends ItemTool implements IToolMaterial, ISmithTongs {
                     return item;
                 }
 
-                Quench.Source source = TongsHelper.findQuench(world, i, j, k);
+                Quench.Source source = TongsHelper.findQuench(world, i, j, k, player);
 
                 if (source != null) {
                     ItemStack drop = held.copy(), cooled = drop;

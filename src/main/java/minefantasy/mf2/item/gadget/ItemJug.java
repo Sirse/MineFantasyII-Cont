@@ -103,7 +103,7 @@ public class ItemJug extends ItemComponentMF {
                     return super.onItemRightClick(item, world, player);
                 }
 
-                if (TongsHelper.drawWater(world, i, j, k, FluidsMF.JUG)) {
+                if (TongsHelper.drawWater(world, i, j, k, FluidsMF.JUG, player)) {
                     gather(item, world, player);
                     return item;
                 }

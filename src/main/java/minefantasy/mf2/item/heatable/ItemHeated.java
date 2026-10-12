@@ -273,7 +273,7 @@ public class ItemHeated extends Item implements IHotItem {
                 if (!player.canPlayerEdit(i, j, k, movingobjectposition.sideHit, item)) {
                     return item;
                 }
-                Quench.Source source = TongsHelper.findQuench(world, i, j, k);
+                Quench.Source source = TongsHelper.findQuench(world, i, j, k, player);
 
                 if (source != null) {
                     Sounds.quench(player);
