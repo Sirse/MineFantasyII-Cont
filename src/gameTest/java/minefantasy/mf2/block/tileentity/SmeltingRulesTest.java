@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.common.util.FakePlayer;
@@ -75,6 +76,31 @@ public class SmeltingRulesTest {
         FakePlayer player = holding(helper, new ItemStack(ComponentListMF.artefacts, 1, 3));
         crucible.onBlockActivated(helper.getWorld(), pos.x(), pos.y(), pos.z(), player, 1, 0F, 0F, 0F);
         return player;
+    }
+
+    @GameTest
+    public static void aCrucibleBecomesAMasterOneWithAllItHolds(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.cruciblemythic_active);
+        TestPos at = helper.absolute(1, 1, 1);
+        TileEntityCrucible before = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
+        before.setInventorySlotContents(0, new ItemStack(Items.iron_ingot, 5));
+        before.setInventorySlotContents(before.getSizeInventory() - 1, new ItemStack(Items.gold_ingot, 3));
+        assertEquals(2, before.getTier());
+        FakePlayer player = holding(helper, new ItemStack(ComponentListMF.artefacts, 1, 3));
+        ((BlockCrucible) BlockListMF.cruciblemythic_active)
+                .onBlockActivated(helper.getWorld(), at.x(), at.y(), at.z(), player, 1, 0F, 0F, 0F);
+        assertSame(BlockListMF.cruciblemaster_active, helper.getWorld().getBlock(at.x(), at.y(), at.z()));
+        TileEntityCrucible after = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 1, 1);
+        assertSame("the crucible was replaced", before, after);
+        assertEquals("the crucible kept its old tier", 3, after.getTier());
+        assertEquals(5, after.getStackInSlot(0).stackSize);
+        assertEquals(3, after.getStackInSlot(after.getSizeInventory() - 1).stackSize);
+        AxisAlignedBB around = AxisAlignedBB
+                .getBoundingBox(at.x() - 3, at.y() - 3, at.z() - 3, at.x() + 4, at.y() + 4, at.z() + 4);
+        assertTrue(
+                "its contents were spilled",
+                helper.getWorld().getEntitiesWithinAABB(EntityItem.class, around).isEmpty());
+        helper.succeed();
     }
 
     @GameTest

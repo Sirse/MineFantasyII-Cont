@@ -21,8 +21,8 @@ public abstract class BlockStation<T extends TileEntityStation> extends BlockTil
     private static boolean swapping;
 
     /**
-     * Swaps a station's block for its lit or unlit twin, keeping its metadata and the station, contents and tile alike.
-     * Does nothing when that block is already there.
+     * Swaps a station's block, for its lit or unlit twin or for an upgrade, keeping its metadata and the station,
+     * contents and tile alike. Does nothing when that block is already there.
      */
     protected static void swapBlock(World world, int x, int y, int z, Block twin) {
         if (twin == null || world.getBlock(x, y, z) == twin) return;
@@ -37,6 +37,8 @@ public abstract class BlockStation<T extends TileEntityStation> extends BlockTil
         if (station != null) {
             station.validate();
             world.setTileEntity(x, y, z, station);
+            // It now stands on another block: forget the one it read before
+            station.updateContainingBlockInfo();
         }
     }
 

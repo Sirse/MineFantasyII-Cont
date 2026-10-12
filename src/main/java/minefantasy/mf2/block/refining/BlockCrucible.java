@@ -131,8 +131,9 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
                         user.setCurrentItemOrArmor(0, null);
                     }
                     if (!world.isRemote) {
+                        // The crucible becomes a master one with all it holds, before the lightning strikes
+                        swapBlock(world, x, y, z, BlockListMF.cruciblemaster_active);
                         world.spawnEntityInWorld(new EntityLightningBolt(world, x + 0.5, y + 1.5, z + 0.5));
-                        world.setBlock(x, y, z, BlockListMF.cruciblemaster_active, 0, 2);
                     }
                 }
                 return true;

@@ -103,7 +103,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             SmokeMechanics.emitSmokeIndirect(worldObj, xCoord, yCoord, zCoord, 1);
         }
 
-        // The master crucible is lit by lightning, not by heat
+        // Mythic and master crucibles are lit by their coating, when used, not by heat
         Block block = worldObj.getBlock(xCoord, yCoord, zCoord);
         if (getTier() < 2 && block instanceof BlockCrucible && ((BlockCrucible) block).isActive != wasHot) {
             BlockCrucible.updateFurnaceBlockState(wasHot, worldObj, xCoord, yCoord, zCoord);
@@ -270,6 +270,12 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
             refreshStructureCache();
         }
         return Math.max(0, cachedTier);
+    }
+
+    @Override
+    public void updateContainingBlockInfo() {
+        super.updateContainingBlockInfo();
+        cachedTier = -1;
     }
 
     private void refreshStructureCache() {
