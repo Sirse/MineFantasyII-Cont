@@ -276,7 +276,8 @@ public class LootEvents {
         if (source != null && source.getEntity() != null) {
             if (source.getEntity() instanceof EntityLivingBase) {
                 hunter = (EntityLivingBase) source.getEntity();
-                weapon = hunter.getHeldItem();
+                // Only a blow struck by hand was dealt with what is held: an arrow or a fire was not
+                if (source.getSourceOfDamage() == hunter) weapon = hunter.getHeldItem();
                 if (hunter instanceof EntityPlayer) {
                     addKill((EntityPlayer) hunter, dead);
                 }
