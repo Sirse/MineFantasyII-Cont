@@ -14,6 +14,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
 import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
@@ -91,6 +92,41 @@ public class FurnaceIdleTest {
             assertEquals(0F, now.progress, 0F);
             return true;
         });
+    }
+
+    /** Lava burned in the heater leaves its bucket in the fuel slot, where automation may take it out. */
+    @GameTest
+    public static void theHeaterGivesBackTheBucketOfItsFuel(GameTestHelper helper) {
+        MineFantasyFuels.Fuel lava = MineFantasyFuels.BLAST.addScript(new ItemStack(Items.lava_bucket), 40);
+        try {
+            helper.setBlock(1, 1, 1, BlockListMF.firebricks);
+            helper.setBlock(3, 1, 1, BlockListMF.firebricks);
+            helper.setBlock(1, 1, 3, BlockListMF.firebricks);
+            helper.setBlock(3, 1, 3, BlockListMF.firebricks);
+            helper.setBlock(2, 1, 2, BlockListMF.blast_heater);
+            helper.setBlock(1, 2, 2, BlockListMF.firebricks);
+            helper.setBlock(3, 2, 2, BlockListMF.firebricks);
+            helper.setBlock(2, 2, 1, BlockListMF.firebricks);
+            helper.setBlock(2, 2, 3, BlockListMF.firebricks);
+            helper.setBlock(2, 2, 2, BlockListMF.blast_chamber);
+            TileEntityBlastFH heater = helper.assertTileEntityPresent(TileEntityBlastFH.class, 2, 1, 2);
+            TileEntityBlastFC chamber = helper.assertTileEntityPresent(TileEntityBlastFC.class, 2, 2, 2);
+            chamber.setInventorySlotContents(0, new ItemStack(Items.coal));
+            ItemStack ore = MFRecipes.BLAST_FURNACE.published().all().get(0).getRecipe().getInput().examples().get(0);
+            chamber.setInventorySlotContents(1, ore.copy());
+            heater.updateBuild();
+            chamber.updateBuild();
+            heater.setInventorySlotContents(0, new ItemStack(Items.lava_bucket));
+            heater.updateEntity();
+            assertEquals("the lava was not burned", 40, heater.maxFuel);
+            ItemStack left = heater.getStackInSlot(0);
+            assertNotNull("the bucket was destroyed", left);
+            assertSame(Items.bucket, left.getItem());
+            assertTrue("automation may not take the bucket", heater.canExtractItem(0, left, 1));
+        } finally {
+            MineFantasyFuels.BLAST.removeScript(lava);
+        }
+        helper.succeed();
     }
 
     /** Once the fire goes out with no fuel left, progress starts over instead of waiting for the next fuel. */

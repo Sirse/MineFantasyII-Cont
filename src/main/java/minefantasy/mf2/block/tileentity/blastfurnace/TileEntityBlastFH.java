@@ -14,6 +14,7 @@ import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
@@ -21,6 +22,7 @@ import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.block.refining.BlockBFH;
+import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityCrucible;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.entity.EntityFireBlast;
@@ -73,7 +75,13 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
             } else if (!worldObj.isRemote) {
                 if (isFuel(items[0])) {
                     fuel = maxFuel = getItemBurnTime(items[0]);
+                    // A fuel in a container, as lava in a bucket, leaves it behind: back in the slot, or out if full
+                    ItemStack container = SafeStacks.containerOf(items[0]);
                     decrStackSize(0, 1);
+                    if (container != null) {
+                        if (items[0] == null) items[0] = container;
+                        else InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, container);
+                    }
                 }
             }
         }
@@ -293,7 +301,8 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
 
     @Override
     public boolean canExtractItem(int slot, ItemStack item, int side) {
-        return false;
+        // Anything left in the fuel slot that no longer burns is spent container, so let automation clear it
+        return slot == 0 && item != null && !isFuel(item);
     }
 
     @Override
