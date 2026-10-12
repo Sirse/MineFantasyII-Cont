@@ -6,8 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -19,6 +17,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
+import minefantasy.mf2.api.crafting.MineFantasyFuels;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.Functions;
@@ -26,7 +25,6 @@ import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SkillList;
 import minefantasy.mf2.item.food.FoodListMF;
-import minefantasy.mf2.item.list.ComponentListMF;
 
 public class TileEntityFirepit extends TileEntityShown implements IBasicMetre, IHeatSource {
 
@@ -36,26 +34,10 @@ public class TileEntityFirepit extends TileEntityShown implements IBasicMetre, I
     private int ticksExisted;
     private Random rand = new Random();
 
-    /**
-     * Gets the burn time
-     * <p>
-     * Planks are 10 seconds, sticks are 15 seconds
-     */
+    /** How many ticks this burns here: its firepit fuel, scaled by the wood of a material plank or pane. */
     public static int getItemBurnTime(ItemStack input) {
-        if (input == null) {
-            return 0;
-        } else {
-            Item i = input.getItem();
-            if (i == Items.stick) return 300;// 15Sec
-            if (i == ComponentListMF.plank || i == ComponentListMF.plank_cut) {
-                return (int) (200 * CustomToolHelper.getBurnModifier(input));
-            }
-            if (i == ComponentListMF.plank_pane) {
-                return (int) (600 * CustomToolHelper.getBurnModifier(input));
-            }
-
-            return 0;
-        }
+        int ticks = MineFantasyFuels.FIREPIT.get(input);
+        return ticks <= 0 ? 0 : (int) (ticks * CustomToolHelper.getBurnModifier(input));
     }
 
     @Override

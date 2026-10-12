@@ -40,7 +40,7 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
     }
 
     public static int getItemBurnTime(ItemStack fuel) {
-        return MineFantasyFuels.getBlastFuel(fuel);
+        return MineFantasyFuels.BLAST.get(fuel);
     }
 
     @Override

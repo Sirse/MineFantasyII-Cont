@@ -21,22 +21,38 @@ public class Fuels {
     /** Fuel for the blast furnace heater, burning this many ticks; it counts ahead of MineFantasy's own. */
     @ZenMethod
     public static void addBlastFuel(IItemStack stack, int ticks) {
-        MineTweakerAPI.apply(new BlastFuelAction(stack, ticks));
+        MineTweakerAPI.apply(new FuelAction(MineFantasyFuels.BLAST, "blast furnace", stack, ticks));
     }
 
     /** Takes an item out as blast furnace heater fuel, MineFantasy's own included. */
     @ZenMethod
     public static void removeBlastFuel(IItemStack stack) {
-        MineTweakerAPI.apply(new BlastFuelAction(stack, 0));
+        MineTweakerAPI.apply(new FuelAction(MineFantasyFuels.BLAST, "blast furnace", stack, 0));
     }
 
-    private static class BlastFuelAction implements IUndoableAction {
+    /** Fuel for the firepit, burning this many ticks before wood scaling; it counts ahead of MineFantasy's own. */
+    @ZenMethod
+    public static void addFirepitFuel(IItemStack stack, int ticks) {
+        MineTweakerAPI.apply(new FuelAction(MineFantasyFuels.FIREPIT, "firepit", stack, ticks));
+    }
 
+    /** Takes an item out as firepit fuel, MineFantasy's own included. */
+    @ZenMethod
+    public static void removeFirepitFuel(IItemStack stack) {
+        MineTweakerAPI.apply(new FuelAction(MineFantasyFuels.FIREPIT, "firepit", stack, 0));
+    }
+
+    private static class FuelAction implements IUndoableAction {
+
+        private final MineFantasyFuels.FuelTable table;
+        private final String fire;
         private final IItemStack stack;
         private final int ticks;
-        private MineFantasyFuels.BlastFuel added;
+        private MineFantasyFuels.Fuel added;
 
-        BlastFuelAction(IItemStack stack, int ticks) {
+        FuelAction(MineFantasyFuels.FuelTable table, String fire, IItemStack stack, int ticks) {
+            this.table = table;
+            this.fire = fire;
             this.stack = stack;
             this.ticks = ticks;
         }
@@ -45,10 +61,10 @@ public class Fuels {
         public void apply() {
             ItemStack mcStack = MineTweakerMC.getItemStack(stack);
             if (mcStack == null) {
-                MineTweakerAPI.logWarning("Skipping blast furnace fuel with invalid item " + stack);
+                MineTweakerAPI.logWarning("Skipping " + fire + " fuel with invalid item " + stack);
                 return;
             }
-            added = MineFantasyFuels.addScriptBlastFuel(mcStack, ticks);
+            added = table.addScript(mcStack, ticks);
         }
 
         @Override
@@ -59,20 +75,20 @@ public class Fuels {
         @Override
         public void undo() {
             if (added != null) {
-                MineFantasyFuels.removeScriptBlastFuel(added);
+                table.removeScript(added);
                 added = null;
             }
         }
 
         @Override
         public String describe() {
-            return ticks > 0 ? "Adding blast furnace fuel: " + stack.getDisplayName() + " (" + ticks + " ticks)"
-                    : "Removing blast furnace fuel: " + stack.getDisplayName();
+            return ticks > 0 ? "Adding " + fire + " fuel: " + stack.getDisplayName() + " (" + ticks + " ticks)"
+                    : "Removing " + fire + " fuel: " + stack.getDisplayName();
         }
 
         @Override
         public String describeUndo() {
-            return "Restoring blast furnace fuel: " + stack.getDisplayName();
+            return "Restoring " + fire + " fuel: " + stack.getDisplayName();
         }
 
         @Override

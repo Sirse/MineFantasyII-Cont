@@ -38,6 +38,7 @@ import minefantasy.mf2.api.recipe.RecipeEntry;
 import minefantasy.mf2.api.recipe.RecipeId;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.refine.Alloy;
+import minefantasy.mf2.block.tileentity.TileEntityFirepit;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.gametest.TestItems;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptRecipes;
@@ -503,24 +504,42 @@ public class TweakerTest {
     }
 
     @GameTest
+    public static void firepitFuel(GameTestHelper helper) throws Exception {
+        ItemStack stick = new ItemStack(Items.stick);
+        assertEquals(300, TileEntityFirepit.getItemBurnTime(stick));
+        assertEquals(0, TileEntityFirepit.getItemBurnTime(new ItemStack(fuel)));
+        around(helper, () -> {
+            noErrors(
+                    run(
+                            "mods.minefantasy.Fuel.addFirepitFuel(" + item("fuel") + ", 40);",
+                            "mods.minefantasy.Fuel.removeFirepitFuel(<minecraft:stick>);"));
+            assertEquals(40, TileEntityFirepit.getItemBurnTime(new ItemStack(fuel)));
+            assertEquals("sticks still burn", 0, TileEntityFirepit.getItemBurnTime(stick));
+            noErrors(run());
+            assertEquals("script fuel outlived its script", 0, TileEntityFirepit.getItemBurnTime(new ItemStack(fuel)));
+            assertEquals("sticks stayed out after a reload", 300, TileEntityFirepit.getItemBurnTime(stick));
+        });
+    }
+
+    @GameTest
     public static void blastFurnaceFuel(GameTestHelper helper) throws Exception {
         ItemStack coke = new ItemStack(ComponentListMF.coke);
         ItemStack charcoal = new ItemStack(Items.coal, 1, 1);
-        assertEquals("charcoal burns as coal", 300, MineFantasyFuels.getBlastFuel(charcoal));
-        assertEquals(600, MineFantasyFuels.getBlastFuel(coke));
-        assertEquals(0, MineFantasyFuels.getBlastFuel(new ItemStack(fuel)));
+        assertEquals("charcoal burns as coal", 300, MineFantasyFuels.BLAST.get(charcoal));
+        assertEquals(600, MineFantasyFuels.BLAST.get(coke));
+        assertEquals(0, MineFantasyFuels.BLAST.get(new ItemStack(fuel)));
         assertFalse("a non-fuel was let in", new TileEntityBlastFH().isItemValidForSlot(0, new ItemStack(fuel)));
         around(helper, () -> {
             noErrors(
                     run(
                             "mods.minefantasy.Fuel.addBlastFuel(" + item("fuel") + ", 40);",
                             "mods.minefantasy.Fuel.removeBlastFuel(<minefantasy2:MF_Com_coke>);"));
-            assertEquals(40, MineFantasyFuels.getBlastFuel(new ItemStack(fuel)));
+            assertEquals(40, MineFantasyFuels.BLAST.get(new ItemStack(fuel)));
             assertTrue(new TileEntityBlastFH().isItemValidForSlot(0, new ItemStack(fuel)));
-            assertEquals("coke still burns", 0, MineFantasyFuels.getBlastFuel(coke));
+            assertEquals("coke still burns", 0, MineFantasyFuels.BLAST.get(coke));
             noErrors(run());
-            assertEquals("script fuel outlived its script", 0, MineFantasyFuels.getBlastFuel(new ItemStack(fuel)));
-            assertEquals("coke stayed out after a reload", 600, MineFantasyFuels.getBlastFuel(coke));
+            assertEquals("script fuel outlived its script", 0, MineFantasyFuels.BLAST.get(new ItemStack(fuel)));
+            assertEquals("coke stayed out after a reload", 600, MineFantasyFuels.BLAST.get(coke));
         });
     }
 
