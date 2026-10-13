@@ -1437,7 +1437,7 @@ knowledge.ores.1=There is a small range of ores that generate in the world. Each
 knowledge.ores.copper=Copper ore is a common occurrence between layers 48-96. It can easily be smelted into ingots and turned into tools.^Copper can also be used to make bronze
 knowledge.ores.tin=Tin is about half as common as copper but can be found in the same levels (48-96).^Tin is smelted into ingots and is used with copper to make bronze.
 knowledge.ores.silver=Silver is found in the same areas as gold from layers <32. It's not very useful early on but more uses may be discovered.
-knowledge.ores.wolframite=Wolframite is a metal most commonly used for high-tech engineering purposes. It can be found interspersed within iron veins.
+knowledge.ores.wolframite=Wolframite is a metal most commonly used for high-tech engineering purposes. It forms small veins deep underground, below layer 16, and can also be dug out of stone at that depth.
 knowledge.ores.mythic=Little is known about this "Mythic ore" only that it is somewhat rare and found near bedrock. This strange ore seems to emit tingling sounds, for what reason is unknown...
 
 knowledge.ores.2=Minerals can also be found generating within the world. Unlike ores, these can't be smelt down into ingots, but have other uses aplenty.
