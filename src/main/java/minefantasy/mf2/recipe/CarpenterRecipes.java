@@ -1241,7 +1241,6 @@ public class CarpenterRecipes {
                 .tool("hands", -1).time(1 + (int) (2 * time)).sound(basic).materialTiers()
                 .shaped(new Object[] { "WW", " S", 'W', plank, 'S', Items.stick });
         Salvage.addSalvage(CustomToolListMF.standard_mallet, new ItemStack(plank, 2), Items.stick);
-        Salvage.addSalvage(CustomToolListMF.standard_spoon, plank, Items.stick);
 
         KnowledgeListMF.refinedPlankR.add(
                 MineFantasyAPI.carpenterRecipe(ComponentListMF.plank.construct("RefinedWood")).skill(construction)
