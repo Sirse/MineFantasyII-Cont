@@ -55,7 +55,8 @@ public abstract class TileEntityShown extends TileEntity implements StationState
 
     /** Sends a tag to the players watching the block, for {@link #show} on their side. */
     protected void send(NBTTagCompound tag) {
-        NetworkUtils.sendToWatchers(new StationStatePacket(this, tag).generatePacket(), worldObj, xCoord, zCoord);
+        // Encoding compresses the tag: skip it while nobody watches
+        NetworkUtils.sendToWatchers(() -> new StationStatePacket(this, tag).generatePacket(), worldObj, xCoord, zCoord);
     }
 
     @Override

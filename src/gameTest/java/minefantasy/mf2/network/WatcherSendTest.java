@@ -2,6 +2,8 @@ package minefantasy.mf2.network;
 
 import static minefantasy.mf2.gametest.Assert.*;
 
+import java.util.function.Supplier;
+
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -36,6 +38,25 @@ public class WatcherSendTest {
             // Far away nobody watches
             NetworkUtils.sendToWatchers(packet, world, at.x() + 100000, at.z());
             assertEquals(1, watcher.sent.size());
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void aPacketIsBuiltOnlyForSomeoneAndOnce(GameTestHelper helper) {
+        WorldServer world = (WorldServer) helper.getWorld();
+        TestPos at = helper.absolute(1, 1, 1);
+        int[] built = new int[1];
+        Supplier<Packet> packet = () -> {
+            built[0]++;
+            return new S03PacketTimeUpdate(0L, 0L, false);
+        };
+        try (Watcher watcher = new Watcher(helper, at.x() + 0.5D, at.y(), at.z() + 0.5D)) {
+            NetworkUtils.sendToWatchers(packet, world, at.x() + 100000, at.z());
+            assertEquals("built for nobody", 0, built[0]);
+            NetworkUtils.sendToWatchers(packet, world, at.x(), at.z());
+            assertEquals("built", 1, built[0]);
+            assertEquals("sent", 1, watcher.sent.size());
         }
         helper.succeed();
     }
