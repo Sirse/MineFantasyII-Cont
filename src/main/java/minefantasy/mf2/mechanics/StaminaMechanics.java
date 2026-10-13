@@ -1,5 +1,9 @@
 package minefantasy.mf2.mechanics;
 
+import java.util.Arrays;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -32,8 +36,6 @@ public class StaminaMechanics {
             ArmourCalculator.setTotalWeightOfWorn(entity, false);
         }
 
-        float[] packet = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getBaseMaxStamina(entity),
-                StaminaBar.getFlashTime(entity), StaminaBar.getBonusStamina(entity) };
         float[] values = new float[] { StaminaBar.getStaminaValue(entity), StaminaBar.getTotalMaxStamina(entity) };
         if (entity.worldObj.isRemote) {
             if (ConfigClient.playBreath && !StaminaBar.isPercentStamAvailable(entity, 0.2F, false)
@@ -108,28 +110,39 @@ public class StaminaMechanics {
         StaminaBar.tickBonusRegen(entity);
 
         if (entity instanceof EntityPlayer) {
-            syncStamina((EntityPlayer) entity, packet);
+            syncStamina((EntityPlayer) entity);
         }
     }
 
-    private static void syncStamina(EntityPlayer player, float[] previous) {
+    /** What each player's client last got, to send only what changed. */
+    private static final Map<EntityPlayer, float[]> sent = new WeakHashMap<EntityPlayer, float[]>();
+
+    private static void syncStamina(EntityPlayer player) {
         if (player.worldObj.isRemote || !(player instanceof EntityPlayerMP)) {
             return;
         }
-
         float[] current = new float[] { StaminaBar.getStaminaValue(player), StaminaBar.getBaseMaxStamina(player),
                 StaminaBar.getFlashTime(player), StaminaBar.getBonusStamina(player) };
-
-        boolean changed = current[0] != previous[0] || current[1] != previous[1]
-                || current[2] != previous[2]
-                || current[3] != previous[3];
-
-        if (!changed && player.ticksExisted % 60 != 0) {
+        if (!shouldSync(sent.get(player), current, player.ticksExisted)) {
             return;
         }
-
+        sent.put(player, current);
         StaminaPacket packet = new StaminaPacket(current, player);
         MineFantasyII.packetHandler.sendPacketToPlayer(packet.generatePacket(), (EntityPlayerMP) player);
+    }
+
+    /**
+     * Whether a client that last got {@code last} (null for nothing yet) should get {@code current}: stamina, base max,
+     * flash time and bonus. A change of max or bonus, running out or filling up, and a flash starting or ending go at
+     * once; stamina flowing and the flash counting down go every fourth tick, and all of it every three seconds.
+     */
+    static boolean shouldSync(float[] last, float[] current, int tick) {
+        if (last == null || tick % 60 == 0) return true;
+        if (Arrays.equals(last, current)) return false;
+        if (last[1] != current[1] || last[3] != current[3]) return true;
+        if (last[0] <= 0 != current[0] <= 0 || last[2] <= 0 != current[2] <= 0) return true;
+        if (current[0] >= current[1] + current[3] && last[0] < last[1] + last[3]) return true;
+        return tick % 4 == 0;
     }
 
     public static float getConstantDecay(EntityLivingBase user) {
