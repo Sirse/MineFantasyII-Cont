@@ -5,15 +5,12 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import io.netty.buffer.ByteBuf;
-import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.network.NetworkUtils;
 
 public class CogworkControlPacket extends PacketMF {
 
     public static final String packetName = "MF2_CogworkCtrl";
-    private static final String LAST_COGWORK_CTRL_TICK_NBT = "MF2_LastCogworkCtrl";
-    private static final long CONTROL_COOLDOWN_TICKS = 1L;
     private EntityCogwork suit;
     private float forward, strafe;
     private boolean isJumping;
@@ -48,10 +45,8 @@ public class CogworkControlPacket extends PacketMF {
         }
         moveForward = Math.max(-1.0F, Math.min(1.0F, moveForward));
         moveStrafe = Math.max(-1.0F, Math.min(1.0F, moveStrafe));
-        if (!Cooldowns.pass(player, LAST_COGWORK_CTRL_TICK_NBT, CONTROL_COOLDOWN_TICKS)) {
-            return;
-        }
-
+        // Not rate-limited: the client sends only changes, so a dropped release would leave the suit walking. Each
+        // packet only sets three fields, and the latest one wins.
         Entity entity = player.worldObj.getEntityByID(id);
 
         if (entity instanceof EntityCogwork) {

@@ -56,8 +56,8 @@ public class PacketAbuseTest {
     }
 
     /** Rate limit keys of the serverbound handlers. */
-    private static final String[] COOLDOWNS = { "MF2_LastRackCmd", "MF2_LastCogworkCtrl", "MF2_LastExtReachAtk",
-            "MF2_LastDodgeCmd", "MF2_LastResearchReq" };
+    private static final String[] COOLDOWNS = { "MF2_LastRackCmd", "MF2_LastExtReachAtk", "MF2_LastDodgeCmd",
+            "MF2_LastResearchReq" };
 
     /**
      * As if the player's last packets were long ago. Set rather than removed: a test world may not have ticked yet, and
@@ -224,6 +224,10 @@ public class PacketAbuseTest {
         handler.process(control(suit, 50F), player);
         later(player);
         assertEquals("the rider's input was not clamped", 1F, suit.getMoveForward(), 0F);
+        // A release arriving in the same tick as the press is the last state, and the client will not send it again
+        handler.process(control(suit, 1F), player);
+        handler.process(control(suit, 0F), player);
+        assertEquals("the release in the same tick was dropped", 0F, suit.getMoveForward(), 0F);
         helper.succeed();
     }
 
