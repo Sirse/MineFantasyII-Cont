@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
 
-import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
@@ -15,10 +14,8 @@ public class KnowledgePacket extends PacketMF {
 
     public static final String packetName = "MF2_KnowledgeSync";
     private EntityPlayer user;
-    private String username;
 
     public KnowledgePacket(EntityPlayer user) {
-        this.username = user.getCommandSenderName();
         this.user = user;
     }
 
@@ -29,7 +26,14 @@ public class KnowledgePacket extends PacketMF {
         if (NetworkUtils.isServer(player)) {
             return;
         }
+        apply(packet, player);
+    }
 
+    /**
+     * Makes the player's research what the server sent, locking what it no longer has too. The whole packet is read
+     * before anything changes, so a short one changes nothing.
+     */
+    static void apply(ByteBuf packet, EntityPlayer player) {
         int size = InformationList.knowledgeList.size();
         ArrayList<Object[]> completed = new ArrayList<>();
         for (int a = 0; a < size; a++) {
@@ -41,13 +45,10 @@ public class KnowledgePacket extends PacketMF {
                 completed.add(new Object[] { base, unlocked, artefactCount });
             }
         }
-        username = ByteBufUtils.readUTF8String(packet);
         for (Object[] entry : completed) {
             InformationBase base = (InformationBase) entry[0];
             ResearchLogic.setArtefactCount(base.getUnlocalisedName(), player, (Integer) entry[2]);
-            if ((Boolean) entry[1]) {
-                ResearchLogic.forceUnlock(player, base);
-            }
+            ResearchLogic.setUnlocked(player, base, (Boolean) entry[1]);
         }
     }
 
@@ -65,6 +66,5 @@ public class KnowledgePacket extends PacketMF {
             packet.writeBoolean(ResearchLogic.hasInfoUnlocked(user, base));
             packet.writeInt(ResearchLogic.getArtefactCount(base.getUnlocalisedName(), user));
         }
-        ByteBufUtils.writeUTF8String(packet, username);
     }
 }

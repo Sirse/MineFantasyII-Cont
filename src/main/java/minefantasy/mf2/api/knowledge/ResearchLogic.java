@@ -28,8 +28,17 @@ public class ResearchLogic {
     }
 
     public static void forceUnlock(EntityPlayer player, InformationBase base) {
+        setUnlocked(player, base, true);
+    }
+
+    /** Unlocks the research, or forgets it so it can be unlocked again. */
+    public static void setUnlocked(EntityPlayer player, InformationBase base, boolean unlocked) {
         NBTTagCompound nbt = getNBT(player);
-        nbt.setBoolean("Research_" + base.getUnlocalisedName(), true);
+        if (unlocked) {
+            nbt.setBoolean("Research_" + base.getUnlocalisedName(), true);
+        } else {
+            nbt.removeTag("Research_" + base.getUnlocalisedName());
+        }
     }
 
     public static boolean tryUnlock(EntityPlayer player, InformationBase base) {
