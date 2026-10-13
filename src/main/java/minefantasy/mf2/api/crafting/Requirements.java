@@ -131,6 +131,16 @@ public final class Requirements {
      * @param tool     the tool type, or empty for any
      * @param research the research, or empty for none
      */
+    /**
+     * Whether the held item is the tool asked for and of its tier, judged as the station judges it: an anvil's weak
+     * hammer works but does not suffice.
+     */
+    public static boolean toolSuffices(Rules rules, ItemStack held, String tool, int toolTier) {
+        Verdict verdict = new Requirements(tool, toolTier, -1, "")
+                .check(rules, ToolHelper.getCrafterTool(held), ToolHelper.getCrafterTier(held), 0, null);
+        return verdict.allows() && !verdict.isToolWeak();
+    }
+
     public Requirements(String tool, int toolTier, int stationTier, String research) {
         this.tool = tool == null ? "" : tool;
         this.toolTier = toolTier;
@@ -202,6 +212,6 @@ public final class Requirements {
 
     private boolean toolFits(Rules rules, String toolHave) {
         return tool.isEmpty() || tool.equalsIgnoreCase(toolHave)
-                || (rules.handsTakeAnyTool && "hands".equalsIgnoreCase(tool));
+                || (rules.handsTakeAnyTool && ToolHelper.isHands(tool));
     }
 }

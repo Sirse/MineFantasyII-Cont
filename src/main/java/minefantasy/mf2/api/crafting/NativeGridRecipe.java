@@ -4,6 +4,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.crafting.anvil.CraftingManagerAnvil;
+import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.recipe.RecipeRegistry;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.config.ConfigKitchen;
@@ -55,7 +56,7 @@ public final class NativeGridRecipe {
     }
 
     public static NativeGridRecipe carpenter(ItemStack result) {
-        return new NativeGridRecipe(Station.CARPENTER, result, "hands");
+        return new NativeGridRecipe(Station.CARPENTER, result, ToolHelper.HANDS);
     }
 
     /**
@@ -63,7 +64,7 @@ public final class NativeGridRecipe {
      * food stays obtainable.
      */
     public static NativeGridRecipe kitchen(ItemStack result) {
-        return new NativeGridRecipe(Station.KITCHEN, result, "hands");
+        return new NativeGridRecipe(Station.KITCHEN, result, ToolHelper.HANDS);
     }
 
     public static NativeGridRecipe anvil(Item result) {

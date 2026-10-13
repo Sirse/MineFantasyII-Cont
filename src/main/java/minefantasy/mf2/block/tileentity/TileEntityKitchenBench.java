@@ -54,7 +54,7 @@ public class TileEntityKitchenBench extends TileEntityStation
     /** The water of one wash: a jug's worth. Forge counts a water bottle as a whole bucket. */
     private static final int WASH_WATER = 250;
     private int washWater;
-    private String toolTypeRequired = "hands";
+    private String toolTypeRequired = ToolHelper.HANDS;
     private String craftSound = "step.wood";
     private String researchRequired = "";
     private Skill skillUsed;
@@ -161,7 +161,7 @@ public class TileEntityKitchenBench extends TileEntityStation
 
         String toolType = ToolHelper.getCrafterTool(held);
         float efficiency = ToolHelper.getCrafterEfficiency(held);
-        if (!toolType.equalsIgnoreCase("hands") || recipeRequiresHands()) {
+        if (!ToolHelper.isHands(toolType) || recipeRequiresHands()) {
             if (worldObj.isRemote) {
                 return true;
             }
@@ -195,7 +195,7 @@ public class TileEntityKitchenBench extends TileEntityStation
     }
 
     private boolean recipeRequiresHands() {
-        return toolTypeRequired.equalsIgnoreCase("hands");
+        return ToolHelper.isHands(toolTypeRequired);
     }
 
     private static float washStrength() {
@@ -452,7 +452,7 @@ public class TileEntityKitchenBench extends TileEntityStation
                 returns + 3);
         GridProject.addGrid(plan, this, getOutputSlotNum(), match == null ? null : match.getAmounts(), false);
         if (match == null) {
-            GridProject.requireRepair(plan, "hands");
+            GridProject.requireRepair(plan, ToolHelper.HANDS);
         } else {
             GridProject.require(plan, match);
         }
@@ -465,7 +465,7 @@ public class TileEntityKitchenBench extends TileEntityStation
             return;
         }
         progressMax = plan.require(MFRecipeKeys.TIME, 0F);
-        toolTypeRequired = plan.require(MFRecipeKeys.TOOL, "hands");
+        toolTypeRequired = plan.require(MFRecipeKeys.TOOL, ToolHelper.HANDS);
         researchRequired = plan.require(MFRecipeKeys.RESEARCH, "");
     }
 
@@ -512,6 +512,11 @@ public class TileEntityKitchenBench extends TileEntityStation
             return verdict.getRefusal();
         }
         return canCraft() ? null : CheckResult.Reason.OUTPUT_FULL;
+    }
+
+    @Override
+    public Requirements.Rules getRules() {
+        return Requirements.KITCHEN;
     }
 
     @Override

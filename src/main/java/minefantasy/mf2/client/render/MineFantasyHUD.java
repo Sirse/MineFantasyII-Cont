@@ -23,6 +23,7 @@ import minefantasy.mf2.api.archery.IDisplayMFAmmo;
 import minefantasy.mf2.api.archery.IFirearm;
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.IQualityBalance;
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.stamina.StaminaBar;
@@ -434,8 +435,7 @@ public class MineFantasyHUD extends Gui {
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
 
         if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
-            boolean hasTool = ToolHelper
-                    .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
+            boolean hasTool = tile.isToolSufficient(player);
             GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);
             if (tile.getAnvilTierNeeded() > -1) {
                 GuiHelper.renderToolIcon(
@@ -476,8 +476,7 @@ public class MineFantasyHUD extends Gui {
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
 
         if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
-            boolean hasTool = ToolHelper
-                    .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
+            boolean hasTool = tile.isToolSufficient(player);
             GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);
         }
         GL11.glPopMatrix();
@@ -518,8 +517,7 @@ public class MineFantasyHUD extends Gui {
         }
 
         if (knowsCraft && tile.hasProject() && tile.getToolNeeded() != null) {
-            boolean hasTool = ToolHelper
-                    .isToolSufficient(player.getHeldItem(), tile.getToolNeeded(), tile.getToolTierNeeded());
+            boolean hasTool = tile.isToolSufficient(player);
             GuiHelper.renderToolIcon(this, tile.getToolNeeded(), tile.getToolTierNeeded(), xPos - 20, yPos, hasTool);
         }
         GL11.glPopMatrix();
@@ -555,7 +553,8 @@ public class MineFantasyHUD extends Gui {
         mc.fontRenderer.drawString(s, xPos + 86 - (mc.fontRenderer.getStringWidth(s) / 2), yPos + 3, 0);
 
         if (knowsCraft && !tile.getResultName().equalsIgnoreCase("") && tile.toolType != null) {
-            boolean hasTool = ToolHelper.isToolSufficient(player.getHeldItem(), tile.toolType, -1);
+            boolean hasTool = Requirements
+                    .toolSuffices(Requirements.TANNING, player.getHeldItem(), tile.toolType, tile.tier);
             GuiHelper.renderToolIcon(this, tile.toolType, tile.tier, xPos - 20, yPos, hasTool);
         }
         GL11.glPopMatrix();

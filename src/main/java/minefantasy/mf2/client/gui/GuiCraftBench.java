@@ -5,7 +5,6 @@ import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.GuiHelper;
-import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.tileentity.CraftBench;
 
 /**
@@ -44,8 +43,7 @@ public abstract class GuiCraftBench extends GuiStation {
     }
 
     private boolean isToolSufficient() {
-        return mc.thePlayer != null && ToolHelper
-                .isToolSufficient(mc.thePlayer.getHeldItem(), bench.getToolNeeded(), bench.getToolTierNeeded());
+        return bench.isToolSufficient(mc.thePlayer);
     }
 
     private static String describe(String tool, int tier) {

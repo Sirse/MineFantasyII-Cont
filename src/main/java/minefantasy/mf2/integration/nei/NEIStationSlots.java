@@ -22,6 +22,7 @@ import codechicken.lib.gui.GuiDraw;
 import codechicken.nei.PositionedStack;
 import minefantasy.mf2.api.crafting.CustomCrafterEntry;
 import minefantasy.mf2.api.crafting.Requirements;
+import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.block.crafting.BlockAnvilMF;
 import minefantasy.mf2.block.crafting.BlockCarpenter;
@@ -43,7 +44,7 @@ public final class NEIStationSlots {
 
     /** Every tool of the type at or above the tier, material variants included */
     public static List<ItemStack> tools(String toolType, int tier) {
-        if (toolType == null || toolType.equalsIgnoreCase("hands") || toolType.equalsIgnoreCase("nothing")) {
+        if (!ToolHelper.isCraftingTool(toolType)) {
             return Collections.emptyList();
         }
         String key = toolType.toLowerCase() + ":" + tier;

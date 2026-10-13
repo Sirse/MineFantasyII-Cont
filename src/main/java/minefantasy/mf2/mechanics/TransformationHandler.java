@@ -66,7 +66,7 @@ public class TransformationHandler {
         int toolTier = ToolHelper.getCrafterTier(held);
 
         TransformationRecipe recipe = TransformationRecipes.findRecipe(block, meta, toolType, toolTier);
-        if (recipe == null && held != null && "nothing".equalsIgnoreCase(toolType)) {
+        if (recipe == null && held != null && ToolHelper.NOTHING.equalsIgnoreCase(toolType)) {
             // Plain tools such as axes are not crafting tools, so fall back to their harvest classes
             for (String toolClass : held.getItem().getToolClasses(held)) {
                 recipe = TransformationRecipes

@@ -18,10 +18,22 @@ public class ToolHelper {
     public static final String sharpnessLevelNBT = "MF_Sharpness_Level";
     private static String specialItem = "MF_SpecialItemType";
 
-    public static boolean shouldShowTooltip(ItemStack tool) {
-        String type = getCrafterTool(tool);
+    /** The tool type of an empty hand, and of a recipe worked by hand. It has no tier. */
+    public static final String HANDS = "hands";
+    /** The tool type of a held item that is no crafting tool. */
+    public static final String NOTHING = "nothing";
 
-        return type != null && !type.equalsIgnoreCase("nothing") && !type.equalsIgnoreCase("hands");
+    public static boolean isHands(String type) {
+        return HANDS.equalsIgnoreCase(type);
+    }
+
+    /** Whether the type is a real crafting tool: neither bare hands nor an item that is no tool. */
+    public static boolean isCraftingTool(String type) {
+        return type != null && !type.isEmpty() && !isHands(type) && !NOTHING.equalsIgnoreCase(type);
+    }
+
+    public static boolean shouldShowTooltip(ItemStack tool) {
+        return isCraftingTool(getCrafterTool(tool));
     }
 
     public static float getCrafterEfficiency(ItemStack tool) {
@@ -69,7 +81,7 @@ public class ToolHelper {
 
     public static String getCrafterTool(ItemStack tool) {
         if (tool == null) {
-            return "hands";
+            return HANDS;
         }
         if (tool.getItem() instanceof IToolMF) {
             return ((IToolMF) tool.getItem()).getToolType(tool);
@@ -253,13 +265,6 @@ public class ToolHelper {
             stringList[i] = entries.get(i);
         }
         return stringList;
-    }
-
-    public static boolean isToolSufficient(ItemStack heldItem, String toolNeeded, int toolTierNeeded) {
-        String toolType = getCrafterTool(heldItem);
-        int tier = getCrafterTier(heldItem);
-
-        return toolType.equalsIgnoreCase(toolNeeded) && tier >= toolTierNeeded;
     }
 
     public static void setUnbreakable(ItemStack tool, boolean isUnbreakable) {

@@ -292,12 +292,8 @@ public class RecipeHandlerAnvil extends MFNEIRecipeHandler {
             if (material == null) {
                 return;
             }
-            if (toolTier < 0) {
-                toolTier = material.crafterTier;
-            }
-            if (anvilTier < 0) {
-                anvilTier = material.crafterAnvilTier;
-            }
+            toolTier = iAnvilRecipe.toolTierFor(material);
+            anvilTier = iAnvilRecipe.stationTierFor(material);
         }
 
         private void addSpecialCatalyst(ItemStack specialCatalyst) {

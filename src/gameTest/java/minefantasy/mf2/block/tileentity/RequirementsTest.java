@@ -54,6 +54,23 @@ public class RequirementsTest {
         helper.succeed();
     }
 
+    /** The tool icon shows the tool sufficing exactly when the station takes it at full strength. */
+    @GameTest
+    public static void theShownToolSufficesAsTheStationJudgesIt(GameTestHelper helper) throws Exception {
+        ItemStack spoon = new ItemStack(minefantasy.mf2.item.list.CustomToolListMF.standard_spoon);
+        assertTrue(
+                "the kitchen takes any tool for hands, the icon did not",
+                Requirements.toolSuffices(Requirements.KITCHEN, spoon, ToolHelper.HANDS, -1));
+        assertFalse(
+                "the carpenter takes only an empty hand for hands",
+                Requirements.toolSuffices(Requirements.CARPENTER, spoon, ToolHelper.HANDS, -1));
+        assertTrue(Requirements.toolSuffices(Requirements.CARPENTER, null, ToolHelper.HANDS, -1));
+        assertFalse(
+                "a spoon below the tier was shown as enough",
+                Requirements.toolSuffices(Requirements.KITCHEN, spoon, "spoon", 5));
+        helper.succeed();
+    }
+
     @GameTest
     public static void benchRefusesAWeakToolThenAWeakBench(GameTestHelper helper) throws Exception {
         assertEquals(

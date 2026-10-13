@@ -74,7 +74,7 @@ public class GuiHelper {
     public static int[] getToolTypeIcon(String s) {
         int width = 20;
         int height = 20;
-        if (s.equalsIgnoreCase("hands")) {
+        if (ToolHelper.isHands(s)) {
             return new int[] { 0, 0 };
         }
         if (s.equalsIgnoreCase("knife")) {

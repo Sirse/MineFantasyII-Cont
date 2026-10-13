@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.FakePlayer;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
@@ -20,6 +21,8 @@ import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.Input;
 import minefantasy.mf2.api.recipe.RecipeTransaction;
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.integration.minetweaker.helpers.ScriptInputs;
 import minefantasy.mf2.integration.minetweaker.helpers.TweakedIngredients;
 import minetweaker.api.item.IIngredient;
@@ -215,6 +218,55 @@ public class GridStationTest {
         } finally {
             Stations.end();
         }
+        helper.succeed();
+    }
+
+    /** A spoon of tiered wood, made by hand as the native spoon recipe is: issue 81. */
+    @GameTest
+    public static void aHandsRecipeOfTieredWoodIsMadeByAnEmptyHand(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            GridRecipe spoon = shapeless(GridRecipe.Grid.BENCH, new ItemStack(blade), new ItemStack(junk))
+                    .tiers(GridRecipe.Tiers.MATERIAL).build();
+            anvilRecipes(tx -> tx.add(MFRecipes.CARPENTER, id("carpenter", "spoon"), spoon, 0));
+            helper.setBlock(1, 1, 1, BlockListMF.carpenter);
+            TileEntityCarpenterMF bench = helper.assertTileEntityPresent(TileEntityCarpenterMF.class, 1, 1, 1);
+            ItemStack wood = of(junk, oak);
+            wood.stackSize = 2;
+            bench.setInventorySlotContents(0, wood);
+            bench.updateCraftingData();
+            assertEquals("hands", bench.getToolNeeded());
+            assertEquals("the wood's tier was asked of bare hands", -1, bench.getToolTierNeeded());
+
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+            assertNull(player.getHeldItem());
+            int output = bench.getSizeInventory() - 5;
+            for (int hit = 0; hit < 20 && bench.getStackInSlot(output) == null; hit++) {
+                bench.tryCraft(player);
+            }
+            ItemStack made = bench.getStackInSlot(output);
+            assertNotNull("an empty hand made nothing", made);
+            assertEquals(blade, made.getItem());
+            assertEquals(oak, CustomMaterial.getMaterialFor(made, CustomToolHelper.slot_main));
+            assertEquals("the grid did not pay one wood", 1, bench.getStackInSlot(0).stackSize);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
+    /** The Java API refuses the tool requirements no one can meet, as scripts are refused. */
+    @GameTest
+    public static void impossibleToolsAreRefused(GameTestHelper helper) {
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> shapeless(GridRecipe.Grid.BENCH, new ItemStack(blade), new ItemStack(junk)).tool("hands", 2)
+                        .build().validate());
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> shapeless(GridRecipe.Grid.BENCH, new ItemStack(blade), new ItemStack(junk)).tool("nothing", 0)
+                        .build().validate());
+        shapeless(GridRecipe.Grid.BENCH, new ItemStack(blade), new ItemStack(junk)).tool("hands", 0).build().validate();
         helper.succeed();
     }
 

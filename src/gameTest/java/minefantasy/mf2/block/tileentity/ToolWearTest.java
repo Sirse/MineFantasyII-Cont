@@ -85,6 +85,40 @@ public class ToolWearTest {
         helper.succeed();
     }
 
+    /** A carpenter's bench wears only the tool its recipe asks for, not another crafting tool struck on it. */
+    @GameTest
+    public static void aCarpenterBenchWearsOnlyTheToolItAsksFor(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            reload(
+                    tx -> tx.add(
+                            MFRecipes.CARPENTER,
+                            id("carpenter", "sawn"),
+                            GridRecipe.shapeless(
+                                    GridRecipe.Grid.BENCH,
+                                    new Object[] { new ItemStack(seed) },
+                                    null,
+                                    new ItemStack(flour)).tool("saw", 0).time(100).build(),
+                            0));
+            TileEntityCarpenterMF bench = place(new TileEntityCarpenterMF());
+            bench.setInventorySlotContents(0, new ItemStack(seed));
+            bench.updateCraftingData();
+            assertEquals("the bench does not ask for a saw", "saw", bench.getToolNeeded());
+            FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+            ItemStack spoon = new ItemStack(CustomToolListMF.standard_spoon);
+            player.setCurrentItemOrArmor(0, spoon);
+            bench.tryCraft(player);
+            assertEquals("a spoon struck where a saw is asked for wore", 0, spoon.getItemDamage());
+            ItemStack saw = new ItemStack(CustomToolListMF.standard_saw);
+            player.setCurrentItemOrArmor(0, saw);
+            bench.tryCraft(player);
+            assertEquals("the saw did not wear", 1, saw.getItemDamage());
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
     /** A rack asking for hands, worked with an empty hand, wears nothing and does not crash. */
     @GameTest
     public static void aTanningRackWorkedByHandWearsNothing(GameTestHelper helper) throws Exception {

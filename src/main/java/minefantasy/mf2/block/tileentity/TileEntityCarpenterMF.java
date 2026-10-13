@@ -42,7 +42,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
     private ContainerCarpenterMF syncCarpenter;
     private InventoryCrafting craftMatrix;
     private String lastPlayerHit = "";
-    private String toolTypeRequired = "hands";
+    private String toolTypeRequired = ToolHelper.HANDS;
     private String craftSound = "step.wood";
     private String researchRequired = "";
     private Skill skillUsed;
@@ -141,8 +141,11 @@ public class TileEntityCarpenterMF extends TileEntityStation
         if (user == null) return false;
 
         String toolType = ToolHelper.getCrafterTool(user.getHeldItem());
-        if (!toolType.equalsIgnoreCase("nothing")) {
-            ToolHelper.wearCrafterTool(user);
+        if (!ToolHelper.NOTHING.equalsIgnoreCase(toolType)) {
+            // Only the tool the recipe works with wears: a saw used where a knife is asked for does nothing
+            if (toolType.equalsIgnoreCase(toolTypeRequired)) {
+                ToolHelper.wearCrafterTool(user);
+            }
             if (worldObj.isRemote) return true;
 
             Requirements.Verdict verdict = verdict(user);
@@ -364,7 +367,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
                 returns + 3);
         GridProject.addGrid(plan, this, getOutputSlotNum(), match == null ? null : match.getAmounts(), false);
         if (match == null) {
-            GridProject.requireRepair(plan, "hands");
+            GridProject.requireRepair(plan, ToolHelper.HANDS);
         } else {
             GridProject.require(plan, match);
         }
@@ -377,7 +380,7 @@ public class TileEntityCarpenterMF extends TileEntityStation
             return;
         }
         progressMax = plan.require(MFRecipeKeys.TIME, 0F);
-        toolTypeRequired = plan.require(MFRecipeKeys.TOOL, "hands");
+        toolTypeRequired = plan.require(MFRecipeKeys.TOOL, ToolHelper.HANDS);
         researchRequired = plan.require(MFRecipeKeys.RESEARCH, "");
         hammerTierRequired = plan.require(MFRecipeKeys.TOOL_TIER, 0);
         CarpenterTierRequired = plan.require(MFRecipeKeys.TIER, 0);
@@ -419,6 +422,11 @@ public class TileEntityCarpenterMF extends TileEntityStation
             return verdict.getRefusal();
         }
         return canCraft() ? null : CheckResult.Reason.OUTPUT_FULL;
+    }
+
+    @Override
+    public Requirements.Rules getRules() {
+        return Requirements.CARPENTER;
     }
 
     @Override

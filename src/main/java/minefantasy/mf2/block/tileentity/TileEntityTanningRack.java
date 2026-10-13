@@ -128,8 +128,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
             }
             return true;
         }
-        if (!leftClick && (ToolHelper.getCrafterTool(held).equalsIgnoreCase("nothing")
-                || ToolHelper.getCrafterTool(held).equalsIgnoreCase("hands"))) {
+        if (!leftClick && !ToolHelper.isCraftingTool(ToolHelper.getCrafterTool(held))) {
             // Item placement
             ItemStack item = items[0];
             if (item == null) {

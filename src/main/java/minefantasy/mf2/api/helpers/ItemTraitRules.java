@@ -75,10 +75,7 @@ public final class ItemTraitRules {
 
     public static CustomCrafterEntry crafter(Item tool, String type, float efficiency, int tier) {
         notOwn(tool instanceof IToolMF);
-        if (type == null || type.isEmpty()
-                || !type.equals(type.trim())
-                || "nothing".equals(type)
-                || "hands".equals(type)) {
+        if (type == null || type.isEmpty() || !type.equals(type.trim()) || !ToolHelper.isCraftingTool(type)) {
             throw new IllegalArgumentException("the tool type is a name such as " + CRAFTER_TYPES);
         }
         if (!finite(efficiency) || efficiency <= 0F || efficiency > 1000F || tier < -1 || tier > 100) {

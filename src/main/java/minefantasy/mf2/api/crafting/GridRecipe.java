@@ -8,6 +8,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
+import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.api.recipe.RecipeChecks;
 import minefantasy.mf2.api.recipe.RecipeEntry;
@@ -193,7 +194,7 @@ public final class GridRecipe implements RecipeChecks.Validated {
         private final ItemStack output;
         private boolean anchored;
         private Tiers tiers = Tiers.FIXED;
-        private String tool = "hands";
+        private String tool = ToolHelper.HANDS;
         private int toolTier = -1;
         private int stationTier = -1;
         private int time = 1;
@@ -387,8 +388,8 @@ public final class GridRecipe implements RecipeChecks.Validated {
                 amounts,
                 result,
                 (int) (time * material.craftTimeModifier),
-                toolTier < 0 ? material.crafterTier : toolTier,
-                stationTier < 0 && this.grid == Grid.ANVIL ? material.crafterAnvilTier : stationTier,
+                toolTierFor(material),
+                stationTierFor(material),
                 smithed ? "smelt" + material.getName() : ownResearch);
     }
 
@@ -492,6 +493,23 @@ public final class GridRecipe implements RecipeChecks.Validated {
         return stationTier;
     }
 
+    /**
+     * The tool tier made of this material: a tier of -1 is the material's for {@link Tiers#MATERIAL}, except for bare
+     * hands, which have no tier.
+     */
+    public int toolTierFor(CustomMaterial material) {
+        boolean fromMaterial = tiers == Tiers.MATERIAL && material != null && !ToolHelper.isHands(tool);
+        return toolTier < 0 && fromMaterial ? material.crafterTier : toolTier;
+    }
+
+    /**
+     * The station tier made of this material: a tier of -1 is the material's on the anvil for {@link Tiers#MATERIAL}.
+     */
+    public int stationTierFor(CustomMaterial material) {
+        boolean fromMaterial = tiers == Tiers.MATERIAL && material != null && grid == Grid.ANVIL;
+        return stationTier < 0 && fromMaterial ? material.crafterAnvilTier : stationTier;
+    }
+
     public boolean outputHot() {
         return hot;
     }
@@ -529,6 +547,10 @@ public final class GridRecipe implements RecipeChecks.Validated {
         RecipeChecks.tier("tool tier", toolTier);
         RecipeChecks.tier("station tier", stationTier);
         RecipeChecks.notEmpty("tool", tool);
+        RecipeChecks.require(
+                !ToolHelper.NOTHING.equalsIgnoreCase(tool),
+                "\"nothing\" is no tool; give the tool type, or hands");
+        RecipeChecks.require(!ToolHelper.isHands(tool) || toolTier <= 0, "bare hands have no tier; give hands -1 or 0");
         RecipeChecks.require(dirtyAmount >= 0, "dirty amount must not be negative");
         // "tier" asks for the research of the parts' metal, worked out when the grid is matched
         if (!"tier".equalsIgnoreCase(research)) {

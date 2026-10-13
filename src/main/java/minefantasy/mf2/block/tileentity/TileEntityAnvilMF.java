@@ -460,6 +460,11 @@ public class TileEntityAnvilMF extends TileEntityStation
     }
 
     @Override
+    public Requirements.Rules getRules() {
+        return Requirements.ANVIL;
+    }
+
+    @Override
     public CheckResult.Reason getWorkProblem(EntityPlayer player) {
         if (project != null && project.getGeneration() != MFRecipes.ANVIL.published().getGeneration()) {
             return CheckResult.Reason.of("checking");

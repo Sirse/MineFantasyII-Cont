@@ -3,6 +3,7 @@ package minefantasy.mf2.block.tileentity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.Requirements;
 import minefantasy.mf2.api.recipe.CheckResult;
 
 /** A bench worked by hand, as its window shows it: the project, its progress and what it asks of tool and bench. */
@@ -31,6 +32,15 @@ public interface CraftBench {
 
     /** The bench tier the project needs; -1 for any. */
     int getBenchTierNeeded();
+
+    /** How this bench judges tools and its own tier. */
+    Requirements.Rules getRules();
+
+    /** Whether the player holds the tool the project needs, as the bench judges it. */
+    default boolean isToolSufficient(EntityPlayer player) {
+        return player != null
+                && Requirements.toolSuffices(getRules(), player.getHeldItem(), getToolNeeded(), getToolTierNeeded());
+    }
 
     /** Whether this bench is good enough for the project; only an anvil of too low a tier is not. */
     default boolean isBenchSufficient() {

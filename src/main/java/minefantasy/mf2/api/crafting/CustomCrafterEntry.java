@@ -5,6 +5,8 @@ import java.util.HashMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.helpers.ToolHelper;
+
 /**
  * Makes an item of another mod count as a crafting tool: its type ("hammer", "knife", ...), tier and efficiency, as
  * recipes and {@link minefantasy.mf2.api.crafting.Requirements} read them through
@@ -51,7 +53,7 @@ public class CustomCrafterEntry {
         if (entry != null) {
             return entry.type;
         }
-        return "nothing";
+        return ToolHelper.NOTHING;
     }
 
     public static float getEntryEfficiency(ItemStack piece) {

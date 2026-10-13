@@ -159,6 +159,12 @@ public class GridBuilderScriptTest {
                     { "mods.minefantasy.CarpenterBench.shapeless(\"dirty\", <minecraft:diamond>)"
                             + ".ingredients([<minecraft:stick>]).tool(\"hands\", 0).time(10).dirt(1.0).register();",
                             "carpenter/dirty", "only the kitchen bench gets dirty" },
+                    { "mods.minefantasy.CarpenterBench.shapeless(\"tiered_hands\", <minecraft:diamond>)"
+                            + ".ingredients([<minecraft:stick>]).tool(\"hands\", 2).time(10).register();",
+                            "carpenter/tiered_hands", "bare hands have no tier" },
+                    { "mods.minefantasy.CarpenterBench.shapeless(\"no_tool_type\", <minecraft:diamond>)"
+                            + ".ingredients([<minecraft:stick>]).tool(\"nothing\", 0).time(10).register();",
+                            "carpenter/no_tool_type", "\"nothing\" is no tool" },
                     { "mods.minefantasy.Anvil.shapeless(\"mixed\", <minecraft:diamond>)"
                             + ".pattern([\"I\"]).ingredients([<minecraft:stick>]).tool(\"hammer\", 0).time(10)"
                             + ".register();", "anvil/mixed", "pattern is for shaped recipes" } };
