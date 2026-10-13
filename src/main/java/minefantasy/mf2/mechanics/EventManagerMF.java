@@ -20,6 +20,7 @@ import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.*;
 import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.rpg.LevelupEvent;
+import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.SyncSkillEvent;
 import minefantasy.mf2.api.stamina.StaminaBar;
 import minefantasy.mf2.api.tool.ISmithTongs;
@@ -29,7 +30,6 @@ import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.entity.EntityItemUnbreakable;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.network.packet.LevelupPacket;
-import minefantasy.mf2.network.packet.SkillPacket;
 import minefantasy.mf2.util.MFLogUtil;
 import minefantasy.mf2.util.XSTRandom;
 
@@ -154,21 +154,16 @@ public class EventManagerMF {
         if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
             EntityPlayerMP serverPlayer = (EntityPlayerMP) player;
             MineFantasyII.packetHandler.sendPacketToPlayer(
-                    new LevelupPacket(player, event.theSkill, event.theLevel).generatePacket(),
+                    new LevelupPacket(event.theSkill, event.theLevel).generatePacket(),
                     serverPlayer);
-            MineFantasyII.packetHandler
-                    .sendPacketToPlayer(new SkillPacket(player, event.theSkill).generatePacket(), serverPlayer);
+            RPGElements.syncAll(player);
         }
     }
 
     @SubscribeEvent
     public void syncSkill(SyncSkillEvent event) {
         EntityPlayer player = event.thePlayer;
-        if (!player.worldObj.isRemote && player instanceof EntityPlayerMP) {
-            MineFantasyII.packetHandler.sendPacketToPlayer(
-                    new SkillPacket(player, event.theSkill).generatePacket(),
-                    (EntityPlayerMP) player);
-        }
+        RPGElements.syncAll(player);
     }
 
     @SubscribeEvent

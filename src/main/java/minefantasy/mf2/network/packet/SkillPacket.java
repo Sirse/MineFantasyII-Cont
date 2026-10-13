@@ -1,5 +1,8 @@
 package minefantasy.mf2.network.packet;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -9,20 +12,22 @@ import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
 import minefantasy.mf2.network.NetworkUtils;
 
+/** Every skill of a player in one packet: name, level, xp and the xp to the next level. */
 public class SkillPacket extends PacketMF {
 
     public static final String packetName = "MF2_SkillSync";
-    private EntityPlayer user;
-    private int level, xp, xpMax;
-    private String skillName;
+    /** More skills than any pack registers; a longer list is a broken packet. */
+    private static final int MAX_SKILLS = 256;
+    private final List<String> names = new ArrayList<>();
+    private final List<int[]> values = new ArrayList<>();
 
-    public SkillPacket(EntityPlayer user, Skill skill) {
-        this.user = user;
-        NBTTagCompound skilltag = RPGElements.getSkill(user, skill.skillName);
-        skillName = skill.skillName;
-        level = skilltag.getInteger("level");
-        xp = skilltag.getInteger("xp");
-        xpMax = skilltag.getInteger("xpMax");
+    public SkillPacket(EntityPlayer user) {
+        for (Skill skill : RPGElements.skillsList) {
+            if (skill == null) continue;
+            NBTTagCompound tag = RPGElements.getSkill(user, skill.skillName);
+            names.add(skill.skillName);
+            values.add(new int[] { tag.getInteger("level"), tag.getInteger("xp"), tag.getInteger("xpMax") });
+        }
     }
 
     public SkillPacket() {}
@@ -32,16 +37,22 @@ public class SkillPacket extends PacketMF {
         if (NetworkUtils.isServer(player)) {
             return;
         }
-
-        String name = ByteBufUtils.readUTF8String(packet);
-        int skillLvl = packet.readInt();
-        int skillXp = packet.readInt();
-        int skillMaxXp = packet.readInt();
-
-        NBTTagCompound tag = RPGElements.getSkill(player, name);
-        tag.setInteger("level", skillLvl);
-        tag.setInteger("xp", skillXp);
-        tag.setInteger("xpMax", skillMaxXp);
+        int count = packet.readInt();
+        if (count < 0 || count > MAX_SKILLS) {
+            return;
+        }
+        for (int i = 0; i < count; i++) {
+            String name = ByteBufUtils.readUTF8String(packet);
+            int level = packet.readInt();
+            int xp = packet.readInt();
+            int xpMax = packet.readInt();
+            // Only skills this side knows, so a stray name makes no tag
+            if (!RPGElements.isSkill(name)) continue;
+            NBTTagCompound tag = RPGElements.getSkill(player, name);
+            tag.setInteger("level", level);
+            tag.setInteger("xp", xp);
+            tag.setInteger("xpMax", xpMax);
+        }
     }
 
     @Override
@@ -51,9 +62,13 @@ public class SkillPacket extends PacketMF {
 
     @Override
     public void write(ByteBuf packet) {
-        ByteBufUtils.writeUTF8String(packet, skillName);
-        packet.writeInt(level);
-        packet.writeInt(xp);
-        packet.writeInt(xpMax);
+        packet.writeInt(names.size());
+        for (int i = 0; i < names.size(); i++) {
+            int[] value = values.get(i);
+            ByteBufUtils.writeUTF8String(packet, names.get(i));
+            packet.writeInt(value[0]);
+            packet.writeInt(value[1]);
+            packet.writeInt(value[2]);
+        }
     }
 }

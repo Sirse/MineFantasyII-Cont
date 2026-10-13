@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 
+import minefantasy.mf2.MineFantasyII;
 import minefantasy.mf2.api.helpers.PlayerTagData;
+import minefantasy.mf2.network.packet.SkillPacket;
 import minefantasy.mf2.util.XSTRandom;
 
 public class RPGElements {
@@ -57,10 +60,12 @@ public class RPGElements {
     }
 
     public static void initSkills(EntityPlayer player) {
-        for (int id = 0; id < skillsList.size(); id++) {
-            Skill skill = skillsList.get(id);
-            skill.sync(player);
-        }
+        syncAll(player);
+    }
+
+    /** Whether a skill of exactly this name is registered. */
+    public static boolean isSkill(String name) {
+        return skillsMap.containsKey(name);
     }
 
     public static Skill getSkillByName(String name) {
@@ -109,14 +114,11 @@ public class RPGElements {
         return skillsList.get(id);
     }
 
+    /** Sends the player every skill in one packet. */
     public static void syncAll(EntityPlayer user) {
-        if (!user.worldObj.isRemote) {
-            for (int a = 0; a < skillsList.size(); a++) {
-                Skill skill = skillsList.get(a);
-                if (skill != null) {
-                    skill.sync(user);
-                }
-            }
+        if (user instanceof EntityPlayerMP && !user.worldObj.isRemote) {
+            MineFantasyII.packetHandler
+                    .sendPacketToPlayer(new SkillPacket(user).generatePacket(), (EntityPlayerMP) user);
         }
     }
 }

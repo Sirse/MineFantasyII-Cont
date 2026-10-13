@@ -13,14 +13,10 @@ import minefantasy.mf2.network.NetworkUtils;
 public class LevelupPacket extends PacketMF {
 
     public static final String packetName = "MF2_levelup";
-    private EntityPlayer user;
-    private String username;
     private int level;
     private String skillName;
 
-    public LevelupPacket(EntityPlayer user, Skill skill, int level) {
-        this.username = user.getCommandSenderName();
-        this.user = user;
+    public LevelupPacket(Skill skill, int level) {
         this.skillName = skill.skillName;
         this.level = level;
     }
@@ -58,6 +54,5 @@ public class LevelupPacket extends PacketMF {
     public void write(ByteBuf packet) {
         ByteBufUtils.writeUTF8String(packet, skillName);
         packet.writeInt(level);
-        ByteBufUtils.writeUTF8String(packet, username);
     }
 }
