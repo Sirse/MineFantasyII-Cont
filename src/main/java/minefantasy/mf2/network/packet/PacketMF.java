@@ -11,7 +11,10 @@ public abstract class PacketMF {
     public final FMLProxyPacket generatePacket() {
         ByteBuf buf = Unpooled.buffer(16);
         write(buf);
-        return new FMLProxyPacket(buf, getChannel());
+        // Forge sends the whole backing array, so hand it one holding exactly what was written
+        byte[] data = new byte[buf.readableBytes()];
+        buf.readBytes(data);
+        return new FMLProxyPacket(Unpooled.wrappedBuffer(data), getChannel());
     }
 
     public abstract String getChannel();
