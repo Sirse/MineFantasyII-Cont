@@ -161,6 +161,10 @@ public class CommonProxyMF implements IGuiHandler, ISmokeHandler {
         return null;
     }
 
+    /** Draws a blast the server reported; only the client proxy draws anything. */
+    public void showBlast(World world, double x, double y, double z, float radius, int filling, boolean upward,
+            int fragments, float fragmentRange, long seed) {}
+
     /** Whether the local client player is in the given gametype; only the client proxy can know. */
     public boolean clientIsInGameType(WorldSettings.GameType type) {
         return false;

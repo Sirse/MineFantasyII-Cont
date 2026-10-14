@@ -1,143 +1,72 @@
 package minefantasy.mf2.entity;
 
-import java.util.Iterator;
 import java.util.List;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EntityDamageSourceIndirect;
-import net.minecraft.util.MathHelper;
+import net.minecraft.network.play.server.S18PacketEntityTeleport;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import minefantasy.mf2.item.gadget.EnumCasingType;
-import minefantasy.mf2.item.gadget.EnumExplosiveType;
-import minefantasy.mf2.item.gadget.EnumFuseType;
-import minefantasy.mf2.item.gadget.EnumPowderType;
+import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.item.list.ToolListMF;
+import minefantasy.mf2.item.tool.crafting.ItemEAnvilTools;
 
-public class EntityMine extends Entity {
+/**
+ * A mine: armed once its fuse runs out, it is sprung by a living thing in reach that it can see, never by whoever set
+ * it, and from closer by one sneaking.
+ */
+public class EntityMine extends EntityExplosive {
 
-    private final int typeId = 2;
-    /**
-     * How long the fuse is
-     */
-    public int fuse;
-    private EntityLivingBase thrower;
-    /**
-     * Name of whoever placed the mine, so attribution survives a chunk reload
-     */
-    private String placerName = "";
+    /** Ticks from being sprung to the blast. */
+    private static final int SPRUNG = 10;
+    /** DataWatcher slot after the four components: whether it lies still on the ground. */
+    private static final int LANDED_ID = 6;
+    /** Whether the owner was in reach at the last look, so a forgetful owner is rolled for once per approach. */
+    private boolean ownerWasNear;
 
     public EntityMine(World world) {
-        super(world);
-        this.preventEntitySpawning = true;
-        this.setSize(0.5F, 0.25F);
-        this.yOffset = this.height / 2.0F;
+        super(world, 0.5F, 0.25F);
     }
 
     public EntityMine(World world, EntityLivingBase thrower) {
-        this(world);
-        this.thrower = thrower;
+        super(world, 0.5F, 0.25F, thrower, 0.5F);
         this.fuse = 40;
-
-        this.setLocationAndAngles(
-                thrower.posX,
-                thrower.posY + thrower.getEyeHeight(),
-                thrower.posZ,
-                thrower.rotationYaw,
-                thrower.rotationPitch);
-        this.posX -= MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
-        this.posY -= 0.10000000149011612D;
-        this.posZ -= MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
-        this.setPosition(this.posX, this.posY, this.posZ);
-
-        float f = 0.4F;
-        this.motionX = -MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI)
-                * f;
-        this.motionZ = MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI)
-                * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI)
-                * f;
-        this.motionY = -MathHelper.sin((this.rotationPitch + this.getThrownOffset()) / 180.0F * (float) Math.PI) * f;
-        this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, this.getThrownForce(), 1.0F);
-
-        this.prevPosX = posX;
-        this.prevPosY = posY;
-        this.prevPosZ = posZ;
     }
 
+    /**
+     * Disarms the mine for one sneaking with engineering tools in hand, wearing them by a use. A sprung mine is past
+     * disarming.
+     */
     @Override
     public boolean interactFirst(EntityPlayer user) {
-        if (user.isSneaking()) {
-            // DISARM
-            setDead();
-            user.swingItem();
-            if (!worldObj.isRemote) {
-                ItemStack item = ToolListMF.mine_custom
-                        .createMine(getCasing(), getFilling(), getFuse(), getPowder(), 1);
-                if (!user.inventory.addItemStackToInventory(item)) {
-                    this.entityDropItem(item, 0.0F);
-                }
+        ItemStack tools = user.getHeldItem();
+        if (isDead || fuse < 0
+                || !user.isSneaking()
+                || tools == null
+                || !(tools.getItem() instanceof ItemEAnvilTools)) {
+            return false;
+        }
+        setDead();
+        user.swingItem();
+        if (!worldObj.isRemote) {
+            tools.damageItem(1, user);
+            if (tools.stackSize <= 0) user.destroyCurrentEquippedItem();
+            ItemStack item = ToolListMF.mine_custom.createMine(getCasing(), getFilling(), getFuse(), getPowder(), 1);
+            if (!user.inventory.addItemStackToInventory(item)) {
+                this.entityDropItem(item, 0.0F);
             }
         }
-        return super.interactFirst(user);
-    }
-
-    public void setThrowableHeading(double x, double y, double z, float offset, float force) {
-        float f2 = MathHelper.sqrt_double(x * x + y * y + z * z);
-        x /= f2;
-        y /= f2;
-        z /= f2;
-        x += this.rand.nextGaussian() * 0.007499999832361937D * force;
-        y += this.rand.nextGaussian() * 0.007499999832361937D * force;
-        z += this.rand.nextGaussian() * 0.007499999832361937D * force;
-        x *= offset;
-        y *= offset;
-        z *= offset;
-        this.motionX = x;
-        this.motionY = y;
-        this.motionZ = z;
-        float f3 = MathHelper.sqrt_double(x * x + z * z);
-        this.prevRotationYaw = this.rotationYaw = (float) (Math.atan2(x, z) * 180.0D / Math.PI);
-        this.prevRotationPitch = this.rotationPitch = (float) (Math.atan2(y, f3) * 180.0D / Math.PI);
-    }
-
-    protected float getThrownOffset() {
-        return 0.0F;
-    }
-
-    protected float getThrownForce() {
-        return 0.5F;
+        return true;
     }
 
     @Override
     protected void entityInit() {
-        dataWatcher.addObject(typeId, (byte) 0);
-        dataWatcher.addObject(typeId + 1, (byte) 0);
-        dataWatcher.addObject(typeId + 2, (byte) 0);
-        dataWatcher.addObject(typeId + 3, (byte) 0);
-    }
-
-    /**
-     * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
-     * prevent them from trampling crops
-     */
-    @Override
-    protected boolean canTriggerWalking() {
-        return false;
-    }
-
-    /**
-     * Returns true if other Entities should be prevented from moving through this Entity.
-     */
-    @Override
-    public boolean canBeCollidedWith() {
-        return !this.isDead;
+        super.entityInit();
+        dataWatcher.addObject(LANDED_ID, (byte) 0);
     }
 
     /**
@@ -148,47 +77,25 @@ public class EntityMine extends Entity {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-        this.motionY -= (0.03999999910593033D * getCase().weightModifier);
-        this.moveEntity(this.motionX, this.motionY, this.motionZ);
-        this.motionX *= 0.9800000190734863D;
-        this.motionY *= 0.9800000190734863D;
-        this.motionZ *= 0.9800000190734863D;
-
-        if (this.onGround) {
-            this.motionX = 0;
-            this.motionZ = 0;
-            this.motionY *= -0.99D;
+        if (isLanded() && (!worldObj.isRemote || onGround)) {
+            // Lying still: neither side moves it, so the client cannot drift off the server's position and hop back.
+            // The client still falls the rest of the way, landing where the server did, or it would hang in the air.
+            if (!worldObj.isRemote && ticksExisted % 10 == 0 && !hasGround()) setLanded(false);
+        } else {
+            fall();
         }
 
         if (fuse > 0) {
             --fuse;
         }
-        double radius = Math.max(1.0D, getRangeOfBlast() - 1.5D);
 
-        if (!worldObj.isRemote && fuse == 0 && ticksExisted % 5 == 0) {
-            List<EntityLivingBase> list = worldObj
-                    .getEntitiesWithinAABB(EntityLivingBase.class, boundingBox.expand(radius * 2, radius, radius * 2));
-            if (!list.isEmpty()) {
-                boolean detonate = false;
-                Iterator i = list.iterator();
-                while (i.hasNext()) {
-                    EntityLivingBase e = (EntityLivingBase) i.next();
-                    if (e.getDistanceToEntity(this) < radius) {
-                        detonate = true;
-                        break;
-                    }
-                }
-
-                if (detonate) {
-                    worldObj.playSoundEffect(posX, posY, posZ, "game.tnt.primed", 1.0F, 0.75F);
-                    --fuse;
-                }
-            }
+        if (!worldObj.isRemote && fuse == 0 && ticksExisted % 5 == 0 && isSomeoneInReach()) {
+            spring();
         }
         if (fuse < 0) {
             fuse--;
 
-            if (fuse < -10) {
+            if (fuse < -SPRUNG) {
                 this.setDead();
 
                 if (!this.worldObj.isRemote) {
@@ -198,116 +105,112 @@ public class EntityMine extends Entity {
         }
     }
 
-    /**
-     * (abstract) Protected helper method to write subclass entity data to NBT.
-     */
-    @Override
-    protected void writeEntityToNBT(NBTTagCompound nbt) {
-        nbt.setInteger("Fuse", this.fuse);
-        // The four components live in the DataWatcher, which the base Entity does not serialise
-        nbt.setByte("Filling", getFilling());
-        nbt.setByte("Casing", getCasing());
-        nbt.setByte("FuseType", getFuse());
-        nbt.setByte("Powder", getPowder());
-        nbt.setString("Placer", thrower == null ? placerName : thrower.getCommandSenderName());
+    private void fall() {
+        this.motionY -= (0.03999999910593033D * getCase().weightModifier);
+        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+        this.motionX *= 0.9800000190734863D;
+        this.motionY *= 0.9800000190734863D;
+        this.motionZ *= 0.9800000190734863D;
+
+        if (this.onGround) {
+            this.motionX = this.motionY = this.motionZ = 0;
+            if (!worldObj.isRemote) land();
+        }
     }
 
     /**
-     * (abstract) Protected helper method to read subclass entity data from NBT.
+     * Lies still where it landed, and tells watching clients exactly where: the tracker leaves out moves under an
+     * eighth of a block, so a client that fell differently (onto grass, or from a throw at the feet) would otherwise
+     * stay put above the ground.
      */
-    @Override
-    protected void readEntityFromNBT(NBTTagCompound nbt) {
-        // Restore the components straight into the DataWatcher: setType would reset the timer to a full fuse
-        dataWatcher.updateObject(typeId, nbt.getByte("Filling"));
-        dataWatcher.updateObject(typeId + 1, nbt.getByte("Casing"));
-        dataWatcher.updateObject(typeId + 2, nbt.getByte("FuseType"));
-        dataWatcher.updateObject(typeId + 3, nbt.getByte("Powder"));
-        placerName = nbt.getString("Placer");
-        this.fuse = nbt.getInteger("Fuse");
+    private void land() {
+        setLanded(true);
+        ((WorldServer) worldObj).getEntityTracker().func_151247_a(this, new S18PacketEntityTeleport(this));
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public float getShadowSize() {
-        return 0.25F;
+    private boolean hasGround() {
+        return !worldObj.getCollidingBoundingBoxes(this, boundingBox.getOffsetBoundingBox(0, -0.05D, 0)).isEmpty();
+    }
+
+    boolean isLanded() {
+        return dataWatcher.getWatchableObjectByte(LANDED_ID) != 0;
+    }
+
+    private void setLanded(boolean landed) {
+        dataWatcher.updateObject(LANDED_ID, (byte) (landed ? 1 : 0));
+    }
+
+    /** Whether a living thing other than its owner is in reach and in sight; one sneaking only from half as far. */
+    boolean isSomeoneInReach() {
+        double radius = getTriggerRadius();
+        List<?> list = worldObj
+                .getEntitiesWithinAABB(EntityLivingBase.class, boundingBox.expand(radius * 2, radius, radius * 2));
+        boolean ownerNear = false;
+        boolean sprung = false;
+        for (Object value : list) {
+            EntityLivingBase e = (EntityLivingBase) value;
+            double reach = e.isSneaking() ? radius / 2 : radius;
+            if (e.getDistanceToEntity(this) >= reach || !canSee(e)) continue;
+            if (isPlacer(e)) {
+                ownerNear = true;
+                if (springsForOwner()) sprung = true;
+            } else {
+                sprung = true;
+            }
+        }
+        ownerWasNear = ownerNear;
+        return sprung;
     }
 
     /**
-     * returns null or the entityliving it was placed or ignited by
+     * Whether the mine springs for its owner now in reach: never, always, or for a forgetful owner by chance, rolled
+     * once each time they come within reach rather than every look.
      */
-    public EntityLivingBase getTntPlacedBy() {
-        return this.thrower;
+    private boolean springsForOwner() {
+        switch (ConfigWeapon.mineOwnerTrigger) {
+            case ALWAYS:
+                return true;
+            case FORGETFUL:
+                return !ownerWasNear && rand.nextFloat() < ConfigWeapon.mineOwnerChance;
+            default:
+                return false;
+        }
     }
 
-    public void explode() {
-        // Dealt by whoever placed the mine, so protection (and a hybrid server's damage event) weighs that player
-        Blast blast = new Blast(
-                this,
-                getRangeOfBlast() * getPowderType().rangeModifier,
-                getDamage(),
-                new EntityDamageSourceIndirect("mine", this, getPlacer())).filling(getFilling(), 8).upward();
-        if (getCasing() == 2) blast.noFalloff();
-        blast.explode();
+    private double getTriggerRadius() {
+        return Math.max(1.0D, getRangeOfBlast() - 1.5D);
     }
 
-    private double getRangeOfBlast() {
-        return getBlast().range * getCase().rangeModifier;
+    private boolean canSee(EntityLivingBase entity) {
+        Vec3 from = Vec3.createVectorHelper(posX, posY + height, posZ);
+        Vec3 to = Vec3.createVectorHelper(entity.posX, entity.posY + entity.getEyeHeight() / 2, entity.posZ);
+        return worldObj.func_147447_a(from, to, false, true, false) == null;
     }
 
-    private float getDamage() {
-        return getBlast().damage * getCase().damageModifier * getPowderType().damageModifier;
+    /** Sprung: it clicks and goes off shortly after. Springing it again changes nothing. */
+    private void spring() {
+        if (fuse < 0) return;
+        worldObj.playSoundEffect(posX, posY, posZ, "game.tnt.primed", 1.0F, 0.75F);
+        fuse = -1;
     }
 
-    public byte getFilling() {
-        return dataWatcher.getWatchableObjectByte(typeId);
+    @Override
+    protected void onSetOff() {
+        spring();
     }
 
-    public byte getCasing() {
-        return dataWatcher.getWatchableObjectByte(typeId + 1);
+    @Override
+    protected DamageSource damageSource() {
+        return damageSource("mine", this, getPlacer());
     }
 
-    public byte getFuse() {
-        return dataWatcher.getWatchableObjectByte(typeId + 2);
-    }
-
-    public byte getPowder() {
-        return dataWatcher.getWatchableObjectByte(typeId + 3);
+    @Override
+    protected void shape(Blast blast) {
+        blast.filling(getFilling(), 8).upward();
     }
 
     public EntityMine setType(byte fill, byte casing, byte fuse, byte powder) {
-        dataWatcher.updateObject(typeId, fill);
-        dataWatcher.updateObject(typeId + 1, casing);
-        dataWatcher.updateObject(typeId + 2, fuse);
-        dataWatcher.updateObject(typeId + 3, powder);
-
-        this.fuse = getFuseType().time;
-
+        setComponents(fill, casing, fuse, powder);
         return this;
-    }
-
-    /**
-     * Resolves the placer lazily: after a reload only the name survives, and the player may be offline.
-     */
-    private EntityLivingBase getPlacer() {
-        if (thrower == null && worldObj != null && placerName != null && !placerName.isEmpty()) {
-            thrower = worldObj.getPlayerEntityByName(placerName);
-        }
-        return thrower;
-    }
-
-    private EnumExplosiveType getBlast() {
-        return EnumExplosiveType.getType(getFilling());
-    }
-
-    private EnumCasingType getCase() {
-        return EnumCasingType.getType(getCasing());
-    }
-
-    private EnumFuseType getFuseType() {
-        return EnumFuseType.getType(getFuse());
-    }
-
-    private EnumPowderType getPowderType() {
-        return EnumPowderType.getType(getPowder());
     }
 }

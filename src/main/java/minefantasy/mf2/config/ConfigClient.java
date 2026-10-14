@@ -2,6 +2,7 @@ package minefantasy.mf2.config;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import minefantasy.mf2.client.CameraShake;
 import minefantasy.mf2.client.TooltipEvents;
 
 @SideOnly(Side.CLIENT)
@@ -63,6 +64,13 @@ public class ConfigClient extends ConfigurationBaseMF {
                 "Custom Apparel Model",
                 true,
                 "Determines if some work apparel (like aprons and clothing) use special models").getBoolean();
+        CameraShake.scale = config.getFloat(
+                "Explosion Shake",
+                CATEGORY_AESTHETIC,
+                1F,
+                0F,
+                1F,
+                "How hard bombs and mines shake the camera nearby: 0 for none, 1 for full");
 
         stam_xOrient = config.getInt(
                 "X Orient",

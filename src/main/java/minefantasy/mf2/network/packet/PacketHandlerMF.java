@@ -38,6 +38,7 @@ public class PacketHandlerMF {
         packetList.put(RackCommand.packetName, new RackCommand());
         packetList.put(CogworkControlPacket.packetName, new CogworkControlPacket());
         packetList.put(ExtendedReachPacket.packetName, new ExtendedReachPacket());
+        packetList.put(BlastPacket.packetName, new BlastPacket());
     }
 
     @SubscribeEvent

@@ -14,7 +14,6 @@ public class EntityListMF {
     public static void register() {
         addEntity(EntityArrowMF.class, "arrowMF", 1, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
         addEntity(EntityBomb.class, "bombMF", 2, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
-        addEntity(EntityShrapnel.class, "shrapnel_mf", 3, 16, ConfigWeapon.dynamicArrows ? 1 : 20);
         addEntity(EntityFireBlast.class, "fire_blast", 4, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
         addEntity(EntitySmoke.class, "smoke_mf", 5, 16, ConfigWeapon.dynamicArrows ? 2 : 20);
         addEntity(EntityItemUnbreakable.class, "special_eitem_mf", 6, 16, ConfigWeapon.dynamicArrows ? 2 : 20);

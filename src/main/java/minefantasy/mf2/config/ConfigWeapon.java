@@ -13,6 +13,18 @@ public class ConfigWeapon extends ConfigurationBaseMF {
     public static boolean breakArrowsGround;
     public static float arrowBreakMod;
     public static boolean xpTrain;
+    public static MineOwnerTrigger mineOwnerTrigger = MineOwnerTrigger.FORGETFUL;
+    public static float mineOwnerChance = 0.1F;
+
+    /** Whether a mine springs for whoever set it. */
+    public enum MineOwnerTrigger {
+        /** It never does. */
+        NEVER,
+        /** Now and then, as if they forgot where it lay: a chance each time they come within reach. */
+        FORGETFUL,
+        /** It treats them as anyone else. */
+        ALWAYS
+    }
 
     @Override
     protected void loadConfig() {
@@ -25,6 +37,23 @@ public class ConfigWeapon extends ConfigurationBaseMF {
         breakArrowsGround = config
                 .get(CATEGORY_PENALTIES, "Arrow Ground Break", true, "Arrows can break when hitting the ground")
                 .getBoolean();
+        String trigger = config.getString(
+                "Mine Owner Trigger",
+                CATEGORY_PENALTIES,
+                "forgetful",
+                "Whether a mine springs for whoever set it: never, forgetful (a chance each time they come within reach, as if they forgot where it lay) or always",
+                new String[] { "never", "forgetful", "always" });
+        mineOwnerTrigger = MineOwnerTrigger.FORGETFUL;
+        for (MineOwnerTrigger mode : MineOwnerTrigger.values()) {
+            if (mode.name().equalsIgnoreCase(trigger)) mineOwnerTrigger = mode;
+        }
+        mineOwnerChance = config.getFloat(
+                "Mine Owner Chance",
+                CATEGORY_PENALTIES,
+                0.1F,
+                0F,
+                1F,
+                "For a forgetful mine owner: the chance the mine springs each time they come within reach");
         arrowBreakMod = config.getFloat(
                 "Arrow Break Chance modifier",
                 CATEGORY_PENALTIES,

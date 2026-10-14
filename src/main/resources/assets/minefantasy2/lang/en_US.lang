@@ -66,6 +66,15 @@ research.finishResearch=Finished Research for %1$s
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 entity.MF_Minotaur.name=Minotaur
 entity.MF_Dragon.name=Dragon
+entity.minefantasy2.arrowMF.name=Arrow
+entity.minefantasy2.bombMF.name=Bomb
+entity.minefantasy2.fire_blast.name=Fire Blast
+entity.minefantasy2.smoke_mf.name=Smoke
+entity.minefantasy2.landmineMF.name=Mine
+entity.minefantasy2.parachute_mf.name=Parachute
+entity.minefantasy2.dragonbreath.name=Dragon Breath
+entity.minefantasy2.MF_CogSuit.name=Cogwork Suit
+entity.minefantasy2.MF_Hound.name=Hound
 death.attack.dragonstomp=%1$s was stomped by a Dragon
 death.attack.humanstomp=%1$s was stomped by %2$s
 death.attack.fireblast=%1$s was incinerated by %2$s
@@ -1918,11 +1927,12 @@ knowledge.bombs.desc=Explosion Delivery
 
 knowledge.bombs.1=What use is blackpowder without something to put it in? Well these little gadgets will do serious damage to a small area.^Bomb crafting is more... experimental than other works. First of all: you need a workstation set up.
 
-knowledge.bombs.2=Now put that down... Wherever.^With this table you will be able to create both bombs and mines. Bombs can be thrown by holding right-click for a short time and they will explode after a time. Mines however will be placed with holding right click and explode when something steps near them.
+knowledge.bombs.2=Now put that down... Wherever.^With this table you can make both bombs and mines. A bomb is thrown by holding right-click, and bursts once its fuse burns down. A mine is laid on the ground the same way, and then it waits.^A mine is blind through stone and deaf to a careful step: one sneaking it only senses up close. It usually spares its maker, but do not count on it. To lift a mine, crouch beside it and gently right-click - though you will need the proper tools.
 
 knowledge.bombs.3=Bombs and Mines require 3-4 components in their creation.^The casing$h[1]$r determines the damage and range of the device. Powder$h[2]$r will modify damage. Filling$h[3]$r can be empty and is used to add effects to the bomb. Finally, the fuse$h[4]$r determines the time until detonation.
 
 knowledge.bombs.4=To craft a bomb: simply put components in their respective slots - e.g., a ceramic casing, blackpowder, and a short fuse - then click the block to make a single bomb.
+knowledge.bombs.5=Blackpowder does not take kindly to rough handling. An arrow, a blade or a spark makes a mine click and burst a moment later, and burns a bomb's fuse down almost at once. A seasoned sapper clears a minefield from afar, with a bow, and never with a fist.^Beasts and monsters lack the wit for this: their arrows and claws leave a mine be. Nor will a well-made charge go off from a blast nearby.
 
 knowledge.crossbows=Crossbow Crafting
 knowledge.crossbows.desc=Deadly Projectiles
@@ -1976,7 +1986,7 @@ knowledge.bombarrow.1=Your experience in the creations of bombs has paid off. Th
 
 knowledge.shrapnel=Shrapnel Bombs
 knowledge.shrapnel.desc=Simple Filling
-knowledge.shrapnel.1=Bombs seem all well and good so far, but there seems to be room to improve. Each bomb is able to fit in a layer of filling that modifies the detonation of the device.^Shrapnel can be added in bomb crafting to increase the damage dealt from explosions.
+knowledge.shrapnel.1=Bombs seem all well and good so far, but there is room to improve.^A handful of chopped iron in the filling layer flies every way when the bomb bursts, tearing into the first thing in its path. Stone stops it, and a mine throws its fragments only upward, from beneath one's feet. Armour guards against both the fragments and the blast, though mail holds a blow worse, and plate worse holds piercing iron.
 
 knowledge.firebomb=Fiery Explosions
 knowledge.firebomb.desc=Deadly Incineration
@@ -1984,7 +1994,7 @@ knowledge.firebomb.desc=Deadly Incineration
 knowledge.firebomb.1=Adding shrapnel to bombs is very effective at eliminating one's fellow critters of the land. But there can be more insane carnage.^A mixture of magma cream can release a massive blast of pure flame upon detonation. Refined magma cream burns at such a high temperature - few can withstand its blast.
 
 knowledge.firebomb.2=The magma cream (being a mixture of burning embers and sticky slime) is able to keep a self-sustaining flame while also remaining as a spreadable substance. Additional blaze powder then reacts with a dragon heart to catalyze the reaction, which massively increases the temperature of the flame.
-knowledge.firebomb.3=Incineration bombs may be expensive, but they're extremely effective against armor.
+knowledge.firebomb.3=Incineration bombs may be expensive, but their flame reaches everyone around, and the red-hot fragments set alight whoever they strike.
 
 knowledge.bombCeramic=Ceramic Bomb Casing
 knowledge.bombCeramic.desc=Basic Bombs

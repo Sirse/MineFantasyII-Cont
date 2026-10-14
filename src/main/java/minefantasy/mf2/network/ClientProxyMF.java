@@ -25,6 +25,7 @@ import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.block.tileentity.decor.TileEntityAmmoBox;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityTrough;
+import minefantasy.mf2.client.BlastEffects;
 import minefantasy.mf2.client.ItemUseSyncMF;
 import minefantasy.mf2.client.KnowledgePageRegistry;
 import minefantasy.mf2.client.TooltipEvents;
@@ -160,7 +161,6 @@ public class ClientProxyMF extends CommonProxyMF {
         // when syncing is
         // fixed
         RenderingRegistry.registerEntityRenderingHandler(EntityMine.class, new RenderMine());
-        RenderingRegistry.registerEntityRenderingHandler(EntityShrapnel.class, new RenderShrapnel("shrapnel"));
         RenderingRegistry.registerEntityRenderingHandler(EntityFireBlast.class, new RenderFireBlast());
         RenderingRegistry.registerEntityRenderingHandler(EntitySmoke.class, new RenderFireBlast());
         RenderingRegistry.registerEntityRenderingHandler(EntityDragonBreath.class, new RenderDragonBreath());
@@ -176,6 +176,12 @@ public class ClientProxyMF extends CommonProxyMF {
     @Override
     public EntityPlayer getClientPlayer() {
         return Minecraft.getMinecraft().thePlayer;
+    }
+
+    @Override
+    public void showBlast(World world, double x, double y, double z, float radius, int filling, boolean upward,
+            int fragments, float fragmentRange, long seed) {
+        BlastEffects.show(world, x, y, z, radius, filling, upward, fragments, fragmentRange, seed);
     }
 
     @Override

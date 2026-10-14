@@ -262,13 +262,14 @@ public class ArmourCalculator {
         if (source == DamageSource.cactus) {
             return new float[] { 0, 0, 1 };// pierce
         }
-        if (source != null && source.getSourceOfDamage() != null && source.getEntity() != null) {
-            Entity user = source.getEntity();// The attacker
+        if (source != null && source.getSourceOfDamage() != null) {
+            Entity user = source.getEntity();// The attacker, if any
             Entity damager = source.getSourceOfDamage();// The thing causing damage(like arrows)
 
             if (user == damager && user instanceof EntityLivingBase) {
                 return getRatioForMelee((EntityLivingBase) user, ((EntityLivingBase) user).getHeldItem());
             }
+            // An arrow from a dispenser or a bomb nobody threw still strikes as what it is
             return getRatioForIndirect(damager);
         }
 

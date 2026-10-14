@@ -20,7 +20,8 @@ public class RenderMine extends Render {
     private RenderBlocks blockRenderer = new RenderBlocks();
 
     public RenderMine() {
-        this.shadowSize = 0.25F;
+        // Flat on the ground, a mine casts no shadow to give it away
+        this.shadowSize = 0F;
     }
 
     public void doRender(EntityMine mine, double x, double y, double z, float f, float f1) {
@@ -28,7 +29,10 @@ public class RenderMine extends Render {
                 : mine.getCasing() == 2 ? Blocks.obsidian
                         : mine.getCasing() == 1 ? Blocks.iron_block : Blocks.hardened_clay;
         GL11.glPushMatrix();
-        GL11.glTranslatef((float) x, (float) y - 0.3F, (float) z);
+        // Buried but for the plate, which stands a pixel proud of the ground. The ground is an eighth below the
+        // mine's position, and a client may place it up to a thirty-second off, so a thinner lip could sink from sight.
+        // The casing's top sits just under the ground, not level with it, or the two faces would flicker.
+        GL11.glTranslatef((float) x, (float) y - 0.26F, (float) z);
 
         this.bindEntityTexture(mine);
         GL11.glScalef(0.5F, 0.25F, 0.5F);

@@ -559,7 +559,8 @@ public class KnowledgePageRegistry {
                 new EntryPageText("knowledge.bombs.2"),
                 new EntryPageImage("textures/gui/knowledge/bombGuiExample.png", 128, 128, "knowledge.guiSubtitle"),
                 new EntryPageText("knowledge.bombs.3"),
-                new EntryPageText("knowledge.bombs.4"));
+                new EntryPageText("knowledge.bombs.4"),
+                new EntryPageText("knowledge.bombs.5"));
         KnowledgeListMF.bpress.addPages(
                 new EntryPageText("knowledge.bpress.1"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.bombPressCraft));

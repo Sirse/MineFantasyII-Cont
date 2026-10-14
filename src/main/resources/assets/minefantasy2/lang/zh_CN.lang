@@ -66,6 +66,15 @@ research.finishResearch=完成 %1$s 研究
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 entity.MF_Minotaur.name=牛头人
 entity.MF_Dragon.name=龙
+entity.minefantasy2.arrowMF.name=箭
+entity.minefantasy2.bombMF.name=炸弹
+entity.minefantasy2.fire_blast.name=火焰冲击
+entity.minefantasy2.smoke_mf.name=烟雾
+entity.minefantasy2.landmineMF.name=地雷
+entity.minefantasy2.parachute_mf.name=降落伞
+entity.minefantasy2.dragonbreath.name=龙息
+entity.minefantasy2.MF_CogSuit.name=齿轮动力装甲
+entity.minefantasy2.MF_Hound.name=猎犬
 death.attack.dragonstomp=%1$s 被 龙 踩死了
 death.attack.humanstomp=%1$s 被 %2$s 踩死了
 death.attack.fireblast=%1$s 被 %2$s 烤熟了
@@ -1918,11 +1927,12 @@ knowledge.bombs.desc=扩大爆炸范围
 
 knowledge.bombs.1=当使用黑火药的时候没有什么东西能让它在这些小物品可以让小范围内有恐怖的伤害。^炸弹需要多个物品制作……比起其他物品制作。首先: 你需要制作一个工作站。
 
-knowledge.bombs.2=然后把工作站放置……随便哪里都行。^这个工作站可以制作炸弹和地雷。可以通过点击右键来投掷炸弹，炸弹会在很短地时间内爆炸。而地雷可以长按右键放置，当有东西接近就会引爆。
+knowledge.bombs.2=然后把工作站放置……随便哪里都行。^在这个工作台上你可以制作炸弹和地雷。按住右键投掷炸弹，引线燃尽时它就会爆炸。地雷用同样的方式放在地上，然后静静等待。^地雷看不穿石头，也听不见小心的脚步：潜行者只有走近时才会被它察觉。它通常会放过它的制作者，但别指望这一点。要拆除地雷，蹲在它旁边轻轻右键——不过你需要合适的工具。
 
 knowledge.bombs.3=炸弹和地雷需要3-4个物品才能制作。^壳体$h[1]$r确定了装置所造成的的伤害和距离。粉末r$h[2]$r会改变伤害。填充$h[3]$r可以在炸弹上添加效果。最后需要保险丝$h[4]$r确定了爆炸之前时间。
 
 knowledge.bombs.4=制作一个炸弹：只用将部件放入相应的地方，比如黑火药和很短的保险丝。然后需要不停的点击扳手来制作物品。然后点击方块制作一个炸弹。
+knowledge.bombs.5=火药可受不了粗暴对待。一支箭、一记刀刃或一点火星都会让地雷咔哒一声，片刻后炸开，而炸弹的引线会几乎立刻燃尽。老练的工兵会远远地用弓清理雷区，绝不用拳头。^野兽和怪物没有这种机灵：它们的箭矢和爪子碰不响地雷。做工精良的炸药也不会被附近的爆炸引爆。
 
 knowledge.crossbows=制作弩弓
 knowledge.crossbows.desc=致命一箭
@@ -1976,7 +1986,7 @@ knowledge.bombarrow.1=你制作炸弹的经验是值得的。这种微型爆炸�
 
 knowledge.shrapnel=弹片炸弹
 knowledge.shrapnel.desc=简单的装填
-knowledge.shrapnel.1=炸弹目前似乎已足够好了，但仍有提升的空间。每个炸弹都可以加上这种装置，从而改进引爆效果。^在合成中加入炸弹弹片可以提高其爆炸伤害。
+knowledge.shrapnel.1=炸弹目前似乎已足够好了，但仍有改进的余地。^在填充层中加入一把碎铁，爆炸时它会向四面八方飞散，撕裂路径上的第一个目标。石头能挡住它，而地雷的弹片只会从脚下向上飞。盔甲能同时抵御弹片和冲击波，不过锁甲更难承受冲击，板甲更难抵挡穿刺的铁片。
 
 knowledge.firebomb=燃烧弹
 knowledge.firebomb.desc=烈火焚身
@@ -1984,7 +1994,7 @@ knowledge.firebomb.desc=烈火焚身
 knowledge.firebomb.1=弹片炸弹对打击地面上的单个敌人很有效。但有时场面会更加疯狂。^岩浆膏的混合物可使炸弹在爆炸时释放出大团火球。精制岩浆膏则更是能释放出难以抵挡的热度。
 
 knowledge.firebomb.2=它的工作原理是岩浆膏 (岩浆怪灰烬的混合物) 能提供源源不断的火焰。额外加入烈焰粉，接着加入龙心，将会产生魔法般的催化效果，提高火焰的温度。
-knowledge.firebomb.3=燃烧弹可能会使你觉得昂贵，但这对攻破敌人防具极为有效。
+knowledge.firebomb.3=燃烧弹可能很昂贵，但它的火焰会波及周围的每一个人，炽热的弹片会点燃被它击中的任何人。
 
 knowledge.bombCeramic=陶瓷炸弹壳
 knowledge.bombCeramic.desc=基础炸弹

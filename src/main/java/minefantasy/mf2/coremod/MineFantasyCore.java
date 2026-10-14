@@ -27,9 +27,10 @@ public class MineFantasyCore implements IFMLLoadingPlugin, IEarlyMixinLoader {
     @Override
     public List<String> getMixins(Set<String> loadedCoreMods) {
         List<String> mixins = new ArrayList<>(Arrays.asList("EntityPlayerAccessor", "ItemInWorldManagerMixin"));
-        // The player controller is client only: its accessor would not resolve on a dedicated server
+        // The player controller and renderer are client only: their mixins would not resolve on a dedicated server
         if (FMLLaunchHandler.side().isClient()) {
             mixins.add("PlayerControllerAccessor");
+            mixins.add("EntityRendererMixin");
         }
         return mixins;
     }
