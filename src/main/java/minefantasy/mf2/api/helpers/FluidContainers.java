@@ -1,7 +1,6 @@
 package minefantasy.mf2.api.helpers;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
@@ -175,8 +174,6 @@ public final class FluidContainers {
                 player.dropPlayerItemWithRandomChoice(result, false);
             }
         }
-        if (player instanceof EntityPlayerMP) {
-            player.inventoryContainer.detectAndSendChanges();
-        }
+        SafeStacks.afterBlockUse(player);
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
 import minefantasy.mf2.api.crafting.Requirements;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.recipe.CheckResult;
@@ -148,6 +149,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
                 if (!player.inventory.addItemStackToInventory(item)) {
                     player.entityDropItem(item, 0.0F);
                 }
+                SafeStacks.afterBlockUse(player);
                 setInventorySlotContents(0, null);
                 updateRecipe();
                 Sounds.at(this, "mob.horse.leather", 1.0F, 1.0F);

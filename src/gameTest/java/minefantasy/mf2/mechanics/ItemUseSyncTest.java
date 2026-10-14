@@ -2,10 +2,16 @@ package minefantasy.mf2.mechanics;
 
 import static minefantasy.mf2.gametest.Assert.*;
 
+import java.io.IOException;
+
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.Packet;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.server.S2FPacketSetSlot;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 
@@ -14,8 +20,11 @@ import com.gtnewhorizons.horizonqa.api.TestPos;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
+import io.netty.buffer.Unpooled;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityRoast;
+import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 import minefantasy.mf2.farming.FarmingHelper;
 import minefantasy.mf2.gametest.DenyPlacing;
 import minefantasy.mf2.gametest.Overrides;
@@ -37,6 +46,8 @@ public class ItemUseSyncTest {
     private static Watcher holding(GameTestHelper helper, TestPos at, ItemStack held) {
         Watcher watcher = new Watcher(helper, at.x() + 0.5D, at.y() + 1, at.z() + 2.5D);
         watcher.player.setCurrentItemOrArmor(0, held);
+        // As logging in does, so the inventory reports its changes to the client
+        watcher.player.addSelfToInternalCraftingInventory();
         return watcher;
     }
 
@@ -91,6 +102,91 @@ public class ItemUseSyncTest {
             assertEquals("one oil is paid", 1, oil(watcher));
             assertEquals("the brush wore", 1, watcher.player.getHeldItem().getItemDamage());
             assertEquals("the client sees the paint", BlockListMF.refined_planks, shown(watcher, plank));
+        }
+        helper.succeed();
+    }
+
+    /**
+     * How many the client was last told a hotbar slot holds, or -1 when it was never told. The player's own inventory
+     * numbers the hotbar from 36.
+     */
+    private static int shownIn(Watcher watcher, int hotbar) {
+        int shown = -1;
+        for (Packet packet : watcher.sent) {
+            if (!(packet instanceof S2FPacketSetSlot)) continue;
+            PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+            try {
+                packet.writePacketData(data);
+                data.readByte();
+                int slot = data.readShort();
+                ItemStack stack = data.readItemStackFromBuffer();
+                if (slot == 36 + hotbar) shown = stack == null ? 0 : stack.stackSize;
+            } catch (IOException exception) {
+                throw new AssertionError("could not read a slot", exception);
+            }
+        }
+        return shown;
+    }
+
+    /** A right click on the top of a block as the client sends it; the packet's own constructor is client only. */
+    private static C08PacketPlayerBlockPlacement click(TestPos at, ItemStack held) {
+        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+        C08PacketPlayerBlockPlacement packet = new C08PacketPlayerBlockPlacement();
+        try {
+            data.writeInt(at.x());
+            data.writeByte(at.y());
+            data.writeInt(at.z());
+            data.writeByte(1);
+            data.writeItemStackToBuffer(held);
+            data.writeByte(8);
+            data.writeByte(16);
+            data.writeByte(8);
+            packet.readPacketData(data);
+        } catch (IOException exception) {
+            throw new AssertionError("could not write a click", exception);
+        }
+        return packet;
+    }
+
+    /** A right click on the top of a block, through the server's handling of the client's packet. */
+    private static void rightClick(Watcher watcher, TestPos at) {
+        watcher.sent.clear();
+        watcher.player.playerNetServerHandler.processPlayerBlockPlacement(click(at, watcher.player.getHeldItem()));
+    }
+
+    /** Taking food off a spit or hide off a rack into a slot other than the held one shows it to the client at once. */
+    @GameTest
+    public static void takingOffAStationShowsTheItemTaken(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.roast);
+        helper.setBlock(3, 1, 1, BlockListMF.tanner);
+        World world = helper.getWorld();
+        TestPos spit = helper.absolute(1, 1, 1);
+        TestPos rack = helper.absolute(3, 1, 1);
+        ((TileEntityRoast) world.getTileEntity(spit.x(), spit.y(), spit.z()))
+                .setInventorySlotContents(0, new ItemStack(Items.beef));
+        ((TileEntityTanningRack) world.getTileEntity(rack.x(), rack.y(), rack.z()))
+                .setInventorySlotContents(0, new ItemStack(Items.leather));
+        try (Watcher watcher = holding(helper, spit, new ItemStack(Items.stick))) {
+            rightClick(watcher, spit);
+            assertEquals("the client was not shown the food taken", 1, shownIn(watcher, 1));
+            watcher.player.inventory.setInventorySlotContents(1, null);
+            rightClick(watcher, rack);
+            assertEquals("the client was not shown the hide taken", 1, shownIn(watcher, 1));
+        }
+        helper.succeed();
+    }
+
+    /** Painting through the client's real click: the oil paid from another slot reaches the client at once (#83). */
+    @GameTest
+    public static void paintingShowsThePaidOil(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.nailed_planks);
+        TestPos plank = helper.absolute(1, 1, 1);
+        World world = helper.getWorld();
+        try (Watcher watcher = painter(helper, plank)) {
+            rightClick(watcher, plank);
+            assertEquals(BlockListMF.refined_planks, at(world, plank));
+            assertEquals("one oil is paid", 1, oil(watcher));
+            assertEquals("the client was not told of the oil paid", 1, shownIn(watcher, 1));
         }
         helper.succeed();
     }

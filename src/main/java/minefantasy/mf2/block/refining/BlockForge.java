@@ -25,6 +25,7 @@ import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.PlayerModeHelper;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -143,6 +144,7 @@ public class BlockForge extends BlockStation<TileEntityForge> {
                             if (!user.inventory.addItemStackToInventory(container)) {
                                 user.entityDropItem(container, 0.0F);
                             }
+                            SafeStacks.afterBlockUse(user);
                         }
                     }
                     if (user.getHeldItem().stackSize == 1) {

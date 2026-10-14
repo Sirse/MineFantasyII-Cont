@@ -8,6 +8,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
 
 import minefantasy.mf2.api.crafting.refine.PaintOilRecipe;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.rpg.SkillList;
@@ -77,6 +78,7 @@ public class ItemPaintBrush extends ItemBasicCraftTool implements IRackItem {
                     world.playAuxSFXAtEntity(user, 2001, x, y, z, Block.getIdFromBlock(paint) + (paintMeta << 12));
                     SkillList.construction.addXP(user, 1);
                     item.damageItem(1, user);
+                    SafeStacks.afterBlockUse(user);
                     return true;
                 }));
         return false;

@@ -14,6 +14,7 @@ import minefantasy.mf2.api.heating.IQuenchBlock;
 import minefantasy.mf2.api.heating.QuenchMedium;
 import minefantasy.mf2.api.helpers.FluidContainers;
 import minefantasy.mf2.api.helpers.PlayerModeHelper;
+import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.fluid.FluidsMF;
 import minefantasy.mf2.item.food.FoodListMF;
 
@@ -132,7 +133,7 @@ public class TileEntityTrough extends TileEntityWoodDecor implements IQuenchBloc
                     user.dropPlayerItemWithRandomChoice(given, false);
                 }
             }
-            user.inventoryContainer.detectAndSendChanges();
+            SafeStacks.afterBlockUse(user);
         }
         fluidName = FluidsMF.saltWater.getName();
         changed = true;
