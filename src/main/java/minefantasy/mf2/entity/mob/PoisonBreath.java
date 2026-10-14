@@ -2,7 +2,6 @@ package minefantasy.mf2.entity.mob;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -13,6 +12,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.entity.EntityDragonBreath;
+import minefantasy.mf2.mechanics.ElementalWear;
 
 public class PoisonBreath extends DragonBreath {
 
@@ -39,16 +39,10 @@ public class PoisonBreath extends DragonBreath {
             ((EntityLivingBase) target).addPotionEffect(new PotionEffect(Potion.poison.id, 40, (int) dam));
             ((EntityLivingBase) target).addPotionEffect(new PotionEffect(Potion.confusion.id, 50, 10));
 
-            if (instance.rand.nextInt(10) == 0) {
-                for (int a = 0; a < 5; a++) {
-                    ItemStack item = ((EntityLivingBase) target).getEquipmentInSlot(a);
-                    if (item != null) {
-                        item.damageItem((int) dam, ((EntityLivingBase) target));
-                        if (item.getItemDamage() >= item.getMaxDamage()) {
-                            ((EntityLivingBase) target).renderBrokenItemStack(item);
-                            ((EntityLivingBase) target).setCurrentItemOrArmor(a, null);
-                        }
-                    }
+            // Now and then the acid eats into the armour and what is held
+            if (ElementalWear.acid && instance.rand.nextInt(10) == 0) {
+                for (int slot = 0; slot <= 4; slot++) {
+                    ElementalWear.wear((EntityLivingBase) target, slot, (int) dam);
                 }
             }
         }

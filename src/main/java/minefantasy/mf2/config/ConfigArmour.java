@@ -3,6 +3,7 @@ package minefantasy.mf2.config;
 import minefantasy.mf2.api.helpers.ArmourCalculator;
 import minefantasy.mf2.api.helpers.TacticalManager;
 import minefantasy.mf2.entity.EntityCogwork;
+import minefantasy.mf2.mechanics.ElementalWear;
 
 public class ConfigArmour extends ConfigurationBaseMF {
 
@@ -10,6 +11,7 @@ public class ConfigArmour extends ConfigurationBaseMF {
     public static final String CATEGORY_DAMAGE_TYPES = "Damage Types";
     public static final String CATEGORY_PENALTIES = "Penalties";
     public static final String CATEGORY_COGWORK = "Cogwork Features";
+    public static final String CATEGORY_WEAR = "Fire and Acid Wear";
     public static boolean resistArrow;
     public static boolean cogworkGrief;
     public static float cogworkFuelUnits;
@@ -50,6 +52,26 @@ public class ConfigArmour extends ConfigurationBaseMF {
                 0F,
                 100F,
                 "A modifier for the rate armours slow down movement, increasing this slows you more, decreasing it slows less");
+
+        ElementalWear.fire = config
+                .get(
+                        CATEGORY_WEAR,
+                        "Fire Wears Armour",
+                        true,
+                        "Fire damage wears worn armour. Items without durability or unbreakable are never worn")
+                .getBoolean();
+        ElementalWear.acid = config.get(
+                CATEGORY_WEAR,
+                "Acid Wears Equipment",
+                true,
+                "Acid dragon breath now and then wears worn armour and the held item. Items without durability or unbreakable are never worn")
+                .getBoolean();
+        ElementalWear.setImmune(
+                config.get(
+                        CATEGORY_WEAR,
+                        "Immune Items",
+                        new String[0],
+                        "Registry names of items fire and acid never wear, such as modid:item_name").getStringList());
 
         dropCategory("Misc");
         String AADesc = "This feature Sets supported armours to calculate weapons differently: \n"

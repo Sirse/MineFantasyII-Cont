@@ -411,29 +411,10 @@ public class CombatMechanics {
         }
 
         // Fire dura degrade
-        if (properHit && source.isFireDamage() && dam > 0) {
-            for (int a = 0; a < 4; a++) {
-                ItemStack armour = user.getEquipmentInSlot(a + 1);
-                if (armour != null && armour.isItemStackDamageable()) {
-                    int dura = (int) (dam) + 1;
-                    if (!user.worldObj.isRemote && !isArmourFireImmune(armour, source)) {
-                        MFLogUtil.logDebug("Armour Flame Damage: " + dura);
-                        if (armour.getItemDamage() + dura < armour.getMaxDamage()) {
-                            armour.damageItem(dura, user);
-                        } else {
-                            armour.setItemDamage(armour.getMaxDamage());
-                        }
-                    }
-                    if (!user.worldObj.isRemote && armour.getItemDamage() >= armour.getMaxDamage()) {
-                        user.setCurrentItemOrArmor(a + 1, null);
-                        user.worldObj.playSoundEffect(
-                                user.posX,
-                                user.posY + user.getEyeHeight() - (0.4F * a),
-                                user.posZ,
-                                "random.break",
-                                1.0F,
-                                1.0F);
-                    }
+        if (properHit && source.isFireDamage() && dam > 0 && ElementalWear.fire) {
+            for (int slot = 1; slot <= 4; slot++) {
+                if (!isArmourFireImmune(user.getEquipmentInSlot(slot), source)) {
+                    ElementalWear.wear(user, slot, (int) dam + 1);
                 }
             }
         }
