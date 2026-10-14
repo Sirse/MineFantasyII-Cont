@@ -11,7 +11,6 @@ import net.minecraft.util.Vec3;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.weapon.IExtendedReach;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class ExtendedReachPacket extends PacketMF {
 
@@ -40,11 +39,11 @@ public class ExtendedReachPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf in, EntityPlayer user) {
-        if (!NetworkUtils.isServer(user) || !(user instanceof EntityPlayerMP)) {
+        if (!isServer(user) || !(user instanceof EntityPlayerMP)) {
             return;
         }
 
-        if (!NetworkUtils.hasPayload(in, 4)) {
+        if (!hasPayload(in, 4)) {
             return;
         }
         int id = in.readInt();

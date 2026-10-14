@@ -7,7 +7,6 @@ import minefantasy.mf2.api.helpers.Cooldowns;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class ResearchRequest extends PacketMF {
 
@@ -26,10 +25,10 @@ public class ResearchRequest extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (!NetworkUtils.isServer(player)) {
+        if (!isServer(player)) {
             return;
         }
-        if (!NetworkUtils.hasPayload(packet, 4)) {
+        if (!hasPayload(packet, 4)) {
             return;
         }
         // Local, not a field: this handler instance is shared by every player through packetList

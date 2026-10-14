@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.config.ConfigClient;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class HitSoundPacket extends PacketMF {
 
@@ -23,7 +22,7 @@ public class HitSoundPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
 

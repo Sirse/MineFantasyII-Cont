@@ -8,7 +8,6 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class LevelupPacket extends PacketMF {
 
@@ -25,7 +24,7 @@ public class LevelupPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
 

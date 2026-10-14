@@ -10,7 +10,6 @@ import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.rpg.RPGElements;
 import minefantasy.mf2.api.rpg.Skill;
-import minefantasy.mf2.network.NetworkUtils;
 
 /** Every skill of a player in one packet: name, level, xp and the xp to the next level. */
 public class SkillPacket extends PacketMF {
@@ -34,7 +33,7 @@ public class SkillPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
         int count = packet.readInt();

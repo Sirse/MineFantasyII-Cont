@@ -22,4 +22,12 @@ public abstract class PacketMF {
     public abstract void write(ByteBuf out);
 
     public abstract void process(ByteBuf in, EntityPlayer user);
+
+    protected static boolean isServer(EntityPlayer player) {
+        return player != null && !player.worldObj.isRemote;
+    }
+
+    protected static boolean hasPayload(ByteBuf buf, int bytes) {
+        return buf != null && buf.readableBytes() >= bytes;
+    }
 }

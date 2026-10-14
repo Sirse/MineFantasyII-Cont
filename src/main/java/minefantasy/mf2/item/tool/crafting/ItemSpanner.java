@@ -13,6 +13,8 @@ import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
@@ -36,7 +38,6 @@ import minefantasy.mf2.api.tier.IToolMaterial;
 import minefantasy.mf2.api.tool.IToolMF;
 import minefantasy.mf2.api.weapon.IDamageType;
 import minefantasy.mf2.item.list.CreativeTabMF;
-import minefantasy.mf2.util.Utils;
 
 /**
  * @author Anonymous Productions
@@ -91,7 +92,7 @@ public class ItemSpanner extends ItemTool implements IToolMaterial, IToolMF, IDa
             return false;
         }
 
-        if (block instanceof BlockChest && Utils.getOtherDoubleChest(world.getTileEntity(x, y, z)) != null) {
+        if (block instanceof BlockChest && isDoubleChest(world.getTileEntity(x, y, z))) {
             return false;
         }
 
@@ -311,5 +312,13 @@ public class ItemSpanner extends ItemTool implements IToolMaterial, IToolMF, IDa
     @Method(modid = "CoFHAPI|item")
     public void toolUsed(ItemStack item, EntityLivingBase user, int x, int y, int z) {
         item.damageItem(1, user);
+    }
+
+    private static boolean isDoubleChest(TileEntity tile) {
+        if (!(tile instanceof TileEntityChest)) return false;
+        TileEntityChest chest = (TileEntityChest) tile;
+        return chest.adjacentChestXNeg != null || chest.adjacentChestXPos != null
+                || chest.adjacentChestZNeg != null
+                || chest.adjacentChestZPos != null;
     }
 }

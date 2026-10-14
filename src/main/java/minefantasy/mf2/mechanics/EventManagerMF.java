@@ -129,15 +129,6 @@ public class EventManagerMF {
     }
 
     @SubscribeEvent
-    public void clonePlayer(PlayerEvent.Clone event) {
-        EntityPlayer origin = event.original;
-        EntityPlayer spawn = event.entityPlayer;
-        if (origin != null && spawn != null) {
-            EntityHelper.cloneNBT(origin, spawn);
-        }
-    }
-
-    @SubscribeEvent
     public void startUseItem(PlayerUseItemEvent.Start event) {
         EntityPlayer player = event.entityPlayer;
         if (event.item != null && event.item.getItemUseAction() == EnumAction.block) {

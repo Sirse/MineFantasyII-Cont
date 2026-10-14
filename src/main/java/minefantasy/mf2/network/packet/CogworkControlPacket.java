@@ -6,7 +6,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.entity.EntityCogwork;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class CogworkControlPacket extends PacketMF {
 
@@ -26,11 +25,11 @@ public class CogworkControlPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (!NetworkUtils.isServer(player) || !(player instanceof EntityPlayerMP)) {
+        if (!isServer(player) || !(player instanceof EntityPlayerMP)) {
             return;
         }
 
-        if (!NetworkUtils.hasPayload(packet, 13)) {
+        if (!hasPayload(packet, 13)) {
             return;
         }
         // Locals, not fields: this handler instance is shared by every player through packetList

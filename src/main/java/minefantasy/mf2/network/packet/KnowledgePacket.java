@@ -8,7 +8,6 @@ import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.knowledge.InformationBase;
 import minefantasy.mf2.api.knowledge.InformationList;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class KnowledgePacket extends PacketMF {
 
@@ -23,7 +22,7 @@ public class KnowledgePacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
         apply(packet, player);

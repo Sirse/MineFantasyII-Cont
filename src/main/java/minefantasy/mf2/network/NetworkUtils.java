@@ -2,14 +2,11 @@ package minefantasy.mf2.network;
 
 import java.util.function.Supplier;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.server.management.PlayerManager;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-
-import io.netty.buffer.ByteBuf;
 
 public class NetworkUtils {
 
@@ -45,17 +42,5 @@ public class NetworkUtils {
                 ((EntityPlayerMP) player).playerNetServerHandler.sendPacket(packet);
             }
         }
-    }
-
-    public static boolean isServer(EntityPlayer player) {
-        return player != null && !player.worldObj.isRemote;
-    }
-
-    /**
-     * Serverbound handlers call this before decoding. A truncated payload would otherwise throw out of the read itself,
-     * which happens before the handler reaches its own rate limit and so cannot be throttled at all.
-     */
-    public static boolean hasPayload(ByteBuf buf, int bytes) {
-        return buf != null && buf.readableBytes() >= bytes;
     }
 }

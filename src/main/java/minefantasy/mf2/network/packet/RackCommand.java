@@ -8,7 +8,6 @@ import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.block.decor.BlockRack;
 import minefantasy.mf2.block.tileentity.decor.TileEntityRack;
 import minefantasy.mf2.mechanics.ProtectionHelper;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class RackCommand extends PacketMF {
 
@@ -29,11 +28,11 @@ public class RackCommand extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (!NetworkUtils.isServer(player)) {
+        if (!isServer(player)) {
             return;
         }
 
-        if (!NetworkUtils.hasPayload(packet, 16)) {
+        if (!hasPayload(packet, 16)) {
             return;
         }
         // Keep everything the packet carries in locals: this instance is shared through packetList

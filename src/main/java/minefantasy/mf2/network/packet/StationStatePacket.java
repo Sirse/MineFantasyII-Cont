@@ -7,7 +7,6 @@ import net.minecraft.tileentity.TileEntity;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.api.helpers.Tiles;
-import minefantasy.mf2.network.NetworkUtils;
 
 /**
  * A station's state for the players watching it: the same tag its description packet carries, applied the same way, so
@@ -36,7 +35,7 @@ public class StationStatePacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
         // Locals, not fields: this handler instance is shared by every player through packetList

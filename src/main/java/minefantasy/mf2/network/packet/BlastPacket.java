@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.MineFantasyII;
-import minefantasy.mf2.network.NetworkUtils;
 
 /**
  * Tells players near a blast what to draw: its centre, size and filling, and the seed its fragments flew from, so the
@@ -43,7 +42,7 @@ public class BlastPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf in, EntityPlayer player) {
-        if (player == null || NetworkUtils.isServer(player)) return;
+        if (player == null || isServer(player)) return;
         BlastPacket blast = read(in);
         if (blast == null) return;
         MineFantasyII.proxy.showBlast(
@@ -61,7 +60,7 @@ public class BlastPacket extends PacketMF {
 
     /** The blast a payload describes, or null for one cut short or out of range. */
     static BlastPacket read(ByteBuf in) {
-        if (!NetworkUtils.hasPayload(in, SIZE)) return null;
+        if (!hasPayload(in, SIZE)) return null;
         BlastPacket blast = new BlastPacket(
                 in.readDouble(),
                 in.readDouble(),

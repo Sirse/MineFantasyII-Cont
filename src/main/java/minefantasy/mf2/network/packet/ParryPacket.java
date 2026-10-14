@@ -4,7 +4,6 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import io.netty.buffer.ByteBuf;
 import minefantasy.mf2.mechanics.Parrying;
-import minefantasy.mf2.network.NetworkUtils;
 
 public class ParryPacket extends PacketMF {
 
@@ -19,7 +18,7 @@ public class ParryPacket extends PacketMF {
 
     @Override
     public void process(ByteBuf packet, EntityPlayer player) {
-        if (NetworkUtils.isServer(player)) {
+        if (isServer(player)) {
             return;
         }
 
