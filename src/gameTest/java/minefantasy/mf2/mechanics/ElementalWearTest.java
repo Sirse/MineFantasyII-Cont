@@ -4,6 +4,7 @@ import static minefantasy.mf2.gametest.Assert.*;
 
 import java.util.Random;
 
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.init.Blocks;
@@ -21,6 +22,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import minefantasy.mf2.entity.EntityDragonBreath;
 import minefantasy.mf2.entity.mob.DragonBreath;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.item.list.CustomArmourListMF;
 
 /**
  * Fire and acid wear only what has durability, through its own damage handling: an unbreakable item or one without
@@ -121,6 +123,81 @@ public class ElementalWearTest {
             acid(helper, zombie);
             assertTrue("acid did not wear the sword", zombie.getEquipmentInSlot(0).getItemDamage() > 0);
             assertNull("worn-out boots did not break", zombie.getEquipmentInSlot(1));
+        } finally {
+            zombie.setDead();
+        }
+        helper.succeed();
+    }
+
+    /** Metal MineFantasy armour shrugs off fire, while armour without fire resistance still wears. */
+    @GameTest
+    public static void fireSparesFireproofArmour(GameTestHelper helper) {
+        EntityZombie zombie = wearer(helper);
+        try (Overrides overrides = wear(true, true)) {
+            zombie.setCurrentItemOrArmor(4, CustomArmourListMF.standard_plate_helmet.construct("Steel"));
+            zombie.setCurrentItemOrArmor(3, new ItemStack(Items.iron_chestplate));
+            burn(zombie);
+            assertEquals("fire wore fireproof armour", 0, zombie.getEquipmentInSlot(4).getItemDamage());
+            assertTrue("fire did not wear the chestplate", zombie.getEquipmentInSlot(3).getItemDamage() > 0);
+        } finally {
+            zombie.setDead();
+        }
+        helper.succeed();
+    }
+
+    /** A wearer whose luck is fixed by the roll: Unbreaking saves each point of wear on 1 and none on 0. */
+    private static EntityZombie lucky(GameTestHelper helper, int[] roll) {
+        World world = helper.getWorld();
+        TestPos at = helper.absolute(2, 2, 2);
+        EntityZombie zombie = new EntityZombie(world) {
+
+            {
+                rand = new Random() {
+
+                    @Override
+                    public int nextInt(int bound) {
+                        return Math.min(roll[0], bound - 1);
+                    }
+                };
+            }
+        };
+        zombie.setPosition(at.x() + 0.5D, at.y(), at.z() + 0.5D);
+        world.spawnEntityInWorld(zombie);
+        return zombie;
+    }
+
+    @GameTest
+    public static void unbreakingSavesWearAsItsRollSays(GameTestHelper helper) {
+        int[] roll = { 1 };
+        EntityZombie zombie = lucky(helper, roll);
+        try (Overrides overrides = wear(true, true)) {
+            ItemStack sword = new ItemStack(Items.iron_sword);
+            sword.addEnchantment(Enchantment.unbreaking, 3);
+            zombie.setCurrentItemOrArmor(0, sword);
+            acid(helper, zombie);
+            assertEquals("Unbreaking did not save the wear", 0, zombie.getEquipmentInSlot(0).getItemDamage());
+            roll[0] = 0;
+            acid(helper, zombie);
+            assertTrue("acid did not wear past a failed roll", zombie.getEquipmentInSlot(0).getItemDamage() > 0);
+        } finally {
+            zombie.setDead();
+        }
+        helper.succeed();
+    }
+
+    /** A stack of worn-out damageable items loses only the one that breaks; the next is whole. */
+    @GameTest
+    public static void aBreakingStackLosesOnlyOne(GameTestHelper helper) {
+        EntityZombie zombie = wearer(helper);
+        try (Overrides overrides = wear(true, true)) {
+            ItemStack helmets = new ItemStack(Items.iron_helmet, 2);
+            helmets.setItemDamage(helmets.getMaxDamage() - 1);
+            zombie.setCurrentItemOrArmor(4, helmets);
+            burn(zombie);
+            ItemStack left = zombie.getEquipmentInSlot(4);
+            assertNotNull("the whole stack broke", left);
+            assertEquals("not one helmet broke", 1, left.stackSize);
+            assertEquals("the next helmet is not whole", 0, left.getItemDamage());
         } finally {
             zombie.setDead();
         }

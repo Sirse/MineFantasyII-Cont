@@ -23,6 +23,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import io.netty.buffer.Unpooled;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.block.tileentity.TileEntityBombBench;
 import minefantasy.mf2.block.tileentity.TileEntityRoast;
 import minefantasy.mf2.block.tileentity.TileEntityTanningRack;
 import minefantasy.mf2.farming.FarmingHelper;
@@ -150,6 +151,8 @@ public class ItemUseSyncTest {
 
     /** A right click on the top of a block, through the server's handling of the client's packet. */
     private static void rightClick(Watcher watcher, TestPos at) {
+        // The client already knows what the player held before the click
+        watcher.player.inventoryContainer.detectAndSendChanges();
         watcher.sent.clear();
         watcher.player.playerNetServerHandler.processPlayerBlockPlacement(click(at, watcher.player.getHeldItem()));
     }
@@ -172,6 +175,63 @@ public class ItemUseSyncTest {
             watcher.player.inventory.setInventorySlotContents(1, null);
             rightClick(watcher, rack);
             assertEquals("the client was not shown the hide taken", 1, shownIn(watcher, 1));
+        }
+        helper.succeed();
+    }
+
+    /** Fuel fed from a stack gives its container back into another slot and shows it to the client at once. */
+    @GameTest
+    public static void fuelFromAStackShowsTheContainerReturned(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.forge_metal);
+        TestPos forge = helper.absolute(1, 1, 1);
+        try (Watcher watcher = holding(helper, forge, new ItemStack(Items.lava_bucket, 2))) {
+            rightClick(watcher, forge);
+            assertEquals("one lava is used", 1, watcher.player.getHeldItem().stackSize);
+            ItemStack bucket = watcher.player.inventory.getStackInSlot(1);
+            assertNotNull("the bucket is given back", bucket);
+            assertEquals(Items.bucket, bucket.getItem());
+            assertEquals("the client was not shown the bucket returned", 1, shownIn(watcher, 1));
+        }
+        helper.succeed();
+    }
+
+    /** Slime for a sticky bomb is taken from the first slot holding it, not the held one, and the client sees it. */
+    @GameTest
+    public static void stickingABombShowsTheSlimeUsed(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.bombBench);
+        TestPos bench = helper.absolute(1, 1, 1);
+        World world = helper.getWorld();
+        TileEntityBombBench tile = (TileEntityBombBench) world.getTileEntity(bench.x(), bench.y(), bench.z());
+        tile.setInventorySlotContents(4, ToolListMF.bomb_custom.createBomb((byte) 0, (byte) 0, (byte) 0, (byte) 0, 1));
+        try (Watcher watcher = holding(helper, bench, new ItemStack(Items.slime_ball))) {
+            watcher.player.inventory.setInventorySlotContents(1, new ItemStack(Items.slime_ball));
+            watcher.player.inventory.currentItem = 1;
+            ResearchLogic.forceUnlock(watcher.player, KnowledgeListMF.bombs);
+            ResearchLogic.forceUnlock(watcher.player, KnowledgeListMF.stickybomb);
+            rightClick(watcher, bench);
+            assertTrue("the bomb is sticky", tile.getStackInSlot(4).getTagCompound().getBoolean("stickyBomb"));
+            assertNull("the first slime is used", watcher.player.inventory.getStackInSlot(0));
+            assertNotNull("the held slime is kept", watcher.player.getHeldItem());
+            assertEquals("the client was not shown the slime used", 0, shownIn(watcher, 0));
+        }
+        helper.succeed();
+    }
+
+    /** Building a cogwork station takes the pulley from another slot and shows it gone to the client at once. */
+    @GameTest
+    public static void buildingAStationShowsThePulleyUsed(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.frame_block);
+        helper.setBlock(0, 1, 1, BlockListMF.frame_block);
+        helper.setBlock(2, 1, 1, BlockListMF.frame_block);
+        helper.setBlock(1, 1, 2, BlockListMF.frame_block);
+        TestPos frame = helper.absolute(1, 1, 1);
+        World world = helper.getWorld();
+        try (Watcher watcher = holding(helper, frame, CustomToolListMF.standard_spanner.construct("Iron", "OakWood"))) {
+            watcher.player.inventory.setInventorySlotContents(1, new ItemStack(ComponentListMF.cogwork_pulley));
+            rightClick(watcher, frame);
+            assertEquals(BlockListMF.cogwork_builder, at(world, frame));
+            assertNull("the pulley is used", watcher.player.inventory.getStackInSlot(1));
+            assertEquals("the client was not shown the pulley used", 0, shownIn(watcher, 1));
         }
         helper.succeed();
     }
