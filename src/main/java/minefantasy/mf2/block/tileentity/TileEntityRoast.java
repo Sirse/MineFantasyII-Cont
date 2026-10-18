@@ -18,13 +18,13 @@ import minefantasy.mf2.api.crafting.IHeatSource;
 import minefantasy.mf2.api.crafting.IHeatUser;
 import minefantasy.mf2.api.crafting.MFRecipeKeys;
 import minefantasy.mf2.api.crafting.MFRecipes;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.Sounds;
 import minefantasy.mf2.api.helpers.Tiles;
 import minefantasy.mf2.api.recipe.CraftInventory;
 import minefantasy.mf2.api.recipe.CraftPlan;
 import minefantasy.mf2.block.crafting.BlockRoast;
 import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.network.NetworkUtils;
 
 public class TileEntityRoast extends TileEntityStation implements IHeatUser {
 
@@ -115,7 +115,7 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
             if (!player.inventory.addItemStackToInventory(item)) {
                 player.entityDropItem(item, 0.0F);
             }
-            SafeStacks.afterBlockUse(player);
+            NetworkUtils.afterBlockUse(player);
             setInventorySlotContents(0, null);
             updateRecipe();
             return true;

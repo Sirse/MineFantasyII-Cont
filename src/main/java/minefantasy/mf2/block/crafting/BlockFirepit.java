@@ -22,12 +22,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.Drops;
 import minefantasy.mf2.api.helpers.PlayerModeHelper;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.tool.ILighter;
 import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.tileentity.InventorySlots;
 import minefantasy.mf2.block.tileentity.TileEntityFirepit;
 import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.network.NetworkUtils;
 
 public class BlockFirepit extends BlockTiled<TileEntityFirepit> {
 
@@ -78,7 +78,7 @@ public class BlockFirepit extends BlockTiled<TileEntityFirepit> {
                                 if (!player.inventory.addItemStackToInventory(container)) {
                                     player.entityDropItem(container, 0F);
                                 }
-                                SafeStacks.afterBlockUse(player);
+                                NetworkUtils.afterBlockUse(player);
                             }
                         }
                     }

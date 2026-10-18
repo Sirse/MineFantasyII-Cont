@@ -1,10 +1,8 @@
 package minefantasy.mf2.api.helpers;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 
-/** Stacks the mod did not make itself, brought within what an item can be, and changes the client must see. */
+/** Stacks the mod did not make itself, brought within what an item can be. */
 public final class SafeStacks {
 
     private SafeStacks() {}
@@ -42,14 +40,5 @@ public final class SafeStacks {
         container = container.copy();
         container.stackSize = 1;
         return container;
-    }
-
-    /**
-     * After a right click on a block changed slots other than the held one. Vanilla checks the inventory after the use
-     * with isChangingQuantityOnly set, which drops every change but the held slot's, so the client shows the old
-     * contents until something else resends them. Checking here, during the use, sends them.
-     */
-    public static void afterBlockUse(EntityPlayer player) {
-        if (player instanceof EntityPlayerMP) player.inventoryContainer.detectAndSendChanges();
     }
 }

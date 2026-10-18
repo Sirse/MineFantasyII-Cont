@@ -25,7 +25,6 @@ import minefantasy.mf2.api.heating.ForgeItemHandler;
 import minefantasy.mf2.api.heating.Heatable;
 import minefantasy.mf2.api.heating.TongsHelper;
 import minefantasy.mf2.api.helpers.PlayerModeHelper;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.basic.BlockStation;
 import minefantasy.mf2.block.list.BlockListMF;
@@ -36,6 +35,7 @@ import minefantasy.mf2.item.list.CreativeTabMF;
 import minefantasy.mf2.item.tool.ItemLighterMF;
 import minefantasy.mf2.item.tool.crafting.ItemTongs;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
+import minefantasy.mf2.network.NetworkUtils;
 
 public class BlockForge extends BlockStation<TileEntityForge> {
 
@@ -144,7 +144,7 @@ public class BlockForge extends BlockStation<TileEntityForge> {
                             if (!user.inventory.addItemStackToInventory(container)) {
                                 user.entityDropItem(container, 0.0F);
                             }
-                            SafeStacks.afterBlockUse(user);
+                            NetworkUtils.afterBlockUse(user);
                         }
                     }
                     if (user.getHeldItem().stackSize == 1) {

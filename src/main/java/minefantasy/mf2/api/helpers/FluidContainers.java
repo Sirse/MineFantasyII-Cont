@@ -9,6 +9,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidContainerItem;
 import net.minecraftforge.fluids.IFluidHandler;
 
+import minefantasy.mf2.network.NetworkUtils;
+
 /**
  * Fluid in what a player holds, through both of Forge's container kinds: an item that keeps its fluid itself
  * ({@link IFluidContainerItem}, such as universal cells and portable tanks, drained by the millibucket) and a
@@ -174,6 +176,6 @@ public final class FluidContainers {
                 player.dropPlayerItemWithRandomChoice(result, false);
             }
         }
-        SafeStacks.afterBlockUse(player);
+        NetworkUtils.afterBlockUse(player);
     }
 }

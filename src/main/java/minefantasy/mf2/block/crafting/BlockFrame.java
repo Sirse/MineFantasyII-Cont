@@ -8,12 +8,12 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.api.helpers.PowerArmour;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.block.basic.BasicBlockMF;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
+import minefantasy.mf2.network.NetworkUtils;
 
 public class BlockFrame extends BasicBlockMF {
 
@@ -132,7 +132,7 @@ public class BlockFrame extends BasicBlockMF {
                 && (player.capabilities.isCreativeMode || player.inventory.hasItem(ComponentListMF.cogwork_pulley))) {
             if (!player.capabilities.isCreativeMode) {
                 player.inventory.consumeInventoryItem(ComponentListMF.cogwork_pulley);
-                SafeStacks.afterBlockUse(player);
+                NetworkUtils.afterBlockUse(player);
             }
             if (!world.isRemote) {
                 world.setBlock(x, y, z, BlockListMF.cogwork_builder, 0, 2);

@@ -13,7 +13,6 @@ import net.minecraft.util.StatCollector;
 
 import minefantasy.mf2.api.crafting.IBasicMetre;
 import minefantasy.mf2.api.crafting.engineer.IBombComponent;
-import minefantasy.mf2.api.helpers.SafeStacks;
 import minefantasy.mf2.api.helpers.ToolHelper;
 import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.api.recipe.CraftInventory;
@@ -24,6 +23,7 @@ import minefantasy.mf2.item.gadget.ItemBomb;
 import minefantasy.mf2.item.gadget.ItemExplodingArrow;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
+import minefantasy.mf2.network.NetworkUtils;
 
 public class TileEntityBombBench extends TileEntityStation implements IBasicMetre {
 
@@ -68,7 +68,7 @@ public class TileEntityBombBench extends TileEntityStation implements IBasicMetr
                 && user.getHeldItem().getItem() == Items.slime_ball;
         if (!worldObj.isRemote && sticky && applySlime()) {
             user.inventory.consumeInventoryItem(Items.slime_ball);
-            SafeStacks.afterBlockUse(user);
+            NetworkUtils.afterBlockUse(user);
             return true;
         }
         ItemStack result = findResult();
