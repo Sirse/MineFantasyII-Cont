@@ -184,6 +184,22 @@ public abstract class ContainerMF extends Container {
         if (!canInteractWith(player)) {
             return null;
         }
+        if (modifier == 2 && slotId >= 0 && slotId < inventorySlots.size() && mouseButton >= 0 && mouseButton < 9) {
+            Slot slot = (Slot) inventorySlots.get(slotId);
+            ItemStack hotbar = player.inventory.getStackInSlot(mouseButton);
+            // A number key swaps whole stacks, past what a station slot holds: an empty one takes only its limit,
+            // a filled one is not swapped at all
+            if (!(slot.inventory instanceof InventoryPlayer) && hotbar != null
+                    && slot.isItemValid(hotbar)
+                    && hotbar.stackSize > limit(slot, hotbar)) {
+                ItemStack before = slot.getStack() == null ? null : slot.getStack().copy();
+                if (!slot.getHasStack()) {
+                    slot.putStack(hotbar.splitStack(limit(slot, hotbar)));
+                    if (hotbar.stackSize <= 0) player.inventory.setInventorySlotContents(mouseButton, null);
+                }
+                return before;
+            }
+        }
         return super.slotClick(slotId, mouseButton, modifier, player);
     }
 

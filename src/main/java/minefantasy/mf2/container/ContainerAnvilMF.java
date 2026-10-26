@@ -2,9 +2,11 @@ package minefantasy.mf2.container;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import minefantasy.mf2.api.crafting.exotic.SpecialForging;
 import minefantasy.mf2.block.tileentity.TileEntityAnvilMF;
 
 public class ContainerAnvilMF extends ContainerMF {
@@ -49,7 +51,7 @@ public class ContainerAnvilMF extends ContainerMF {
         }
 
         if (anvilSlotCount > 0) {
-            this.addSlotToContainer(new SlotOutput(tile, anvilOutputSlotIndex, outputSlotX, outputSlotY));
+            this.addSlotToContainer(new SlotResult(tile, anvilOutputSlotIndex, outputSlotX, outputSlotY));
         }
 
         if (addPlayerSlots && user != null) {
@@ -82,5 +84,26 @@ public class ContainerAnvilMF extends ContainerMF {
     @Override
     protected void onPostTransfer(EntityPlayer player, Slot slot, ItemStack moved) {
         tile.onInventoryChanged();
+    }
+
+    /**
+     * The result slot, which also holds a design, such as an ornate crest, for the anvil to forge its special result
+     * from: the craft puts the result in the design's place. Nothing else goes in, and one design at a time.
+     */
+    private static final class SlotResult extends SlotOutput {
+
+        SlotResult(IInventory inventory, int id, int x, int y) {
+            super(inventory, id, x, y);
+        }
+
+        @Override
+        public boolean isItemValid(ItemStack stack) {
+            return SpecialForging.getItemDesign(stack) != null;
+        }
+
+        @Override
+        public int getSlotStackLimit() {
+            return 1;
+        }
     }
 }

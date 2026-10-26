@@ -31,6 +31,7 @@ import minefantasy.mf2.container.ContainerBigFurnace;
 import minefantasy.mf2.container.ContainerCrucible;
 import minefantasy.mf2.container.ContainerQuern;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.item.list.ComponentListMF;
 
 /**
  * The clicks besides picking up and shift-clicking: double-click to collect, throwing, number keys, dragging and the
@@ -189,6 +190,47 @@ public class ClickModesTest {
                 new TileEntityAnvilMF().getSizeInventory() - 1,
                 (p, t) -> new ContainerAnvilMF(p.inventory, t));
         everyMode(w, new ItemStack(Items.iron_ingot), 0);
+        helper.succeed();
+    }
+
+    /**
+     * The anvil's result slot also takes a design, such as an ornate crest, for the special version of the result: one
+     * at a time, by a click, a number key or a drag. Anything else stays out.
+     */
+    @GameTest
+    public static void anvilTakesADesignInItsResultSlot(GameTestHelper helper) {
+        Window<TileEntityAnvilMF> w = open(
+                helper,
+                BlockListMF.anvilStone,
+                TileEntityAnvilMF.class,
+                new TileEntityAnvilMF().getSizeInventory() - 1,
+                (p, t) -> new ContainerAnvilMF(p.inventory, t));
+        int result = w.stationSlot(w.output);
+
+        // An ingot on the cursor does not go in
+        w.player.inventory.setItemStack(new ItemStack(Items.iron_ingot, 4));
+        w.container.slotClick(result, 0, PICK, w.player);
+        assertNull("an ingot went into the result slot", w.station.getStackInSlot(w.output));
+
+        // Two crests on the cursor: one goes in, the other stays
+        w.player.inventory.setItemStack(new ItemStack(ComponentListMF.ornate_items, 2));
+        w.container.slotClick(result, 0, PICK, w.player);
+        ItemStack design = w.station.getStackInSlot(w.output);
+        assertNotNull("the crest did not go into the result slot", design);
+        assertEquals(ComponentListMF.ornate_items, design.getItem());
+        assertEquals("more than one crest went in", 1, design.stackSize);
+        assertEquals("the crest left the cursor", 1, w.player.inventory.getItemStack().stackSize);
+
+        // Taken back out with an empty hand, both crests to the hotbar, then put in by its number key: still one
+        w.player.inventory.setInventorySlotContents(0, w.player.inventory.getItemStack());
+        w.player.inventory.setItemStack(null);
+        w.container.slotClick(result, 0, PICK, w.player);
+        w.player.inventory.getStackInSlot(0).stackSize += w.player.inventory.getItemStack().stackSize;
+        w.player.inventory.setItemStack(null);
+        assertNull("the crest was not taken back out", w.station.getStackInSlot(w.output));
+        w.container.slotClick(result, 0, SWAP, w.player);
+        assertEquals("a number key put in more than one crest", 1, w.station.getStackInSlot(w.output).stackSize);
+        assertEquals(1, w.player.inventory.getStackInSlot(0).stackSize);
         helper.succeed();
     }
 
