@@ -22,6 +22,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.gametest.Templates;
 
 /** Issue #79: furnaces smelt only from fuel they burn, and only what they hold. */
 @GameTestHolder("minefantasy2")
@@ -29,26 +30,13 @@ public class FurnaceIdleTest {
 
     private FurnaceIdleTest() {}
 
-    /** A heater and a furnace above it, walled in firebrick, facing north. */
-    static TileEntityBigFurnace builtFurnace(GameTestHelper helper) {
-        for (int y = 1; y <= 2; y++) {
-            helper.setBlock(1, y, 2, BlockListMF.firebricks);
-            helper.setBlock(3, y, 2, BlockListMF.firebricks);
-            helper.setBlock(2, y, 3, BlockListMF.firebricks);
-        }
-        helper.setBlock(2, 3, 2, BlockListMF.firebricks);
-        helper.setBlock(2, 1, 2, BlockListMF.furnace_heater, 0);
-        helper.setBlock(2, 2, 2, BlockListMF.furnace_stone, 0);
-        return helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
-    }
-
     /**
      * The air by a heater is warmer than up at the furnace, as altitude makes it: an unlit heater still smelts nothing.
      */
-    @GameTest(timeoutTicks = 100)
+    @GameTest(timeoutTicks = 100, template = Templates.BIG_FURNACE)
     public static void aColdHeaterDoesNotSmelt(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
-        int heaterY = helper.absolute(2, 1, 2).y();
+        int heaterY = helper.absolute(Templates.HEATER).y();
         // The air stays overridden while the furnace ticks between polls; the close runs when the test ends.
         Overrides overrides = new Overrides().air((world, x, y, z) -> y == heaterY ? 25F : 20F);
         helper.afterTest(overrides::close);
@@ -58,14 +46,14 @@ public class FurnaceIdleTest {
                         id("big_furnace", "seed"),
                         ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
                         0));
-        TileEntityBigFurnace furnace = builtFurnace(helper);
+        TileEntityBigFurnace furnace = Templates.furnace(helper);
         furnace.setInventorySlotContents(0, new ItemStack(seed));
         Stations.keepUntilFinished();
         int[] ticks = { 0 };
         helper.succeedWhen(() -> {
             if (++ticks[0] < 60) return false;
-            TileEntityBigFurnace now = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
-            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            TileEntityBigFurnace now = Templates.furnace(helper);
+            TileEntityBigFurnace heater = Templates.heater(helper);
             assertTrue("the furnace was never built: heater " + heater.built, now.built);
             assertEquals("a cold heater made progress", 0, now.progress);
             return true;
@@ -227,7 +215,7 @@ public class FurnaceIdleTest {
         helper.succeed();
     }
 
-    @GameTest
+    @GameTest(template = Templates.BIG_FURNACE)
     public static void bigHeaterLightsOnlyForWorkThatFits(GameTestHelper helper) {
         Stations.begin(helper);
         try {
@@ -237,8 +225,8 @@ public class FurnaceIdleTest {
                             id("big_furnace", "idle"),
                             ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
                             0));
-            TileEntityBigFurnace furnace = builtFurnace(helper);
-            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            TileEntityBigFurnace furnace = Templates.furnace(helper);
+            TileEntityBigFurnace heater = Templates.heater(helper);
             heater.setInventorySlotContents(0, new ItemStack(Items.coal, 4));
             tick(30, furnace, heater);
             assertTrue(furnace.built && heater.built);
@@ -317,4 +305,30 @@ public class FurnaceIdleTest {
         helper.succeed();
     }
 
+    /**
+     * A furnace saved mid-smelt, iron ore in, bars out and coal in a hot heater, comes back from its saved data built
+     * and smelting on.
+     */
+    @GameTest(template = Templates.BIG_FURNACE_WORKING)
+    public static void aSavedWorkingFurnaceSmeltsOn(GameTestHelper helper) {
+        TileEntityBigFurnace furnace = Templates.furnace(helper);
+        TileEntityBigFurnace heater = Templates.heater(helper);
+        // What the template holds, whatever the amounts: ore in, bars out, coal in a heater that is hot
+        assertNotNull("the ore was not restored", furnace.getStackInSlot(0));
+        assertNotNull("the bars were not restored", furnace.getStackInSlot(4));
+        assertNotNull("the coal was not restored", heater.getStackInSlot(0));
+        assertTrue("the heat was not restored", heater.heat > 0F);
+        int ore = furnace.getStackInSlot(0).stackSize, bars = furnace.getStackInSlot(4).stackSize;
+        tickUntil(
+                () -> furnace.getStackInSlot(0) == null || furnace.getStackInSlot(0).stackSize < ore,
+                2400,
+                heater,
+                furnace);
+        assertTrue("the structure was not found", furnace.built && heater.built);
+        assertTrue(
+                "the furnace did not smelt on",
+                furnace.getStackInSlot(0) == null || furnace.getStackInSlot(0).stackSize < ore);
+        assertTrue("the smelted ore made no bar", furnace.getStackInSlot(4).stackSize > bars);
+        helper.succeed();
+    }
 }

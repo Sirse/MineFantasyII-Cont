@@ -1,0 +1,90 @@
+{
+  tiles: [
+    {
+      AmbientHeat: 1b,
+      Built: 1b,
+      Items: [
+        {
+          Count: 51b,
+          Damage: 0s,
+          HorizonQAItemId: "minecraft:coal",
+          Slot: 0b
+        }
+      ],
+      Level: 1,
+      Shared: 0,
+      SourceHeat: {
+        Air: 20.0f,
+        Displayed: 1420.0f,
+        Initialized: 1b,
+        Work: 1420.0f
+      },
+      fuel: 37,
+      heat: 1420.0f,
+      id: "MF_BigFurnace",
+      maxFuel: 113,
+      maxHeat: 1500.0f,
+      progress: 0,
+      x: 1,
+      y: 0,
+      z: 0
+    },
+    {
+      AmbientHeat: 1b,
+      Built: 1b,
+      Items: [
+        {
+          Count: 22b,
+          Damage: 0s,
+          HorizonQAItemId: "minefantasy2:MF_Ore_oreIron",
+          Slot: 0b
+        },
+        {
+          Count: 22b,
+          Damage: 0s,
+          HorizonQAItemId: "minefantasy2:MF_Ore_oreIron",
+          Slot: 3b
+        },
+        {
+          Count: 10b,
+          Damage: 0s,
+          HorizonQAItemId: "minefantasy2:custom_bar",
+          Slot: 4b,
+          tag: {
+            MF_CustomMaterials: {
+              main_metal: "Iron"
+            }
+          }
+        },
+        {
+          Count: 10b,
+          Damage: 0s,
+          HorizonQAItemId: "minefantasy2:custom_bar",
+          Slot: 7b,
+          tag: {
+            MF_CustomMaterials: {
+              main_metal: "Iron"
+            }
+          }
+        }
+      ],
+      Level: 0,
+      Shared: 0,
+      SourceHeat: {
+        Air: 20.0f,
+        Displayed: 1420.0f,
+        Initialized: 1b,
+        Work: 1420.0f
+      },
+      fuel: 0,
+      heat: 1420.0f,
+      id: "MF_BigFurnace",
+      maxFuel: 0,
+      maxHeat: 0.0f,
+      progress: 12744,
+      x: 1,
+      y: 1,
+      z: 0
+    }
+  ]
+}

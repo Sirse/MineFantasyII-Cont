@@ -41,6 +41,7 @@ import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.gametest.Templates;
 import minefantasy.mf2.item.list.ToolListMF;
 
 /**
@@ -386,20 +387,16 @@ public class StationBreakTest {
         return all;
     }
 
-    /** Heater, furnace on it, firebricks on their sides and back and over the furnace. */
-    private static TileEntityBigFurnace bigFurnace(GameTestHelper helper) throws Exception {
-        helper.setBlock(2, 1, 2, BlockListMF.furnace_heater, 0);
-        helper.setBlock(2, 2, 2, BlockListMF.furnace_stone, 0);
-        for (int y = 1; y <= 2; y++) {
-            helper.setBlock(1, y, 2, BlockListMF.firebricks);
-            helper.setBlock(3, y, 2, BlockListMF.firebricks);
-            helper.setBlock(2, y, 3, BlockListMF.firebricks);
-        }
-        helper.setBlock(2, 3, 2, BlockListMF.firebricks);
-        TileEntityBigFurnace furnace = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
+    private static void breakAt(GameTestHelper helper, String label) {
+        TestPos at = helper.pos(label);
+        breakAt(helper, at.x(), at.y(), at.z());
+    }
+
+    /** The furnace of the template loaded with seed, its heater with coal. */
+    private static TileEntityBigFurnace loaded(GameTestHelper helper) {
+        TileEntityBigFurnace furnace = Templates.furnace(helper);
         furnace.setInventorySlotContents(0, new ItemStack(seed, 2));
-        helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2)
-                .setInventorySlotContents(0, new ItemStack(Items.coal, 3));
+        Templates.heater(helper).setInventorySlotContents(0, new ItemStack(Items.coal, 3));
         return furnace;
     }
 
@@ -411,7 +408,7 @@ public class StationBreakTest {
         assertTrue(plan.apply(CraftInventory.of(furnace), new ArrayList<>()));
     }
 
-    @GameTest
+    @GameTest(template = Templates.BIG_FURNACE)
     public static void bigFurnaceLosesAPartAtATime(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
         try {
@@ -421,21 +418,24 @@ public class StationBreakTest {
                             id("big_furnace", "seed"),
                             ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
                             0));
-            TileEntityBigFurnace furnace = bigFurnace(helper);
+            TileEntityBigFurnace furnace = loaded(helper);
             furnace.progress = 50;
-            breakAt(helper, 2, 3, 2);
+            breakAt(helper, Templates.ROOF);
             assertEquals("a wall dropped items", items(), pickUp(helper));
             assertEquals("the furnace lost its load with a wall", 2, furnace.getStackInSlot(0).stackSize);
-            breakAt(helper, 2, 1, 2);
+            breakAt(helper, Templates.HEATER);
             assertEquals("the heater drops its fuel alone", items(new ItemStack(Items.coal, 3)), pickUp(helper));
-            breakAt(helper, 2, 2, 2);
+            breakAt(helper, Templates.FURNACE);
             assertEquals("during the work", items(new ItemStack(seed, 2)), pickUp(helper));
 
-            furnace = bigFurnace(helper);
+            helper.setBlock(Templates.HEATER, BlockListMF.furnace_heater, 0);
+            helper.setBlock(Templates.FURNACE, BlockListMF.furnace_stone, 0);
+            helper.setBlock(Templates.ROOF, BlockListMF.firebricks);
+            furnace = loaded(helper);
             smeltOnce(furnace);
-            breakAt(helper, 2, 2, 2);
+            breakAt(helper, Templates.FURNACE);
             assertEquals("after the work", items(new ItemStack(seed), new ItemStack(flour)), pickUp(helper));
-            breakAt(helper, 2, 1, 2);
+            breakAt(helper, Templates.HEATER);
             assertEquals(items(new ItemStack(Items.coal, 3)), pickUp(helper));
         } finally {
             Stations.end();

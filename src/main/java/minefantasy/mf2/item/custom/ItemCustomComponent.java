@@ -22,11 +22,12 @@ import minefantasy.mf2.api.crafting.ITieredComponent;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.block.decor.IPiledComponent;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
-public class ItemCustomComponent extends Item implements ITieredComponent {
+public class ItemCustomComponent extends Item implements ITieredComponent, IPiledComponent {
 
     private final String materialType;
     @SideOnly(Side.CLIENT)
@@ -184,6 +185,16 @@ public class ItemCustomComponent extends Item implements ITieredComponent {
     @Override
     public String getMaterialType(ItemStack item) {
         return materialType;
+    }
+
+    @Override
+    public String getPileType() {
+        return storageType;
+    }
+
+    @Override
+    public String getPileTexture() {
+        return blocktex;
     }
 
     public ItemCustomComponent setStoragePlacement(String type, String tex) {

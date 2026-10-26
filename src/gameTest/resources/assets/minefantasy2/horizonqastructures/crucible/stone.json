@@ -1,0 +1,22 @@
+{
+  "format_version": 2,
+  "size": [1, 2, 1],
+  "palette": {
+    "A": {"name": "minefantasy2:MF_Cruciblestone", "meta": 0, "label": "Stone Crucible"},
+    "B": {"name": "minefantasy2:MF_Forgestone", "meta": 0, "label": "Stone Forge"}
+  },
+  "layers": [
+    [
+      "B"
+    ],
+    [
+      "A"
+    ]
+  ],
+  "annotations": {
+    "labels": {
+      "crucible": [0, 1, 0],
+      "heat_source": [0, 0, 0]
+    }
+  }
+}

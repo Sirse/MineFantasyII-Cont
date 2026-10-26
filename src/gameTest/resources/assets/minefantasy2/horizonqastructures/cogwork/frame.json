@@ -1,0 +1,19 @@
+{
+  "format_version": 2,
+  "size": [3, 1, 2],
+  "palette": {
+    "F": {"name": "minefantasy2:frame_block", "meta": 0, "label": "Frame"}
+  },
+  "layers": [
+    [
+      "FFF",
+      ".F."
+    ]
+  ],
+  "annotations": {
+    "labels": {
+      "station": [1, 0, 0],
+      "shaft": [1, 0, 1]
+    }
+  }
+}

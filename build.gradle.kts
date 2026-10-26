@@ -324,6 +324,13 @@ tasks.findByName("extractNatives2")?.let { extractTask ->
   tasks.named("spotlessGradleCheck").configure { mustRunAfter(extractTask) }
 }
 
+// runClient loads the game tests and Horizon-QA interactively: the wand, its editor and /qa load and export work on the
+// integrated server, for building and revising structure templates
+tasks.named<JavaExec>("runClient").configure {
+  dependsOn(tasks.named("gameTestClasses"))
+  classpath(gameTest.output, gameTestMods)
+}
+
 // runServer loads the game tests; with -PgameTests it runs them all in CI mode, reports to build/horizonqa and
 // exits with their status
 tasks.named<JavaExec>("runServer").configure {

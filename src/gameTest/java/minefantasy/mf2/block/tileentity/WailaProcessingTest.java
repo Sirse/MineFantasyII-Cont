@@ -28,6 +28,7 @@ import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFC;
 import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.gametest.Templates;
 import minefantasy.mf2.integration.waila.WailaProvider;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -329,7 +330,7 @@ public class WailaProcessingTest {
         helper.succeed();
     }
 
-    @GameTest
+    @GameTest(template = Templates.BIG_FURNACE)
     public static void warmAirIsNoHeatForACrucibleOrAnUnfuelledHeater(GameTestHelper helper) {
         Stations.begin(helper);
         try (Overrides overrides = new Overrides().air((world, x, y, z) -> 40F)) {
@@ -342,8 +343,8 @@ public class WailaProcessingTest {
                                     0,
                                     java.util.Arrays.asList(new ItemStack(seed))),
                             0));
-            TileEntityBigFurnace furnace = FurnaceIdleTest.builtFurnace(helper);
-            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            TileEntityBigFurnace furnace = Templates.furnace(helper);
+            TileEntityBigFurnace heater = Templates.heater(helper);
             helper.setBlock(5, 1, 2, BlockListMF.forge);
             helper.setBlock(5, 2, 2, BlockListMF.crucible);
             TileEntityForge forge = helper.assertTileEntityPresent(TileEntityForge.class, 5, 1, 2);

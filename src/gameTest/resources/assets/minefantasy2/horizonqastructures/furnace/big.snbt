@@ -1,0 +1,48 @@
+{
+  tiles: [
+    {
+      AmbientHeat: 1b,
+      Built: 1b,
+      Items: [],
+      Level: 1,
+      Shared: 0,
+      SourceHeat: {
+        Air: 20.0f,
+        Displayed: 20.0f,
+        Initialized: 1b,
+        Work: 0.0f
+      },
+      fuel: 0,
+      heat: 20.0f,
+      id: "MF_BigFurnace",
+      maxFuel: 0,
+      maxHeat: 0.0f,
+      progress: 0,
+      x: 1,
+      y: 0,
+      z: 0
+    },
+    {
+      AmbientHeat: 1b,
+      Built: 1b,
+      Items: [],
+      Level: 0,
+      Shared: 0,
+      SourceHeat: {
+        Air: 20.0f,
+        Displayed: 20.0f,
+        Initialized: 1b,
+        Work: 0.0f
+      },
+      fuel: 0,
+      heat: 20.0f,
+      id: "MF_BigFurnace",
+      maxFuel: 0,
+      maxHeat: 0.0f,
+      progress: 0,
+      x: 1,
+      y: 1,
+      z: 0
+    }
+  ]
+}

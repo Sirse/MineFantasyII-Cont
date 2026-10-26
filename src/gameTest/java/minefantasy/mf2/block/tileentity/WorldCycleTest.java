@@ -21,6 +21,7 @@ import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.config.ConfigKitchen;
 import minefantasy.mf2.gametest.Modders;
+import minefantasy.mf2.gametest.Templates;
 import minefantasy.mf2.item.food.FoodListMF;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
@@ -100,33 +101,24 @@ public class WorldCycleTest {
 
     // region big furnace
 
-    /** A heater with a furnace on it, firebricks on their sides and back and over the furnace, the front open. */
-    private static TileEntityBigFurnace bigFurnace(GameTestHelper helper, boolean walls) {
+    /** Loads the furnace with seed it smelts; the heater below must be one. */
+    private static TileEntityBigFurnace seeded(GameTestHelper helper, TileEntityBigFurnace furnace,
+            TileEntityBigFurnace heater) {
         reload(
                 tx -> tx.add(
                         MFRecipes.BIG_FURNACE,
                         id("big_furnace", "seed"),
                         ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
                         0));
-        // Metadata 0 faces the front north (towards -z)
-        helper.setBlock(2, 1, 2, BlockListMF.furnace_heater, 0);
-        helper.setBlock(2, 2, 2, BlockListMF.furnace_stone, 0);
-        if (walls) {
-            for (int y = 1; y <= 2; y++) {
-                helper.setBlock(1, y, 2, BlockListMF.firebricks);
-                helper.setBlock(3, y, 2, BlockListMF.firebricks);
-                helper.setBlock(2, y, 3, BlockListMF.firebricks);
-            }
-            helper.setBlock(2, 3, 2, BlockListMF.firebricks);
-        }
-        TileEntityBigFurnace furnace = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2);
-        assertTrue("the lower block is not the heater", heater(helper).isHeater());
+        assertTrue("the lower block is not the heater", heater.isHeater());
         furnace.setInventorySlotContents(0, new ItemStack(seed, 2));
         return furnace;
     }
 
-    private static TileEntityBigFurnace heater(GameTestHelper helper) {
-        return helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+    /** A heater with a furnace on it alone in an empty cell; metadata 0 faces the front north (towards -z). */
+    private static void bareFurnace(GameTestHelper helper) {
+        helper.setBlock(2, 1, 2, BlockListMF.furnace_heater, 0);
+        helper.setBlock(2, 2, 2, BlockListMF.furnace_stone, 0);
     }
 
     /**
@@ -141,11 +133,11 @@ public class WorldCycleTest {
         }
     }
 
-    @GameTest(timeoutTicks = 200)
+    @GameTest(timeoutTicks = 200, template = Templates.BIG_FURNACE)
     public static void builtBigFurnaceSmeltsOverItsHeater(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
-        TileEntityBigFurnace furnace = bigFurnace(helper, true);
-        TileEntityBigFurnace heater = heater(helper);
+        TileEntityBigFurnace heater = Templates.heater(helper);
+        TileEntityBigFurnace furnace = seeded(helper, Templates.furnace(helper), heater);
         Stations.keepUntilFinished();
         helper.succeedWhen(() -> {
             stokeOnceBuilt(heater);
@@ -162,8 +154,12 @@ public class WorldCycleTest {
     @GameTest(timeoutTicks = 60)
     public static void bigFurnaceWithoutWallsGetsNoHeat(GameTestHelper helper) throws Exception {
         Stations.begin(helper);
-        TileEntityBigFurnace furnace = bigFurnace(helper, false);
-        TileEntityBigFurnace heater = heater(helper);
+        bareFurnace(helper);
+        TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+        TileEntityBigFurnace furnace = seeded(
+                helper,
+                helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 2, 2),
+                heater);
         Stations.keepUntilFinished();
         helper.onEachTick("nothing smelts", () -> {
             stokeOnceBuilt(heater);

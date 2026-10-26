@@ -25,11 +25,12 @@ import minefantasy.mf2.api.recipe.ProcessRecipe;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.gametest.Templates;
 
 @GameTestHolder("minefantasy2")
 public class ClimateHeatTest {
 
-    @GameTest
+    @GameTest(template = Templates.BIG_FURNACE)
     public static void repeatedWeatherChangesNeverPowerIdleStations(GameTestHelper helper) {
         Stations.begin(helper);
         float[] air = { 40F };
@@ -46,8 +47,8 @@ public class ClimateHeatTest {
                         ProcessRecipe.of(Input.of(seed), new ItemStack(flour)),
                         0);
             });
-            TileEntityBigFurnace furnace = FurnaceIdleTest.builtFurnace(helper);
-            TileEntityBigFurnace heater = helper.assertTileEntityPresent(TileEntityBigFurnace.class, 2, 1, 2);
+            TileEntityBigFurnace furnace = Templates.furnace(helper);
+            TileEntityBigFurnace heater = Templates.heater(helper);
             furnace.setInventorySlotContents(0, new ItemStack(seed));
             helper.setBlock(5, 1, 2, BlockListMF.forge_metal_active);
             helper.setBlock(5, 2, 2, BlockListMF.crucible);

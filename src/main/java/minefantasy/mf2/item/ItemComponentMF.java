@@ -23,13 +23,14 @@ import minefantasy.mf2.api.crafting.ITieredComponent;
 import minefantasy.mf2.api.helpers.CustomToolHelper;
 import minefantasy.mf2.api.material.CustomMaterial;
 import minefantasy.mf2.block.decor.BlockComponent;
+import minefantasy.mf2.block.decor.IPiledComponent;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.CreativeTabMF;
 
 /**
  * @author Anonymous Productions
  */
-public class ItemComponentMF extends Item implements ITieredComponent {
+public class ItemComponentMF extends Item implements ITieredComponent, IPiledComponent {
 
     protected String name;
     protected int itemRarity;
@@ -295,6 +296,16 @@ public class ItemComponentMF extends Item implements ITieredComponent {
     @Override
     public String getMaterialType(ItemStack item) {
         return isCustom ? materialType : null;
+    }
+
+    @Override
+    public String getPileType() {
+        return storageType;
+    }
+
+    @Override
+    public String getPileTexture() {
+        return blocktex;
     }
 
     public ItemComponentMF setStoragePlacement(String type, String tex) {

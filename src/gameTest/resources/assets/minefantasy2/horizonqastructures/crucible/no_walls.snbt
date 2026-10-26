@@ -1,0 +1,32 @@
+{
+  tiles: [
+    {
+      AmbientHeat: 1b,
+      Items: [],
+      SourceHeat: {
+        Air: 20.0f,
+        Displayed: 20.0f,
+        Initialized: 1b,
+        Work: 0.0f
+      },
+      dragonHeartPower: 0.0f,
+      fuel: 0.0f,
+      fuelTemperature: 0.0f,
+      id: "MF_Forge",
+      maxFuel: 6000.0f,
+      temperature: 20.0f,
+      x: 1,
+      y: 0,
+      z: 1
+    },
+    {
+      Items: [],
+      id: "MF_Crucible",
+      progress: 0.0f,
+      progressMax: 400.0f,
+      x: 1,
+      y: 1,
+      z: 1
+    }
+  ]
+}

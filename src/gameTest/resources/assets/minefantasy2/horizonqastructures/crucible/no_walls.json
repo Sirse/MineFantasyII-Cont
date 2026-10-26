@@ -1,0 +1,30 @@
+{
+  "format_version": 2,
+  "size": [3, 2, 3],
+  "palette": {
+    "A": {"name": "minefantasy2:MF_Cruciblefireclay", "meta": 0, "label": "Fireclay Crucible"},
+    "B": {"name": "minefantasy2:MF_Forgemetal", "meta": 0, "label": "Advanced Forge"}
+  },
+  "layers": [
+    [
+      "...",
+      ".B.",
+      "..."
+    ],
+    [
+      "...",
+      ".A.",
+      "..."
+    ]
+  ],
+  "annotations": {
+    "labels": {
+      "crucible": [1, 1, 1],
+      "heat_source": [1, 0, 1],
+      "wall_west": [0, 1, 1],
+      "wall_east": [2, 1, 1],
+      "wall_north": [1, 1, 0],
+      "wall_south": [1, 1, 2]
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "format_version": 2,
+  "size": [3, 4, 3],
+  "palette": {
+    "A": {"name": "minefantasy2:firebricks", "meta": 0, "label": "Fire Bricks"},
+    "H": {"name": "minefantasy2:MF_BlastHeater", "meta": 0, "label": "Blast Furnace Heater"},
+    "C": {"name": "minefantasy2:MF_BlastChamber", "meta": 0, "label": "Blast Furnace Chamber"},
+    "U": {"name": "minefantasy2:MF_Cruciblestone", "meta": 0, "label": "Stone Crucible"}
+  },
+  "layers": [
+    [
+      "...",
+      ".U.",
+      "..."
+    ],
+    [
+      "A.A",
+      ".H.",
+      "A.A"
+    ],
+    [
+      ".A.",
+      "ACA",
+      ".A."
+    ],
+    [
+      ".A.",
+      "ACA",
+      ".A."
+    ]
+  ],
+  "annotations": {
+    "labels": {
+      "catcher": [1, 0, 1],
+      "heater": [1, 1, 1],
+      "chamber": [1, 2, 1],
+      "chamber_top": [1, 3, 1],
+      "heater_corner": [0, 1, 0],
+      "chamber_top_wall": [0, 3, 1]
+    }
+  }
+}
