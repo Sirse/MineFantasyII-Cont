@@ -113,6 +113,12 @@ public class BlockCrucible extends BlockStation<TileEntityCrucible> {
     }
 
     @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block neighbour) {
+        TileEntityCrucible tile = stationAt(world, x, y, z);
+        if (tile != null) tile.onNeighborChanged();
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(int side, int meta) {
         return side == 1 ? topTex : sideTex;

@@ -54,6 +54,8 @@ public class TileEntityBigFurnace extends TileEntityStation
     public ItemStack[] inv;
     public int itemMeta;
     public boolean built = false;
+    /** Not saved: the walls may change while the chunk is unloaded, so the first tick looks at them again */
+    private boolean builtChecked;
     // ANIMATE
     public int numUsers;
     public int doorAngle;
@@ -157,8 +159,9 @@ public class TileEntityBigFurnace extends TileEntityStation
 
         ++ticksExisted;
         if (justShared > 0) justShared--;
-        if (ticksExisted % 10 == 0) {
+        if (!builtChecked || ticksExisted % 10 == 0) {
             built = structureExists();
+            builtChecked = true;
         }
         if (isHeater()) {
             updateHeater();
@@ -541,7 +544,6 @@ public class TileEntityBigFurnace extends TileEntityStation
         inv = InventorySlots.read(nbt, "Items", inv.length);
 
         justShared = nbt.getInteger("Shared");
-        built = nbt.getBoolean("Built");
 
         fuel = nbt.getInteger("fuel");
         maxFuel = nbt.hasKey("maxFuel") ? nbt.getInteger("maxFuel") : nbt.getInteger("MaxFuel");
@@ -564,7 +566,6 @@ public class TileEntityBigFurnace extends TileEntityStation
 
         nbt.setInteger("Shared", justShared);
         nbt.setInteger("Level", aboveType);
-        nbt.setBoolean("Built", built);
 
         nbt.setInteger("fuel", fuel);
         nbt.setInteger("maxFuel", maxFuel);

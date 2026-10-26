@@ -15,6 +15,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -233,25 +234,7 @@ public class BlockRack extends BlockWoodDecor<TileEntityRack> {
             tile.updateInventory();
         }
         int l = world.getBlockMetadata(x, y, z);
-        boolean flag = false;
-
-        if (l == 2 && world.isSideSolid(x, y, z + 1, NORTH)) {
-            flag = true;
-        }
-
-        if (l == 3 && world.isSideSolid(x, y, z - 1, SOUTH)) {
-            flag = true;
-        }
-
-        if (l == 4 && world.isSideSolid(x + 1, y, z, WEST)) {
-            flag = true;
-        }
-
-        if (l == 5 && world.isSideSolid(x - 1, y, z, EAST)) {
-            flag = true;
-        }
-
-        if (!flag) {
+        if (!hasWall(world, x, y, z, l)) {
             this.dropBlockAsItem(world, x, y, z, l, 0);
             world.setBlockToAir(x, y, z);
         }
@@ -312,4 +295,37 @@ public class BlockRack extends BlockWoodDecor<TileEntityRack> {
     @SideOnly(Side.CLIENT)
     @Override
     public void registerBlockIcons(IIconRegister reg) {}
+
+    @Override
+    public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
+        // The metadata is the side the rack faces, away from its wall
+        if (axis != UP && axis != DOWN) return false;
+        int meta = world.getBlockMetadata(x, y, z);
+        if (meta < 2 || meta > 5) return false;
+        int turned = getOrientation(meta).getRotation(axis).ordinal();
+        // Turned away from every wall it would hang on nothing and fall off at the next neighbour change
+        if (!hasWall(world, x, y, z, turned)) return false;
+        return world.setBlockMetadataWithNotify(x, y, z, turned, 3);
+    }
+
+    /** Whether a rack facing this side (its metadata) has a wall behind it to hang on. */
+    private static boolean hasWall(World world, int x, int y, int z, int facing) {
+        switch (facing) {
+            case 2:
+                return world.isSideSolid(x, y, z + 1, NORTH);
+            case 3:
+                return world.isSideSolid(x, y, z - 1, SOUTH);
+            case 4:
+                return world.isSideSolid(x + 1, y, z, WEST);
+            case 5:
+                return world.isSideSolid(x - 1, y, z, EAST);
+            default:
+                return false;
+        }
+    }
+
+    @Override
+    public ForgeDirection[] getValidRotations(World world, int x, int y, int z) {
+        return new ForgeDirection[] { UP, DOWN };
+    }
 }

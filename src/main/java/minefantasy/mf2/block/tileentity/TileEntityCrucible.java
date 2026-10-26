@@ -48,7 +48,6 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     private final int[] outputSlots = new int[] { OUTPUT_SLOT };
     private final int[] allSlots = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-    private int ticksExisted;
     private int cachedTier = -1;
     private boolean cachedCoated;
     public float progress = 0;
@@ -68,14 +67,13 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
     @Override
     public void updateEntity() {
         super.updateEntity();
-        ++ticksExisted;
 
         if (!worldObj.isRemote && recipeCacheDirty) {
             updateCachedRecipe();
             recipeCacheDirty = false;
         }
 
-        if (cachedTier < 0 || ticksExisted % 40 == 0) {
+        if (cachedTier < 0) {
             refreshStructureCache();
         }
 
@@ -204,7 +202,7 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (recipeCacheDirty || cachedTier < 0 || cachedRecipeVersion != AlloyRecipes.getVersion()) {
             return CheckResult.Reason.of("checking");
         }
-        if (cachedTier >= 1 && !cachedCoated) {
+        if (cachedTier >= 1 && !isCoated()) {
             return CheckResult.Reason.of("not_built");
         }
         if (cachedRecipeOutput == null) {
@@ -278,6 +276,11 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         cachedTier = -1;
     }
 
+    /** Called by the block when a neighbour changes, so an added or removed firebrick counts at once */
+    public void onNeighborChanged() {
+        refreshStructureCache();
+    }
+
     private void refreshStructureCache() {
         Block block = this.getBlockType();
         if (block == null || block == Blocks.air) {
@@ -342,6 +345,8 @@ public class TileEntityCrucible extends TileEntityStation implements ISidedInven
         if (cachedTier < 0) {
             refreshStructureCache();
         }
+        // The eyes sit in frames out of neighbour reach, and inserting one notifies nobody: read them every time
+        if (cachedTier >= 2) return computeCoated();
         return cachedCoated;
     }
 

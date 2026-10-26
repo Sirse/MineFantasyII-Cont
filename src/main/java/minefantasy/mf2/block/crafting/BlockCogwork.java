@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -15,6 +16,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import minefantasy.mf2.api.helpers.Heading;
 import minefantasy.mf2.api.helpers.PowerArmour;
 import minefantasy.mf2.api.helpers.ToolHelper;
+import minefantasy.mf2.block.basic.BlockTiled;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.entity.EntityCogwork;
 import minefantasy.mf2.item.list.CreativeTabMF;
@@ -113,6 +115,16 @@ public class BlockCogwork extends BlockDirectional {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase user, ItemStack placed) {
         int l = Heading.towards(user);
         world.setBlockMetadataWithNotify(x, y, z, l, 2);
+    }
+
+    @Override
+    public boolean rotateBlock(World world, int x, int y, int z, ForgeDirection axis) {
+        return BlockTiled.turnHeading(world, x, y, z, axis);
+    }
+
+    @Override
+    public ForgeDirection[] getValidRotations(World world, int x, int y, int z) {
+        return BlockTiled.HEADING_ROTATIONS;
     }
 
     @SideOnly(Side.CLIENT)

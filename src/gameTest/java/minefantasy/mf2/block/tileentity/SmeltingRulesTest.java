@@ -21,6 +21,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import com.mojang.authlib.GameProfile;
 
 import minefantasy.mf2.api.crafting.Requirements;
+import minefantasy.mf2.api.heating.AmbientTemperature;
 import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.block.refining.BlockCrucible;
@@ -28,6 +29,7 @@ import minefantasy.mf2.block.tileentity.blastfurnace.TileEntityBlastFH;
 import minefantasy.mf2.config.ConfigHardcore;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.gametest.Overrides;
+import minefantasy.mf2.gametest.Templates;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.knowledge.KnowledgeListMF;
 
@@ -41,24 +43,48 @@ public class SmeltingRulesTest {
 
     // region crucibles
 
-    @GameTest
+    /** A fireclay crucible walled in firebrick on an advanced forge stays coated only while all four walls stand. */
+    @GameTest(template = Templates.CRUCIBLE_COATED)
+    public static void aCrucibleLosesItsCoatingWithAWall(GameTestHelper helper) {
+        TileEntityCrucible crucible = Templates.crucible(helper);
+        assertTrue("the walled crucible is not coated", crucible.isCoated());
+        helper.setBlock(Templates.CRUCIBLE_WALLS[0], Blocks.air);
+        assertFalse("a crucible with a wall gone stayed coated", crucible.isCoated());
+        helper.succeed();
+    }
+
+    /**
+     * The same crucible on lava without walls takes no source heat, and is coated and takes the lava's heat only once
+     * all four firebricks are laid around it.
+     */
+    @GameTest(template = Templates.CRUCIBLE_NO_WALLS)
     public static void anAdvancedCrucibleNeedsFirebricksAroundIt(GameTestHelper helper) {
-        helper.setBlock(1, 1, 1, Blocks.lava);
-        helper.setBlock(1, 2, 1, BlockListMF.crucibleadv);
-        helper.setBlock(5, 1, 1, Blocks.lava);
-        helper.setBlock(5, 2, 1, BlockListMF.crucibleadv);
-        for (int[] side : new int[][] { { 4, 1 }, { 6, 1 }, { 5, 0 }, { 5, 2 } }) {
-            helper.setBlock(side[0], 2, side[1], BlockListMF.firebricks);
-        }
-        TileEntityCrucible bare = helper.assertTileEntityPresent(TileEntityCrucible.class, 1, 2, 1);
-        TileEntityCrucible walled = helper.assertTileEntityPresent(TileEntityCrucible.class, 5, 2, 1);
+        TileEntityCrucible crucible = Templates.crucible(helper);
+        helper.setBlock(Templates.HEAT_SOURCE, Blocks.lava);
+        assertFalse("a bare crucible is coated", crucible.isCoated());
         assertEquals(
                 "a crucible without firebricks takes source heat",
-                minefantasy.mf2.api.heating.AmbientTemperature
-                        .get(helper.getWorld(), bare.xCoord, bare.yCoord, bare.zCoord),
-                bare.getTemperature(),
+                AmbientTemperature.get(helper.getWorld(), crucible.xCoord, crucible.yCoord, crucible.zCoord),
+                crucible.getTemperature(),
                 0F);
-        assertEquals("the walled crucible does not take the lava's heat", 750F, walled.getTemperature(), 0F);
+        for (int wall = 0; wall < Templates.CRUCIBLE_WALLS.length; wall++) {
+            helper.setBlock(Templates.CRUCIBLE_WALLS[wall], BlockListMF.firebricks);
+            assertEquals(
+                    "coated with " + (wall + 1) + " walls",
+                    wall == Templates.CRUCIBLE_WALLS.length - 1,
+                    crucible.isCoated());
+        }
+        assertEquals("the walled crucible does not take the lava's heat", 750F, crucible.getTemperature(), 0F);
+        helper.succeed();
+    }
+
+    /** A stone crucible needs no walls: it takes the heat of lava under it as it stands. */
+    @GameTest(template = Templates.CRUCIBLE_STONE)
+    public static void aStoneCrucibleTakesHeatWithoutWalls(GameTestHelper helper) {
+        TileEntityCrucible crucible = Templates.crucible(helper);
+        assertEquals("an unlit forge gave heat", 0F, crucible.getWorkingHeat(), 0F);
+        helper.setBlock(Templates.HEAT_SOURCE, Blocks.lava);
+        assertEquals("the stone crucible did not take the lava's heat", 750F, crucible.getWorkingHeat(), 0F);
         helper.succeed();
     }
 

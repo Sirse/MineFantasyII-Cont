@@ -261,11 +261,6 @@ public class TileEntityBlastFH extends TileEntityBlastFC {
     }
 
     @Override
-    public void updateBuild() {
-        isBuilt = getIsBuilt();
-    }
-
-    @Override
     protected boolean getIsBuilt() {
         return (isFirebrick(-1, 0, -1) && isFirebrick(1, 0, -1) && isFirebrick(-1, 0, 1) && isFirebrick(1, 0, 1))
                 && (isAir(-1, 0, 0) && isAir(1, 0, 0) && isAir(0, 0, -1) && isAir(0, 0, 1));

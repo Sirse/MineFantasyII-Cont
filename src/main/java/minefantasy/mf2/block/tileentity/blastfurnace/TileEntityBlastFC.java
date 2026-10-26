@@ -28,6 +28,8 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
 
     public int ticksExisted;
     public boolean isBuilt = false;
+    /** Not saved: the bricks may change while the chunk is unloaded, so the first tick looks at them again */
+    private boolean builtChecked;
     public int fireTime;
     private final ActionOwner owner = new ActionOwner();
     public int tempUses;
@@ -72,6 +74,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     public void updateEntity() {
         super.updateEntity();
         ++ticksExisted;
+        if (!builtChecked) updateBuild();
         int dropFrequency = 5;
 
         if (!worldObj.isRemote && ticksExisted % dropFrequency == 0) {
@@ -121,6 +124,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
     }
 
     protected void interact(TileEntityBlastFC tile) {
+        if (!tile.builtChecked) tile.updateBuild();
         if (!tile.isBuilt) return;
 
         for (int a = 0; a < getSizeInventory(); a++) {
@@ -151,6 +155,7 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
 
     public void updateBuild() {
         isBuilt = getIsBuilt();
+        builtChecked = true;
     }
 
     protected boolean getIsBuilt() {
@@ -180,7 +185,6 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
         owner.writeToNBT(nbt);
         nbt.setInteger("fireTime", fireTime);
         nbt.setInteger("CarbonUses", tempUses);
-        nbt.setBoolean("isBuilt", isBuilt);
         nbt.setInteger("ticksExisted", ticksExisted);
         nbt.setInteger("StoredSmoke", smokeStorage);
         InventorySlots.write(nbt, "Items", items);
@@ -193,7 +197,6 @@ public class TileEntityBlastFC extends TileEntityStation implements ISidedInvent
         owner.readFromNBT(nbt);
         fireTime = nbt.getInteger("fireTime");
         tempUses = nbt.getInteger("CarbonUses");
-        isBuilt = nbt.getBoolean("isBuilt");
         ticksExisted = nbt.getInteger("ticksExisted");
         smokeStorage = nbt.getInteger("StoredSmoke");
         items = InventorySlots.read(nbt, "Items", items.length);
