@@ -60,7 +60,11 @@ public class PlayerTickHandlerMF {
         spawnDragon(player, 64);
     }
 
+    /** Calls a dragon over a player; a creative player or a spectator is not hunted. */
     public static void spawnDragon(EntityPlayer player, int offset) {
+        if (player.capabilities.isCreativeMode || PlayerModeHelper.isSpectator(player)) {
+            return;
+        }
         int y = MathHelper.floor_double(player.posY + offset);
         int maxY = Math.max(1, player.worldObj.getActualHeight() - 1);
         if (y < 1) y = 1;
@@ -71,7 +75,7 @@ public class PlayerTickHandlerMF {
             dragon.setPosition(player.posX, y, player.posZ);
             player.worldObj.spawnEntityInWorld(dragon);
             dragon.setDragon(tier);
-            dragon.disengage(100);
+            dragon.callTo(player);
             player.worldObj
                     .playSoundEffect(dragon.posX, dragon.posY - 16D, dragon.posZ, "mob.enderdragon.growl", 3.0F, 1.5F);
             dragon.fireBreathCooldown = 200;
@@ -339,9 +343,6 @@ public class PlayerTickHandlerMF {
     }
 
     private void tickDragonSpawner(EntityPlayer player) {
-        if (PlayerModeHelper.isSpectator(player)) {
-            return;
-        }
         if (player.worldObj.difficultySetting != EnumDifficulty.PEACEFUL && player.dimension == 0) {
             int i = ConfigMobs.dragonInterval;
             float chance = ConfigMobs.dragonChance;

@@ -3,8 +3,9 @@ package minefantasy.mf2.client.render.mob;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
+import net.minecraft.entity.EntityLivingBase;
 
+import minefantasy.mf2.entity.mob.DragonAnimation;
 import minefantasy.mf2.entity.mob.EntityDragon;
 
 public class ModelFrostDragon extends ModelBase {
@@ -951,51 +952,54 @@ public class ModelFrostDragon extends ModelBase {
         model.rotateAngleZ = z;
     }
 
+    private static final float FOLDED = (float) Math.toRadians(40.0D);
+
+    private static float lerp(float from, float to, float amount) {
+        return from + (to - from) * amount;
+    }
+
+    private DragonRig rig;
+
+    /** Set before each render; the pose itself lives on the dragon, so dragons sharing this model share nothing. */
+    private float partialTicks;
+
+    @Override
+    public void setLivingAnimations(EntityLivingBase entity, float swing, float swingAmount, float partialTicks) {
+        this.partialTicks = partialTicks;
+    }
+
+    /** Sets every joint the animation moves, from the dragon's pose alone, never from the last dragon drawn. */
     public void setRotationAngles(EntityDragon dragon, float step1, float step2, float head1, float neckY, float neckX,
             float head4) {
         super.setRotationAngles(step1, step2, head1, neckY, neckX, head4, dragon);
-        float wingFlap = (float) Math.toRadians(dragon.wingFlap());
-        float jawAngle = (float) Math.toRadians(dragon.getJawMove());
-        float neckAngle = -(float) Math.toRadians(4.5F * dragon.getNeckAngle());
+        DragonAnimation pose = dragon.animation();
+        float spread = pose.spread(partialTicks);
+        float flap = pose.flap(partialTicks);
 
-        this.Headback.rotateAngleX = neckX / (180F / (float) Math.PI) + neckAngle;
-        this.Headback.rotateAngleY = neckY / (180F / (float) Math.PI);
-
-        this.Mouthback_MOVE_THIS_TO_OPEN_MOUTH.rotateAngleX = jawAngle - (3.141F / 9F);
-
-        if (!dragon.isTerrestrial()) // Fly
-        {
-            if (!dragon.onGround) {
-                float angle = (float) Math.toRadians(dragon.getVertTailAngle());
-                this.Body.rotateAngleX = 0.546F - angle;
-            } else {
-                this.Body.rotateAngleX = 0.5462880558742251F;
-            }
-
-            if (dragon.motionY < -0.01F)// Glide
-            {
-                wingFlap = 0;
-            } else if (dragon.motionX == 0 && dragon.motionZ == 0) // Hover
-            {
-                wingFlap = (float) Math.toRadians(dragon.wingFlap());
-            } else {
-                wingFlap = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;// Move
-            }
-            this.Wingshoulderright.rotateAngleZ = wingFlap * 0.75F;
-            this.Wingshoulderleft.rotateAngleZ = -(wingFlap * 0.75F);
-            this.Wingupperarmright.rotateAngleZ = wingFlap * 0.25F;
-            this.Wingupperarmleft.rotateAngleZ = -(wingFlap * 0.25F);
-
-        } else // Walk
-        {
-            this.Body.rotateAngleX = 0.5462880558742251F;
-            this.Wingshoulderright.rotateAngleZ = (float) -Math.toRadians(40);
-            this.Wingshoulderleft.rotateAngleZ = (float) Math.toRadians(40);
-
-            this.Righthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
-            this.Lefthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;
-            this.Shoulderleft_1.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;
-            this.Shoulderleft.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
+        if (rig == null) {
+            // Built at the first render, while every joint still has its modelled angle
+            rig = new DragonRig(
+                    Body,
+                    new ModelRenderer[] { Neckbase, Neckmid, Neckend },
+                    new ModelRenderer[] { Tail1, Tail3, Tail4, Tail6, Tail7, Tail8 },
+                    Winglowerarmright,
+                    Winglowerarmleft)
+                    // Right hind and left fore step together, then the other pair
+                    .leg(Righthip, RightLeg, RightFoot, false, true).leg(Lefthip, Rightleg, Rightfoot, false, false)
+                    .leg(Shoulderleft, Lowerarmleft, null, true, true)
+                    .leg(Shoulderleft_1, Lowerarmleft_1, null, true, false);
         }
+        rig.apply(dragon, pose, partialTicks, head1, step1, step2);
+        this.Headback.rotateAngleX = rig.headPitch(dragon, pose, partialTicks);
+        this.Headback.rotateAngleY = rig.headYaw(pose, partialTicks);
+        this.Mouthback_MOVE_THIS_TO_OPEN_MOUTH.rotateAngleX = pose.jaw(partialTicks) - (3.141F / 9F);
+
+        // Folded back at rest, beating in flight, blended while taking off or landing
+        float shoulder = lerp(-FOLDED, flap * 0.75F, spread);
+        this.Wingshoulderright.rotateAngleZ = shoulder;
+        this.Wingshoulderleft.rotateAngleZ = -shoulder;
+        float arm = lerp(-0.091106186954104F, flap * 0.25F, spread);
+        this.Wingupperarmright.rotateAngleZ = arm;
+        this.Wingupperarmleft.rotateAngleZ = -arm;
     }
 }

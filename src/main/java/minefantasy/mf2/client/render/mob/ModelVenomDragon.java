@@ -3,8 +3,9 @@ package minefantasy.mf2.client.render.mob;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
+import net.minecraft.entity.EntityLivingBase;
 
+import minefantasy.mf2.entity.mob.DragonAnimation;
 import minefantasy.mf2.entity.mob.EntityDragon;
 
 public class ModelVenomDragon extends ModelBase {
@@ -929,107 +930,8 @@ public class ModelVenomDragon extends ModelBase {
         this.Wingfinger1right.addChild(this.Wingmembramelargeright);
 
         // Grouping
-        this.RightFoot.addChild(this.Righttoeleft);
-        this.Thumbtoeupperright.addChild(this.Thumbtoelowerright);
-        this.Wingupperarmleft.addChild(this.Wingmembramesmallleft);
-        this.Headback.addChild(this.Snout);
-        this.Lowerarmleft.addChild(this.Thumbtoeupperleft);
-        this.Rightleg.addChild(this.Rightfoot);
-        this.Wingfinger1left.addChild(this.Wingfinger3left);
-        this.Snout.addChild(this.Tooth10);
-        this.Headmidhornlowerleft.addChild(this.Headmidhornupperleft);
-        this.RightFoot.addChild(this.Righttoeright);
-        this.Headback.addChild(this.Headmidhornlowerright);
-        this.Outertoelowerright.addChild(this.Outertoelowerright_1);
-        this.Headlargehornlowerleft.addChild(this.Headlargehornupperleft);
-        this.Wingfinger1right.addChild(this.Wingfinger3right);
-        this.Snout.addChild(this.Tooth1);
-        this.Lefttoeleft.addChild(this.Lefttoelowerleft);
         this.Smallheadhornright2.addChild(this.Smallheadhornright3);
-        this.Lowerarmleft.addChild(this.Lefthandrightfinger_1);
-        this.Tail1.addChild(this.Righthip);
         this.Smallheadhornleft2.addChild(this.Smallheadhornleft3);
-        this.Headmidhornlowerright.addChild(this.Headmidhornupperright);
-        this.Snout.addChild(this.Tooth6);
-        this.Wingfinger3left.addChild(this.Wingfingerlower3left);
-        this.Lowerarmleft.addChild(this.Lefthandmidfinger);
-        this.Shoulderleft_1.addChild(this.Lowerarmleft_1);
-        this.Headback.addChild(this.Headlargehornlowerright);
-        this.Body.addChild(this.Wingshoulderright);
-        this.Righthandrightfinger.addChild(this.Clawrighthandright);
-        this.Lefttoemid.addChild(this.Lefttoelowermid);
-        this.Headback.addChild(this.Smallheadhornleft2);
-        this.Lefthandrightfinger.addChild(this.Clawlefthandright);
-        this.RTailSpike.addChild(this.RTailMembrane);
-        this.Lowerarmleft_1.addChild(this.Righthandrightfinger);
-        this.Winglowerarmleft.addChild(this.Wingmembramemidleft);
-        this.Body.addChild(this.Tail1);
-        this.Headback.addChild(this.Smallheadhornright2);
-        this.Lefttoeright.addChild(this.Lefttoelowerright);
-        this.Wingfinger1right.addChild(this.Wingmembramelargeright);
-        this.Wingupperarmleft.addChild(this.Winglowerarmleft);
-        this.Tail7.addChild(this.Tail8);
-        this.Snout.addChild(this.Tooth4);
-        this.Wingfinger1left.addChild(this.Wingfingerlower1left);
-        this.Tail8.addChild(this.RTailSpike);
-        this.RightFoot.addChild(this.Outertoelowerright);
-        this.Winglowerarmleft.addChild(this.Wingfinger1left);
-        this.Lefthandmidfinger.addChild(this.Clawlefthandmid);
-        this.Righttoeleft.addChild(this.Righttoelowerleft);
-        this.Body.addChild(this.Shoulderleft);
-        this.Wingshoulderleft.addChild(this.Wingupperarmleft);
-        this.LTailSpike.addChild(this.LTailMembrane);
-        this.Snout.addChild(this.Tooth3);
-        this.Neckmid.addChild(this.Neckend);
-        this.Headlargehornlowerright.addChild(this.Headlargehornupperright);
-        this.Righttoemid.addChild(this.Righttoelowermid);
-        this.Neckbase.addChild(this.Neckmid);
-        this.Lowerarmleft_1.addChild(this.Thumbtoeupperright);
-        this.Tail6.addChild(this.Tail7);
-        this.RightFoot.addChild(this.Righttoemid);
-        this.Rightfoot.addChild(this.Lefttoeleft);
-        this.Righthandleftfinger.addChild(this.Clawrighthandleft);
-        this.Neckend.addChild(this.Headback);
-        this.Shoulderleft.addChild(this.Lowerarmleft);
-        this.Thumbtoeupperleft.addChild(this.Thumbtoelowerleft);
-        this.Body.addChild(this.Shoulderleft_1);
-        this.Winglowerarmright.addChild(this.Wingfinger1right);
-        this.Wingfinger2right.addChild(this.Wingfingerlower2right);
-        this.RightLeg.addChild(this.RightFoot);
-        this.Wingfinger2left.addChild(this.Wingfingerlower2left);
-        this.Wingupperarmright.addChild(this.Winglowerarmright);
-        this.Righttoeright.addChild(this.Righttoelowerright);
-        this.Lefthip.addChild(this.Rightleg);
-        this.Snout.addChild(this.Tooth5);
-        this.Rightfoot.addChild(this.Outertoeleft);
-        this.Wingfinger1right.addChild(this.Wingfinger2right);
-        this.Tail8.addChild(this.LTailSpike);
-        this.Righthandmidfinger.addChild(this.Clawrighthandmid);
-        this.Snout.addChild(this.Tooth9);
-        this.Wingfinger1right.addChild(this.Wingfingerlower1right);
-        this.Wingupperarmright.addChild(this.Wingmembramesmallright);
-        this.Headback.addChild(this.Headlargehornlowerleft);
-        this.Wingfinger1left.addChild(this.Wingmembramelargeleft);
-        this.Wingfinger3right.addChild(this.Wingfingerlower3right);
-        this.Tail3.addChild(this.Tail4);
-        this.Tail1.addChild(this.Tail3);
-        this.Wingshoulderright.addChild(this.Wingupperarmright);
-        this.Outertoeleft.addChild(this.Outertoelowerleft);
-        this.Body.addChild(this.Wingshoulderleft);
-        this.Wingfinger1left.addChild(this.Wingfinger2left);
-        this.Tail1.addChild(this.Lefthip);
-        this.Lowerarmleft_1.addChild(this.Righthandmidfinger);
-        this.Lowerarmleft_1.addChild(this.Righthandleftfinger);
-        this.Headback.addChild(this.Headmidhornlowerleft);
-        this.Tail4.addChild(this.Tail6);
-        this.Rightfoot.addChild(this.Lefttoeright);
-        this.Snout.addChild(this.Tooth7);
-        this.Winglowerarmright.addChild(this.Wingmembramemidright);
-        this.Body.addChild(this.Neckbase);
-        this.Lowerarmleft.addChild(this.Lefthandrightfinger);
-        this.Righthip.addChild(this.RightLeg);
-        this.Rightfoot.addChild(this.Lefttoemid);
-        this.Lefthandrightfinger_1.addChild(this.Clawlefthandleft);
     }
 
     public void setRotateAngle(ModelRenderer modelRenderer, float x, float y, float z) {
@@ -1050,51 +952,54 @@ public class ModelVenomDragon extends ModelBase {
         model.rotateAngleZ = z;
     }
 
+    private static final float FOLDED = (float) Math.toRadians(40.0D);
+
+    private static float lerp(float from, float to, float amount) {
+        return from + (to - from) * amount;
+    }
+
+    private DragonRig rig;
+
+    /** Set before each render; the pose itself lives on the dragon, so dragons sharing this model share nothing. */
+    private float partialTicks;
+
+    @Override
+    public void setLivingAnimations(EntityLivingBase entity, float swing, float swingAmount, float partialTicks) {
+        this.partialTicks = partialTicks;
+    }
+
+    /** Sets every joint the animation moves, from the dragon's pose alone, never from the last dragon drawn. */
     public void setRotationAngles(EntityDragon dragon, float step1, float step2, float head1, float neckY, float neckX,
             float head4) {
         super.setRotationAngles(step1, step2, head1, neckY, neckX, head4, dragon);
-        float wingFlap = (float) Math.toRadians(dragon.wingFlap());
-        float jawAngle = (float) Math.toRadians(dragon.getJawMove());
-        float neckAngle = -(float) Math.toRadians(4.5F * dragon.getNeckAngle());
+        DragonAnimation pose = dragon.animation();
+        float spread = pose.spread(partialTicks);
+        float flap = pose.flap(partialTicks);
 
-        this.Headback.rotateAngleX = neckX / (180F / (float) Math.PI) + neckAngle;
-        this.Headback.rotateAngleY = neckY / (180F / (float) Math.PI);
-
-        this.Lowerjaw.rotateAngleX = 0.045553093477052F + jawAngle;
-
-        if (!dragon.isTerrestrial()) // Fly
-        {
-            if (!dragon.onGround) {
-                float angle = (float) Math.toRadians(dragon.getVertTailAngle());
-                this.Body.rotateAngleX = 0.546F - angle;
-            } else {
-                this.Body.rotateAngleX = 0.5462880558742251F;
-            }
-
-            if (dragon.motionY < -0.01F)// Glide
-            {
-                wingFlap = 0;
-            } else if (dragon.motionX == 0 && dragon.motionZ == 0) // Hover
-            {
-                wingFlap = (float) Math.toRadians(dragon.wingFlap());
-            } else {
-                wingFlap = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;// Move
-            }
-            this.Wingshoulderright.rotateAngleZ = wingFlap * 0.75F;
-            this.Wingshoulderleft.rotateAngleZ = -(wingFlap * 0.75F);
-            this.Wingupperarmright.rotateAngleZ = wingFlap * 0.25F;
-            this.Wingupperarmleft.rotateAngleZ = -(wingFlap * 0.25F);
-
-        } else // Walk
-        {
-            this.Body.rotateAngleX = 0.5462880558742251F;
-            this.Wingshoulderright.rotateAngleZ = (float) -Math.toRadians(40);
-            this.Wingshoulderleft.rotateAngleZ = (float) Math.toRadians(40);
-
-            this.Righthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
-            this.Lefthip.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;
-            this.Shoulderleft_1.rotateAngleX = MathHelper.cos(step1 * 0.6662F + (float) Math.PI) * 1.4F * step2;
-            this.Shoulderleft.rotateAngleX = MathHelper.cos(step1 * 0.6662F) * 1.4F * step2;
+        if (rig == null) {
+            // Built at the first render, while every joint still has its modelled angle
+            rig = new DragonRig(
+                    Body,
+                    new ModelRenderer[] { Neckbase, Neckmid, Neckend },
+                    new ModelRenderer[] { Tail1, Tail3, Tail4, Tail6, Tail7, Tail8 },
+                    Winglowerarmright,
+                    Winglowerarmleft)
+                    // Right hind and left fore step together, then the other pair
+                    .leg(Righthip, RightLeg, RightFoot, false, true).leg(Lefthip, Rightleg, Rightfoot, false, false)
+                    .leg(Shoulderleft, Lowerarmleft, null, true, true)
+                    .leg(Shoulderleft_1, Lowerarmleft_1, null, true, false);
         }
+        rig.apply(dragon, pose, partialTicks, head1, step1, step2);
+        this.Headback.rotateAngleX = rig.headPitch(dragon, pose, partialTicks);
+        this.Headback.rotateAngleY = rig.headYaw(pose, partialTicks);
+        this.Lowerjaw.rotateAngleX = 0.045553093477052F + pose.jaw(partialTicks);
+
+        // Folded back at rest, beating in flight, blended while taking off or landing
+        float shoulder = lerp(-FOLDED, flap * 0.75F, spread);
+        this.Wingshoulderright.rotateAngleZ = shoulder;
+        this.Wingshoulderleft.rotateAngleZ = -shoulder;
+        float arm = lerp(-0.091106186954104F, flap * 0.25F, spread);
+        this.Wingupperarmright.rotateAngleZ = arm;
+        this.Wingupperarmleft.rotateAngleZ = -arm;
     }
 }

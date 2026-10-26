@@ -46,8 +46,14 @@ public class RenderDragon extends RenderLiving {
         this.mainModel = breed.equalsIgnoreCase("ash") ? ashModel
                 : breed.equalsIgnoreCase("white") ? frostModel
                         : breed.equalsIgnoreCase("green") ? venomModel : dragonModel;
-        super.doRender(entity, x, y, z, f, 1);
+        super.doRender(entity, x, y, z, f, f1);
         BossStatus.setBossStatus((EntityDragon) entity, ((EntityDragon) entity).getType().tier == 4);
+    }
+
+    /** A dying dragon sinks where it stands, wings folding and neck dropping, instead of rolling over like a cow. */
+    @Override
+    protected void rotateCorpse(EntityLivingBase entity, float age, float yaw, float partialTicks) {
+        GL11.glRotatef(180.0F - yaw, 0.0F, 1.0F, 0.0F);
     }
 
     protected void preRenderCallback(EntityDragon mob, float f) {

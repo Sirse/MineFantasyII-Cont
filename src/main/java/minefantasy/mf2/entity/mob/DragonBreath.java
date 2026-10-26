@@ -21,6 +21,8 @@ public abstract class DragonBreath {
     public final String name;
     public int id = 0;
     protected Random random = new Random();
+    public int circleTicks = 160, diveTicks = 100;
+    public double circleRadius = 20.0D, circleHeight = 16.0D;
 
     public DragonBreath(String name) {
         this.name = name;
@@ -28,10 +30,24 @@ public abstract class DragonBreath {
     }
 
     public static void init() {
-        fire = new FireBreath("fire");
-        frost = new FrostBreath("frost");
-        poison = new PoisonBreath("poison");
-        ash = new AshBreath("ash");
+        // Fire dives on its prey often; frost keeps high and away, slowing it with breath; poison flies low and close;
+        // ash, blinding it, dives quick and short
+        fire = new FireBreath("fire").hunts(120, 100, 18.0D, 14.0D);
+        frost = new FrostBreath("frost").hunts(220, 80, 24.0D, 20.0D);
+        poison = new PoisonBreath("poison").hunts(160, 100, 16.0D, 10.0D);
+        ash = new AshBreath("ash").hunts(100, 60, 20.0D, 16.0D);
+    }
+
+    /**
+     * How a dragon with this breath hunts in flight: ticks it circles its prey before diving, ticks a dive lasts at
+     * most, and how wide and how high above the prey it circles.
+     */
+    public DragonBreath hunts(int circleTicks, int diveTicks, double circleRadius, double circleHeight) {
+        this.circleTicks = circleTicks;
+        this.diveTicks = diveTicks;
+        this.circleRadius = circleRadius;
+        this.circleHeight = circleHeight;
+        return this;
     }
 
     public void register() {

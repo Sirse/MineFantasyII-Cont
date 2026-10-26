@@ -18,71 +18,71 @@ public class DragonBreed {
      * regions Black: Dire, nether
      */
     public static DragonBreed YOUNGRED = new DragonBreed(0, "dragon_young", "red", "dragon_red", DragonBreath.fire)
-            .setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 15, 200)
+            .setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 15)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 1000, 0.05F).register();
     public static DragonBreed YOUNGWHITE = new DragonBreed(
             0,
             "dragon_young",
             "white",
             "dragon_frost",
-            DragonBreath.frost).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 25, 200)
+            DragonBreath.frost).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 25)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 800, 0.05F).register();
     public static DragonBreed YOUNGGREEN = new DragonBreed(
             0,
             "dragon_young",
             "green",
             "dragon_green",
-            DragonBreath.poison).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 35, 100)
+            DragonBreath.poison).setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 35)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 400, 0.05F).register();
     public static DragonBreed YOUNGASH = new DragonBreed(0, "dragon_young", "ash", "dragon_ash", DragonBreath.ash)
-            .setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 15, 200)
+            .setCombat(ConfigMobs.youngdragonHP, 0.0F, 0F, ConfigMobs.youngdragonMD, 15)
             .setProjectile(ConfigMobs.youngdragonFD, ConfigMobs.youngdragonFT, 200, 0.05F).setBlind().register();
 
     public static DragonBreed RED = new DragonBreed(1, "dragon", "red", "dragon_red", DragonBreath.fire)
-            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 15, 300)
+            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 15)
             .setProjectile(ConfigMobs.dragonFD, ConfigMobs.dragonFT, 500, 0.1F).register();
     public static DragonBreed WHITE = new DragonBreed(1, "dragon", "white", "dragon_frost", DragonBreath.frost)
-            .setCombat(ConfigMobs.youngdragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 25, 300)
+            .setCombat(ConfigMobs.youngdragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 25)
             .setProjectile(ConfigMobs.dragonFD, ConfigMobs.dragonFT, 400, 0.1F).register();
     public static DragonBreed GREEN = new DragonBreed(1, "dragon", "green", "dragon_green", DragonBreath.poison)
-            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 35, 200)
+            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 35)
             .setProjectile(ConfigMobs.dragonFD, ConfigMobs.dragonFT, 300, 0.1F).register();
     public static DragonBreed ASH = new DragonBreed(1, "dragon", "ash", "dragon_ash", DragonBreath.ash)
-            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 15, 300)
+            .setCombat(ConfigMobs.dragonHP, 2.0F, 0F, ConfigMobs.dragonMD, 15)
             .setProjectile(ConfigMobs.dragonFD, ConfigMobs.dragonFT, 150, 0.1F).setBlind().register();
 
     public static DragonBreed REDM = new DragonBreed(2, "dragon_mature", "red", "dragon_red", DragonBreath.fire)
-            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 15, 300)
+            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 15)
             .setProjectile(ConfigMobs.diredragonFD, ConfigMobs.diredragonFT, 400, 0.25F).register();
     public static DragonBreed WHITEM = new DragonBreed(2, "dragon_mature", "white", "dragon_frost", DragonBreath.frost)
-            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 25, 300)
+            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 25)
             .setProjectile(ConfigMobs.diredragonFD, ConfigMobs.diredragonFT, 300, 0.25F).register();
     public static DragonBreed GREENM = new DragonBreed(2, "dragon_mature", "green", "dragon_green", DragonBreath.poison)
-            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 30, 200)
+            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 30)
             .setProjectile(ConfigMobs.diredragonFD, ConfigMobs.diredragonFT, 200, 0.25F).register();
     public static DragonBreed ASHM = new DragonBreed(2, "dragon_mature", "ash", "dragon_ash", DragonBreath.ash)
-            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 15, 300)
+            .setCombat(ConfigMobs.diredragonHP, 2.0F, 1F, ConfigMobs.diredragonMD, 15)
             .setProjectile(ConfigMobs.diredragonFD, ConfigMobs.diredragonFT, 100, 0.25F).setBlind().register();
 
     public static DragonBreed ELDERRED = new DragonBreed(3, "dragon_elder", "red", "dragon_red", DragonBreath.fire)
-            .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15, 300)
+            .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 400, 0.35F).register();
     public static DragonBreed ELDERWHITE = new DragonBreed(
             3,
             "dragon_elder",
             "white",
             "dragon_frost",
-            DragonBreath.frost).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 25, 300)
+            DragonBreath.frost).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 25)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 300, 0.35F).register();
     public static DragonBreed ELDERGREEN = new DragonBreed(
             3,
             "dragon_elder",
             "green",
             "dragon_green",
-            DragonBreath.poison).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 35, 200)
+            DragonBreath.poison).setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 35)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 200, 0.35F).register();
     public static DragonBreed ELDERASH = new DragonBreed(3, "dragon_elder", "ash", "dragon_ash", DragonBreath.ash)
-            .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15, 300)
+            .setCombat(ConfigMobs.elderdragonHP, 2.0F, 2F, ConfigMobs.elderdragonMD, 15)
             .setProjectile(ConfigMobs.elderdragonFD, ConfigMobs.elderdragonFT, 100, 0.35F).setBlind().register();
 
     public static DragonBreed ANCIENT = new DragonBreed(
@@ -90,7 +90,7 @@ public class DragonBreed {
             "dragon_ancient",
             "dire",
             "dragon_ancient",
-            DragonBreath.fire).setCombat(ConfigMobs.ancientdragonHP, 2.0F, 5F, ConfigMobs.ancientdragonMD, 20, 300)
+            DragonBreath.fire).setCombat(ConfigMobs.ancientdragonHP, 2.0F, 5F, ConfigMobs.ancientdragonMD, 20)
             .setProjectile(ConfigMobs.ancientdragonFD, ConfigMobs.ancientdragonFT, 400, 1.0F).register();
     private static Random rand = new Random();
     public int tier = 0;
@@ -103,7 +103,6 @@ public class DragonBreed {
     public float meleeDamage = 8;
     public float fireDamage = 5;
     public float pyro = 0.1F;
-    public int disengageChance = 200;
     public int fireTimer = 50;
     public int coolTimer = 200;
     public int meleeSpeed = 20;
@@ -150,13 +149,11 @@ public class DragonBreed {
         return 0;// Fire
     }
 
-    public DragonBreed setCombat(float health, float DT, float regenRate, float meleeDamage, int meleeSpeed,
-            int disengageChance) {
+    public DragonBreed setCombat(float health, float DT, float regenRate, float meleeDamage, int meleeSpeed) {
         this.health = health;
         this.regenRate = regenRate;
         this.meleeDamage = meleeDamage;
         this.meleeSpeed = meleeSpeed;
-        this.disengageChance = disengageChance;
         this.DT = DT;
         return this;
     }
