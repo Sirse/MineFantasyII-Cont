@@ -66,6 +66,11 @@ public class ModelBigPlateStack extends ModelBase {
         model.rotateAngleZ = z;
     }
 
+    /** The parts in the order a stack fills, for the shared stack geometry. */
+    ModelRenderer[] parts() {
+        return sheet;
+    }
+
     public void render(int stackSize, float f) {
         for (int i = 0; i < stackSize; i++) {
             sheet[i].render(f);

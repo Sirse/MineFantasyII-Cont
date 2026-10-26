@@ -229,7 +229,8 @@ public class TileEntityBigFurnace extends TileEntityStation
             if (plan != null) {
                 canSmelt = true;
 
-                if (progress >= getMaxTime()) {
+                // Payout looks the recipe up afresh, never from the cache
+                if (progress >= getMaxTime() && (plan = freshPlanFor(a, a + 4)) != null) {
                     List<ItemStack> spill = new ArrayList<>();
                     plan.apply(CraftInventory.of(this), spill);
                     for (ItemStack stack : spill) {
@@ -349,9 +350,48 @@ public class TileEntityBigFurnace extends TileEntityStation
      * smelting one item. Null when nothing smelts or the output has no room.
      */
     CraftPlan planFor(int input, int output) {
-        CraftPlan plan = buildPlanFor(input, output);
+        return fits(cachedPlanFor(input, output));
+    }
+
+    /** The same, looked up again now: what a payout uses, so a reload or a changed slot never pays an old plan. */
+    private CraftPlan freshPlanFor(int input, int output) {
+        return fits(buildPlanFor(input, output));
+    }
+
+    private CraftPlan fits(CraftPlan plan) {
         return plan != null && plan.canApplySpilling(CraftInventory.of(this)) ? plan : null;
     }
+
+    /**
+     * The plan for an input slot as last looked up, while the slot holds the same stack, the furnace is the same and
+     * the recipes are the same publication. A furnace asks every tick for each slot, and the lookup is the most of its
+     * work; the cache is still dropped each second, so vanilla smelting changed by a reload is seen soon.
+     */
+    private CraftPlan cachedPlanFor(int input, int output) {
+        if (worldObj == null || output != input + 4) return buildPlanFor(input, output);
+        long now = worldObj.getTotalWorldTime();
+        long generation = MFRecipes.BIG_FURNACE.published().getGeneration();
+        if (planCacheTime[input] < 0 || now - planCacheTime[input] >= PLAN_CACHE_TICKS
+                || now < planCacheTime[input]
+                || planCacheGeneration[input] != generation
+                || planCacheBuilt[input] != built
+                || !ItemStack.areItemStacksEqual(planCacheInput[input], inv[input])) {
+            planCache[input] = buildPlanFor(input, output);
+            planCacheInput[input] = inv[input] == null ? null : inv[input].copy();
+            planCacheGeneration[input] = generation;
+            planCacheBuilt[input] = built;
+            planCacheTime[input] = now;
+        }
+        return planCache[input];
+    }
+
+    /** Ticks a looked-up plan is kept at most. */
+    private static final int PLAN_CACHE_TICKS = 20;
+    private final CraftPlan[] planCache = new CraftPlan[4];
+    private final ItemStack[] planCacheInput = new ItemStack[4];
+    private final long[] planCacheGeneration = new long[4];
+    private final boolean[] planCacheBuilt = new boolean[4];
+    private final long[] planCacheTime = { -1L, -1L, -1L, -1L };
 
     private CraftPlan buildPlanFor(int input, int output) {
         ItemStack in = inv[input];

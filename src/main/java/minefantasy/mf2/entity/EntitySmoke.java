@@ -32,6 +32,8 @@ public class EntitySmoke extends Entity {
     private int field_145794_g = -1;
     private Block field_145796_h;
     private boolean inGround;
+    /** Ticks a puff lasts at most, wherever it drifts. */
+    static final int MAX_AGE = 200;
     private int ticksAlive;
     private int ticksInAir;
 
@@ -95,8 +97,10 @@ public class EntitySmoke extends Entity {
      * Called to update the entity's position/logic.
      */
     public void onUpdate() {
-        if (!this.worldObj.isRemote && (this.shootingEntity != null && this.shootingEntity.isDead
-                || !this.worldObj.blockExists((int) this.posX, (int) this.posY, (int) this.posZ))) {
+        // Under an open sky smoke would rise for a thousand ticks before leaving the world; it thins out long before
+        if (!this.worldObj.isRemote
+                && (this.shootingEntity != null && this.shootingEntity.isDead || this.ticksExisted > MAX_AGE
+                        || !this.worldObj.blockExists((int) this.posX, (int) this.posY, (int) this.posZ))) {
             this.setDead();
         } else {
             super.onUpdate();

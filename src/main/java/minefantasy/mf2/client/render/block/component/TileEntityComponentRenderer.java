@@ -1,7 +1,10 @@
 package minefantasy.mf2.client.render.block.component;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.resources.IReloadableResourceManager;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
@@ -18,6 +21,8 @@ public class TileEntityComponentRenderer extends TileEntitySpecialRenderer {
     private ModelPotStack pots;
     private ModelBigPlateStack bigplates;
     private ModelJugStack jugs;
+    /** Stacks of each kind and size, up to the largest pile a component makes. */
+    private final ComponentStackMesh mesh = new ComponentStackMesh(KINDS.length, 64);
 
     public TileEntityComponentRenderer() {
         this.bars = new ModelBarStack();
@@ -26,6 +31,11 @@ public class TileEntityComponentRenderer extends TileEntitySpecialRenderer {
         this.pots = new ModelPotStack();
         this.bigplates = new ModelBigPlateStack();
         this.jugs = new ModelJugStack();
+        // A reload of the renderer's resources may follow a reset of OpenGL state; the stacks are compiled again
+        IResourceManager resources = Minecraft.getMinecraft().getResourceManager();
+        if (resources instanceof IReloadableResourceManager) {
+            ((IReloadableResourceManager) resources).registerReloadListener(manager -> mesh.release());
+        }
     }
 
     public void renderModelAt(TileEntityComponent tile, double d, double d1, double d2, float f) {
@@ -63,24 +73,32 @@ public class TileEntityComponentRenderer extends TileEntitySpecialRenderer {
 
     }
 
+    /** The kinds of stack, in the order of {@link #parts}. */
+    private static final String[] KINDS = { "bar", "sheet", "plank", "pot", "bigplate", "jug" };
+
     private void render(String type, int stackSize, float f) {
-        if (type.equalsIgnoreCase("bar")) {
-            bars.render(stackSize, f);
+        for (int kind = 0; kind < KINDS.length; kind++) {
+            if (KINDS[kind].equalsIgnoreCase(type)) {
+                mesh.draw(kind, parts(kind), stackSize, f);
+                return;
+            }
         }
-        if (type.equalsIgnoreCase("sheet")) {
-            sheets.render(stackSize, f);
-        }
-        if (type.equalsIgnoreCase("plank")) {
-            planks.render(stackSize, f);
-        }
-        if (type.equalsIgnoreCase("pot")) {
-            pots.render(stackSize, f);
-        }
-        if (type.equalsIgnoreCase("bigplate")) {
-            bigplates.render(stackSize, f);
-        }
-        if (type.equalsIgnoreCase("jug")) {
-            jugs.render(stackSize, f);
+    }
+
+    private ModelRenderer[] parts(int kind) {
+        switch (kind) {
+            case 0:
+                return bars.parts();
+            case 1:
+                return sheets.parts();
+            case 2:
+                return planks.parts();
+            case 3:
+                return pots.parts();
+            case 4:
+                return bigplates.parts();
+            default:
+                return jugs.parts();
         }
     }
 

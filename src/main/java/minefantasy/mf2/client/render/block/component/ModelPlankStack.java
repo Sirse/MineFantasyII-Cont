@@ -37,6 +37,11 @@ public class ModelPlankStack extends ModelBase {
         model.rotateAngleZ = z;
     }
 
+    /** The parts in the order a stack fills, for the shared stack geometry. */
+    ModelRenderer[] parts() {
+        return plank;
+    }
+
     public void render(int stackSize, float f) {
         for (int i = 0; i < stackSize; i++) {
             plank[i].render(f);
