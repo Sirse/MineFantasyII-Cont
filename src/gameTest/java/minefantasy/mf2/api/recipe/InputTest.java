@@ -273,4 +273,19 @@ public class InputTest {
         }
         helper.succeed();
     }
+
+    @GameTest
+    public static void inputExplainsWhyAStackDoesNotPay(GameTestHelper helper) throws Exception {
+        useOreStub();
+        try {
+            Input four = Input.of(ore).amount(4);
+            assertNull(four.explain(new ItemStack(ore, 4)));
+            assertEquals("wrong_item", four.explain(new ItemStack(bar, 4)).getId());
+            assertEquals(CheckResult.Reason.of("amount", 2, 4), four.explain(new ItemStack(ore, 2)));
+            assertEquals("condition", Input.of(ore).where(s -> false, "never").explain(new ItemStack(ore)).getId());
+        } finally {
+            resetOres();
+        }
+        helper.succeed();
+    }
 }

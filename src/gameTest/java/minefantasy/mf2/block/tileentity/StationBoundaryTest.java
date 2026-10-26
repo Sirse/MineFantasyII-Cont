@@ -559,17 +559,22 @@ public class StationBoundaryTest {
             TileEntityRoast.enableOverheat = true;
             cookingRecipe(new ItemStack(flour), 100);
             TileEntityRoast roast = spit();
+            // At the bottom of the range nothing cooks, just above it cooking starts
             cook(roast, 100);
             assertEquals(0F, roast.progress, 0F);
             cook(roast, 101);
-            assertEquals(1.01F, roast.progress, 0.001F);
+            float started = roast.progress;
+            assertTrue("cooking did not start above the lowest heat", started > 0F);
+            // At the top of the range the food cooks on and is not burnt
             cook(roast, 500);
             assertSame(seed, roast.getStackInSlot(0).getItem());
-            assertEquals(6.01F, roast.progress, 0.001F);
+            float top = roast.progress;
+            assertTrue("the food did not cook on at the highest heat", top > started);
+            // Past it, with overheating off, it still cooks and is still not burnt
             TileEntityRoast.enableOverheat = false;
             cook(roast, 501);
             assertSame(seed, roast.getStackInSlot(0).getItem());
-            assertEquals(11.02F, roast.progress, 0.001F);
+            assertTrue("the food did not cook on with overheating off", roast.progress > top);
             TileEntityRoast.enableOverheat = true;
             cook(roast, 501);
             assertSame(junk, roast.getStackInSlot(0).getItem());

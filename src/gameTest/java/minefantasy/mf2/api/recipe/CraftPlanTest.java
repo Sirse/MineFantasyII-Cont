@@ -4,6 +4,7 @@ import static minefantasy.mf2.gametest.Assert.*;
 import static minefantasy.mf2.gametest.TestItems.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.minecraft.item.Item;
@@ -290,4 +291,23 @@ public class CraftPlanTest {
     }
 
     // endregion
+
+    @GameTest
+    public static void stationPlacedProductIsNotPaidOutAndReturnsSpill(GameTestHelper helper) throws Exception {
+        noOreDictionary();
+        try {
+            ItemStack[] slots = { new ItemStack(ore, 2), new ItemStack(bar, 64) };
+            CraftPlan plan = CraftPlan.builder(ID, 1, 1)
+                    .consume(0, slots[0], 2, new ItemStack(ore), s -> s.getItem() == ore).product(new ItemStack(ore))
+                    .build();
+            List<ItemStack> spill = new java.util.ArrayList<>();
+            assertTrue(plan.apply(CraftInventory.of(slots), spill));
+            assertNull(slots[0]);
+            assertEquals(64, slots[1].stackSize);
+            assertEquals(new ItemStack(ore).getItem(), plan.getProduct().getItem());
+        } finally {
+            restoreOreDictionary();
+        }
+        helper.succeed();
+    }
 }

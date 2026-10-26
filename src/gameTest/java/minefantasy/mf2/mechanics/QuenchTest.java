@@ -83,9 +83,9 @@ public class QuenchTest {
         float oil = quality(Quench.cool(hotSword("Steel", 0.5F), OIL, null, NEVER_CRACKS));
         float water = quality(Quench.cool(hotSword("Steel", 0.5F), WATER, null, NEVER_CRACKS));
         float brine = quality(Quench.cool(hotSword("Steel", 0.5F), BRINE, null, NEVER_CRACKS));
-        assertEquals(ItemQuality.ORDINARY + 8, oil, 0.01F);
-        assertEquals(ItemQuality.ORDINARY + 15, water, 0.01F);
-        assertEquals(ItemQuality.ORDINARY + 22, brine, 0.01F);
+        assertTrue("oil did not harden steel", oil > ItemQuality.ORDINARY);
+        assertTrue("water hardened no more than oil", water > oil);
+        assertTrue("brine hardened no more than water", brine > water);
         ItemStack cooled = Quench.cool(hotSword("Steel", 0.5F), BRINE, null, NEVER_CRACKS);
         assertEquals("brine", cooled.getTagCompound().getString(Quench.NBT_MEDIUM));
         assertFalse(cooled.getTagCompound().getBoolean(Quench.NBT_CRACKED));

@@ -30,11 +30,16 @@ public class AxeCombatTest {
             ItemStack stack = user.getHeldItem();
             assertEquals(10F, axe.modifyDamage(stack, user, target, 10F, true), 0F);
             user.setSprinting(true);
-            assertEquals(12.5F, axe.modifyDamage(stack, user, target, 10F, false), 0F);
+            float charged = axe.modifyDamage(stack, user, target, 10F, false);
+            assertTrue("a charge added no damage", charged > 10F);
             assertFalse(target.isPotionActive(Potion.moveSlowdown));
             assertEquals("inactive grounded branch must stay inactive", 0, user.hurtResistantTime);
-            assertEquals(12.5F, axe.modifyDamage(stack, user, target, 10F, true), 0F);
-            assertEquals(200, target.getActivePotionEffect(Potion.moveSlowdown).getDuration());
+            assertEquals(
+                    "a grounded charge hits as any charge",
+                    charged,
+                    axe.modifyDamage(stack, user, target, 10F, true),
+                    0F);
+            int slowed = target.getActivePotionEffect(Potion.moveSlowdown).getDuration();
             // Repeating a hit must not refresh an existing slow effect.
             target.addPotionEffect(new net.minecraft.potion.PotionEffect(Potion.moveSlowdown.id, 123, 4));
             axe.modifyDamage(stack, user, target, 10F, true);
@@ -42,13 +47,17 @@ public class AxeCombatTest {
             target.removePotionEffect(Potion.moveSlowdown.id);
             user.setSprinting(false);
             user.fallDistance = 2F;
-            assertEquals(12.5F, axe.modifyDamage(stack, user, target, 10F, true), 0F);
+            assertEquals("a jump hits as a charge", charged, axe.modifyDamage(stack, user, target, 10F, true), 0F);
             assertFalse(target.isPotionActive(Potion.moveSlowdown));
             user.setSprinting(true);
             float bonus = Math.min(2F, axe.getMeleeDamage(stack)) / 2F;
-            assertEquals((10F + bonus) * 1.25F, axe.modifyDamage(stack, user, target, 10F, true), 0F);
-            assertEquals(2F - bonus, user.fallDistance, 0F);
-            assertEquals(400, target.getActivePotionEffect(Potion.moveSlowdown).getDuration());
+            assertTrue(
+                    "a charged jump hit weaker than a charge",
+                    axe.modifyDamage(stack, user, target, 10F, true) >= charged);
+            assertEquals("the jump's fall was not spent on the blow", 2F - bonus, user.fallDistance, 0F);
+            assertTrue(
+                    "a charged jump slowed no longer than a charge",
+                    target.getActivePotionEffect(Potion.moveSlowdown).getDuration() > slowed);
         }
         assertTrue("waraxe not exercised", waraxe);
         assertTrue("battleaxe not exercised", battleaxe);

@@ -8,9 +8,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import net.minecraft.item.ItemStack;
+
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
+
+import minefantasy.mf2.api.cooking.CookRecipe;
+import minefantasy.mf2.api.crafting.MFRecipes;
+import minefantasy.mf2.api.crafting.NativeRecipes;
 
 @GameTestHolder("minefantasy2")
 public class RecipeRegistryTest {
@@ -439,6 +445,194 @@ public class RecipeRegistryTest {
             } catch (IllegalArgumentException expected) {}
         } finally {
 
+        }
+        helper.succeed();
+    }
+
+    // endregion
+
+    // region registration and lookup against a quern
+
+    private static RecipeId quernId(String path) {
+        return RecipeId.of("test", "quern/" + path);
+    }
+
+    private static void noOreNames() {
+        OreNames.set(new OreNames() {
+
+            @Override
+            public List<String> namesOf(ItemStack stack) {
+                return Collections.emptyList();
+            }
+
+            @Override
+            public List<ItemStack> stacksOf(String name) {
+                return Collections.emptyList();
+            }
+        });
+    }
+
+    private static ProcessRecipe grind(int bars) {
+        return ProcessRecipe.of(Input.of(ore), new ItemStack(bar, bars));
+    }
+
+    private static void assertRefused(Runnable register, String who, String why) {
+        try {
+            register.run();
+            fail("accepted " + who);
+        } catch (RecipeRegistrationException e) {
+            assertTrue(e.getMessage(), e.getMessage().contains(who) && e.getMessage().contains(why));
+        }
+    }
+
+    @GameTest
+    public static void removeWhereSeesStagedAddsAndReplaces(GameTestHelper helper) throws Exception {
+        noOreNames();
+        try {
+            RecipeRegistries registries = new RecipeRegistries();
+            RecipeRegistry<String> quern = registries.create("quern", r -> null);
+            quern.add(quernId("old"), "old", RecipeSource.NATIVE);
+            try (RecipeTransaction tx = registries.begin(RecipeSource.NATIVE)) {
+                tx.add(quern, quernId("new"), "new", 0);
+                tx.replace(quern, quernId("old"), "replaced", 0);
+                List<RecipeId> removed = tx.removeWhere(quern, e -> !e.getRecipe().equals("old"));
+                assertEquals(2, removed.size());
+                tx.commit();
+            }
+            registries.finishLoading();
+            assertEquals(0, quern.published().size());
+        } finally {
+            OreNames.set(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void lookupSkipsRecipesTheStackCannotPayFor(GameTestHelper helper) throws Exception {
+        noOreNames();
+        try {
+            RecipeRegistries registries = new RecipeRegistries();
+            RecipeRegistry<ProcessRecipe> quern = registries.create("quern", ProcessRecipe::indexKeys);
+            quern.add(
+                    quernId("four"),
+                    ProcessRecipe.of(Input.of(ore).amount(4), new ItemStack(bar, 2)),
+                    RecipeSource.NATIVE,
+                    5);
+            quern.add(quernId("one"), ProcessRecipe.of(Input.of(ore), new ItemStack(bar)), RecipeSource.NATIVE);
+            registries.finishLoading();
+
+            assertEquals("quern/one", MFRecipes.find(quern, new ItemStack(ore, 1)).getId().getPath());
+            assertEquals("quern/four", MFRecipes.find(quern, new ItemStack(ore, 4)).getId().getPath());
+            assertTrue(MFRecipes.accepts(quern, new ItemStack(ore, 1)));
+            assertNull(MFRecipes.find(quern, new ItemStack(bar, 1)));
+        } finally {
+            OreNames.set(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void registryRefusesInputsItsStationWouldIgnore(GameTestHelper helper) throws Exception {
+        noOreNames();
+        try {
+            RecipeRegistries registries = new RecipeRegistries();
+            RecipeRegistry<ProcessRecipe> rack = registries
+                    .create("quern", ProcessRecipe::indexKeys, InputSupport.ONE_CONSUMED.of(ProcessRecipe::getInput));
+            rack.add(quernId("one"), ProcessRecipe.of(Input.of(ore), new ItemStack(bar)), RecipeSource.NATIVE);
+            for (Input refused : new Input[] { Input.of(ore).amount(2), Input.of(ore).usage(Usage.CATALYST) }) {
+                try {
+                    rack.add(quernId("bad"), ProcessRecipe.of(refused, new ItemStack(bar)), RecipeSource.NATIVE);
+                    fail("accepted " + refused);
+                } catch (RecipeRegistrationException expected) {
+                    assertTrue(expected.getMessage().contains("refused"));
+                }
+            }
+            assertFalse(rack.containsWorking(quernId("bad")));
+        } finally {
+            OreNames.set(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void nativeIdsDoNotDependOnRegistrationOrder(GameTestHelper helper) throws Exception {
+        noOreNames();
+        try {
+            for (boolean namedFirst : new boolean[] { false, true }) {
+                RecipeRegistry<ProcessRecipe> quern = new RecipeRegistries().create("quern", ProcessRecipe::indexKeys);
+                RecipeId plain = null;
+                RecipeId named = null;
+                for (int step = 0; step < 2; step++) {
+                    if ((step == 0) == namedFirst) {
+                        try (NativeRecipes.Variant v = NativeRecipes.variant("Fine Grind")) {
+                            named = NativeRecipes.addNative(quern, new ItemStack(ore), grind(2)).getId();
+                        }
+                    } else {
+                        plain = NativeRecipes.addNative(quern, new ItemStack(ore), grind(1)).getId();
+                    }
+                }
+                assertEquals("quern/minefantasy2tests.ore.0", plain.getPath());
+                assertEquals("quern/minefantasy2tests.ore.0.fine_grind", named.getPath());
+            }
+        } finally {
+            OreNames.set(null);
+        }
+        helper.succeed();
+    }
+
+    @GameTest
+    public static void registrationRefusesBadValuesNamingIdAndSource(GameTestHelper helper) throws Exception {
+        noOreNames();
+        try {
+            RecipeRegistries registries = new RecipeRegistries();
+            RecipeRegistry<ProcessRecipe> quern = registries.create("quern", ProcessRecipe::indexKeys);
+            RecipeRegistry<minefantasy.mf2.api.cooking.CookRecipe> cooking = registries
+                    .create("cooking", minefantasy.mf2.api.cooking.CookRecipe::indexKeys);
+            RecipeRegistry<Object> carpenter = registries.create("carpenter", r -> null);
+
+            assertRefused(
+                    () -> quern.add(
+                            quernId("unknown"),
+                            ProcessRecipe.of(Input.of(ore).material("unobtainium"), new ItemStack(bar)),
+                            RecipeSource.script("test.zs")),
+                    "test:quern/unknown (SCRIPT(test.zs))",
+                    "unknown material 'unobtainium'");
+            assertRefused(
+                    () -> cooking.add(
+                            RecipeId.of("test", "cooking/cold"),
+                            CookRecipe.builder(Input.of(ore), new ItemStack(bar)).temperature(300, 100).time(20)
+                                    .burnTime(0).canBurn(false).build(),
+                            RecipeSource.NATIVE),
+                    "test:cooking/cold (NATIVE(minefantasy2))",
+                    "temperatures must rise");
+            assertRefused(
+                    () -> carpenter.add(
+                            RecipeId.of("test", "carpenter/wide"),
+                            minefantasy.mf2.api.crafting.GridRecipe.shaped(
+                                    minefantasy.mf2.api.crafting.GridRecipe.Grid.BENCH,
+                                    5,
+                                    1,
+                                    new ItemStack[] { new ItemStack(ore), null, null, null, new ItemStack(ore) },
+                                    null,
+                                    new ItemStack(bar)).time(10).build(),
+                            RecipeSource.NATIVE),
+                    "test:carpenter/wide",
+                    "does not fit the 4x4 grid");
+            assertRefused(
+                    () -> carpenter.add(
+                            RecipeId.of("test", "carpenter/instant"),
+                            minefantasy.mf2.api.crafting.GridRecipe.shaped(
+                                    minefantasy.mf2.api.crafting.GridRecipe.Grid.BENCH,
+                                    1,
+                                    1,
+                                    new ItemStack[] { new ItemStack(ore) },
+                                    null,
+                                    new ItemStack(bar)).time(0).build(),
+                            RecipeSource.NATIVE),
+                    "test:carpenter/instant",
+                    "time must be positive");
+        } finally {
+            OreNames.set(null);
         }
         helper.succeed();
     }
