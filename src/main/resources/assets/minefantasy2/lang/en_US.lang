@@ -1339,17 +1339,17 @@ knowledge.dragons.combat=$hCombat-$r^Dragons may be fast and have the sky advant
 knowledge.gettingStarted=Getting Started
 knowledge.gettingStarted.desc=From the ground-up
 
-knowledge.gettingStarted.1=This is where you start working on MineFantasy. At this stage, it's recommended you at least have a hole to live in and somewhere to build, as well you should have a supply of wood, coal, copper, stone and hide. With these resources you can begin. To start in your world you will need to ready the three main processes.
-knowledge.gettingStarted.2=Crafting blocks require some interaction on your part to function. First: Set up the recipe as instructed (heating items for anvils). Then, select the correct tool with appropriate tier (e.g. knives, hammers, etc). You will then need to click the top of the block with the item, keeping hits about a second apart until the process concludes.
+knowledge.gettingStarted.1=This is where your path in MineFantasy begins. The first night is the hardest, so see to the simple things first: shelter, food and fire. Gather wood and stone and find some meat; animals now leave raw hides instead of leather, so keep them for later. Copper, coal and limestone are needed a little later, once you come to forging.
+knowledge.gettingStarted.2=Crafting blocks need your hand in the work. Lay out the recipe as it asks (pieces for the anvil must be heated). Then take the right tool of a high enough tier (a knife, a hammer and so on) and strike the top of the block about once a second until the work is done.
 
-knowledge.gettingStarted.hcc=$hHardcore Crafting-$r^Hardcore crafting appears to be active. Regular tools are less effective and it's recommended that primitive tools are crafted. See the Artisanry section for all the tools.^To start off: Punch some stone... no really, break stone bare-handed (meaning no item held) and Sharp Rocks will be dropped.^Use these to break some leaves for vines and sticks, and logs for wood.
+knowledge.gettingStarted.hcc=$hStone Age$r^Hardcore Crafting is active: ordinary tools work worse, so start with primitive ones. It can be turned off in the mod's config.^To begin, break stone bare-handed (holding nothing) and Sharp Rocks will drop. They can also be made from dirt on the carpenter bench.^Use the Sharp Rocks on leaves for vines and sticks. From Sharp Rocks, vines and sticks the carpenter bench makes a stone pick, axe, knife and hammer by hand.
 
-knowledge.gettingStarted.fire=$hFirepit-$r^Before you get to work, you need a fire, one of these should provide flame and a place to cook if you have meat.^Right-click with timber to add fuel, and firestarter to light.
-knowledge.gettingStarted.food=Also place one of these stove tops on top of the fire. You then need to right-click raw food (mainly meat) to place them on the plate.
+knowledge.gettingStarted.fire=$hFirepit$r^First of all, make a fire: it gives light and a place to cook. A firepit is made in an ordinary crafting table from Timber and two sticks.^Right-click with Timber to add fuel, then light it with Dry Rocks or a firestarter.
+knowledge.gettingStarted.food=Set a stove top (Timber and cobblestone) or a stone oven over the fire and right-click raw meat onto it. Mind the fire: too much heat burns the food.^A fed smith works better, enjoy your meal!
 
-knowledge.gettingStarted.carpenter=$hCarpenter Bench-$r^The carpenter bench is a basic crafting table for a selection of recipes. The tools needed for this vary and some recipes require bare fists. See the crafting tools section for more information on tools.
+knowledge.gettingStarted.carpenter=$hCarpenter Bench$r^The main workbench for your handiwork. Some recipes are made bare-handed, others need tools: a knife, a hammer, a saw. See the crafting tools section for more on tools.
 
-knowledge.gettingStarted.tanning=$hTanning-$r^By now you likely would have gathered some hide you can't use yet. Tanning is a simple method of creating leather from hide.^To start off, build a shabby tanning rack and a stone knife. These tools are of poor quality and should be upgraded when convenient.
+knowledge.gettingStarted.tanning=$hHides and Tanning$r^A raw hide must first be cleaned with Flux: combine them in an ordinary crafting table. Flux is made from Limestone on the anvil, so your first leather comes once you have taken up forging; until then, keep your hides.^A cleaned hide is tanned on a tanning rack. A Shabby Tanning Rack and a stone knife will do to start; replace them with better ones later.
 	
 knowledge.gettingStarted.forging=$hForging-$r^Forging is the main method of crafting. Pretty much every tool and metal object is made through this process. Start off by making a stone forge, anvil and tools. Place the anvil near the forge and some water. The artisanry tab has an entry of how forging works. Be sure to make a basic firestarter (Dry rocks-Craft-Tools), and wear an apron too!
 

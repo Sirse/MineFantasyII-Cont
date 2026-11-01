@@ -25,6 +25,10 @@ public class KnowledgePageRegistry {
         ItemStack black = ComponentListMF.bar("BlackSteel");
         ItemStack red = ComponentListMF.bar("RedSteel");
         ItemStack blue = ComponentListMF.bar("BlueSteel");
+        // What to gather and how the stations work, then the Stone Age, then fire and food for the first night
+        KnowledgeListMF.gettingStarted.addPages(
+                new EntryPageText("knowledge.gettingStarted.1"),
+                new EntryPageText("knowledge.gettingStarted.2"));
         if (ConfigHardcore.HCCallowRocks) {
             KnowledgeListMF.gettingStarted.addPages(
                     new EntryPageText("knowledge.gettingStarted.hcc"),
@@ -37,13 +41,7 @@ public class KnowledgePageRegistry {
                     new EntryPageRecipeCarpenter(KnowledgeListMF.stoneSpearR),
                     new EntryPageRecipeCarpenter(KnowledgeListMF.stoneAxeR));
         }
-        KnowledgeListMF.gettingStarted.addPages(
-                new EntryPageText("knowledge.gettingStarted.1"),
-                new EntryPageText("knowledge.gettingStarted.2"));
 
-        KnowledgeListMF.gettingStarted.addPages(
-                new EntryPageText("knowledge.gettingStarted.carpenter"),
-                new EntryPageRecipeBase(KnowledgeListMF.carpenterRecipe));
         KnowledgeListMF.gettingStarted.addPages(
                 new EntryPageText("knowledge.gettingStarted.fire"),
                 new EntryPageRecipeBase(KnowledgeListMF.firepitRecipe),
@@ -52,6 +50,9 @@ public class KnowledgePageRegistry {
                 new EntryPageText("knowledge.gettingStarted.food"),
                 new EntryPageRecipeBase(KnowledgeListMF.cooktopRecipe),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.stoneovenRecipe));
+        KnowledgeListMF.gettingStarted.addPages(
+                new EntryPageText("knowledge.gettingStarted.carpenter"),
+                new EntryPageRecipeBase(KnowledgeListMF.carpenterRecipe));
         KnowledgeListMF.gettingStarted.addPages(
                 new EntryPageText("knowledge.gettingStarted.tanning"),
                 new EntryPageRecipeCarpenter(KnowledgeListMF.tannerRecipe),
