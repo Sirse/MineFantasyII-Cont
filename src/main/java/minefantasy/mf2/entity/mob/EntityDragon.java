@@ -463,11 +463,18 @@ public class EntityDragon extends EntityFlyingMF
                     this.posX + (this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F,
                     this.posY + (this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F,
                     this.posZ + (this.rand.nextFloat() * 2.0F - 1.0F) * 16.0F);
+            // The course is to the new waypoint, not the one just left
+            dx = this.waypointX - this.posX;
+            dy = this.waypointY - this.posY;
+            dz = this.waypointZ - this.posZ;
+            distance = dx * dx + dy * dy + dz * dz;
         }
         if (this.detourTicks > 0) --this.detourTicks;
         if (this.courseChangeCooldown-- > 0) return;
         this.courseChangeCooldown += this.rand.nextInt(5) + 2;
         distance = MathHelper.sqrt_double(distance);
+        // Already there: no course to push along
+        if (distance < 1.0E-3D) return;
         if (this.isCourseTraversable(this.waypointX, this.waypointY, this.waypointZ, distance)) {
             double push = 0.5D * getFlightSpeed() / distance;
             this.motionX += dx * push;
@@ -481,17 +488,20 @@ public class EntityDragon extends EntityFlyingMF
 
     /** Lets a dead target go, and with none looks for the nearest player it can hunt, then anything, now and then. */
     private void findTarget() {
-        if (targetedEntity != null && targetedEntity.isDead) {
+        Entity target = targetedEntity;
+        // A target gone, in another world or past the hunt's range is let go, so another can be found
+        if (target != null && (!target.isEntityAlive() || target.worldObj != worldObj
+                || target.getDistanceSqToEntity(this) >= HUNT_RANGE * HUNT_RANGE)) {
             targetedEntity = null;
         }
-        if (targetedEntity == null) {
+        // Looked for only now and then: the nearest player first, then anything it may hunt
+        if (targetedEntity == null && --this.targetScanCooldown <= 0) {
+            this.targetScanCooldown = 20;
             EntityPlayer closest = this.worldObj.getClosestVulnerablePlayerToEntity(this, 100.0D);
             if (closest != null && canAttackEntity(closest)) {
                 targetedEntity = closest;
+                return;
             }
-        }
-        if (targetedEntity == null && --this.targetScanCooldown <= 0) {
-            this.targetScanCooldown = 20;
             this.setEntityToAttack(EntityPlayer.class);
             if (ConfigMobs.dragonKillNPC && this.targetedEntity == null) {
                 this.setEntityToAttack(EntityLiving.class);
@@ -678,7 +688,10 @@ public class EntityDragon extends EntityFlyingMF
 
     /** Whether a dragon would ever hunt this: not another dragon, its rider, a creative player or a spectator. */
     private boolean isPrey(Entity target) {
-        if (target == this || target instanceof EntityDragon || target == this.riddenByEntity) {
+        if (target == null || target == this || target instanceof EntityDragon || target == this.riddenByEntity) {
+            return false;
+        }
+        if (!target.isEntityAlive() || target.worldObj != worldObj) {
             return false;
         }
         if (target instanceof EntityPlayer && ((EntityPlayer) target).capabilities.isCreativeMode) {
@@ -713,7 +726,7 @@ public class EntityDragon extends EntityFlyingMF
         Entity attacker = source.getEntity();
         if (hurt && attacker != null
                 && isPrey(attacker)
-                && threats.note(attacker, before - getHealth(), source.isProjectile(), targetedEntity)
+                && threats.note(attacker, before - getHealth(), source.isProjectile(), targetedEntity, getMaxHealth())
                 && getDisengageTime() <= 0) {
             setTarget(attacker);
         }

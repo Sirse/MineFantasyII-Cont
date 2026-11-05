@@ -110,7 +110,7 @@ public class WorldGenStructures {
 
     private static void generateAncientAlter(Random seed, int chunkX, int chunkZ, World world) {
         int spawnZ = world.getSpawnPoint().posZ;
-        int spawnChunkZ = (int) (spawnZ / 16F);
+        int spawnChunkZ = spawnZ >> 4;
 
         if (chunkZ == spawnChunkZ) {
             int x = (16 * chunkX);

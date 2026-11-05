@@ -143,7 +143,7 @@ public class WorldGenBiological {
     }
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Block neighbour) {
-        return world.getBlock(x - 1, y, z) == neighbour || world.getBlock(+1, y, z) == neighbour
+        return world.getBlock(x - 1, y, z) == neighbour || world.getBlock(x + 1, y, z) == neighbour
                 || world.getBlock(x, y - 1, z) == neighbour
                 || world.getBlock(x, y + 1, z) == neighbour
                 || world.getBlock(x, y, z - 1) == neighbour
@@ -152,7 +152,7 @@ public class WorldGenBiological {
 
     private static boolean isNeibourNear(World world, int x, int y, int z, Material neighbour) {
         return world.getBlock(x - 1, y, z).getMaterial() == neighbour
-                || world.getBlock(+1, y, z).getMaterial() == neighbour
+                || world.getBlock(x + 1, y, z).getMaterial() == neighbour
                 || world.getBlock(x, y - 1, z).getMaterial() == neighbour
                 || world.getBlock(x, y + 1, z).getMaterial() == neighbour
                 || world.getBlock(x, y, z - 1).getMaterial() == neighbour

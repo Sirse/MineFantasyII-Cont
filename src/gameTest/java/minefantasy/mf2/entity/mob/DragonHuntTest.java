@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.WorldServer;
 
@@ -23,6 +24,7 @@ import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 import minefantasy.mf2.entity.EntityDragonBreath;
 import minefantasy.mf2.gametest.Difficulty;
 import minefantasy.mf2.gametest.Players;
+import minefantasy.mf2.mechanics.EventManagerMF;
 
 /** A dragon's hunt goes as it should: it bites, flies, breaks off and comes back without the faults it once had. */
 @GameTestHolder("minefantasy2")
@@ -277,5 +279,32 @@ public class DragonHuntTest {
             prey.motionX = prey.motionY = prey.motionZ = 0.0D;
             return breaths[0] >= 40;
         });
+    }
+
+    /**
+     * A target yet to strike holds the dragon against a scratch from another, but not against blows that clearly
+     * outweigh it.
+     */
+    @GameTest
+    public static void aScratchDoesNotDrawTheDragonOffItsTarget(GameTestHelper helper) {
+        Difficulty.hold(helper);
+        ground(helper);
+        TestPos at = helper.absolute(0, 1, 0);
+        EntityZombie hunted = prey(helper, at.x() + 0.5D, at.y(), at.z() + 8.5D);
+        EntityZombie other = prey(helper, at.x() + 4.5D, at.y(), at.z() + 8.5D);
+        EntityDragon dragon = dragon(helper, hunted, at.x() + 0.5D, at.y(), at.z() + 12.5D, false);
+        // A young dragon: the target holds as 5% of 60, so a turn takes more than 4.5 of harm
+        dragon.attackEntityFrom(DamageSource.causeMobDamage(other), 1.0F);
+        assertTrue("a scratch drew the dragon off its target", dragon.getTarget() == hunted);
+        // Its armour takes part of each blow: struck until the harm done clearly outweighs the hold
+        float start = dragon.getHealth();
+        for (int i = 0; i < 10 && start - dragon.getHealth() <= 6.0F; i++) {
+            dragon.hurtResistantTime = 0;
+            EventManagerMF.setHitTime(other, 0);
+            dragon.attackEntityFrom(DamageSource.causeMobDamage(other), 4.0F);
+        }
+        assertTrue("the blows did no harm: " + (start - dragon.getHealth()), start - dragon.getHealth() > 6.0F);
+        assertTrue("blows clearly outweighing the target did not draw the dragon", dragon.getTarget() == other);
+        helper.succeed();
     }
 }
