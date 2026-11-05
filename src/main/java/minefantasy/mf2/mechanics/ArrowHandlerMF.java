@@ -119,7 +119,7 @@ public class ArrowHandlerMF {
         if (AmmoMechanicsMF.handlers != null && AmmoMechanicsMF.handlers.size() > 0) {
             for (int a = 0; a < AmmoMechanicsMF.handlers.size(); a++) {
                 // If the Arrow handler succeeds at firing an arrow
-                if (AmmoMechanicsMF.handlers.get(a).onFireArrow(world, arrow, bow, user, charge, creative)) {
+                if (AmmoMechanicsMF.handlers.get(a).onFireArrow(world, arrow, bow, user, charge, infinite)) {
                     fired = true;
                     if (!user.capabilities.isCreativeMode) {
                         bow.damageItem(1, user);

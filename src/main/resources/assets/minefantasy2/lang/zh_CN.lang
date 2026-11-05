@@ -57,6 +57,7 @@ vehicle.noArmour=你的衣服磨损的太厉害了，不能再穿这个。
 vehicle.tooBigArmour=你穿的衣服太厚了，挤不进这套装甲。
 
 research.noskill=你也许能从中学到什么，如果你更精于此道的话。
+research.studiedByAnother=有人正在研究这个。请等对方离开一分钟后再来。
 research.null=这里面已经没有可学的了。
 
 research.addArtefact=习得 %1$s 的知识 (%2$s/%3$s)

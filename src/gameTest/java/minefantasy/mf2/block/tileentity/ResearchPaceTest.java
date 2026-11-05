@@ -7,10 +7,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.FakePlayer;
 
 import com.gtnewhorizons.horizonqa.api.GameTestHelper;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
+
+import minefantasy.mf2.block.list.BlockListMF;
+import minefantasy.mf2.gametest.Modders;
 
 /**
  * The research table's pace: bookshelves speed study up less with each one and never past a cap, striking faster than
@@ -129,6 +133,36 @@ public class ResearchPaceTest {
         study.shelves(ResearchStudy.SHELF_RECOUNT_TICKS - 1, counts::incrementAndGet);
         assertEquals(1, counts.get());
         assertEquals("counted again", 2, study.shelves(ResearchStudy.SHELF_RECOUNT_TICKS, counts::incrementAndGet));
+        helper.succeed();
+    }
+
+    /**
+     * Through the table: a player clicking it does not wipe another's study while it is going on, but may start over on
+     * a study left for a minute.
+     */
+    @GameTest
+    public static void aStudyIsKeptFromAnotherUntilItIsLeft(GameTestHelper helper) {
+        helper.setBlock(1, 1, 1, BlockListMF.research);
+        TileEntityResearch table = helper.assertTileEntityPresent(TileEntityResearch.class, 1, 1, 1);
+        ItemStack book = new ItemStack(Items.book);
+        table.setInventorySlotContents(0, book);
+        FakePlayer alice = Modders.fresh(helper, Modders.SMITH), bob = Modders.fresh(helper, Modders.NOVICE);
+        String aliceId = alice.getUniqueID().toString();
+        long now = helper.getWorld().getTotalWorldTime();
+        table.study.startOverIfChanged(book, aliceId);
+        table.study.strike(now, 1.0F);
+        float progress = table.study.progress;
+
+        table.interact(bob);
+        assertTrue("another player took over a study going on", table.study.belongsTo(book, aliceId));
+        assertEquals("another player wiped a study going on", progress, table.study.progress, 1e-6);
+
+        // Left for longer than a minute: the next player may start over
+        table.study.strike(now - ResearchStudy.LEFT_AFTER_TICKS - 1, 1.0F);
+        table.interact(bob);
+        assertTrue(
+                "a study left a minute stayed its owner's",
+                table.study.belongsTo(book, bob.getUniqueID().toString()));
         helper.succeed();
     }
 }

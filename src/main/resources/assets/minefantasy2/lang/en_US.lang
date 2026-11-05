@@ -57,6 +57,7 @@ vehicle.noArmour=You cannot fit in this suit when apparel is worn.
 vehicle.tooBigArmour=Your worn items make you too big to fit.
 
 research.noskill=You may learn something from this, with more skill.
+research.studiedByAnother=Someone else is studying this. Wait until they have left it for a minute.
 research.null=There is nothing to learn from this.
 
 research.addArtefact=Added Knowledge to %1$s (%2$s/%3$s)

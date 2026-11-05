@@ -96,9 +96,11 @@ public class MineFantasyFuels {
 
         for (String name : minefantasy.mf2.api.recipe.OreNames.get().namesOf(item)) {
             if (name != null && name.startsWith("Carbon-")) {
-                String s = name.substring(7);
-                int uses = Integer.parseInt(s);
-                return uses;
+                try {
+                    return Math.max(0, Integer.parseInt(name.substring(7)));
+                } catch (NumberFormatException e) {
+                    // Another mod's name that only looks like ours: not carbon
+                }
             }
         }
 

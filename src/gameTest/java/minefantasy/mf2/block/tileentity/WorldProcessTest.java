@@ -30,6 +30,7 @@ import minefantasy.mf2.api.refine.Alloy;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.food.FoodListMF;
+import minefantasy.mf2.item.heatable.ItemHeated;
 import minefantasy.mf2.item.list.ComponentListMF;
 import minefantasy.mf2.item.list.ToolListMF;
 
@@ -365,4 +366,18 @@ public class WorldProcessTest {
     }
 
     // endregion
+
+    /** A cold piece put on a hot stack in the forge cools the stack to their average, not warms itself for free. */
+    @GameTest
+    public static void aColdPieceCoolsTheHotStackItJoins(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        TileEntityForge forge = litForge(helper, 400F, ItemHeated.createHotItem(new ItemStack(ore), 800));
+        assertTrue("the forge took no second piece", forge.tryAddHeatable(new ItemStack(ore)));
+        ItemStack stack = forge.getStackInSlot(0);
+        assertEquals("the stack did not grow", 2, stack.stackSize);
+        int heat = ItemHeated.getTemp(stack);
+        assertTrue("the cold piece came in at the stack's heat: " + heat, heat < 800);
+        assertTrue("the stack cooled past the average: " + heat, heat > 300);
+        helper.succeed();
+    }
 }

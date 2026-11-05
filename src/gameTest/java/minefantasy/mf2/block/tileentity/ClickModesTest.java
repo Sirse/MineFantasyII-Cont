@@ -32,6 +32,7 @@ import minefantasy.mf2.container.ContainerCrucible;
 import minefantasy.mf2.container.ContainerQuern;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.item.list.CustomToolListMF;
 
 /**
  * The clicks besides picking up and shift-clicking: double-click to collect, throwing, number keys, dragging and the
@@ -211,6 +212,12 @@ public class ClickModesTest {
         w.player.inventory.setItemStack(new ItemStack(Items.iron_ingot, 4));
         w.container.slotClick(result, 0, PICK, w.player);
         assertNull("an ingot went into the result slot", w.station.getStackInSlot(w.output));
+
+        // Nor a forged weapon, though it names a design of its own
+        w.player.inventory.setItemStack(new ItemStack(CustomToolListMF.standard_sword));
+        w.container.slotClick(result, 0, PICK, w.player);
+        assertNull("a sword went into the result slot", w.station.getStackInSlot(w.output));
+        w.player.inventory.setItemStack(null);
 
         // Two crests on the cursor: one goes in, the other stays
         w.player.inventory.setItemStack(new ItemStack(ComponentListMF.ornate_items, 2));

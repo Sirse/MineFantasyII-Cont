@@ -191,7 +191,11 @@ public class TileEntityAnvilMF extends TileEntityStation
                     this.qualityBalance -= (leftHit * mod);
                 }
                 if (qualityBalance >= 1.0F || qualityBalance <= -1.0F) {
+                    // The ruined work is paid for and gone: this hit does not go on to finish the next one
                     ruinCraft();
+                    lastPlayerHit = user.getCommandSenderName();
+                    updateCraftingData();
+                    return true;
                 }
 
                 Sounds.at(this, "minefantasy2:block.anvilsucceed", 0.25F, rightClick ? 1.2F : 1.0F);

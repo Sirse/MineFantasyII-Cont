@@ -29,6 +29,8 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
 
     /** How far study has got, on which item and by whom, and its pace; saved with the table. */
     public final ResearchStudy study = new ResearchStudy();
+    /** When a player was last told the study is another's. */
+    private static final String TOLD_HELD = "MF_ResearchHeldTold";
     public float maxProgress;
     public int researchID = -1;
     private ItemStack[] items = new ItemStack[1];
@@ -52,8 +54,19 @@ public class TileEntityResearch extends TileEntityStation implements IBasicMetre
         if (worldObj.isRemote) {
             return true;
         }
+        String player = user.getUniqueID().toString();
+        long now = worldObj.getTotalWorldTime();
+        if (study.isHeldByAnother(items[0], player, now)) {
+            // Told now and then, not at every click
+            long told = user.getEntityData().getLong(TOLD_HELD);
+            if (now - told >= 40 || now < told) {
+                user.getEntityData().setLong(TOLD_HELD, now);
+                user.addChatComponentMessage(new ChatComponentTranslation("research.studiedByAnother"));
+            }
+            return true;
+        }
         // Whatever study changes below is saved with the chunk, even when nothing else in it changed
-        if (study.startOverIfChanged(items[0], user.getUniqueID().toString())) {
+        if (study.startOverIfChanged(items[0], player)) {
             markDirty();
         }
         ArrayList<String> research = this.getInfo(items[0]);

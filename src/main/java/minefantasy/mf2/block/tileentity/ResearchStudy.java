@@ -14,6 +14,8 @@ public final class ResearchStudy {
 
     /** Study goes at most this fast: a strike sooner after the last counts for as much less. */
     public static final int STUDY_INTERVAL_TICKS = 8;
+    /** Ticks a study is left untouched before another player may start over on it. */
+    public static final int LEFT_AFTER_TICKS = 1200;
     /** How often the shelves are counted again, in ticks. */
     public static final int SHELF_RECOUNT_TICKS = 100;
     private static final long NEVER = Long.MIN_VALUE / 2;
@@ -44,6 +46,17 @@ public final class ResearchStudy {
         studied = item == null ? null : ItemStack.copyItemStack(item);
         researcher = player;
         return true;
+    }
+
+    /**
+     * Whether another player is still at this study: one with progress on this very item, struck within the last
+     * minute. Their work is theirs; only once they have left it may someone else start over.
+     */
+    public boolean isHeldByAnother(ItemStack item, String player, long now) {
+        return researcher != null && !researcher.equals(player)
+                && progress > 0
+                && ItemStack.areItemStacksEqual(studied, item)
+                && now - lastStrike < LEFT_AFTER_TICKS;
     }
 
     /** The world time of the last strike. */

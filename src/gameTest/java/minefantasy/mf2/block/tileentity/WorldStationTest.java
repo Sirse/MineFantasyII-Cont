@@ -104,6 +104,39 @@ public class WorldStationTest {
         helper.succeed();
     }
 
+    /**
+     * A hit that ruins the work pays for it and ends there: with enough on the grid for more, it does not go on to make
+     * the next piece at once, and the next piece is made by the full work.
+     */
+    @GameTest
+    public static void aRuiningHitMakesNothingFromWhatIsLeft(GameTestHelper helper) throws Exception {
+        Stations.begin(helper);
+        try {
+            TileEntityAnvilMF anvil = anvil(
+                    helper,
+                    oneCell(new ItemStack(junk, 2), new ItemStack(bar)).time(10).build(),
+                    new ItemStack(junk, 6));
+            FakePlayer smith = holding(helper, new ItemStack(ToolListMF.hammerStone));
+            int output = anvil.getSizeInventory() - 1;
+
+            anvil.rightHit = 0.1F;
+            anvil.qualityBalance = 0.99F;
+            anvil.tryCraft(smith, true);
+            assertNull("the ruining hit made a piece", anvil.getStackInSlot(output));
+            assertEquals("the ruined work was not paid once", 4, anvil.getStackInSlot(0).stackSize);
+            assertTrue("the next piece starts with work done", anvil.progress <= 0F);
+            assertEquals("the ruin left a balance", 0F, anvil.qualityBalance, 0F);
+
+            ItemStack made = forge(anvil, smith);
+            assertNotNull("the next piece was not made", made);
+            assertEquals(1, made.stackSize);
+            assertEquals("the next piece was not paid once", 2, anvil.getStackInSlot(0).stackSize);
+        } finally {
+            Stations.end();
+        }
+        helper.succeed();
+    }
+
     @GameTest
     public static void hotRecipeLeavesTheForgedPieceHot(GameTestHelper helper) throws Exception {
         Stations.begin(helper);

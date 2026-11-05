@@ -503,6 +503,10 @@ public class TileEntityForge extends TileEntityStation implements IBasicMetre, I
             if (hot != null && hot.isItemEqual(held)
                     && ItemStack.areItemStackTagsEqual(held, hot)
                     && contents.stackSize < contents.getMaxStackSize()) {
+                // The new piece comes in at the air's heat, not the stack's: the stack takes their average
+                int count = contents.stackSize;
+                float cold = getAmbientTemperature();
+                ItemHeated.setTemp(contents, Math.round((ItemHeated.getTemp(contents) * count + cold) / (count + 1)));
                 contents.stackSize++;
                 return true;
             }

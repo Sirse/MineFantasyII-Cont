@@ -147,12 +147,13 @@ public class ItemCrossbow extends Item
                     if (shouldConsume) AmmoMechanicsMF.consumeAmmo(user, item);
                     AmmoMechanicsMF.putAmmoOnFirearm(item, ammo);
                     success = true;
-                } else if (loaded.isItemEqual(storage) && loaded.stackSize < getAmmoCapacity(item)) {
-                    if (shouldConsume) AmmoMechanicsMF.consumeAmmo(user, item);
-                    ++loaded.stackSize;
-                    AmmoMechanicsMF.putAmmoOnFirearm(item, loaded);
-                    success = true;
-                }
+                } else if (loaded.isItemEqual(storage) && ItemStack.areItemStackTagsEqual(loaded, storage)
+                        && loaded.stackSize < getAmmoCapacity(item)) {
+                            if (shouldConsume) AmmoMechanicsMF.consumeAmmo(user, item);
+                            ++loaded.stackSize;
+                            AmmoMechanicsMF.putAmmoOnFirearm(item, loaded);
+                            success = true;
+                        }
                 if (success) {
                     user.playSound("random.click", 1.0F, 1.0F);
                 }

@@ -142,8 +142,10 @@ public class TileEntityBloomery extends TileEntityStation implements Diagnosis.S
     public void updateEntity() {
         if (isActive && progressMax > 0) {
             if (!worldObj.canBlockSeeTheSky(xCoord, yCoord + 1, zCoord)) {
-                progressMax = progress = 0;
-                isActive = false;
+                if (!worldObj.isRemote) {
+                    extinguish();
+                    markDirty();
+                }
                 return;
             }
             if (!worldObj.isRemote) {
