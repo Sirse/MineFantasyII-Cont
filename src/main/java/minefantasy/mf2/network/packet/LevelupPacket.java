@@ -1,5 +1,7 @@
 package minefantasy.mf2.network.packet;
 
+import java.util.Locale;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
@@ -39,7 +41,7 @@ public class LevelupPacket extends PacketMF {
                     new ChatComponentText(
                             StatCollector.translateToLocalFormatted(
                                     "rpg.levelup",
-                                    skill.getDisplayName().toLowerCase(),
+                                    skill.getDisplayName().toLowerCase(Locale.ROOT),
                                     skillLvl)));
         }
     }

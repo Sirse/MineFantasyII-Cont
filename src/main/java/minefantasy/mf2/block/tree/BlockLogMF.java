@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.tree;
 
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -23,7 +24,7 @@ public class BlockLogMF extends BlockLog {
     private Random rand = new Random();
 
     public BlockLogMF(String baseWood) {
-        name = baseWood.toLowerCase() + "_log";
+        name = baseWood.toLowerCase(Locale.ROOT) + "_log";
         GameRegistry.registerBlock(this, name);
         setBlockName(name);
         this.setHarvestLevel("axe", 0);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.minecraft.block.Block;
@@ -47,7 +48,7 @@ public final class NEIStationSlots {
         if (!ToolHelper.isCraftingTool(toolType)) {
             return Collections.emptyList();
         }
-        String key = toolType.toLowerCase() + ":" + tier;
+        String key = toolType.toLowerCase(Locale.ROOT) + ":" + tier;
         List<ItemStack> found = TOOLS.get(key);
         if (found == null) {
             found = findTools(toolType, tier);

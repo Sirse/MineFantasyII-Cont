@@ -2,6 +2,7 @@ package minefantasy.mf2.integration.nei;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -144,7 +145,7 @@ public class RecipeHandlerBombBench extends MFNEIRecipeHandler {
         if (type == null) {
             return combos;
         }
-        type = type.toLowerCase();
+        type = type.toLowerCase(Locale.ROOT);
 
         if ("arrow".equals(type) || "bolt".equals(type)) {
             for (ItemStack powder : POWDERS) {
@@ -188,7 +189,7 @@ public class RecipeHandlerBombBench extends MFNEIRecipeHandler {
         if (type == null) {
             return null;
         }
-        type = type.toLowerCase();
+        type = type.toLowerCase(Locale.ROOT);
 
         byte powderTier = TileEntityBombBench.getComponentTier(powder);
         byte fillingTier = filling == null ? 0 : TileEntityBombBench.getComponentTier(filling);

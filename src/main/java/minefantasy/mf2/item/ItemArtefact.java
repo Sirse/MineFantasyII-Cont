@@ -1,6 +1,7 @@
 package minefantasy.mf2.item;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -158,7 +159,7 @@ class Artefact {
     public void register(Item item, int id) {
         if (researches != null) {
             for (String research : this.researches) {
-                ResearchArtefacts.addArtefact(new ItemStack(item, 1, id), research.toLowerCase());
+                ResearchArtefacts.addArtefact(new ItemStack(item, 1, id), research.toLowerCase(Locale.ROOT));
             }
         }
         if (lootType != null) {

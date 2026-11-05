@@ -2,6 +2,7 @@ package minefantasy.mf2.api.rpg;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -69,7 +70,7 @@ public class RPGElements {
     }
 
     public static Skill getSkillByName(String name) {
-        return skillsMap.get(name.toLowerCase());
+        return skillsMap.get(name.toLowerCase(Locale.ROOT));
     }
 
     public static int getLevel(EntityPlayer player, Skill skill) {

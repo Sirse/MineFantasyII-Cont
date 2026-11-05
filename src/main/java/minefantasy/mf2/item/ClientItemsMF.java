@@ -1,6 +1,7 @@
 package minefantasy.mf2.item;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -21,7 +22,8 @@ public class ClientItemsMF {
             return true;
         } else {
             String keyname = Keyboard.getKeyName(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
-            list.add(StatCollector.translateToLocalFormatted("info.tooltip.moreinfo", keyname.toUpperCase()));
+            list.add(
+                    StatCollector.translateToLocalFormatted("info.tooltip.moreinfo", keyname.toUpperCase(Locale.ROOT)));
             return false;
         }
     }

@@ -1,5 +1,7 @@
 package minefantasy.mf2.api.knowledge;
 
+import java.util.Locale;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -132,7 +134,7 @@ public class ResearchLogic {
     }
 
     public static InformationBase getResearch(String researchName) {
-        return InformationList.nameMap.get(researchName.toLowerCase());
+        return InformationList.nameMap.get(researchName.toLowerCase(Locale.ROOT));
     }
 
     public static int getArtefactCount(String research, EntityPlayer user) {

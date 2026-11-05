@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.basic;
 
+import java.util.Locale;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
@@ -12,7 +14,7 @@ public class BlockMetalMF extends Block {
     public BlockMetalMF(BaseMaterialMF material) {
         super(Material.iron);
 
-        String name = material.name.toLowerCase() + "_block";
+        String name = material.name.toLowerCase(Locale.ROOT) + "_block";
         GameRegistry.registerBlock(this, name);
         setBlockName(name);
 

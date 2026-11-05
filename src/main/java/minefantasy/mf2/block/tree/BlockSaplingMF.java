@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.tree;
 
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -28,7 +29,7 @@ public class BlockSaplingMF extends BlockBush implements IGrowable {
         this.setBlockBounds(0.5F - f, 0.0F, 0.5F - f, 0.5F + f, f * 2.0F, 0.5F + f);
         this.setCreativeTab(CreativeTabs.tabDecorations);
         this.growthModifier = growthModifier;
-        name = baseWood.toLowerCase() + "_sapling";
+        name = baseWood.toLowerCase(Locale.ROOT) + "_sapling";
         this.log = log;
         this.leaves = leaves;
 

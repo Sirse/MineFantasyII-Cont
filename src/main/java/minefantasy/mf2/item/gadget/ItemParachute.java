@@ -23,12 +23,14 @@ public class ItemParachute extends Item {
 
     @Override
     public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer user) {
+        // One chute at a time: another opened in flight would leave the first falling without its rider
+        if (user.ridingEntity instanceof EntityParachute) return item;
         if (!world.isRemote) {
             world.playSoundAtEntity(user, "mob.horse.leather", 1.0F, 0.5F);
             EntityParachute chute = new EntityParachute(world, user.posX, user.posY, user.posZ);
             world.spawnEntityInWorld(chute);
             user.mountEntity(chute);
-            --item.stackSize;
+            if (!user.capabilities.isCreativeMode) --item.stackSize;
         }
         return item;
     }

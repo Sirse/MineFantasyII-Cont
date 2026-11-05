@@ -1,5 +1,7 @@
 package minefantasy.mf2.item.list;
 
+import java.util.Locale;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -34,35 +36,35 @@ public class ArmourListMF {
             ArmourDesign design = baseMat == BaseMaterialMF.padding ? ArmourDesign.PADDING : ArmourDesign.LEATHER;
 
             leather[id + 0] = new ItemArmourMF(
-                    matName.toLowerCase() + "_helmet",
+                    matName.toLowerCase(Locale.ROOT) + "_helmet",
                     baseMat,
                     design,
                     0,
-                    matName.toLowerCase() + "_layer_1",
+                    matName.toLowerCase(Locale.ROOT) + "_layer_1",
                     rarity,
                     bulk);
             leather[id + 1] = new ItemArmourMF(
-                    matName.toLowerCase() + "_chest",
+                    matName.toLowerCase(Locale.ROOT) + "_chest",
                     baseMat,
                     design,
                     1,
-                    matName.toLowerCase() + "_layer_1",
+                    matName.toLowerCase(Locale.ROOT) + "_layer_1",
                     rarity,
                     bulk);
             leather[id + 2] = new ItemArmourMF(
-                    matName.toLowerCase() + "_legs",
+                    matName.toLowerCase(Locale.ROOT) + "_legs",
                     baseMat,
                     design,
                     2,
-                    matName.toLowerCase() + "_layer_2",
+                    matName.toLowerCase(Locale.ROOT) + "_layer_2",
                     rarity,
                     bulk);
             leather[id + 3] = new ItemArmourMF(
-                    matName.toLowerCase() + "_boots",
+                    matName.toLowerCase(Locale.ROOT) + "_boots",
                     baseMat,
                     design,
                     3,
-                    matName.toLowerCase() + "_layer_1",
+                    matName.toLowerCase(Locale.ROOT) + "_layer_1",
                     rarity,
                     bulk);
         }

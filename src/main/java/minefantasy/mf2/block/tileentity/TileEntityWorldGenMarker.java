@@ -17,18 +17,12 @@ public class TileEntityWorldGenMarker extends TileEntity {
     public void updateEntity() {
         // Check the delay before touching neighbouring chunks, so a pending marker costs nothing per tick
         if (!worldObj.isRemote && ticks >= getSpawnTime() && areChunksLoaded()) {
+            // The marker's meta is the direction of the next piece: read it before the block it stood in comes back
+            int direction = getBlockMetadata();
             Block block = Block.getBlockById(prevID);
             worldObj.setBlock(xCoord, yCoord, zCoord, block != null ? block : Blocks.air, prevMeta, 2);
-            StructureModuleMF.placeStructure(
-                    className,
-                    type,
-                    length,
-                    deviation,
-                    worldObj,
-                    xCoord,
-                    yCoord,
-                    zCoord,
-                    this.getBlockMetadata());
+            StructureModuleMF
+                    .placeStructure(className, type, length, deviation, worldObj, xCoord, yCoord, zCoord, direction);
         }
 
         ++ticks;

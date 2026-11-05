@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.decor;
 
+import java.util.Locale;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRail;
 import net.minecraft.entity.item.EntityMinecart;
@@ -14,7 +16,7 @@ public class BlockRailMF extends BlockRail {
     private boolean isPowered = true;
 
     public BlockRailMF(BaseMaterialMF material) {
-        this(material, material.name.toLowerCase());
+        this(material, material.name.toLowerCase(Locale.ROOT));
     }
 
     public BlockRailMF(BaseMaterialMF material, String type) {

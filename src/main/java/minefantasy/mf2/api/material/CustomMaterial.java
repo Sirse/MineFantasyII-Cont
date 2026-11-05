@@ -3,6 +3,7 @@ package minefantasy.mf2.api.material;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -80,14 +81,14 @@ public class CustomMaterial {
      * Gets material name
      */
     public String getName() {
-        return name.toLowerCase();
+        return name.toLowerCase(Locale.ROOT);
     }
 
     /**
      * Gets material type
      */
     public String getType() {
-        return type.toLowerCase();
+        return type.toLowerCase(Locale.ROOT);
     }
 
     /**
@@ -96,7 +97,7 @@ public class CustomMaterial {
     public static CustomMaterial getMaterial(String name) {
         if (name == null) return null;
 
-        return materialList.get(name.toLowerCase());
+        return materialList.get(name.toLowerCase(Locale.ROOT));
     }
 
     /**

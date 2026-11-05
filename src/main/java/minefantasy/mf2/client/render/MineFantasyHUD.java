@@ -102,7 +102,8 @@ public class MineFantasyHUD extends Gui {
         EntityPlayer player = mc.thePlayer;
         if (mc.gameSettings.thirdPersonView == 0) {
             ItemStack heldItem = player.getHeldItem();
-            if (heldItem != null && heldItem.getItem() instanceof IScope) {
+            // Only while aiming: the fire action stays in the item's tag when the player switches slots mid-aim
+            if (heldItem != null && heldItem.getItem() instanceof IScope && player.isUsingItem()) {
                 renderScope(heldItem);
             }
             if (player.ridingEntity instanceof EntityCogwork) {

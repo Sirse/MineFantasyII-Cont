@@ -3,6 +3,7 @@ package minefantasy.mf2.api.crafting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import net.minecraft.block.Block;
@@ -157,7 +158,8 @@ public final class Salvage {
         if (materials != null) {
             for (String slot : new String[] { CustomToolHelper.slot_main, CustomToolHelper.slot_haft }) {
                 if (materials.hasKey(slot)) {
-                    id = id.withSuffix("." + materials.getString(slot).toLowerCase().replaceAll("[^a-z0-9_.-]", "_"));
+                    id = id.withSuffix(
+                            "." + materials.getString(slot).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_"));
                 }
             }
         }

@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.knowledge;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,7 +53,7 @@ public class ResearchArtefacts {
     }
 
     public static int useArtefact(ItemStack itemStack, InformationBase base, EntityPlayer user) {
-        int artefacts = ResearchLogic.addArtefact(base.getUnlocalisedName().toLowerCase(), user);
+        int artefacts = ResearchLogic.addArtefact(base.getUnlocalisedName().toLowerCase(Locale.ROOT), user);
         ResearchLogic.addArtefactUsed(user, base, itemStack);
         if (artefacts >= base.getArtefactCount()) {
             ResearchLogic.tryUnlock(user, base);

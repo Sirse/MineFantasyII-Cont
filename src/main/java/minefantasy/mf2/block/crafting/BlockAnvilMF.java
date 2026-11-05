@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.crafting;
 
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -41,7 +42,7 @@ public class BlockAnvilMF extends BlockStation<TileEntityAnvilMF> {
         float height = 1.0F / 16F * 13F;
         setBlockBounds(0F, 0F, 0F, 1F, height, 1F);
 
-        this.setBlockTextureName("minefantasy2:metal/" + name.toLowerCase() + "_block");
+        this.setBlockTextureName("minefantasy2:metal/" + name.toLowerCase(Locale.ROOT) + "_block");
         name = "anvil" + name;
         this.tier = material.tier;
         GameRegistry.registerBlock(this, ItemBlockAnvilMF.class, name);

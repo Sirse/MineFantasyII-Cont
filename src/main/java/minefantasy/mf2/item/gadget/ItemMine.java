@@ -201,7 +201,7 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
 
     @SideOnly(Side.CLIENT)
     public IIcon getIcon(byte type) {
-        return mines[type];
+        return mines[type >= 0 && type < mines.length ? type : 0];
     }
 
     @Override
@@ -217,7 +217,7 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
     @SideOnly(Side.CLIENT)
     public IIcon getIconIndex(ItemStack item) {
         int type = getCasing(item);
-        return mines[type];
+        return mines[type >= 0 && type < mines.length ? type : 0];
     }
 
     @Override
@@ -225,7 +225,7 @@ public class ItemMine extends Item implements ISpecialSalvage, IAmmo {
     public IIcon getIcon(ItemStack item, int layer) {
         if (layer > 0) {
             int type = getFilling(item);
-            if (type != 0) {
+            if (type > 0 && type <= ToolListMF.bomb_custom.icons.length) {
                 return ToolListMF.bomb_custom.icons[type - 1];
             }
         }

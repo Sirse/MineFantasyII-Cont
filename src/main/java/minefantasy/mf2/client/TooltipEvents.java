@@ -1,6 +1,7 @@
 package minefantasy.mf2.client;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.*;
@@ -54,7 +55,7 @@ public class TooltipEvents {
                         }
                         if (s.startsWith("Artefact-")) {
                             if (!saidArtefact) {
-                                String knowledge = s.substring(9).toLowerCase();
+                                String knowledge = s.substring(9).toLowerCase(Locale.ROOT);
 
                                 if (!ResearchLogic.hasInfoUnlocked(event.entityPlayer, knowledge)) {
                                     saidArtefact = true;
@@ -101,7 +102,7 @@ public class TooltipEvents {
             }
             WeaponClass WC = WeaponClass.findClassForAny(event.itemStack);
             if (WC != null && RPGElements.isSystemActive && WC.parentSkill != null) {
-                event.toolTip.add(StatCollector.translateToLocal("weaponclass." + WC.name.toLowerCase()));
+                event.toolTip.add(StatCollector.translateToLocal("weaponclass." + WC.name.toLowerCase(Locale.ROOT)));
                 float skillMod = RPGElements.getWeaponModifier(event.entityPlayer, WC.parentSkill) * 100F;
                 if (skillMod > 100) event.toolTip.add(
                         StatCollector.translateToLocal("rpg.skillmod")

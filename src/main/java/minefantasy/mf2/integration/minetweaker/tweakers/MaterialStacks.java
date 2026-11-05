@@ -1,5 +1,7 @@
 package minefantasy.mf2.integration.minetweaker.tweakers;
 
+import java.util.Locale;
+
 import net.minecraft.item.ItemStack;
 
 import minefantasy.mf2.api.helpers.CustomToolHelper;
@@ -40,10 +42,12 @@ public class MaterialStacks {
         // registered name ("Steel"), tools the lower case one
         CustomMaterial material = known(main);
         boolean part = made.getItem() instanceof ItemCustomComponent;
-        CustomMaterial
-                .addMaterial(made, CustomToolHelper.slot_main, part ? material.name : material.name.toLowerCase());
+        CustomMaterial.addMaterial(
+                made,
+                CustomToolHelper.slot_main,
+                part ? material.name : material.name.toLowerCase(Locale.ROOT));
         if (haft != null) {
-            CustomMaterial.addMaterial(made, CustomToolHelper.slot_haft, known(haft).name.toLowerCase());
+            CustomMaterial.addMaterial(made, CustomToolHelper.slot_haft, known(haft).name.toLowerCase(Locale.ROOT));
         }
         return MineTweakerMC.getIItemStack(made);
     }

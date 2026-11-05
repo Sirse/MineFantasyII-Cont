@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -51,7 +52,7 @@ public final class Input {
             if (material == null || material.isEmpty()) {
                 throw new IllegalArgumentException("Material name must not be empty");
             }
-            return new MaterialRule(material.toLowerCase(), false);
+            return new MaterialRule(material.toLowerCase(Locale.ROOT), false);
         }
 
         public String getName() {
@@ -63,7 +64,7 @@ public final class Input {
                 return true;
             }
             NBTTagCompound tag = CustomMaterial.getNBT(stack, false);
-            String present = tag != null && tag.hasKey(slot) ? tag.getString(slot).toLowerCase() : null;
+            String present = tag != null && tag.hasKey(slot) ? tag.getString(slot).toLowerCase(Locale.ROOT) : null;
             if (none) {
                 return present == null || present.isEmpty();
             }

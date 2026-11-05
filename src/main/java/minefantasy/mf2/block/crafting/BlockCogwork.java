@@ -1,5 +1,7 @@
 package minefantasy.mf2.block.crafting;
 
+import java.util.Locale;
+
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -38,7 +40,7 @@ public class BlockCogwork extends BlockDirectional {
         this.setTickRandomly(true);
         this.name = name;
         this.setCreativeTab(CreativeTabMF.tabGadget);
-        this.setBlockTextureName("minefantasy2:metal/" + name.toLowerCase());
+        this.setBlockTextureName("minefantasy2:metal/" + name.toLowerCase(Locale.ROOT));
         setBlockName(name);
         this.setHardness(1F);
         this.setResistance(5F);

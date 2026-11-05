@@ -2,6 +2,7 @@ package minefantasy.mf2.api.crafting;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -227,7 +228,7 @@ public final class NativeRecipes {
             if (materials != null) {
                 for (String slot : new String[] { CustomToolHelper.slot_main, CustomToolHelper.slot_haft }) {
                     if (materials.hasKey(slot)) {
-                        name += "." + sanitize(materials.getString(slot).toLowerCase());
+                        name += "." + sanitize(materials.getString(slot).toLowerCase(Locale.ROOT));
                     }
                 }
             }
@@ -278,6 +279,6 @@ public final class NativeRecipes {
     }
 
     private static String sanitize(String name) {
-        return name.toLowerCase().replaceAll("[^a-z0-9_.-]", "_");
+        return name.toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_");
     }
 }

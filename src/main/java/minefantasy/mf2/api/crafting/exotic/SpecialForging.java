@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.crafting.exotic;
 
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,7 +71,7 @@ public final class SpecialForging {
     }
 
     public static RecipeId idFor(String design, Item base) {
-        return NativeRecipes.idFor("special_forging", base).withSuffix("." + design.toLowerCase());
+        return NativeRecipes.idFor("special_forging", base).withSuffix("." + design.toLowerCase(Locale.ROOT));
     }
 
     /** Stages the craft and the output's salvage alias; a second craft for the same design and base replaces it. */

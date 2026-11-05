@@ -95,7 +95,7 @@ public abstract class GuiCraftBench extends GuiStation {
     @Override
     protected void drawGauges(int left, int top) {
         if (bench.getProgressMax() > 0 && bench.getProgress() > 0) {
-            int width = (int) (160F / bench.getProgressMax() * bench.getProgress());
+            int width = Math.min(160, (int) (160F / bench.getProgressMax() * bench.getProgress()));
             drawTexturedModalRect(left + 8 + inset, top + 21, 0, progressV, width, 3);
         }
         if (showsProject()) {

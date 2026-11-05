@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.block.BlockDispenser;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -122,7 +123,7 @@ public class ItemArrowMF extends Item implements IArrowMF, IAmmo {
         if (type.name.equalsIgnoreCase("bolt")) {
             return mat + "_bolt";
         }
-        return mat + "_arrow_" + type.name.toLowerCase();
+        return mat + "_arrow_" + type.name.toLowerCase(Locale.ROOT);
     }
 
     public EntityArrowMF getFiredArrow(EntityArrowMF instance, ItemStack arrow) {

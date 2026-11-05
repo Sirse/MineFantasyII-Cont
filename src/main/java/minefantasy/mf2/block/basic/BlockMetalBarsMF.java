@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.basic;
 
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -21,11 +22,11 @@ public class BlockMetalBarsMF extends BlockPane {
 
     public BlockMetalBarsMF(BaseMaterialMF material) {
         super(
-                "minefantasy2:metal/" + material.name.toLowerCase() + "_bars",
-                "minefantasy2:metal/" + material.name.toLowerCase() + "_bars",
+                "minefantasy2:metal/" + material.name.toLowerCase(Locale.ROOT) + "_bars",
+                "minefantasy2:metal/" + material.name.toLowerCase(Locale.ROOT) + "_bars",
                 Material.iron,
                 true);
-        String name = material.name.toLowerCase() + "_bars";
+        String name = material.name.toLowerCase(Locale.ROOT) + "_bars";
         GameRegistry.registerBlock(this, name);
         setBlockName(name);
 

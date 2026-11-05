@@ -109,8 +109,17 @@ final class BookFrame {
      * Motes of dust drifting slowly over the pages, too faint to notice one by one: the book stops looking like a flat
      * screen. Each mote follows its own slow loop, worked out from the time, so nothing needs keeping between frames.
      */
+    /**
+     * Milliseconds for animations, kept small enough for a float. The system time counts from the epoch on Linux and
+     * macOS, where a float of it steps only every couple of minutes and anything drawn from it stands still; the jump
+     * once an hour goes unseen.
+     */
+    static float animationTime() {
+        return Minecraft.getSystemTime() % 3_600_000L;
+    }
+
     void drawDust() {
-        long now = Minecraft.getSystemTime();
+        float now = animationTime();
         int x0 = left() + 12, y0 = top() + 12;
         int w = PAGE_WIDTH * 2 - 24, h = PAGE_HEIGHT - 24;
         GL11.glDisable(GL11.GL_DEPTH_TEST);

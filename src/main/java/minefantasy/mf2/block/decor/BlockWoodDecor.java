@@ -1,6 +1,7 @@
 package minefantasy.mf2.block.decor;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -84,7 +85,7 @@ public abstract class BlockWoodDecor<T extends TileEntityWoodDecor> extends Bloc
 
     public ItemStack construct(String name, int stacksize) {
         ItemStack item = new ItemStack(this, stacksize);
-        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, name.toLowerCase());
+        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, name.toLowerCase(Locale.ROOT));
 
         return item;
     }

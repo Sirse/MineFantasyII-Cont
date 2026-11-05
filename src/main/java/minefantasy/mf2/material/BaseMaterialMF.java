@@ -1,6 +1,7 @@
 package minefantasy.mf2.material;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import net.minecraft.item.Item.ToolMaterial;
 import net.minecraftforge.common.util.EnumHelper;
@@ -213,7 +214,7 @@ public class BaseMaterialMF {
     }
 
     public static BaseMaterialMF register(BaseMaterialMF material) {
-        materialMap.put(material.name.toLowerCase(), material);
+        materialMap.put(material.name.toLowerCase(Locale.ROOT), material);
         return material;
     }
 
@@ -236,7 +237,7 @@ public class BaseMaterialMF {
     }
 
     public static BaseMaterialMF getMaterial(String name) {
-        return materialMap.get(name.toLowerCase());
+        return materialMap.get(name.toLowerCase(Locale.ROOT));
     }
 
     protected BaseMaterialMF setForgeStats(int hammer, int anvil, float timer, int workable, int unstable) {

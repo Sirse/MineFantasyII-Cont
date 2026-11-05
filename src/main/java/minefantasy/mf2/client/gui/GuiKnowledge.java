@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
 
@@ -607,12 +608,12 @@ public class GuiKnowledge extends GuiScreen {
      */
     private List<InformationBase> find(String query) {
         List<InformationBase> found = new LinkedList<InformationBase>();
-        String wanted = query.toLowerCase();
+        String wanted = query.toLowerCase(Locale.ROOT);
         for (InformationBase entry : InformationList.knowledgeList) {
             boolean named = ResearchLogic.hasInfoUnlocked(player, entry)
                     || ResearchLogic.func_150874_c(player, entry) < HIDDEN_DEPTH;
-            if (named && EnumChatFormatting.getTextWithoutFormattingCodes(entry.getDisplayName()).toLowerCase()
-                    .contains(wanted)) {
+            if (named && EnumChatFormatting.getTextWithoutFormattingCodes(entry.getDisplayName())
+                    .toLowerCase(Locale.ROOT).contains(wanted)) {
                 found.add(entry);
             }
         }
@@ -976,7 +977,7 @@ public class GuiKnowledge extends GuiScreen {
             ResourceLocation seal = entry.getSpecial() ? sealSpecialTex : entry.getPerk() ? sealPerkTex : sealTex;
             if (state == ResearchAvailability.BUYABLE) {
                 // What can be learned right now breathes with a slow glow
-                float pulse = 0.45F + 0.3F * MathHelper.sin(now / 400F);
+                float pulse = 0.45F + 0.3F * MathHelper.sin(BookFrame.animationTime() / 400F);
                 tint(GLOW, pulse * alpha);
                 drawImage(glowTex, x - 9, y - 9, 40, 40);
             }
@@ -991,7 +992,7 @@ public class GuiKnowledge extends GuiScreen {
                 drawImage(outline, x - 6, y - 6, 34, 34);
             }
             if (matches.contains(entry)) {
-                tint(RING_FOUND, 0.6F + 0.3F * MathHelper.sin(now / 350F));
+                tint(RING_FOUND, 0.6F + 0.3F * MathHelper.sin(BookFrame.animationTime() / 350F));
                 drawImage(outline, x - 6, y - 6, 34, 34);
             }
             float flash = childFlash(entry, now);
@@ -1657,7 +1658,7 @@ public class GuiKnowledge extends GuiScreen {
             }
             if (hasLearnable(entries)) {
                 // A small flame on the icon's top right corner when the category has something to learn now
-                long now = Minecraft.getSystemTime();
+                float now = BookFrame.animationTime();
                 float flicker = 0.55F + 0.25F * MathHelper.sin(now / 170F + i * 1.7F)
                         + 0.15F * MathHelper.sin(now / 53F + i);
                 GL11.glDisable(GL11.GL_DEPTH_TEST);

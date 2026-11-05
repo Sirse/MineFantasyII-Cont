@@ -1,5 +1,6 @@
 package minefantasy.mf2.block.tree;
 
+import java.util.Locale;
 import java.util.Random;
 
 import net.minecraft.block.Block;
@@ -30,7 +31,7 @@ public class BlockLeavesMF extends BlockLeaves implements IShearable {
     }
 
     public BlockLeavesMF(String baseWood, int droprate) {
-        this.name = baseWood.toLowerCase() + "_leaves";
+        this.name = baseWood.toLowerCase(Locale.ROOT) + "_leaves";
         GameRegistry.registerBlock(this, name);
         this.dropRate = droprate;
         this.setTickRandomly(true);

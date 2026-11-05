@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.knowledge;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
@@ -120,7 +121,7 @@ public class InformationBase {
         ID = nextID;
         nextID++;
         InformationList.knowledgeList.add(this);
-        InformationList.nameMap.put(idName.toLowerCase(), this);
+        InformationList.nameMap.put(idName.toLowerCase(Locale.ROOT), this);
         return this;
     }
 

@@ -222,7 +222,7 @@ public class TileEntityRoast extends TileEntityStation implements IHeatUser {
 
     public int getProgressBar(int i) {
         if (maxProgress <= 0) return 0;
-        return (int) (i / maxProgress * progress);
+        return Math.max(0, Math.min(i, (int) (i / maxProgress * progress)));
     }
 
     public String getResultName() {

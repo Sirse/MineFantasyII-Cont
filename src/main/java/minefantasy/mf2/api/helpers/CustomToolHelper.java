@@ -1,6 +1,7 @@
 package minefantasy.mf2.api.helpers;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 
 import net.minecraft.item.EnumRarity;
@@ -67,9 +68,9 @@ public class CustomToolHelper {
 
     public static ItemStack construct(Item base, String main, String haft) {
         ItemStack item = new ItemStack(base);
-        CustomMaterial.addMaterial(item, slot_main, main.toLowerCase());
+        CustomMaterial.addMaterial(item, slot_main, main.toLowerCase(Locale.ROOT));
         if (haft != null) {
-            CustomMaterial.addMaterial(item, slot_haft, haft.toLowerCase());
+            CustomMaterial.addMaterial(item, slot_haft, haft.toLowerCase(Locale.ROOT));
         }
         return item;
     }
@@ -80,7 +81,7 @@ public class CustomToolHelper {
 
     public static ItemStack constructSingleColoredLayer(Item base, String main, int stacksize) {
         ItemStack item = new ItemStack(base, stacksize);
-        CustomMaterial.addMaterial(item, slot_main, main.toLowerCase());
+        CustomMaterial.addMaterial(item, slot_main, main.toLowerCase(Locale.ROOT));
         return item;
     }
 
@@ -481,7 +482,7 @@ public class CustomToolHelper {
         if (reference == null) {
             return "";
         }
-        return reference.toLowerCase() + "_@" + dam;
+        return reference.toLowerCase(Locale.ROOT) + "_@" + dam;
     }
 
     public static String getSimpleReferenceName(Item item) {

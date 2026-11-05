@@ -3,6 +3,7 @@ package minefantasy.mf2.recipe;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -107,7 +108,7 @@ public class BasicRecipesMF {
                         new ItemStack(BlockListMF.storage[id]),
                         new Object[] { "III", "III", "III", 'I', ingot });
             }
-            ItemStack own = ComponentListMF.ingot(material.name.toLowerCase());
+            ItemStack own = ComponentListMF.ingot(material.name.toLowerCase(Locale.ROOT));
             if (own == null || own.getItem() == null) {
                 own = ingots.isEmpty() ? null : ingots.get(0);
             }
@@ -246,14 +247,14 @@ public class BasicRecipesMF {
         if (material == null || material.name == null || material.name.length() < 4) {
             return found;
         }
-        String sub = material.name.substring(0, material.name.length() - 4).toLowerCase();
+        String sub = material.name.substring(0, material.name.length() - 4).toLowerCase(Locale.ROOT);
         for (ItemStack planks : OreDictionary.getOres("plankWood")) {
             int from = planks.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 0 : planks.getItemDamage();
             int to = planks.getItemDamage() == OreDictionary.WILDCARD_VALUE ? 15 : planks.getItemDamage();
             for (int meta = from; meta <= to; meta++) {
                 ItemStack item = planks.copy();
                 item.setItemDamage(meta);
-                if (item.getUnlocalizedName().toLowerCase().contains(sub)) {
+                if (item.getUnlocalizedName().toLowerCase(Locale.ROOT).contains(sub)) {
                     found.add(item);
                 }
             }

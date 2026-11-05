@@ -1,6 +1,7 @@
 package minefantasy.mf2.item.armour;
 
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -47,7 +48,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     public ItemArmourMF(String name, BaseMaterialMF material, ArmourDesign AD, int slot, String tex, int rarity) {
         super(name, material.getArmourConversion(), AD, slot, tex);
         baseMaterial = material;
-        this.setTextureName("minefantasy2:apparel/" + AD.getName().toLowerCase() + "/" + name);
+        this.setTextureName("minefantasy2:apparel/" + AD.getName().toLowerCase(Locale.ROOT) + "/" + name);
         GameRegistry.registerItem(this, name, MineFantasyII.MODID);
         setCreativeTab(CreativeTabMF.tabArmour);
 
@@ -287,7 +288,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
 
     public ItemStack construct(String plate) {
         ItemStack item = new ItemStack(this);
-        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, plate.toLowerCase());
+        CustomMaterial.addMaterial(item, CustomToolHelper.slot_main, plate.toLowerCase(Locale.ROOT));
         return item;
     }
 
@@ -391,7 +392,7 @@ public class ItemArmourMF extends ItemArmourMFBase implements IElementalResistan
     }
 
     public String getArmourTextureName(ItemStack stack, Entity entity, int slot, String type) {
-        String tex = "minefantasy2:textures/models/armour/" + design.getName().toLowerCase() + "/" + texture;
+        String tex = "minefantasy2:textures/models/armour/" + design.getName().toLowerCase(Locale.ROOT) + "/" + texture;
         if (type == null && canColour())// bottom layer
         {
             return tex + "_cloth";

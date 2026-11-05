@@ -1,5 +1,7 @@
 package minefantasy.mf2.item.armour;
 
+import java.util.Locale;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -24,7 +26,7 @@ public class ItemClothingMF extends ItemArmourMF {
 
     @Override
     public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
-        String tex = "minefantasy2:textures/models/armour/" + design.getName().toLowerCase() + "/" + texture;
+        String tex = "minefantasy2:textures/models/armour/" + design.getName().toLowerCase(Locale.ROOT) + "/" + texture;
         if (type == null && canColour())// bottom layer
         {
             return tex + "_cloth.png";

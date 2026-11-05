@@ -117,7 +117,8 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
                         SkillList.artisanry.addXP(player, 1);
                     }
                     if (isShabbyRack() && rand.nextInt(10) == 0 && !worldObj.isRemote) {
-                        for (int a = 0; a < rand.nextInt(10); a++) {
+                        int scraps = rand.nextInt(10);
+                        for (int a = 0; a < scraps; a++) {
                             ItemStack plank = ComponentListMF.plank.construct("ScrapWood");
                             Sounds.at(this, "mob.zombie.woodbreak", 1.0F, 1.5F);
                             InventorySlots.drop(worldObj, xCoord, yCoord, zCoord, plank);
@@ -276,7 +277,7 @@ public class TileEntityTanningRack extends TileEntityStation implements Diagnosi
 
     public int getProgressBar(int i) {
         if (maxProgress <= 0) return 0;
-        return (int) (i / maxProgress * progress);
+        return Math.max(0, Math.min(i, (int) (i / maxProgress * progress)));
     }
 
     public String getResultName() {

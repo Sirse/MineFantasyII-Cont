@@ -50,11 +50,11 @@ public class ItemJug extends ItemComponentMF {
                 StaminaBar.modifyStaminaValue(user, 10);
             }
         }
+        // In creative the drink is not spent, so it leaves no empty jug either
+        if (user.capabilities.isCreativeMode) return item;
         ItemStack container = getContainerItem(item);
         if (item.stackSize > 1) {
-            if (!user.capabilities.isCreativeMode) {
-                --item.stackSize;
-            }
+            --item.stackSize;
             if (!user.inventory.addItemStackToInventory(container)) {
                 user.entityDropItem(container, 0F);
             }

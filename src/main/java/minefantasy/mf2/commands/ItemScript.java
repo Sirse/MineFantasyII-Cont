@@ -3,6 +3,7 @@ package minefantasy.mf2.commands;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.minecraft.item.Item;
@@ -132,7 +133,7 @@ public final class ItemScript {
         if (haft != null && (haft.isEmpty() || haft.equalsIgnoreCase("any"))) {
             haft = null;
         }
-        return new String[] { main.toLowerCase(), haft == null ? null : haft.toLowerCase() };
+        return new String[] { main.toLowerCase(Locale.ROOT), haft == null ? null : haft.toLowerCase(Locale.ROOT) };
     }
 
     private static String materialArgs(String[] materials) {

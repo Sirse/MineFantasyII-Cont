@@ -237,7 +237,7 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
         if (type < 0) {
             return ToolListMF.bomb_crude.getIcon(type);
         }
-        return bombs[type];
+        return bombs[Math.min(type, bombs.length - 1)];
     }
 
     @Override
@@ -255,8 +255,9 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
     @Override
     @SideOnly(Side.CLIENT)
     public IIcon getIconIndex(ItemStack item) {
+        // Tags come from anywhere: an odd value shows the plainest casing, not a crash
         int type = getCasing(item);
-        return bombs[type];
+        return bombs[type >= 0 && type < bombs.length ? type : 0];
     }
 
     @Override
@@ -274,7 +275,7 @@ public class ItemBomb extends Item implements ISpecialSalvage, IAmmo {
         }
         if (layer > (sticky ? 1 : 0)) {
             int type = getFilling(item);
-            if (type != 0) {
+            if (type > 0 && type <= icons.length) {
                 return icons[type - 1];
             }
         }

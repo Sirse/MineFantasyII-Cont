@@ -34,7 +34,7 @@ public class TileEntityRoastRenderer extends TileEntitySpecialRenderer {
     public void renderAModelAt(TileEntityRoast tile, double d, double d1, double d2, float f) {
         int i = 0;
         if (tile.getWorldObj() != null) {
-            i = tile.blockMetadata;
+            i = tile.getBlockMetadata();
         }
         int j = 360 - (90 * i);
         float pixelHeight = tile.isOven() ? 3F : 5F;

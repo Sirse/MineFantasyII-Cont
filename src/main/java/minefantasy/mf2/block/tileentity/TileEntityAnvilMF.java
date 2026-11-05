@@ -567,7 +567,7 @@ public class TileEntityAnvilMF extends TileEntityStation
         if (progressMax <= 0.0F) {
             return 0;
         }
-        return (int) Math.ceil((i * progress) / progressMax);
+        return Math.max(0, Math.min(i, (int) Math.ceil((i * progress) / progressMax)));
     }
 
     public String getTextureName() {

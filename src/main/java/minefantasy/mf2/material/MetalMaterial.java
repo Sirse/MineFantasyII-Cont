@@ -2,6 +2,7 @@ package minefantasy.mf2.material;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
@@ -142,7 +143,7 @@ public class MetalMaterial extends CustomMaterial {
      */
     @Override
     public ItemStack getItem() {
-        ItemStack own = ComponentListMF.ingot(name.toLowerCase());
+        ItemStack own = ComponentListMF.ingot(name.toLowerCase(Locale.ROOT));
         if (own != null && own.getItem() != null) {
             return own;
         }

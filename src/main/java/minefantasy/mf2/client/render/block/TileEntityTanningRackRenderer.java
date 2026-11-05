@@ -37,7 +37,7 @@ public class TileEntityTanningRackRenderer extends TileEntitySpecialRenderer {
         int i = 0;
         float acAnim = tile.prevAcTime + (tile.acTime - tile.prevAcTime) * f;
         if (tile.getWorldObj() != null) {
-            i = tile.blockMetadata;
+            i = tile.getBlockMetadata();
         }
 
         int j = 90 * i;
