@@ -2040,7 +2040,7 @@ knowledge.bombFuse.2=You can also make an extended fuse. With this: bombs can be
 knowledge.stickybomb=Sticky Bombs
 knowledge.stickybomb.desc=Catch this!
 knowledge.stickybomb.1=Sticky bombs- as the name might suggest, are bombs that are sticky. And with this amazing trait: will attach themselves to whatever poor sod gets in its way.^So what you have here is a bomb that does a lot of damage sticking to someone! Which never stops being funny.
-knowledge.stickybomb.2=To create these: Leave (or put) a bomb in the output slot and right-click the block with a slime ball. A single slimeball can coat a stack of any size.
+knowledge.stickybomb.2=To create these: leave (or put) bombs in the output slot and right-click the block holding slime balls, one for each bomb in the stack. With too few in hand, nothing is coated.
 
 $hUse of Cogworks$r^
 

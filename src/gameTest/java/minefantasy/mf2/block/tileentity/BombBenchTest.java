@@ -15,10 +15,12 @@ import com.gtnewhorizons.horizonqa.api.TestPos;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTest;
 import com.gtnewhorizons.horizonqa.api.annotation.GameTestHolder;
 
+import minefantasy.mf2.api.knowledge.ResearchLogic;
 import minefantasy.mf2.block.list.BlockListMF;
 import minefantasy.mf2.gametest.Modders;
 import minefantasy.mf2.item.gadget.ItemBomb;
 import minefantasy.mf2.item.list.ComponentListMF;
+import minefantasy.mf2.knowledge.KnowledgeListMF;
 
 /**
  * The bomb bench takes one of each component per bomb, puts the bomb into its output and the pots of the powder and the
@@ -109,6 +111,39 @@ public class BombBenchTest {
         assertNotNull("the bomb waited for room for the pot", bench.getStackInSlot(OUTPUT));
         assertEquals(64, size(bench.getStackInSlot(SPARE)));
         assertEquals("the pots were lost", 2, droppedPots(helper));
+        helper.succeed();
+    }
+
+    private static boolean sticky(ItemStack bomb) {
+        return bomb.hasTagCompound() && bomb.getTagCompound().hasKey("stickyBomb");
+    }
+
+    /** Right-clicks the bench with this much slime in hand; returns what is left in the hand. */
+    private static ItemStack slime(GameTestHelper helper, TileEntityBombBench bench, int balls) {
+        FakePlayer player = Modders.fresh(helper, Modders.SMITH);
+        ResearchLogic.forceUnlock(player, KnowledgeListMF.stickybomb);
+        player.inventory.clearInventory(null, -1);
+        player.inventory.currentItem = 0;
+        player.inventory.setInventorySlotContents(0, new ItemStack(Items.slime_ball, balls));
+        bench.tryCraft(player, false);
+        return player.inventory.getStackInSlot(0);
+    }
+
+    /** Slime coats a stack of bombs a ball for each; too little in hand coats none and spends none. */
+    @GameTest
+    public static void slimeCoatsEachBombWithABall(GameTestHelper helper) {
+        TileEntityBombBench bench = loaded(helper, 3);
+        for (int i = 0; i < 3; i++) press(helper, bench);
+        ItemStack bombs = bench.getStackInSlot(OUTPUT);
+        assertEquals(3, size(bombs));
+
+        assertEquals("too little slime was spent", 2, size(slime(helper, bench, 2)));
+        assertTrue("too little slime coated the stack", !sticky(bench.getStackInSlot(OUTPUT)));
+
+        assertEquals("three bombs took other than three balls", 2, size(slime(helper, bench, 5)));
+        assertTrue("the stack was not coated", sticky(bench.getStackInSlot(OUTPUT)));
+
+        assertEquals("a coated stack took slime again", 5, size(slime(helper, bench, 5)));
         helper.succeed();
     }
 }

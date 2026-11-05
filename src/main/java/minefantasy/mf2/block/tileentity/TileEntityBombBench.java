@@ -66,8 +66,7 @@ public class TileEntityBombBench extends TileEntityStation implements IBasicMetr
         boolean sticky = !pressUsed && ResearchLogic.hasInfoUnlocked(user, KnowledgeListMF.stickybomb)
                 && user.getHeldItem() != null
                 && user.getHeldItem().getItem() == Items.slime_ball;
-        if (!worldObj.isRemote && sticky && applySlime()) {
-            user.inventory.consumeInventoryItem(Items.slime_ball);
+        if (!worldObj.isRemote && sticky && applySlime(user)) {
             NetworkUtils.afterBlockUse(user);
             return true;
         }
@@ -108,16 +107,28 @@ public class TileEntityBombBench extends TileEntityStation implements IBasicMetr
         return false;
     }
 
-    private boolean applySlime() {
-        ItemStack res = getStackInSlot(4);
-
-        if (res != null && res.getItem() instanceof ItemBomb) {
-            if (res.hasTagCompound() && !res.getTagCompound().hasKey("stickyBomb")) {
-                res.getTagCompound().setBoolean("stickyBomb", true);
-                return true;
-            }
+    /**
+     * Coats the bombs in the output with slime from the hand, a ball for each bomb: the whole stack or, without slime
+     * enough in hand, none of it and nothing spent.
+     */
+    private boolean applySlime(EntityPlayer user) {
+        ItemStack res = getStackInSlot(OUTPUT_SLOT);
+        ItemStack slime = user.getHeldItem();
+        if (res == null || !(res.getItem() instanceof ItemBomb)
+                || !res.hasTagCompound()
+                || res.getTagCompound().hasKey("stickyBomb")) {
+            return false;
         }
-        return false;
+        if (slime == null || slime.getItem() != Items.slime_ball || slime.stackSize < res.stackSize) {
+            return false;
+        }
+        slime.stackSize -= res.stackSize;
+        if (slime.stackSize <= 0) {
+            user.inventory.setInventorySlotContents(user.inventory.currentItem, null);
+        }
+        res.getTagCompound().setBoolean("stickyBomb", true);
+        markDirty();
+        return true;
     }
 
     private static final RecipeId ASSEMBLY = RecipeId.of("minefantasy2", "bomb_bench/assembly");

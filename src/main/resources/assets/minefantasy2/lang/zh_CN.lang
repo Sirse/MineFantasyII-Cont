@@ -2040,7 +2040,7 @@ knowledge.bombFuse.2=你还可以制作加长导火索。这样你就可以离�
 knowledge.stickybomb=粘性炸弹
 knowledge.stickybomb.desc=抓住它！
 knowledge.stickybomb.1=正如它名字那样，它可以粘在任何与之接触的可怜家伙身上。^所以这是一种能粘住某人，造成巨大伤害的炸弹。其乐无穷！
-knowledge.stickybomb.2=制造方法：在输出槽中放入炸弹后，用粘液球右击。一个粘液球就可以黏住整组任何尺寸的炸弹。
+knowledge.stickybomb.2=制造方法：在输出槽中放入炸弹后，手持粘液球右击方块，每个炸弹需要一个粘液球。手中的粘液球不够时，不会粘上任何炸弹。
 
 $hUse of Cogworks$r^
 

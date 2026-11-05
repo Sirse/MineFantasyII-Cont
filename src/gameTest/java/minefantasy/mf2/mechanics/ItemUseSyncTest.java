@@ -195,7 +195,7 @@ public class ItemUseSyncTest {
         helper.succeed();
     }
 
-    /** Slime for a sticky bomb is taken from the first slot holding it, not the held one, and the client sees it. */
+    /** Slime for a sticky bomb is taken from the hand, a ball for the bomb, and the client sees it. */
     @GameTest
     public static void stickingABombShowsTheSlimeUsed(GameTestHelper helper) {
         helper.setBlock(1, 1, 1, BlockListMF.bombBench);
@@ -210,9 +210,9 @@ public class ItemUseSyncTest {
             ResearchLogic.forceUnlock(watcher.player, KnowledgeListMF.stickybomb);
             rightClick(watcher, bench);
             assertTrue("the bomb is sticky", tile.getStackInSlot(4).getTagCompound().getBoolean("stickyBomb"));
-            assertNull("the first slime is used", watcher.player.inventory.getStackInSlot(0));
-            assertNotNull("the held slime is kept", watcher.player.getHeldItem());
-            assertEquals("the client was not shown the slime used", 0, shownIn(watcher, 0));
+            assertNull("the held slime is used", watcher.player.getHeldItem());
+            assertNotNull("slime in another slot was used", watcher.player.inventory.getStackInSlot(0));
+            assertEquals("the client was not shown the slime used", 0, shownIn(watcher, 1));
         }
         helper.succeed();
     }
