@@ -340,6 +340,9 @@ public class CombatMechanics {
             ((IPowerAttack) weapon.getItem()).onPowerAttack(dam, user, target, properHit);
             ticks = ((IPowerAttack) weapon.getItem()).getParryModifier(weapon, user, target);
         }
+        // Damage is worked out twice, as the attack is made and as it lands: what follows comes only once, when it
+        // lands
+        if (!properHit) return;
         if (target instanceof EntityLivingBase) {
             if (ticks > Parrying.getParryCooldown((EntityLivingBase) target)) {
                 Parrying.setParryCooldown((EntityLivingBase) target, ticks);

@@ -69,7 +69,7 @@ public class ItemSpearMF extends ItemWeaponMF implements IExtendedReach {
         }
         EntityLivingBase target = (EntityLivingBase) hit;
 
-        if (wielder.isRiding() && tryPerformAbility(wielder, charge_cost)) {
+        if (wielder.isRiding() && tryPerformAbility(wielder, charge_cost, properHit, true, true, properHit)) {
             ItemWaraxeMF.brutalise(wielder, target, 1.0F);
             return damage + getMountedDamage();
         }

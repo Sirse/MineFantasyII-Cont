@@ -234,23 +234,8 @@ public class Parrying {
             }
         }
 
-        if (!user.onGround && !tryJumpEvade(user, stamModifier)) {
-            return false;
-        }
-        return tryGroundEvade(user, stamModifier);
-    }
-
-    /**
-     * If the player can slip past enemies Should be any armour but heavy
-     */
-    private static boolean tryGroundEvade(EntityLivingBase user, float cost) {
-        return ItemWeaponMF.tryPerformAbility(user, evade_cost * cost, true, false);
-    }
-
-    /**
-     * If the player can jump over enemies in evading Only ment for unarmoured/Lightarmour
-     */
-    private static boolean tryJumpEvade(EntityLivingBase user, float cost) {
-        return ItemWeaponMF.tryPerformAbility(user, jumpEvade_cost * cost, true, false);
+        // In the air the jump over and the slip past are paid together, so a dodge refused costs nothing
+        float cost = (user.onGround ? evade_cost : evade_cost + jumpEvade_cost) * stamModifier;
+        return ItemWeaponMF.tryPerformAbility(user, cost, true, false);
     }
 }

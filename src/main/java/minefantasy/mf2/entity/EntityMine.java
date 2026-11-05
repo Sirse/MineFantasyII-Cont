@@ -11,6 +11,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
+import minefantasy.mf2.api.helpers.PlayerModeHelper;
 import minefantasy.mf2.config.ConfigWeapon;
 import minefantasy.mf2.item.list.ToolListMF;
 import minefantasy.mf2.item.tool.crafting.ItemEAnvilTools;
@@ -149,6 +150,7 @@ public class EntityMine extends EntityExplosive {
         boolean sprung = false;
         for (Object value : list) {
             EntityLivingBase e = (EntityLivingBase) value;
+            if (!e.isEntityAlive() || PlayerModeHelper.isSpectator(e)) continue;
             double reach = e.isSneaking() ? radius / 2 : radius;
             if (e.getDistanceToEntity(this) >= reach || !canSee(e)) continue;
             if (isPlacer(e)) {

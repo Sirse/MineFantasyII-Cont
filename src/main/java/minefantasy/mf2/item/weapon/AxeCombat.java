@@ -30,14 +30,14 @@ final class AxeCombat {
 
         if (wielder.isSprinting()) {
             if (wielder.fallDistance > 0
-                    && ItemWeaponMF.tryPerformAbility(wielder, weapon.lunge_cost, !properHit, true, true, true)) {
+                    && ItemWeaponMF.tryPerformAbility(wielder, weapon.lunge_cost, properHit, true, true, properHit)) {
                 return chargeAt(weapon, wielder, target, true, damage, properHit);
             } else if (wielder.onGround && getHeightGap(target, wielder) <= 0.5F
-                    && ItemWeaponMF.tryPerformAbility(wielder, weapon.charge_cost)) {
+                    && ItemWeaponMF.tryPerformAbility(wielder, weapon.charge_cost, properHit, true, true, properHit)) {
                         return chargeAt(weapon, wielder, target, false, damage, properHit);
                     }
         } else if (wielder.fallDistance > 0 && !wielder.isOnLadder()
-                && ItemWeaponMF.tryPerformAbility(wielder, weapon.jump_cost)) {
+                && ItemWeaponMF.tryPerformAbility(wielder, weapon.jump_cost, properHit, true, true, properHit)) {
                     if (properHit) brutalise(wielder, target, 1.0F);
                     return damage * 1.25F;
                 }
